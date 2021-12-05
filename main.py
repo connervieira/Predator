@@ -42,6 +42,46 @@ def save_to_file(file_name, contents):
     return success
 
 
+# Define some styling information
+class style:
+    # Define colors
+    purple = '\033[95m'
+    cyan = '\033[96m'
+    blue = '\033[94m'
+    green = '\033[92m'
+    yellow = '\033[93m'
+    gray = '\033[1;37m'
+    red = '\033[91m'
+
+    # Define text decoration
+    bold = '\033[1m'
+    underline = '\033[4m'
+    italic = '\033[3m'
+    faint = '\033[2m'
+
+    # Define styling end marker
+    end = '\033[0m'
+
+
+
+
+print(style.red + style.bold)
+print(" /$$$$$$$  /$$$$$$$  /$$$$$$$$ /$$$$$$$   /$$$$$$  /$$$$$$$$ /$$$$$$  /$$$$$$$ ")
+print("| $$__  $$| $$__  $$| $$_____/| $$__  $$ /$$__  $$|__  $$__//$$__  $$| $$__  $$")
+print("| $$  \ $$| $$  \ $$| $$      | $$  \ $$| $$  \ $$   | $$  | $$  \ $$| $$  \ $$")
+print("| $$$$$$$/| $$$$$$$/| $$$$$   | $$  | $$| $$$$$$$$   | $$  | $$  | $$| $$$$$$$/")
+print("| $$____/ | $$__  $$| $$__/   | $$  | $$| $$__  $$   | $$  | $$  | $$| $$__  $$")
+print("| $$      | $$  \ $$| $$      | $$  | $$| $$  | $$   | $$  | $$  | $$| $$  \ $$")
+print("| $$      | $$  | $$| $$$$$$$$| $$$$$$$/| $$  | $$   | $$  |  $$$$$$/| $$  | $$")
+print("|__/      |__/  |__/|________/|_______/ |__/  |__/   |__/   \______/ |__/  |__/" + style.end + style.bold)
+
+print("                              _    ___ ___  ___ ")
+print("                             | |  | _ \ _ \/ __|")
+print("                             | |__|  _/   /\__ \\")
+print("                             |____|_| |_|_\\|___/")
+print(style.end)
+print("\n")
+
 
 # Get the required information from the user.
 root = input("Enter the root filepath for this project, without a forward slash at the end: ")
