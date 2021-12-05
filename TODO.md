@@ -7,6 +7,8 @@ This document explains features that may be added to Predator in the future.
 
 These are the features actively planned for Predator and are likely to be added within the near future.
 
+- [ ] The ability to view plate data in different formats.
+- [ ] The ability to modify the cropping margins for frames.
 - [ ] The ability to natively export detected license plates to an external file.
 - [ ] The ability to format detected license plates as CSV.
 
