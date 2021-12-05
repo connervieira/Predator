@@ -5,7 +5,6 @@ import sys
 
 # ----- Configuration Start -----
 crop_script_path = "/path/to/crop_image/script" # Path to the cropping script in the Predator directory.
-crop_script_path = "/home/cvieira/Software/ProgrammingLanguages/Python/Predator/crop_image"
 
 # Define frame cropping margins. These defaults are designed for a 1440p dashcam facing directly forward. You are highly encouraged to change these to better fit your camera set up.
 left_margin = "700" # How many pixels will be cropped on the left side of the frame.
