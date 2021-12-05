@@ -1,5 +1,8 @@
 # Predator
+
 A front end for OpenALPR designed to detect and record license plates in pre-recorded video
+
+![Predator LPRS header](./assets/PredatorHeader.svg)
 
 
 ## Disclaimer
