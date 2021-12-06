@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 
-**Bug Description:*
+**Bug Description:**
 A clear description of what the bug is.
 
 **Steps To Reproduce:**
