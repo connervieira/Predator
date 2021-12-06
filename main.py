@@ -6,7 +6,6 @@ import sys
 
 # ----- Configuration Start -----
 crop_script_path = "/path/to/crop_image/script" # Path to the cropping script in the Predator directory.
-crop_script_path = "/home/cvieira/Software/ProgrammingLanguages/Python/Predator/crop_image"
 ascii_art_header = True # This setting determines whether or not the large ASCII art Predator title will show on start-up. When set to False, a small, normal text title will appear instead. This is useful when running Predator on a device with a small display to avoid weird formatting.
 
 # Define frame cropping margins. These defaults are designed for a 1440p dashcam facing directly forward. You are highly encouraged to change these to better fit your camera set up.
