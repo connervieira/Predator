@@ -25,5 +25,5 @@ If applicable, add screenshots and logs to help explain your problem.
 **Setup Information:**
 - OS: [e.g. Pop!_OS Linux 20.04]
 
-**Additional Information**
+**Additional Information:**
 Add any other context about the problem here.
