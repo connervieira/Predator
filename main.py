@@ -16,7 +16,7 @@ bottom_margin = "300" # How many pixels will be cropped on the bottom of the fra
 
 
 
-print_invalid_plates = True # In real-time mode, print all plates that get invalided by the formatting rules in red. When this is set to false, only valid plates are displayed.
+print_invalid_plates = False # In real-time mode, print all plates that get invalided by the formatting rules in red. When this is set to false, only valid plates are displayed.
 realtime_guesses = "10" # This setting determines how many guesses Predator will make per plate in real-time mode. The higher this number, the less accurate guesses will be, but the more likely it will be that a plate matching the formatting guidelines is found.
 camera_resolution = "1920x1080" # This is the resolution you want to use when taking images using the connected camera. Under normal circumstances, this should be the maximum resoultion supported by your camera.
 real_time_cropping_enabled = False # This value determines whether or not each frame captured in real-time mode will be cropped.
@@ -93,6 +93,7 @@ def validate_plate(plate, template):
     return plate_valid # Return the results of the plate validation
 
 
+
 # Define some styling information
 class style:
     # Define colors
@@ -138,6 +139,28 @@ else:
     print(style.bold + "LPRS" + style.end + "\n")
 
 
+
+# Run some basic error checks to see if any of the data supplied in the configuration seems wrong.
+
+if (os.path.exists(crop_script_path) == False):
+    print(style.yellow + "Warning: The 'crop_script_path' defined in the configuration section doesn't point to a valid file. Image cropping will be broken." + style.end)
+
+if (int(left_margin) < 0 or int(right_margin) < 0 or int(bottom_margin) < 0 or int(top_margin) < 0):
+    print(style.yellow + "Warning: One or more of the cropping margins for pre-recorded mode are below 0. This should never happen, and it's likely there's a configuration issue somewhere. Cropping has been disabled." + style.end)
+    left_margin = "0"
+    right_margin = "0"
+    bottom_margin = "0"
+    top_margin = "0"
+
+if (int(real_time_left_margin) < 0 or int(real_time_right_margin) < 0 or int(real_time_bottom_margin) < 0 or int(real_time_top_margin) < 0):
+    print(style.yellow + "Warning: One or more of the cropping margins for real-time mode are below 0. This should never happen, and it's likely there's a configuration issue somewhere. Cropping has been disabled." + style.end)
+    real_time_left_margin = "0"
+    real_time_right_margin = "0"
+    real_time_bottom_margin = "0"
+    real_time_top_margin = "0"
+
+
+
 # Figure out which mode to boot into.
 
 print("Please select an operating mode.")
@@ -153,6 +176,21 @@ if (mode_selection == "1"): # The user has selected to boot into pre-recorded mo
     video = input("Please enter the file name of the video you would like to scan for license plates: ")
     framerate = float(input("Please enter how many seconds you want to wait between taking frames to analyze: "))
     license_plate_format = input("Please enter the license plate format you would like to scan for. Leave blank for all: ")
+
+
+
+    # Run some validation to make sure the information just entered by the user is correct.
+    if (os.path.exists(root) == False): # Check to see if the root directory entered by the user exists.
+        print(style.yellow + "Warning: The root project directory entered doesn't seem to exist. Predator will almost certainly fail." + style.end)
+        input("Press enter to continue...")
+
+    if (os.path.exists(root + "/" + video) == False): # Check to see if the video file name supplied by the user actually exists in the root project folder.
+        print(style.yellow + "Warning: The video file name entered doesn't seem to exist. Predator will almost certainly fail." + style.end)
+        input("Press enter to continue...")
+
+    if (len(license_plate_format) > 12): # Check to see if the license plate template supplied by the user abnormally long.
+        print(style.yellow + "Warning: The license plate template supplied is abnormally long. Predator will still be able to operate as usual, but it's possible there's been a typo, since extremely few license plates are this long." + style.end)
+        input("Press enter to continue...")
 
 
 
@@ -355,9 +393,17 @@ elif (mode_selection == "2"): # The user has selected to boot into real time mod
 
 
     # Load the alert database
-    f = open(root + "/" + alert_database, "r") # Open the user-specified datbase file.
-    alert_database_list = f.read().split() # Read each line of the file as a seperate entry in the alert database list.
-    f.close() # Close the file.
+    if (alert_database != None and alert_database != ""): # Check to see if the user has supplied a database to scan for alerts.
+        if (os.path.exists(root + "/" + alert_database)): # Check to see if the database specified by the user actually exists.
+            f = open(root + "/" + alert_database, "r") # Open the user-specified datbase file.
+            alert_database_list = f.read().split() # Read each line of the file as a seperate entry in the alert database list.
+            f.close() # Close the file.
+        else: # If the alert database specified by the user does not exist, alert the user of the error.
+            print(style.yellow + "Warning: The alert database specified at " + root + "/" + alert_database + " does not exist. Alerts have been disabled.")
+            alert_database_list = [] # Set the alert database to an empty list.
+    else: # The user has not entered in an alert database.
+        alert_database_list = [] # Set the alert database to an empty list.
+
 
 
     detected_license_plates = [] # Create an empty dictionary that will hold each frame and the potential license plates IDs.
@@ -369,9 +415,9 @@ elif (mode_selection == "2"): # The user has selected to boot into real time mod
         time.sleep(0.2) # Sleep to give the user time to quit Predator if they want to.
         print("Taking image...")
         if (save_images_preference == True): # Check to see whether or not the user wants to save all images captured by Predator.
-            os.system("fswebcam -r " + camera_resolution + " --jpeg 100 " + root + "/realtime_image" + str(i) + ".jpg >/dev/null 2>&1") # Take a photo using FSWebcam, and save it to the root project folder specified by the user.
+            os.system("fswebcam --no-banner -r " + camera_resolution + " --jpeg 100 " + root + "/realtime_image" + str(i) + ".jpg >/dev/null 2>&1") # Take a photo using FSWebcam, and save it to the root project folder specified by the user.
         else:
-            os.system("fswebcam -r " + camera_resolution + " --jpeg 100 " + root + "/realtime_image.jpg >/dev/null 2>&1") # Take a photo using FSWebcam, and save it to the root project folder specified by the user.
+            os.system("fswebcam --no-banner -r " + camera_resolution + " --jpeg 100 " + root + "/realtime_image.jpg >/dev/null 2>&1") # Take a photo using FSWebcam, and save it to the root project folder specified by the user.
         print("Done.\n----------")
 
 
@@ -382,7 +428,7 @@ elif (mode_selection == "2"): # The user has selected to boot into real time mod
                 os.system(crop_script_path + " " + root + "/realtime_image" + str(i) + ".jpg " + real_time_left_margin + " " + real_time_right_margin + " " + real_time_top_margin + " " + real_time_bottom_margin) # Execute the command to crop the image.
             else:
                 os.system(crop_script_path + " " + root + "/realtime_image.jpg " + real_time_left_margin + " " + real_time_right_margin + " " + real_time_top_margin + " " + real_time_bottom_margin) # Execute the command to crop the image.
-            print("Done.")
+            print("Done.\n----------")
             
 
 
@@ -433,7 +479,7 @@ elif (mode_selection == "2"): # The user has selected to boot into real time mod
                     print("Detected plate: " + detected_plate + "\n")
                     new_plate_detected = detected_plate
                 elif (successfully_found_plate == False):
-                    print("A plate was found, but none of the guesses matched the supplied plate format.")
+                    print("A plate was found, but none of the guesses matched the supplied plate format.\n----------")
 
         else: # No license plate was detected.
             print("Done.\n----------")
@@ -442,10 +488,12 @@ elif (mode_selection == "2"): # The user has selected to boot into real time mod
 
         # Check to see if the license plate detected (if any) is in an alert database.
         active_alert = False
-        if (new_plate_detected != ""):
-            for alert_plate in alert_database_list:
-                if (new_plate_detected == alert_plate):
-                    active_alert = True
+        if (new_plate_detected != ""): # Check to see that the new_plate_detected variable isn't blank. This variable will only have a string if a plate was detected this round.
+            for alert_plate in alert_database_list: # Run through every plate in the alert plate database supplied by the user. If no database was supplied, this list will be empty, and will not run.
+                if (new_plate_detected == alert_plate): # Check to see if the detected plate matches the current plate in the alert database as we iterate through all of them.
+                    active_alert = True # If the plate does exist in the alert database, indicate that there is an active alert by changing this variable to True. This will reset on the next round.
+
+                    # Display an alert that is starkly different from the rest of the console output.
                     print(style.yellow + style.bold)
                     print("===================")
                     print("ALERT HIT - " + new_plate_detected)
