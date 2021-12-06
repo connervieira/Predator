@@ -201,7 +201,7 @@ if (mode_selection == "1"): # The user has selected to boot into pre-recorded mo
     print("Validating license plates...")
 
     for frame in lpr_scan: # Iterate through each frame of video in the database of scanned plates.
-        lpr_scan[frame].remove(lpr_scan[frame][0]) # AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        lpr_scan[frame].remove(lpr_scan[frame][0]) # Remove the first element in the data, since it will never be a license plate. The first line of output for open ALPR doesn't contain license plates.
         for i in range(0,len(lpr_scan)): # Run repeatedly to make sure the list shifting around doesn't mix anything up.
             for plate in lpr_scan[frame]:
                 if (validate_plate(plate, license_plate_format) == False and license_plate_format != ""): # Remove the plate if it fails the validation test (and the license plate format isn't blank).
