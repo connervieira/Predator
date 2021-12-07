@@ -4,18 +4,27 @@ import subprocess
 import sys
 
 
+# ===============================
 # ----- Configuration Start -----
+# ===============================
+
+
+# ----- General configuration -----
 crop_script_path = "/path/to/crop_image/script" # Path to the cropping script in the Predator directory.
 ascii_art_header = True # This setting determines whether or not the large ASCII art Predator title will show on start-up. When set to False, a small, normal text title will appear instead. This is useful when running Predator on a device with a small display to avoid weird formatting.
-
-# Define frame cropping margins. These defaults are designed for a 1440p dashcam facing directly forward. You are highly encouraged to change these to better fit your camera set up.
-left_margin = "700" # How many pixels will be cropped on the left side of the frame.
-right_margin = "700" # How many pixels will be cropped on the right side of the frame.
-top_margin = "700" # How many pixels will be cropped on the top of the frame.
-bottom_margin = "300" # How many pixels will be cropped on the bottom of the frame.
+auto_start_mode = "2" # This variable determines whether or not automatically start in a particular mode. When empty, the user will be prompted whether to start in pre-recorded mode or in real-time mode. When set to "1", Predator will automatically select and start pre-recorded mode when launched. Contrarily, when set to "2", Predator will automatically select and start real-time mode when launched.
 
 
 
+# ----- Pre-recorded mode configuration -----
+left_margin = "700" # How many pixels will be cropped on the left side of the frame in pre-recorded mode.
+right_margin = "700" # How many pixels will be cropped on the right side of the frame in pre-recorded mode.
+top_margin = "700" # How many pixels will be cropped on the top of the frame in pre-recorded mode.
+bottom_margin = "300" # How many pixels will be cropped on the bottom of the frame in pre-recorded mode.
+
+
+
+# ----- Real-time mode configuration -----
 print_invalid_plates = False # In real-time mode, print all plates that get invalided by the formatting rules in red. When this is set to false, only valid plates are displayed.
 realtime_guesses = "10" # This setting determines how many guesses Predator will make per plate in real-time mode. The higher this number, the less accurate guesses will be, but the more likely it will be that a plate matching the formatting guidelines is found.
 camera_resolution = "1920x1080" # This is the resolution you want to use when taking images using the connected camera. Under normal circumstances, this should be the maximum resoultion supported by your camera.
@@ -25,7 +34,18 @@ real_time_right_margin = "200" # How many pixels will be cropped from the right 
 real_time_top_margin = "100" # How many pixels will be cropped from the bottom side of the frame in real-time mode.
 real_time_bottom_margin = "100" # How many pixels will be cropped from the top side of the frame in real-time mode.
 
+# Default settings
+default_root = "/home/cvieira/Downloads" # If this variable isn't empty, the "root directory" prompt will be skipped when starting in real-time mode. This variable will be used as the root directory.
+default_alert_database = " " # If this variable isn't empty, the "alert database" prompt will be skipped when starting in real-time mode. This variable will be used as the alert database. Add a single space to skip this prompt without specifying a database.
+default_save_license_plates_preference = "n" # If this variable isn't empty, the "save license plates" prompt will be skipped when starting in real-time mode. If this variable is set to "y", license plates will be saved.
+default_save_images_preference = "n" # If this variable isn't empty, the "save images" prompt will be skipped when starting in real-time mode. If this variable is set to "y", all images will be saved.
+default_license_plate_format = "aaa0000" # If this variable isn't empty, the "license plate format" prompt will be skipped when starting in real-time mode. This variable will be used as the license plate format.
+
+
+
+# =============================
 # ----- Configuration End -----
+# =============================
 
 
 # Define the function that will be used to clear the screen.
@@ -162,12 +182,24 @@ if (int(real_time_left_margin) < 0 or int(real_time_right_margin) < 0 or int(rea
 
 
 # Figure out which mode to boot into.
-
 print("Please select an operating mode.")
 print("1. Pre-recorded")
 print("2. Real time")
 
-mode_selection = input("Selection: ")
+# Check to see if the auto_start_mode configuration value is an expected value. If it isn't execution can continue, but the user will need to manually select what mode Predator should start in.
+if (auto_start_mode != "" and auto_start_mode != "1" and auto_start_mode != "2"):
+    print(style.yellow + "Warning: The 'auto_start_mode' configuration value isn't properly set. This value should be blank, '1', or '2'. It's possible there's been a typo." + style.end)
+
+if (auto_start_mode == "1"): # Based on the configuration, Predator will automatically boot into pre-recorded mode.
+    print(style.bold + "Automatically starting into pre-recorded mode based on the auto_start_mode configuration value." + style.end)
+    mode_selection = "1"
+elif (auto_start_mode == "2"): # Based on the configuration, Predator will automatically boot into real-time mode.
+    print(style.bold + "Automatically starting into real-time mode based on the auto_start_mode configuration value." + style.end)
+    mode_selection = "2"
+else: # No 'auto start mode' has been configured, so ask the user to select manually.
+    mode_selection = input("Selection: ")
+
+
 
 
 if (mode_selection == "1"): # The user has selected to boot into pre-recorded mode.
@@ -373,20 +405,50 @@ if (mode_selection == "1"): # The user has selected to boot into pre-recorded mo
 
 
 elif (mode_selection == "2"): # The user has selected to boot into real time mode.
-    root = input("Enter the root filepath for this project, without a forward slash at the end: ")
-    alert_database = input("Enter the file name of the database you would like to scan for alert. Leave blank for none: ")
-    save_license_plates_preference = input("Would you like to save all of the license plates detected? (y/n): ")
-    save_images_preference = input("Would you like to save all of the images taken? (y/n): ")
-    license_plate_format = input("Please enter the license plate format you would like to scan for. Leave blank for all: ")
+
+    # Configure the user's preferences for this session.
+    if (default_root != ""): # Check to see if the user has configured a default for this preference.
+        print(style.bold + "Using default preference for root directory." + style.end)
+        root = default_root
+    else:
+        root = input("Enter the root filepath for this project, without a forward slash at the end: ")
+
+    if (default_alert_database != ""): # Check to see if the user has configured a default for this preference.
+        print(style.bold + "Using default preference for alert database." + style.end)
+        if (default_alert_database == " "): # If the default alert database is configured as a single space, then skip the prompt, but don't load an alert database.
+            alert_database = ""
+        else:
+            alert_database = default_alert_database
+    else:
+        alert_database = input("Enter the file name of the database you would like to scan for alerts. Leave blank for none: ")
+
+    if (default_save_license_plates_preference != ""): # Check to see if the user has configured a default for this preference.
+        print(style.bold + "Using default preference for license plate saving." + style.end)
+        save_license_plates_preference = default_save_license_plates_preference
+    else:
+        save_license_plates_preference = input("Would you like to save all of the license plates detected? (y/n): ")
+
+    if (default_save_images_preference != ""): # Check to see if the user has configured a default for this preference.
+        print(style.bold + "Using default preference for image saving." + style.end)
+        save_images_preference = default_save_images_preference
+    else:
+        save_images_preference = input("Would you like to save all of the images taken? (y/n): ")
+
+
+    if (default_license_plate_format != ""): # Check to see if the user has configured a default for this preference.
+        print(style.bold + "Using default preference for license plate formatting." + style.end)
+        license_plate_format = default_license_plate_format
+    else:
+        license_plate_format = input("Please enter the license plate format you would like to scan for. Leave blank for all: ")
 
 
     # Save yes/no preferences as boolean values for easier access.
-    if (save_license_plates_preference == "y"):
+    if (save_license_plates_preference.lower() == "y"):
         save_license_plates_preference = True
     else:
         save_license_plates_preference = False
 
-    if (save_images_preference == "y"):
+    if (save_images_preference.lower() == "y"):
         save_images_preference = True
     else:
         save_images_preference = False

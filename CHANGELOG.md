@@ -68,3 +68,14 @@ December 6th, 2021
 ### Hard-wire update
 
 This update contains enhancements that make it much easier to install Predator in a hard-wire context, where Predator is seamlessly integrated with a more complete system in a car, building, or other location.
+
+December 8th, 2021
+
+- Added support for 'auto start'.
+    - In the script configuration, the user can configure Predator to automatically start into either pre-recorded mode or real-time mode without asking for confirmation.
+    - Added optional default preferences for real-time mode.
+        - Each preference can be individually pre-set in the configuration. Any values pre-set will have their prompts skipped when starting real-time mode.
+    - Predator can now be configured to automatically load into real-time mode after starting without any user intervention.
+    - For sake of debugging, messages will appear each time a prompt is skipped to inform the user why Predator is auto-starting.
+- Yes/no preferences are no longer case-sensitive
+    - Preferences that take input as 'y' or 'n' will be interpreted appropriate regardless of whether the character is capitalized.
