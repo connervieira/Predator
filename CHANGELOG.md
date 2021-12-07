@@ -16,6 +16,8 @@ December 4th, 2021
 
 ### First stable release
 
+This is the first stable release of Predator, and contains the ability to detect license plates in pre-recorded video.
+
 December 5th, 2021
 
 - Added a basic command line menu based user interface for managing data after analysis
@@ -30,6 +32,8 @@ December 5th, 2021
 ## Version 2.0
 
 ### Real-time update
+
+This is the 'real-time update' of Predator, and adds real-time mode to Predator, where plates can be detected on a second-by-second basis, with automatic alerts and logging.
 
 December 6th, 2021
 
@@ -58,3 +62,9 @@ December 6th, 2021
 - Made the license plate validation system much faster and easily customizable.
     - License plate validation now uses a function for easy customization. For example, the state of Ohio typically follows the format of AAA0000 on their license plates, while other states don't, so the function allows you to submit a plate along side a validation format template.
     - There is now a preference prompt for both pre-recorded and real-time mode that asks for a license plate validation template/example.
+
+## Version 3.0
+
+### Hard-wire update
+
+This update contains enhancements that make it much easier to install Predator in a hard-wire context, where Predator is seamlessly integrated with a more complete system in a car, building, or other location.
