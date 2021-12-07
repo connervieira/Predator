@@ -392,6 +392,12 @@ elif (mode_selection == "2"): # The user has selected to boot into real time mod
         save_images_preference = False
 
 
+
+    if (os.path.exists(root) == False): # Check to see if the root directory entered by the user exists.
+        print(style.yellow + "Warning: The root project directory entered doesn't seem to exist. Predator will almost certainly fail." + style.end)
+        input("Press enter to continue...")
+
+
     # Load the alert database
     if (alert_database != None and alert_database != ""): # Check to see if the user has supplied a database to scan for alerts.
         if (os.path.exists(root + "/" + alert_database)): # Check to see if the database specified by the user actually exists.
@@ -399,7 +405,7 @@ elif (mode_selection == "2"): # The user has selected to boot into real time mod
             alert_database_list = f.read().split() # Read each line of the file as a seperate entry in the alert database list.
             f.close() # Close the file.
         else: # If the alert database specified by the user does not exist, alert the user of the error.
-            print(style.yellow + "Warning: The alert database specified at " + root + "/" + alert_database + " does not exist. Alerts have been disabled.")
+            print(style.yellow + "Warning: The alert database specified at " + root + "/" + alert_database + " does not exist. Alerts have been disabled." + style.end)
             alert_database_list = [] # Set the alert database to an empty list.
     else: # The user has not entered in an alert database.
         alert_database_list = [] # Set the alert database to an empty list.
