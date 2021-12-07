@@ -28,3 +28,4 @@ These are features that require more in-depth changes, and are purely hypothetic
 - [ ] The ability to process multiple sequential videos at once.
 - [ ] The ability to correlate license plate detects with GPS data from a GPX file.
 - [ ] De-duplication of license plates that aren't identical, but are very similar and likely to be invalid repeats of the same plate.
+- [ ] The ability to black out parts of frames in real-time and pre-recorded mode to further refine where Predator will scan for license plates.
