@@ -79,3 +79,5 @@ December 8th, 2021
     - For sake of debugging, messages will appear each time a prompt is skipped to inform the user why Predator is auto-starting.
 - Yes/no preferences are no longer case-sensitive
     - Preferences that take input as 'y' or 'n' will be interpreted appropriate regardless of whether the character is capitalized.
+- Added the ability to specify the alert database in real-time mode as a web URL.
+    - When a URL is detected, Predator will request the file at the URL specified, and attempt to interpret it as an alert database the same way it would for a local file.

@@ -2,6 +2,11 @@ import os
 import time
 import subprocess
 import sys
+import urllib.request
+import re
+import validators
+
+
 
 
 # ===============================
@@ -12,7 +17,7 @@ import sys
 # ----- General configuration -----
 crop_script_path = "/path/to/crop_image/script" # Path to the cropping script in the Predator directory.
 ascii_art_header = True # This setting determines whether or not the large ASCII art Predator title will show on start-up. When set to False, a small, normal text title will appear instead. This is useful when running Predator on a device with a small display to avoid weird formatting.
-auto_start_mode = "2" # This variable determines whether or not automatically start in a particular mode. When empty, the user will be prompted whether to start in pre-recorded mode or in real-time mode. When set to "1", Predator will automatically select and start pre-recorded mode when launched. Contrarily, when set to "2", Predator will automatically select and start real-time mode when launched.
+auto_start_mode = "" # This variable determines whether or not automatically start in a particular mode. When empty, the user will be prompted whether to start in pre-recorded mode or in real-time mode. When set to "1", Predator will automatically select and start pre-recorded mode when launched. Contrarily, when set to "2", Predator will automatically select and start real-time mode when launched.
 
 
 
@@ -35,11 +40,11 @@ real_time_top_margin = "100" # How many pixels will be cropped from the bottom s
 real_time_bottom_margin = "100" # How many pixels will be cropped from the top side of the frame in real-time mode.
 
 # Default settings
-default_root = "/home/cvieira/Downloads" # If this variable isn't empty, the "root directory" prompt will be skipped when starting in real-time mode. This variable will be used as the root directory.
-default_alert_database = " " # If this variable isn't empty, the "alert database" prompt will be skipped when starting in real-time mode. This variable will be used as the alert database. Add a single space to skip this prompt without specifying a database.
-default_save_license_plates_preference = "n" # If this variable isn't empty, the "save license plates" prompt will be skipped when starting in real-time mode. If this variable is set to "y", license plates will be saved.
-default_save_images_preference = "n" # If this variable isn't empty, the "save images" prompt will be skipped when starting in real-time mode. If this variable is set to "y", all images will be saved.
-default_license_plate_format = "aaa0000" # If this variable isn't empty, the "license plate format" prompt will be skipped when starting in real-time mode. This variable will be used as the license plate format.
+default_root = "" # If this variable isn't empty, the "root directory" prompt will be skipped when starting in real-time mode. This variable will be used as the root directory.
+default_alert_database = "" # If this variable isn't empty, the "alert database" prompt will be skipped when starting in real-time mode. This variable will be used as the alert database. Add a single space to skip this prompt without specifying a database.
+default_save_license_plates_preference = "" # If this variable isn't empty, the "save license plates" prompt will be skipped when starting in real-time mode. If this variable is set to "y", license plates will be saved.
+default_save_images_preference = "" # If this variable isn't empty, the "save images" prompt will be skipped when starting in real-time mode. If this variable is set to "y", all images will be saved.
+default_license_plate_format = "" # If this variable isn't empty, the "license plate format" prompt will be skipped when starting in real-time mode. This variable will be used as the license plate format.
 
 
 
@@ -112,6 +117,19 @@ def validate_plate(plate, template):
 
     return plate_valid # Return the results of the plate validation
 
+
+
+def download_plate_database(url):
+    raw_download_data = urllib.request.urlopen(url).read() # Save the raw data from the URL to a variable.
+
+    # Process the downloaded data step by step to form a list of all of the plates in the database.
+    processed_download_data = str(raw_download_data) # Convert the downloaded data to a string.
+    processed_download_data = processed_download_data.replace("\\n", "\n") # Replace the indicated line-breaks with true line-breaks.
+    processed_download_data = re.sub('([^A-Z0-9\\n\\r])+', '', processed_download_data) # Remove all chracters except capital letters, numbers, and line-breaks.
+
+    download_data_list = processed_download_data.split() # Split the downloaded data line-by-line into a Python list.
+
+    return download_data_list
 
 
 # Define some styling information
@@ -420,7 +438,7 @@ elif (mode_selection == "2"): # The user has selected to boot into real time mod
         else:
             alert_database = default_alert_database
     else:
-        alert_database = input("Enter the file name of the database you would like to scan for alerts. Leave blank for none: ")
+        alert_database = input("Enter the file name of the database you would like to scan for alerts. Leave blank for none. If a compatible URL entered, the database will be downloaded from the URL: ")
 
     if (default_save_license_plates_preference != ""): # Check to see if the user has configured a default for this preference.
         print(style.bold + "Using default preference for license plate saving." + style.end)
@@ -462,12 +480,17 @@ elif (mode_selection == "2"): # The user has selected to boot into real time mod
 
     # Load the alert database
     if (alert_database != None and alert_database != ""): # Check to see if the user has supplied a database to scan for alerts.
-        if (os.path.exists(root + "/" + alert_database)): # Check to see if the database specified by the user actually exists.
-            f = open(root + "/" + alert_database, "r") # Open the user-specified datbase file.
-            alert_database_list = f.read().split() # Read each line of the file as a seperate entry in the alert database list.
-            f.close() # Close the file.
-        else: # If the alert database specified by the user does not exist, alert the user of the error.
-            print(style.yellow + "Warning: The alert database specified at " + root + "/" + alert_database + " does not exist. Alerts have been disabled." + style.end)
+
+        if (validators.url(alert_database)): # Check to see if the user supplied a URL as their alert database.
+            # If so, download the data at the URL as the databse.
+            alert_database_list = download_plate_database(alert_database)
+        else: # The input the user supplied doesn't appear to be a URL.
+            if (os.path.exists(root + "/" + alert_database)): # Check to see if the database specified by the user actually exists.
+                f = open(root + "/" + alert_database, "r") # Open the user-specified datbase file.
+                alert_database_list = f.read().split() # Read each line of the file as a seperate entry in the alert database list.
+                f.close() # Close the file.
+            else: # If the alert database specified by the user does not exist, alert the user of the error.
+                print(style.yellow + "Warning: The alert database specified at " + root + "/" + alert_database + " does not exist. Alerts have been disabled." + style.end)
             alert_database_list = [] # Set the alert database to an empty list.
     else: # The user has not entered in an alert database.
         alert_database_list = [] # Set the alert database to an empty list.

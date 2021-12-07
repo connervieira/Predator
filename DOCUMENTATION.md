@@ -19,7 +19,9 @@ This is the installation process for Predator and all of it's dependencies.
     - You can learn about the ImageMagick installation process at <https://imagemagick.org/script/download.php>
 4. Install FSWebcam
     - Predator uses FSWebcam to access cameras when using real-time mode.
-    -You can install FSWebcam using the following command on a Debian based Linux machine: `sudo apt-get install fswebcam`
+    - You can install FSWebcam using the following command on a Debian based Linux machine: `sudo apt-get install fswebcam`
+5. Install the `validators` Python package.
+    - `pip3 install validators`
 4. Download Predator.
     - Predator can be downloaded either from the V0LT website, or from it's GitHub page. The download straight from the V0LT website is recommended for sake of stability and completeness, but you're free to use GitHub as well if you're OK with using a less stable version of Predator.
     - V0LT website: <https://v0lttech.com/predator.php>
@@ -87,6 +89,7 @@ After configuring Predator, you can try it out for the first time!
             - Example: `/home/cvieira/Downloads/MyProjectFolder`
         - Next, you'll be asked for an alert database. An alert database is simply a plain text file containing a list of license plates you want Predator to display an alert for.
             - This alert database should have one license plate per line, and no other characters.
+            - This preference also accepts URLs. If a URL is entered, Predator will download the list of plates from a plain text file hosted at the URL specified.
             - If you leave this blank, no alerts will be displayed.
         - Next, you'll be asked whether or not you want to save the license plates detected by Predator in real-time mode. When this turned on, Predator will automatically save every plate it detects in a file named `real_time_plates.csv` in the root project directory, along with a timestamp and whether or not the plate was in the alert database you specified before.
             - This file follows this format: `PLATE,timestamp,alert_status`
