@@ -15,8 +15,8 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Support for saving real-time license plate readings to a file.
 - [X] Support for saving all images taken in real-time mode to disk.
 - [X] Real-time alerts for detected license plates based on a text file.
-- [ ] The ability to autmatically submit plates detected in real-time to a webhook.
-- [ ] The ability to configure Predator to automatically start up in real-time mode using pre-configured preferences.
+- [X] The ability to configure Predator to automatically start up in real-time mode using pre-configured preferences.
+- [ ] The ability to automatically submit plates detected in real-time to a webhook.
 - [ ] The ability to download alert databases from the internet.
 
 
