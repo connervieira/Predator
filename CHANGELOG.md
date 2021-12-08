@@ -81,3 +81,4 @@ December 8th, 2021
     - Preferences that take input as 'y' or 'n' will be interpreted appropriate regardless of whether the character is capitalized.
 - Added the ability to specify the alert database in real-time mode as a web URL.
     - When a URL is detected, Predator will request the file at the URL specified, and attempt to interpret it as an alert database the same way it would for a local file.
+- Added the ability to set custom command arguments for FSWebcam, in case customizations need to be made to optimize performance on a camera-by-camera basis.
