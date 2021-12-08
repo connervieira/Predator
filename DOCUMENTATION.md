@@ -58,6 +58,9 @@ After installing Predator, you'll need to do some quick configuration to be able
 6. Configure the real-time camera resolution.
     - The `camera_resolution` setting determines the resolution that Predator will use in real-time mode.
     - This setting should usually be set to the maximum resolution supported by the camera, but there might be situations in which it makes sense to reduce this to save storage.
+7. Configure other optional values.
+    - All configuration values are extensively describes in the comments beside them.
+    - Make changes to any of the configuration values to better fit your usage situation.
 
 
 ## Usage

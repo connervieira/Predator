@@ -38,6 +38,7 @@ real_time_left_margin = "200" # How many pixels will be cropped from the left si
 real_time_right_margin = "200" # How many pixels will be cropped from the right side of the frame in real-time mode.
 real_time_top_margin = "100" # How many pixels will be cropped from the bottom side of the frame in real-time mode.
 real_time_bottom_margin = "100" # How many pixels will be cropped from the top side of the frame in real-time mode.
+fswebcam_flags = "--set brightness=100%" # These are command flags that will be added to the end of the FSWebcam command. You can use these to customize how FSWebcam takes images in real-time mode based on your camera set up.
 
 # Default settings
 default_root = "" # If this variable isn't empty, the "root directory" prompt will be skipped when starting in real-time mode. This variable will be used as the root directory.
@@ -506,9 +507,9 @@ elif (mode_selection == "2"): # The user has selected to boot into real time mod
         time.sleep(0.2) # Sleep to give the user time to quit Predator if they want to.
         print("Taking image...")
         if (save_images_preference == True): # Check to see whether or not the user wants to save all images captured by Predator.
-            os.system("fswebcam --no-banner -r " + camera_resolution + " --jpeg 100 " + root + "/realtime_image" + str(i) + ".jpg >/dev/null 2>&1") # Take a photo using FSWebcam, and save it to the root project folder specified by the user.
+            os.system("fswebcam --no-banner -r " + camera_resolution + " --jpeg 100 " + fswebcam_flags + " " + root + "/realtime_image" + str(i) + ".jpg >/dev/null 2>&1") # Take a photo using FSWebcam, and save it to the root project folder specified by the user.
         else:
-            os.system("fswebcam --no-banner -r " + camera_resolution + " --jpeg 100 " + root + "/realtime_image.jpg >/dev/null 2>&1") # Take a photo using FSWebcam, and save it to the root project folder specified by the user.
+            os.system("fswebcam --no-banner -r " + camera_resolution + " --jpeg 100 " + fswebcam_flags + " " + root + "/realtime_image.jpg >/dev/null 2>&1") # Take a photo using FSWebcam, and save it to the root project folder specified by the user.
         print("Done.\n----------")
 
 
