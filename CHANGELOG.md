@@ -75,6 +75,7 @@ December 8th, 2021
     - In the script configuration, the user can configure Predator to automatically start into either pre-recorded mode or real-time mode without asking for confirmation.
     - Added optional default preferences for real-time mode.
         - Each preference can be individually pre-set in the configuration. Any values pre-set will have their prompts skipped when starting real-time mode.
+        - Preferences like 'alert database' and 'license plate format' can be skipped without providing a value by setting their default value to a single space.
     - Predator can now be configured to automatically load into real-time mode after starting without any user intervention.
     - For sake of debugging, messages will appear each time a prompt is skipped to inform the user why Predator is auto-starting.
 - Yes/no preferences are no longer case-sensitive
