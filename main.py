@@ -456,7 +456,10 @@ elif (mode_selection == "2"): # The user has selected to boot into real time mod
 
     if (default_license_plate_format != ""): # Check to see if the user has configured a default for this preference.
         print(style.bold + "Using default preference for license plate formatting." + style.end)
-        license_plate_format = default_license_plate_format
+        if (default_license_plate_format == " "): # If the default license plate format is configured as a single space, then skip the prompt, but don't load a license format guideline.
+            license_plate_format = ""
+        else:
+            license_plate_format = default_license_plate_format
     else:
         license_plate_format = input("Please enter the license plate format you would like to scan for. Leave blank for all: ")
 
