@@ -5,6 +5,7 @@ import sys
 import urllib.request
 import re
 import validators
+from playsound import playsound
 
 
 
@@ -17,7 +18,7 @@ import validators
 # ----- General configuration -----
 crop_script_path = "/path/to/crop_image/script" # Path to the cropping script in the Predator directory.
 ascii_art_header = True # This setting determines whether or not the large ASCII art Predator title will show on start-up. When set to False, a small, normal text title will appear instead. This is useful when running Predator on a device with a small display to avoid weird formatting.
-auto_start_mode = "" # This variable determines whether or not automatically start in a particular mode. When empty, the user will be prompted whether to start in pre-recorded mode or in real-time mode. When set to "1", Predator will automatically select and start pre-recorded mode when launched. Contrarily, when set to "2", Predator will automatically select and start real-time mode when launched.
+auto_start_mode = "2" # This variable determines whether or not automatically start in a particular mode. When empty, the user will be prompted whether to start in pre-recorded mode or in real-time mode. When set to "1", Predator will automatically select and start pre-recorded mode when launched. Contrarily, when set to "2", Predator will automatically select and start real-time mode when launched.
 
 
 
@@ -38,14 +39,15 @@ real_time_left_margin = "200" # How many pixels will be cropped from the left si
 real_time_right_margin = "200" # How many pixels will be cropped from the right side of the frame in real-time mode.
 real_time_top_margin = "100" # How many pixels will be cropped from the bottom side of the frame in real-time mode.
 real_time_bottom_margin = "100" # How many pixels will be cropped from the top side of the frame in real-time mode.
-fswebcam_flags = "--set brightness=100%" # These are command flags that will be added to the end of the FSWebcam command. You can use these to customize how FSWebcam takes images in real-time mode based on your camera set up.
+fswebcam_flags = "--set brightness=50%" # These are command flags that will be added to the end of the FSWebcam command. You can use these to customize how FSWebcam takes images in real-time mode based on your camera set up.
+audio_alerts = True # This setting determines whether or not Predator will make use of sounds to inform the user of events.
 
 # Default settings
-default_root = "" # If this variable isn't empty, the "root directory" prompt will be skipped when starting in real-time mode. This variable will be used as the root directory.
-default_alert_database = "" # If this variable isn't empty, the "alert database" prompt will be skipped when starting in real-time mode. This variable will be used as the alert database. Add a single space to skip this prompt without specifying a database.
-default_save_license_plates_preference = "" # If this variable isn't empty, the "save license plates" prompt will be skipped when starting in real-time mode. If this variable is set to "y", license plates will be saved.
-default_save_images_preference = "" # If this variable isn't empty, the "save images" prompt will be skipped when starting in real-time mode. If this variable is set to "y", all images will be saved.
-default_license_plate_format = "" # If this variable isn't empty, the "license plate format" prompt will be skipped when starting in real-time mode. This variable will be used as the license plate format.
+default_root = "/home/cvieira/Downloads" # If this variable isn't empty, the "root directory" prompt will be skipped when starting in real-time mode. This variable will be used as the root directory.
+default_alert_database = "alerts.txt" # If this variable isn't empty, the "alert database" prompt will be skipped when starting in real-time mode. This variable will be used as the alert database. Add a single space to skip this prompt without specifying a database.
+default_save_license_plates_preference = "n" # If this variable isn't empty, the "save license plates" prompt will be skipped when starting in real-time mode. If this variable is set to "y", license plates will be saved.
+default_save_images_preference = "n" # If this variable isn't empty, the "save images" prompt will be skipped when starting in real-time mode. If this variable is set to "y", all images will be saved.
+default_license_plate_format = "aaa0000" # If this variable isn't empty, the "license plate format" prompt will be skipped when starting in real-time mode. This variable will be used as the license plate format.
 
 
 
@@ -176,6 +178,8 @@ if (ascii_art_header == True): # Check to see whether the user has configured th
 else:
     print(style.red + style.bold + "Predator" + style.end)
     print(style.bold + "LPRS" + style.end + "\n")
+
+#playsound("assets/sounds/testnoise.mp3", False)
 
 
 
@@ -484,21 +488,20 @@ elif (mode_selection == "2"): # The user has selected to boot into real time mod
 
     # Load the alert database
     if (alert_database != None and alert_database != ""): # Check to see if the user has supplied a database to scan for alerts.
-
         if (validators.url(alert_database)): # Check to see if the user supplied a URL as their alert database.
             # If so, download the data at the URL as the databse.
             alert_database_list = download_plate_database(alert_database)
         else: # The input the user supplied doesn't appear to be a URL.
             if (os.path.exists(root + "/" + alert_database)): # Check to see if the database specified by the user actually exists.
                 f = open(root + "/" + alert_database, "r") # Open the user-specified datbase file.
-                alert_database_list = f.read().split() # Read each line of the file as a seperate entry in the alert database list.
+                file_contents = f.read() # Read the file.
+                alert_database_list = file_contents.split() # Read each line of the file as a seperate entry in the alert database list.
                 f.close() # Close the file.
             else: # If the alert database specified by the user does not exist, alert the user of the error.
                 print(style.yellow + "Warning: The alert database specified at " + root + "/" + alert_database + " does not exist. Alerts have been disabled." + style.end)
-            alert_database_list = [] # Set the alert database to an empty list.
+                alert_database_list = [] # Set the alert database to an empty list.
     else: # The user has not entered in an alert database.
         alert_database_list = [] # Set the alert database to an empty list.
-
 
 
     detected_license_plates = [] # Create an empty dictionary that will hold each frame and the potential license plates IDs.
@@ -572,6 +575,8 @@ elif (mode_selection == "2"): # The user has selected to boot into real time mod
                 if (successfully_found_plate == True):
                     detected_license_plates.append(detected_plate) # Save the most likely license plate ID to the detected_license_plates list.
                     print("Detected plate: " + detected_plate + "\n")
+                    if (audio_alerts == True): # Check to see if the user has audio alerts enabled.
+                        playsound("assets/sounds/platedetected.mp3", False) # Play the subtle alert sound.
                     new_plate_detected = detected_plate
                 elif (successfully_found_plate == False):
                     print("A plate was found, but none of the guesses matched the supplied plate format.\n----------")
@@ -594,6 +599,8 @@ elif (mode_selection == "2"): # The user has selected to boot into real time mod
                     print("ALERT HIT - " + new_plate_detected)
                     print("===================")
                     print(style.end)
+                    if (audio_alerts == True): # Check to see if the user has audio alerts enabled.
+                        playsound("assets/sounds/alerthit.mp3", False) # Play the prominent alert sound.
 
         if (save_license_plates_preference == True): # Check to see if the user has the 'save detected license plates' preference enabled.
             if (new_plate_detected != ""): # Check to see if the new_plate_detected value is blank. If it is blank, that means no new plate was detected this round.

@@ -68,6 +68,9 @@ Configuration values in this section are settings specific to real-time mode.
     - Example:
         - `--set brightness=100% -F 15 -S 5`
     - For more information on what this setting can be used for, see the FSWebcam documentation by running `man fswebcam`.
+- `audio_alerts`
+    - This setting determines whether or not Predator will make use of audible alerts.
+    - With this is set to `True`, Predator will play subtle alert noises when a plate is detected, and much more prominent noises when a plate in an alert database is detected.
 
 ### Real-time Mode Default Settings
 
