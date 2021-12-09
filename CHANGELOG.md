@@ -89,3 +89,7 @@ December 8th, 2021
     - All sounds can be found in the `/assets/sounds/` directory.
 - Added warning messages when the user enters an invalid selection in pre-recorded mode.
 - Added a simple statistics viewer for pre-recorded mode.
+
+## Version 3.1
+
+- Changed the audio backend from Python playsound to mpg321 in order to fix audio on Raspberry Pi.
