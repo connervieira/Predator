@@ -62,16 +62,16 @@ Predator is extremely customizable, making it easy to fit into any use case.
 
 When operating in real-time mode, Predator can display alerts when it detects a plate found in a configured database.
 
-![Alert hit sample image](./screenshots/alerthit.png)
+![Alert hit sample image](./assets/images/screenshots/alerthit.png)
 
 ### Pre-recorded Mode Sample Image
 
 While operating in pre-recorded mode, Predator can analyze any video, including dashcam video
 
-![Dashcam sample image](./screenshots/dashcamsample.png)
+![Dashcam sample image](./assets/images/screenshots/dashcamsample.png)
 
 ### Pre-recorded Sample Analysis
 
 After scanning through an entire pre-recorded video based on user-configured preferences, Predator can display and export all of the plates it detected.
 
-![Dashcam analysis output](./screenshots/dashcamdetect.png)
+![Dashcam analysis output](./assets/images/screenshots/dashcamdetect.png)
