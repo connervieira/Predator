@@ -16,9 +16,9 @@ from playsound import playsound
 
 
 # ----- General configuration -----
-crop_script_path = "/path/to/crop_image/script" # Path to the cropping script in the Predator directory.
+crop_script_path = str(os.path.dirname(__file__)) + "/crop_image" # Path to the cropping script in the Predator directory.
 ascii_art_header = True # This setting determines whether or not the large ASCII art Predator title will show on start-up. When set to False, a small, normal text title will appear instead. This is useful when running Predator on a device with a small display to avoid weird formatting.
-auto_start_mode = "2" # This variable determines whether or not automatically start in a particular mode. When empty, the user will be prompted whether to start in pre-recorded mode or in real-time mode. When set to "1", Predator will automatically select and start pre-recorded mode when launched. Contrarily, when set to "2", Predator will automatically select and start real-time mode when launched.
+auto_start_mode = "" # This variable determines whether or not automatically start in a particular mode. When empty, the user will be prompted whether to start in pre-recorded mode or in real-time mode. When set to "1", Predator will automatically select and start pre-recorded mode when launched. Contrarily, when set to "2", Predator will automatically select and start real-time mode when launched.
 
 
 
@@ -35,19 +35,20 @@ print_invalid_plates = False # In real-time mode, print all plates that get inva
 realtime_guesses = "10" # This setting determines how many guesses Predator will make per plate in real-time mode. The higher this number, the less accurate guesses will be, but the more likely it will be that a plate matching the formatting guidelines is found.
 camera_resolution = "1920x1080" # This is the resolution you want to use when taking images using the connected camera. Under normal circumstances, this should be the maximum resoultion supported by your camera.
 real_time_cropping_enabled = False # This value determines whether or not each frame captured in real-time mode will be cropped.
-real_time_left_margin = "200" # How many pixels will be cropped from the left side of the frame in real-time mode.
-real_time_right_margin = "200" # How many pixels will be cropped from the right side of the frame in real-time mode.
-real_time_top_margin = "100" # How many pixels will be cropped from the bottom side of the frame in real-time mode.
-real_time_bottom_margin = "100" # How many pixels will be cropped from the top side of the frame in real-time mode.
+real_time_left_margin = "400" # How many pixels will be cropped from the left side of the frame in real-time mode.
+real_time_right_margin = "400" # How many pixels will be cropped from the right side of the frame in real-time mode.
+real_time_top_margin = "200" # How many pixels will be cropped from the bottom side of the frame in real-time mode.
+real_time_bottom_margin = "200" # How many pixels will be cropped from the top side of the frame in real-time mode.
 fswebcam_flags = "--set brightness=50%" # These are command flags that will be added to the end of the FSWebcam command. You can use these to customize how FSWebcam takes images in real-time mode based on your camera set up.
 audio_alerts = True # This setting determines whether or not Predator will make use of sounds to inform the user of events.
+webhook = "" # This setting can be used to define a webhook that Predator will send a request to when it detects a license plate in real-time mode. See CONFIGURATION.md to learn more about how to use flags in this setting.
 
 # Default settings
-default_root = "/home/cvieira/Downloads" # If this variable isn't empty, the "root directory" prompt will be skipped when starting in real-time mode. This variable will be used as the root directory.
-default_alert_database = "alerts.txt" # If this variable isn't empty, the "alert database" prompt will be skipped when starting in real-time mode. This variable will be used as the alert database. Add a single space to skip this prompt without specifying a database.
-default_save_license_plates_preference = "n" # If this variable isn't empty, the "save license plates" prompt will be skipped when starting in real-time mode. If this variable is set to "y", license plates will be saved.
-default_save_images_preference = "n" # If this variable isn't empty, the "save images" prompt will be skipped when starting in real-time mode. If this variable is set to "y", all images will be saved.
-default_license_plate_format = "aaa0000" # If this variable isn't empty, the "license plate format" prompt will be skipped when starting in real-time mode. This variable will be used as the license plate format.
+default_root = "" # If this variable isn't empty, the "root directory" prompt will be skipped when starting in real-time mode. This variable will be used as the root directory.
+default_alert_database = "" # If this variable isn't empty, the "alert database" prompt will be skipped when starting in real-time mode. This variable will be used as the alert database. Add a single space to skip this prompt without specifying a database.
+default_save_license_plates_preference = "" # If this variable isn't empty, the "save license plates" prompt will be skipped when starting in real-time mode. If this variable is set to "y", license plates will be saved.
+default_save_images_preference = "" # If this variable isn't empty, the "save images" prompt will be skipped when starting in real-time mode. If this variable is set to "y", all images will be saved.
+default_license_plate_format = "" # If this variable isn't empty, the "license plate format" prompt will be skipped when starting in real-time mode. This variable will be used as the license plate format.
 
 
 
@@ -578,6 +579,7 @@ elif (mode_selection == "2"): # The user has selected to boot into real time mod
                     if (audio_alerts == True): # Check to see if the user has audio alerts enabled.
                         playsound("assets/sounds/platedetected.mp3", False) # Play the subtle alert sound.
                     new_plate_detected = detected_plate
+                        
                 elif (successfully_found_plate == False):
                     print("A plate was found, but none of the guesses matched the supplied plate format.\n----------")
 
@@ -586,9 +588,9 @@ elif (mode_selection == "2"): # The user has selected to boot into real time mod
 
 
 
-        # Check to see if the license plate detected (if any) is in an alert database.
-        active_alert = False
+        active_alert = False # Reset the alert status to false so we can check for alerts on the current plate (if one was detected) next.
         if (new_plate_detected != ""): # Check to see that the new_plate_detected variable isn't blank. This variable will only have a string if a plate was detected this round.
+
             for alert_plate in alert_database_list: # Run through every plate in the alert plate database supplied by the user. If no database was supplied, this list will be empty, and will not run.
                 if (new_plate_detected == alert_plate): # Check to see if the detected plate matches the current plate in the alert database as we iterate through all of them.
                     active_alert = True # If the plate does exist in the alert database, indicate that there is an active alert by changing this variable to True. This will reset on the next round.
@@ -601,6 +603,23 @@ elif (mode_selection == "2"): # The user has selected to boot into real time mod
                     print(style.end)
                     if (audio_alerts == True): # Check to see if the user has audio alerts enabled.
                         playsound("assets/sounds/alerthit.mp3", False) # Play the prominent alert sound.
+
+
+            if (webhook != None and webhook != ""): # Check to see if the user has specified a webhook to submit detected plates to.
+                url = webhook.replace("[L]", detected_plate) # Replace "[L]" with the license plate detected.
+                url = url.replace("[T]", str(round(time.time()))) # Replace "[T]" with the current timestamp, rounded to the nearest second.
+                url = url.replace("[A]", str(active_alert)) # Replace "[A]" with the current alert status.
+
+                try: # Try sending a request to the webook.
+                    webhook_response = urllib.request.urlopen(url).getcode() # Save the raw data from the URL to a variable.
+                except Exception as e:
+                    webhook_response = e
+
+                if (str(webhook_response) != "200"): # If the webhook didn't respond with a 200 code, warn the user that there was an error.
+                    print(style.yellow + "Warning: Unable to submit data to webhook. Response code: " + str(webhook_response.getcode()) + style.end)
+
+
+
 
         if (save_license_plates_preference == True): # Check to see if the user has the 'save detected license plates' preference enabled.
             if (new_plate_detected != ""): # Check to see if the new_plate_detected value is blank. If it is blank, that means no new plate was detected this round.

@@ -71,6 +71,16 @@ Configuration values in this section are settings specific to real-time mode.
 - `audio_alerts`
     - This setting determines whether or not Predator will make use of audible alerts.
     - With this is set to `True`, Predator will play subtle alert noises when a plate is detected, and much more prominent noises when a plate in an alert database is detected.
+- `webhook`
+    - This setting is used to define a webhook that Predator will send a request to when it detects a license plate in real-time mode.
+    - This setting should either be left blank, or be set to a URL.
+    - Flags can be used to supply information to the webhook.
+        - Predator will replace `[L]` with the detected license plate.
+        - Predator will replace `[T]` with the current time as a Unix epoch timestamp.
+        - Predator will replace `[A]` with the alert status of the plate (`True` or `False`).
+    - Examples:
+        - `http://localhost/app.php?plate=[L]&time=[T]&alert=[A]`
+        - `http://domain.tld/app/[L]`
 
 ### Real-time Mode Default Settings
 

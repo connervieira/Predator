@@ -40,29 +40,12 @@ After installing Predator, you'll need to do some quick configuration to be able
 1. Open the Predator configuration
     - Open the `main.py` file in the Predator folder using your text editor of choice.
     - Navigate to the top of the document, and locate the 'CONFIGURATION START' section.
-2. Set the location of the `crop_image` script
-    - The `crop_image` script is the script used by Predator to crop down individual frames of video.
-    - The script is located in the Predator folder, along side the `main.py` file.
-    - Simply set the `crop_script_path` to an absolute path pointing to the script.
-    - For example: `crop_script_path = "/home/user/Downloads/Predator/crop_image"`
-3. Configure the margin that will be cropped out of the frames.
-    - Since the majority of camera setups (especially dashcams) will see far more than just license plates, it's important to crop images down to increase the likelihood of detecting license plates.
-    - Determine how much Predator will crop out of each image by modifying the appropriate variables.
-    - For example, setting `top_margin = "500"` will cause Predator to crop out the top 500 pixels of each frame.
-    - To configure the cropping settings for real-time mode, follow the same guidelines, only make your changes to the `real_time_x_margin` values.
-4. Configure whether invalid plates will display in real-time mode.
-    - While in real-time mode, similar to pre-recorded mode, Predator will make several guesses at each plate it detects. It then runs validation on these plates based on a plate formatting example provided by the user.
-    - In some situations, it might be useful to view the plates deemed invalid by Predator for sake of debugging.
-    - When `print_invalid_plates` is set to True, these invalidated plates will display in red, but will not be saved to the log.
-5. Configure how many guesses Predator will make per frame in real-time mode.
-    - By default, Predator makes 10 guesses per license plate in real-time mode. However, if none of the guesses are correct, all of the results might be rejected for not fitting the plate formatting example provided by the user. In this case, it might make sense to increase the number of guesses made by Predator. Keep in mind that increasing this value may decrease accuracy.
-    - To change this setting, set `realtime_guesses` to a number in the form of a string.
-6. Configure the real-time camera resolution.
+2. Configure the real-time camera resolution.
     - The `camera_resolution` setting determines the resolution that Predator will use in real-time mode.
     - This setting should usually be set to the maximum resolution supported by the camera, but there might be situations in which it makes sense to reduce this to save storage.
-7. Configure other optional values.
-    - All configuration values are extensively describes in the comments beside them.
-    - Make changes to any of the configuration values to better fit your usage situation.
+3. Configure other optional values.
+    - All configuration values are explained extensively in the CONFIGURING.md document.
+    - Make changes to any of the configuration values to better fit your usage context.
 
 
 ## Usage
@@ -77,7 +60,7 @@ After configuring Predator, you can try it out for the first time!
     - Predator can operate a two possible modes: Pre-recorded and real-time
         - In pre-recorded mode, Predator will analyze a pre-recorded video clip that you provide.
         - In real-time mode, Predator will use a connected camera to detect license plates in real-time.
-2. Set preferences
+3. Set preferences
     - Next Predator will prompt you to set your preferences for this session. The settings you are prompted for will change depending on the mode you choose. Below are the preference menus you'll see for both modes.
     - Pre-recorded mode:
         - First, you'll be asked to set the root project folder. Simple create an empty folder, then place your video(s) into it. Specify the absolute path to this folder here.
@@ -96,6 +79,7 @@ After configuring Predator, you can try it out for the first time!
             - This alert database should have one license plate per line, and no other characters.
             - This preference also accepts URLs. If a URL is entered, Predator will download the list of plates from a plain text file hosted at the URL specified.
             - If you leave this blank, no alerts will be displayed.
+                - To be clear, messages indicating detected license plates will still appear, but all plates will be treated identically.
         - Next, you'll be asked whether or not you want to save the license plates detected by Predator in real-time mode. When this turned on, Predator will automatically save every plate it detects in a file named `real_time_plates.csv` in the root project directory, along with a timestamp and whether or not the plate was in the alert database you specified before.
             - This file follows this format: `PLATE,timestamp,alert_status`
         - Next, you'll be asked whether or not you want Predator to save every image it takes in real-time mode. For sake of storage, this should usually be turned off, but there may be times where you want Predator to act somewhat like a timelapse dashcam, and save every image it takes to the root project folder.
@@ -103,11 +87,10 @@ After configuring Predator, you can try it out for the first time!
             - This value can be set to any alphanumeric string. For example, if all the plates in your state have 3 letters followed by 4 numbers, you could set this value to "AAA0000" or "ABC1234". Both values will work the exact same way.
             - For sake of simplicity, you can also just enter the license plate of another car in your state or region. Since Predator only looks to see whether a character is a number or letter, not the character itself, "EGY4011" will act identically to "AAA0000".
     
-3. Run Predator
+4. Run Predator
     - After finishing setting up your preferences, Predator will begin running automatically. Below you'll see information for both operation modes of Predator.
     - Pre-recorded mode
         - You should note that while Predator is running it's analysis, you'll notice a folder named 'frames' appear in the project folder. Individual frames will begin to appear in this folder as Predator runs. Do not modify or delete these, since Predator will repeatedly access and modify these during the course of it's analysis. After analysis completes, you can safely delete these files.
-    4. Manipulate results
         - After Predator finishes running, you'll be prompted to "Press enter to continue". After pressing enter, you'll see the analysis menu.
         - This menu has 4 options.
             0. Quit
