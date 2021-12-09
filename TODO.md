@@ -17,6 +17,7 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Real-time alerts for detected license plates based on a text file.
 - [X] The ability to configure Predator to automatically start up in real-time mode using pre-configured preferences.
 - [X] The ability to download alert databases from the internet.
+- [ ] Audible alerts.
 - [ ] The ability to automatically submit plates detected in real-time to a webhook.
 
 
