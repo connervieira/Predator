@@ -22,8 +22,8 @@ This is the installation process for Predator and all of it's dependencies.
     - You can install FSWebcam using the following command on a Debian based Linux machine: `sudo apt-get install fswebcam`
 5. Install the `validators` Python package.
     - `pip3 install validators`
-6. Install the `playsound` Python package.
-    - `pip3 install playsound`
+6. Install the `mpg321` package.
+    - `sudo apt-get install mpg321`
 7. Download Predator.
     - Predator can be downloaded either from the V0LT website, or from it's GitHub page. The download straight from the V0LT website is recommended for sake of stability and completeness, but you're free to use GitHub as well if you're OK with using a less stable version of Predator.
     - V0LT website: <https://v0lttech.com/predator.php>
