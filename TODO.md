@@ -19,13 +19,13 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] The ability to download alert databases from the internet.
 - [X] Audio based alerts.
 - [X] The ability to automatically submit plates detected in real-time to a webhook.
+- [X] Statistics viewer.
 
 
 # Hypothetical
 
 These are features that require more in-depth changes, and are purely hypothetical.
 
-- [ ] Statistics viewer.
 - [ ] The ability to process multiple sequential videos at once.
 - [ ] The ability to correlate license plate detects with GPS data from a GPX file.
 - [ ] De-duplication of license plates that aren't identical, but are very similar and likely to be invalid repeats of the same plate.

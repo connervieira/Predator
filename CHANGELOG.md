@@ -5,7 +5,7 @@ This document contains all of the changes for each version of Predator.
 
 ## Version 0.9
 
-### Initial release
+### Initial Release
 
 December 4th, 2021
 
@@ -14,7 +14,7 @@ December 4th, 2021
 
 ## Version 1.0
 
-### First stable release
+### First Stable Release
 
 This is the first stable release of Predator, and contains the ability to detect license plates in pre-recorded video.
 
@@ -31,7 +31,7 @@ December 5th, 2021
 
 ## Version 2.0
 
-### Real-time update
+### Real-time Update
 
 This is the 'real-time update' of Predator, and adds real-time mode to Predator, where plates can be detected on a second-by-second basis, with automatic alerts and logging.
 
@@ -65,7 +65,7 @@ December 6th, 2021
 
 ## Version 3.0
 
-### Hard-wire update
+### Hard-wire Update
 
 This update contains enhancements that make it much easier to install Predator in a hard-wire context, where Predator is seamlessly integrated with a more complete system in a car, building, or other location.
 
@@ -83,3 +83,9 @@ December 8th, 2021
 - Added the ability to specify the alert database in real-time mode as a web URL.
     - When a URL is detected, Predator will request the file at the URL specified, and attempt to interpret it as an alert database the same way it would for a local file.
 - Added the ability to set custom command arguments for FSWebcam, in case customizations need to be made to optimize performance on a camera-by-camera basis.
+- Added support for audio notifications.
+    - When enabled, Predator will play a subtle noise whenever a valid plate is detected, and a more prominent noise when a plate in an alert database is detected.
+    - All notification sounds are sine waves with soft reverb, and will gently "rev up" as to not startle the driver when Predator is installed a vehicle.
+    - All sounds can be found in the `/assets/sounds/` directory.
+- Added warning messages when the user enters an invalid selection in pre-recorded mode.
+- Added a simple statistics viewer for pre-recorded mode.

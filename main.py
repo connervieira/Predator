@@ -14,6 +14,8 @@ from playsound import playsound
 # ----- Configuration Start -----
 # ===============================
 
+# Each configuration value in this section has a short description beside it. However, for more information on each value, see the CONFIGURATION.md document.
+
 
 # ----- General configuration -----
 crop_script_path = str(os.path.dirname(__file__)) + "/crop_image" # Path to the cropping script in the Predator directory.
@@ -334,13 +336,14 @@ if (mode_selection == "1"): # The user has selected to boot into pre-recorded mo
         print("1. View data")
         print("2. Export data")
         print("3. Manage raw analysis data")
+        print("4. View statistics")
 
         selection = input("Selection: ")
         clear()
 
 
         if (selection == "0"):
-            print("Shutting down")
+            print("Shutting down...")
             break
 
         elif (selection == "1"):
@@ -367,7 +370,7 @@ if (mode_selection == "1"): # The user has selected to boot into pre-recorded mo
                     print(plate + ",")
 
             else:
-                print("Unrecognized option.")
+                print(style.yellow + "Warning: Invalid selection." + style.end)
 
             input("\nPress enter to continue...") # Wait for the user to press enter before repeating the menu loop.
             
@@ -403,7 +406,11 @@ if (mode_selection == "1"): # The user has selected to boot into pre-recorded mo
 
                 save_to_file(root + "/export.txt", export_data) # Save to disk.
 
+            else:
+                print(style.yellow + "Warning: Invalid selection." + style.end)
+
             input("\nPress enter to continue...") # Wait for the user to press enter before repeating the menu loop.
+
 
         elif (selection == "3"):
             print("Please select an option")
@@ -422,7 +429,19 @@ if (mode_selection == "1"): # The user has selected to boot into pre-recorded mo
             elif (selection == "2"):
                 save_to_file(root + "/export.txt", str(raw_lpr_scan)) # Save to disk.
                 
+            else:
+                print(style.yellow + "Warning: Invalid selection." + style.end)
 
+
+            input("\nPress enter to continue...") # Wait for the user to press enter before repeating the menu loop.
+
+        elif (selection == "4"):
+            print("Frames analyzed: " + str(len(raw_lpr_scan)))
+            print("Plates found: " + str(len(plates_detected)))
+
+            input("\nPress enter to continue...") # Wait for the user to press enter before repeating the menu loop.
+        else:
+            print(style.yellow + "Warning: Invalid selection." + style.end)
             input("\nPress enter to continue...") # Wait for the user to press enter before repeating the menu loop.
 
 
