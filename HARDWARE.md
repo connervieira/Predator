@@ -19,6 +19,35 @@ This section contains recommendations for those looking to build a hardware devi
     - Ensure your camera is mounted somewhere stable enough that it can take clear images of the vehicles you're scanning, even while they are in motion.
 
 
+## Guidelines
+
+As a general rule, these are the parts you'll need in a Predator device:
+
+- Camera
+    - Required (for real-time mode)
+        - Without a camera, Predator will have no way of using real-time mode, and only pre-recorded mode will be usable.
+- Processing
+    - Required
+        - Needless to say, Predator can't be run without a processing device.
+    - This device could be anything from a high end workstation to a single-board-computer, like a Raspberry Pi.
+- Input Device
+    - Recommended
+        - Without an input device, the only way to configure Predator will be remotely.
+- Display
+    - Recommended
+        - Without a display, Predator can only realistically run in headless mode, and it will be significantly harder to debug.
+- Speaker
+    - Recommended
+        - A speaker allows Predator to play notification noises. Without a speaker, Predator will be able to function, but it won't be able to easily notify the user when a plate is detected.
+- Mounting Hardware
+    - Recommended
+        - Without mounting hardware, your Predator device will be significantly harder to mount in your build.
+- Networking
+    - Optional
+        - Predator is fully functional without being connected to a network. However, connecting to a network will allow Predator to download remote alert databases and submit detected plates to a webhook automatically.
+
+
+
 ## Builds
 
 This section contains part recommendations. Please keep in mind that these parts are not guaranteed to work, and you shouldn't blindly purchase things in these lists.
@@ -32,6 +61,8 @@ Each build in this section has a nick-name to keep it distinct from the other bu
     - All of the parts are physically small, and can be easily fit in tight places, like the interior of a vehicle.
     - The entire system is lightweight, making it easy to move around.
     - Each device is very low power usage, so it should be easy to install using existing infrastructure in your car, building, or other system.
+- Disadvantages:
+    - This hardware configuration severely struggles to successfully read license plates on fast moving vehicles due to the low shutter speed of the camera.
 - Price Range: ~$100
 - Parts:
     - Camera: ELP-USB500W02M-SFV(5-50)
