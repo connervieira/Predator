@@ -90,6 +90,10 @@ December 8th, 2021
 - Added warning messages when the user enters an invalid selection in pre-recorded mode.
 - Added a simple statistics viewer for pre-recorded mode.
 
-## Version 3.1
+## Version 4.0
+
+### Dashcam Update
+
+This update adds 'dash-cam mode' to Predator, which allows it to record video without processing license plates in real-time. This allows you to use your Predator system as a dash-cam while driving, then analyze the video later using 'pre-recorded mode'.
 
 - Changed the audio backend from Python playsound to mpg321 in order to fix audio on Raspberry Pi.
