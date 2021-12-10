@@ -182,7 +182,7 @@ else:
     print(style.bold + "LPRS" + style.end + "\n")
 
 if (audio_alerts == True):
-    os.system("mpg321 ./assets/sounds/testnoise.mp3 &")
+    os.system("mpg321 ./assets/sounds/testnoise.mp3 & > /dev/null")
 
 
 
@@ -596,7 +596,7 @@ elif (mode_selection == "2"): # The user has selected to boot into real time mod
                     detected_license_plates.append(detected_plate) # Save the most likely license plate ID to the detected_license_plates list.
                     print("Detected plate: " + detected_plate + "\n")
                     if (audio_alerts == True): # Check to see if the user has audio alerts enabled.
-                        os.system("mpg321 ./assets/sounds/platedetected.mp3 &") # Play a subtle alert sound.
+                        os.system("mpg321 ./assets/sounds/platedetected.mp3 & > /dev/null") # Play a subtle alert sound.
                     new_plate_detected = detected_plate
                         
                 elif (successfully_found_plate == False):
@@ -621,7 +621,7 @@ elif (mode_selection == "2"): # The user has selected to boot into real time mod
                     print("===================")
                     print(style.end)
                     if (audio_alerts == True): # Check to see if the user has audio alerts enabled.
-                        os.system("mpg321 ./assets/sounds/alerthit.mp3 &") # Play the prominent alert sound.
+                        os.system("mpg321 ./assets/sounds/alerthit.mp3 & > /dev/null") # Play the prominent alert sound.
 
 
             if (webhook != None and webhook != ""): # Check to see if the user has specified a webhook to submit detected plates to.
