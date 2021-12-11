@@ -59,7 +59,8 @@ default_license_plate_format = "" # If this variable isn't empty, the "license p
 dashcam_resolution = "1920x1080" # This setting determines what resolution Predator will attmpt to record at. Be sure that your camera is capable of recording at resolution specified here.
 dashcam_frame_rate = "20" # This setting determines what frame rate Predator will attmpt to record at. Be sure that your camera is capable of recording at the frame rate specified here.
 dashcam_device = "/dev/video0" # This setting defines what camera device Predator will attempt to use when recording video in dash-cam mode.
-dashcam_background_mode = True # This setting determines whether or not Predator will run i's dashcam recording in the background. This should almost always be set to False, since setting it to True will eliminate the user's ability to stop dashcam recording.
+dashcam_background_mode = False # This setting determines whether or not Predator will run i's dashcam recording in the background. This should almost always be set to False, since setting it to True will eliminate the user's ability to stop dashcam recording.
+dashcam_background_mode_realtime = False # This setting determines whether or not Predator will automatically start recording dash-cam video in the background when starting in real-time mode. This setting will only make a difference if 'dashcam_background_mode' is set to true, and 'fswebcam_device' and 'dashcam_device' are different.
 
 
 
@@ -293,6 +294,11 @@ if (re.fullmatch("(\d\d\dx\d\d\d)", dashcam_resolution) == None and re.fullmatch
 if (fswebcam_device == ""):
     print(style.yellow + "Warning: The 'fswebcam_device' specified in the real-time configuration section is blank. It's possible there has been a typo. Defaulting to /dev/video0" + style.end)
     fswebcam_device = "/dev/video0"
+
+
+if (dashcam_background_mode_realtime == True and dashcam_background_mode == True and dashcam_device == fswebcam_device):
+    print(style.yellow + "Warning: The 'dashcam_background_mode_realtime' is turned on, but the same recording device has been specified for 'dashcam_device' and 'fswebcam_device'. Predator can't use the same device for two different tasks. Background dash-cam recording in real-time mode has been disabled." + style.end)
+    dashcam_background_mode_realtime = False
 
 
 
@@ -599,6 +605,11 @@ elif (mode_selection == "2"): # Real-time mode
         input("Press enter to continue...")
 
 
+    if (dashcam_background_mode == True and dashcam_background_mode_realtime == True): # Check to see if the user has enabled both background dash-cam recording, as well as auto dashcam background recording in real-time mode.
+        os.system("ffmpeg -f v4l2 -framerate " + dashcam_frame_rate + " -video_size " + dashcam_resolution + " -input_format mjpeg -i " + dashcam_device + " " + root + "/predator_dashcam.mkv > /dev/null 2>&1 &") # Run dashcam recording in the background.
+        print("Started background dash-cam recording.")
+
+
     # Load the alert database
     if (alert_database != None and alert_database != ""): # Check to see if the user has supplied a database to scan for alerts.
         if (validators.url(alert_database)): # Check to see if the user supplied a URL as their alert database.
@@ -772,13 +783,15 @@ elif (mode_selection == "3"): # Dash-cam mode
 
 
     print("\nStarting dashcam recording on " + dashcam_device + " at " + dashcam_resolution + "@" + dashcam_frame_rate + "fps to " + root + "/predator_dashcam.mkv")
-    print(style.italic + "Press Ctrl+C to stop recording and quit Predator." + style.end)
 
     if (dashcam_background_mode == False):
+        print(style.italic + "Press Ctrl+C to stop recording and quit Predator." + style.end)
         os.system("ffmpeg -f v4l2 -framerate " + dashcam_frame_rate + " -video_size " + dashcam_resolution + " -input_format mjpeg -i " + dashcam_device + " " + root + "/predator_dashcam.mkv > /dev/null 2>&1") # Run dashcam recording in the foreground.
+        print(style.yellow + "Warning: Video recording has unexpectedly stopped. Video is not being saved, and you should attempt to diagnose why the issue is occurring before continuing." + style.end) # Alert the user if the command above finishes running, since it should run indefinitely until cancelled.
     elif (dashcam_background_mode == True):
         os.system("ffmpeg -f v4l2 -framerate " + dashcam_frame_rate + " -video_size " + dashcam_resolution + " -input_format mjpeg -i " + dashcam_device + " " + root + "/predator_dashcam.mkv > /dev/null 2>&1 &") # Run dashcam recording in the background.
         print("Background recording mode is enabled. Recording has started.")
+        print(style.italic + "Enter 'killall ffmpeg' from the command line to kill the recording process." + style.end)
         print("Exiting Predator...")
 
 

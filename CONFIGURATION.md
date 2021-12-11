@@ -140,5 +140,7 @@ Settings in the 'default settings' section allow you to configure Predator to sk
     - When this is set to True, and dash-cam mode is selected, Predator will launch the recording process as a background task, then close.
     - This setting should almost always be False, since setting it to True will remove the user's ability to stop the recording process by pressing `Ctrl + C`.
         - To close the recording process, enter the command `killall ffmpeg` into the standard console. However, keep in mind that this will forcefully close all instances of the FFMPEG process, and potentially corrupt videos, even if they are unrelated to Predator.
-    - It may be useful to set this setting to True if you want to record dashcam video while simutaneously analyzing license plates by first running Predator in dash-cam mode, then re-running it in real-time mode.
-        - Note that it is not possible to record dash-cam video while running Predator in real-time mode unless you have two cameras. In this case, you'll need to use the configuration values for dash-cam mode and real-time mode to configure which camera you want to be used in each mode.
+- `dashcam_background_mode_realtime`
+    - This setting determines whether Predator will automatically enabled background dashcam recording when starting in real-time mode.
+    - This setting will only have an effect if `dashcam_background_mode` has been set to True as well.
+    - Note that Predator can only use one recording device for one task at a time, so if you run real-time mode with background recording enabled, you'll need to specify two different devices by changing `fswebcam_device` and `dashcam_device`.
