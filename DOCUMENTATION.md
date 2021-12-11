@@ -57,11 +57,18 @@ After configuring Predator, you can try it out for the first time!
         - `python3 main.py`
     - After Predator starts, you should see a large banner reading 'PREDATOR LPRS'
 2. Select a mode
-    - Predator can operate a two possible modes: Pre-recorded and real-time
-        - In pre-recorded mode, Predator will analyze a pre-recorded video clip that you provide.
-        - In real-time mode, Predator will use a connected camera to detect license plates in real-time.
+    - Predator can operate a three possible modes.
+        - Pre-recorded mode
+            - In this mode, Predator will analyze a pre-recorded video clip that you provide. This video can be in any format supported by FFMPEG.
+            - Use this mode to analyze dash-cam video, whether it be from a generic dash-cam or from Predator running in dash-cam mode.
+        - Real-time mode
+            - In this mode, Predator will use a connected camera to detect license plates in real-time.
+        - Dash-cam mode
+            - In this mode, Predator will operate like a dash-cam, and simply record video without processing it.
+            - This mode can be used to record video to be used analyzed with pre-recorded mode later.
+    - Select a mode by entering the number associated with it in the selection menu.
 3. Set preferences
-    - Next Predator will prompt you to set your preferences for this session. The settings you are prompted for will change depending on the mode you choose. Below are the preference menus you'll see for both modes.
+    - Next Predator will prompt you to set your preferences for this session. The settings you are prompted for will change depending on the mode you choose. Below are the preference menus you'll see for all modes.
     - Pre-recorded mode:
         - First, you'll be asked to set the root project folder. Simple create an empty folder, then place your video(s) into it. Specify the absolute path to this folder here.
             - Example: `/home/cvieira/Downloads/MyProjectFolder`
@@ -73,7 +80,7 @@ After configuring Predator, you can try it out for the first time!
             - This value can be set to any alphanumeric string. For example, if all the plates in your state have 3 letters followed by 4 numbers, you could set this value to "AAA0000" or "ABC1234". Both values will work the exact same way.
             - For sake of simplicity, you can also just enter the license plate of another car in your state or region. Since Predator only looks to see whether a character is a number or letter, not the character itself, "EGY4011" will act identically to "AAA0000".
     - Real-time mode:
-        - First, you'll be asked to set the root project folder. Simple create an empty folder, then place any files you want to use later into it. Specify the absolute path to this folder here.
+        - First, you'll be asked to set the root project folder. Simply create an empty folder, then place any files you want to use later into it. Specify the absolute path to this folder here.
             - Example: `/home/cvieira/Downloads/MyProjectFolder`
         - Next, you'll be asked for an alert database. An alert database is simply a plain text file containing a list of license plates you want Predator to display an alert for.
             - This alert database should have one license plate per line, and no other characters.
@@ -86,25 +93,32 @@ After configuring Predator, you can try it out for the first time!
         - Finally, you'll be asked for a license plate format example. Filling out this value is highly recommended, since it will greatly reduce the number of incorrectly read plates. If this is left blank, no formatting validation will be used.
             - This value can be set to any alphanumeric string. For example, if all the plates in your state have 3 letters followed by 4 numbers, you could set this value to "AAA0000" or "ABC1234". Both values will work the exact same way.
             - For sake of simplicity, you can also just enter the license plate of another car in your state or region. Since Predator only looks to see whether a character is a number or letter, not the character itself, "EGY4011" will act identically to "AAA0000".
+    - Dash-cam mode:
+        - In dash-cam mode, you'll only be asked for a root project directory. Simply create an empty folder, and specify it's full absolute path here.
+            - Example: `/home/cvieira/Downloads/MyProjectFolder`
     
 4. Run Predator
-    - After finishing setting up your preferences, Predator will begin running automatically. Below you'll see information for both operation modes of Predator.
-    - Pre-recorded mode
-        - You should note that while Predator is running it's analysis, you'll notice a folder named 'frames' appear in the project folder. Individual frames will begin to appear in this folder as Predator runs. Do not modify or delete these, since Predator will repeatedly access and modify these during the course of it's analysis. After analysis completes, you can safely delete these files.
-        - After Predator finishes running, you'll be prompted to "Press enter to continue". After pressing enter, you'll see the analysis menu.
-        - This menu has 4 options.
-            0. Quit
-                - Enter '0' into the selection to quit Predator.
-            1. View data
-                - Enter '1' into the selection to open up further options for viewing the data collected by Predator.
-            2. Export data
-                - Enter '2' into the selection to open up further options for exporting the data collected by Predator.
-            3. Manage raw analysis data
-                - Enter '3' into the selection to view or export the raw data collected by Predator, before sanitization and validations takes place. In other words, this data is every single plate detected by Predator, regardless of whether it matches the formatting guidelines.
-    - Real-time mode
-        - While in real-time mode, Predator will run in an endless loop until quit by holding `Ctrl + C`.
-        - When a license plate is detected, Predator will display it on screen.
-        - Depending on the preferences for the session, Predator might also save images taken and the license plates detected.
-            - Images taken will be saved as `realtime_imageN.jpg` in the root project folder. If saving images is turned on, 'N' with the sequential image number. Otherwise, the N will be removed.
-            - Saved license plates will be saved to `real_time_plates.csv` in the root project folder.
-        - If a plate detected is in the alert database specified during the preferences stage earlier, it will show a large alert message in the console output.
+    - After finishing setting up your preferences, Predator will begin running automatically. Below you'll see information for all operation modes of Predator.
+        - Pre-recorded mode
+            - You should note that while Predator is running it's analysis, you'll notice a folder named 'frames' appear in the project folder. Individual frames will begin to appear in this folder as Predator runs. Do not modify or delete these, since Predator will repeatedly access and modify these during the course of it's analysis. After analysis completes, you can safely delete these files.
+            - After Predator finishes running, you'll be prompted to "Press enter to continue". After pressing enter, you'll see the analysis menu.
+            - This menu has 4 options.
+                0. Quit
+                    - Enter '0' into the selection to quit Predator.
+                1. View data
+                    - Enter '1' into the selection to open up further options for viewing the data collected by Predator.
+                2. Export data
+                    - Enter '2' into the selection to open up further options for exporting the data collected by Predator.
+                3. Manage raw analysis data
+                    - Enter '3' into the selection to view or export the raw data collected by Predator, before sanitization and validations takes place. In other words, this data is every single plate detected by Predator, regardless of whether it matches the formatting guidelines.
+        - Real-time mode
+            - While in real-time mode, Predator will run in an endless loop until quit by holding `Ctrl + C`.
+            - When a license plate is detected, Predator will display it on screen.
+            - Depending on the preferences for the session, Predator might also save images taken and the license plates detected.
+                - Images taken will be saved as `realtime_imageN.jpg` in the root project folder. If saving images is turned on, 'N' with the sequential image number. Otherwise, the N will be removed.
+                - Saved license plates will be saved to `real_time_plates.csv` in the root project folder.
+            - If a plate detected is in the alert database specified during the preferences stage earlier, it will show a large alert message in the console output.
+        - Dash-cam mode
+            - In dash-cam mode, Predator will record video indefinitely until either disk space runs out, or `Ctrl + C` is pressed.
+            - Predator will not detect license plates in this mode.
+            - The dash-cam video recorded will be saved to the project folder as predator_dashcam.mkv

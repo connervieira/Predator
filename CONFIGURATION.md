@@ -25,6 +25,9 @@ This section of configuration values will effect Predator's general operation.
         - If you only ever use the same mode when using Predator, setting this to your preferred mode can save time.
         - When installing Predator in a vehicle, this setting can allow Predator to load without any user input.
             - See the "default" settings later in this document for more information on auto-starting.
+- `default_root`
+    - When this default setting isn't empty, Predator will use it's value as the default root project directory path, and will skip the 'root directory' prompt when running Predator in real-time mode and dash-cam mode.
+    - This setting has no effect on pre-recorded mode.
 
 
 ## Pre-recorded Mode Configuration
@@ -62,6 +65,9 @@ Configuration values in this section are settings specific to real-time mode.
         - Use of optical zoom and framing will lead to higher quality images for Predator to process.
     - In most videos there will be a portion of the frame in which a license plate would never reasonably appear.
         - For example, in dash-cam video, there will rarely be a license plate in the top half of the frame when the camera is mounted facing straight forward.
+- `fswebcam_device`
+    - This setting simply determines the video device that Predator will use FSWebcam to access.
+    - This should almost always be set to `"/dev/video0"`, but there may be some situations it which it would make sense to change this, like in the case that you have two cameras.
 - `fswebcam_flags`
     - This setting specifies any additional arguments that you want to add to the FSWebcam command in real-time mode.
     - This setting can be used to fine tune the way FSWebcam handles your camera.
@@ -86,8 +92,6 @@ Configuration values in this section are settings specific to real-time mode.
 
 Settings in the 'default settings' section allow you to configure Predator to skip some or all of the preferences prompts that appear when launching Predator in real-time mode. By configuring all of the default settings, as well as the `auto_start_mode` setting described above in the "General" section, it's possible to get Predator to start 100% autonomously after it's been executed.
 
-- `default_root`
-    - When this default setting isn't empty, Predator will use it's value as the default root project directory path, and will skip the 'root directory' prompt when running Predator in real-time mode.
 - `default_alert_database`
     - When this default setting isn't empty, Predator will use it's value as the default alert database file path, and will skip the 'alert database' prompt when running Predator in real-time mode.
     - The 'alert database' preference specifies a file path to a plain text file containing a list of license plates that Predator should alert for.
@@ -115,3 +119,26 @@ Settings in the 'default settings' section allow you to configure Predator to sk
         - It should be noted that some regions will have varying license plate formatting guidelines. In this case, setting this preference could inadvertently cause Predator to filter out valid plates.
             - If you want to skip the preference prompt associated with this setting, but you don't want to supply a license plate format, set this preference to a single space.
                 - Example: `default_license_plate_format = " "`
+
+## Dash-cam Mode Configuration
+
+- `dashcam_resolution`
+    - This setting determines what resolution Predator will attmpt to record at.
+    - Be sure that your camera is capable of recording at resolution specified here. If you set an unsupported resolution, it's likely Predator will fail and not record anything.
+    - Example: `dashcam_resolution = "1920x1080"`
+- `dashcam_frame_rate`
+    - This setting determines what frame rate Predator will attmpt to record at.
+    - Even though this setting is a number, it should be entered as a string with quotes around it. See the example below for more context.
+    - Be sure that your camera is capable of recording at the frame rate specified here. If you set an unsupported frame rate, it's likely Predator will fail and not record anything.
+    - If you enter a frame rate too slow for the encoder, it might automatically be sped to a higher frame rate.
+    - Example: `dashcam_frame_rate = "30"`
+- `dashcam_device`
+    - This setting defines what camera device Predator will attempt to use when recording video in dash-cam mode.
+    - Example: `dashcam_device = "/dev/video0"`
+- `dashcam_background_mode`
+    - This setting determines whether or not Predator will record dash-cam video as a background process.
+    - When this is set to True, and dash-cam mode is selected, Predator will launch the recording process as a background task, then close.
+    - This setting should almost always be False, since setting it to True will remove the user's ability to stop the recording process by pressing `Ctrl + C`.
+        - To close the recording process, enter the command `killall ffmpeg` into the standard console. However, keep in mind that this will forcefully close all instances of the FFMPEG process, and potentially corrupt videos, even if they are unrelated to Predator.
+    - It may be useful to set this setting to True if you want to record dashcam video while simutaneously analyzing license plates by first running Predator in dash-cam mode, then re-running it in real-time mode.
+        - Note that it is not possible to record dash-cam video while running Predator in real-time mode unless you have two cameras. In this case, you'll need to use the configuration values for dash-cam mode and real-time mode to configure which camera you want to be used in each mode.

@@ -19,7 +19,8 @@ import validators
 # ----- General configuration -----
 crop_script_path = str(os.path.dirname(__file__)) + "/crop_image" # Path to the cropping script in the Predator directory.
 ascii_art_header = True # This setting determines whether or not the large ASCII art Predator title will show on start-up. When set to False, a small, normal text title will appear instead. This is useful when running Predator on a device with a small display to avoid weird formatting.
-auto_start_mode = "" # This variable determines whether or not automatically start in a particular mode. When empty, the user will be prompted whether to start in pre-recorded mode or in real-time mode. When set to "1", Predator will automatically select and start pre-recorded mode when launched. Contrarily, when set to "2", Predator will automatically select and start real-time mode when launched.
+auto_start_mode = "" # This variable determines whether or not automatically start in a particular mode. When empty, the user will be prompted whether to start in pre-recorded mode or in real-time mode. When set to "1", Predator will automatically select and start pre-recorded mode when launched. When set to "2", Predator will automatically select and start real-time mode when launched. When set to "3", Predator will start into dashcam-mode when launched.
+default_root = "" # If this variable isn't empty, the "root directory" prompt will be skipped when starting Predator. This variable will be used as the root directory. This variable only affects real-time mode and dash-cam mode.
 
 
 
@@ -40,12 +41,13 @@ real_time_left_margin = "400" # How many pixels will be cropped from the left si
 real_time_right_margin = "400" # How many pixels will be cropped from the right side of the frame in real-time mode.
 real_time_top_margin = "200" # How many pixels will be cropped from the bottom side of the frame in real-time mode.
 real_time_bottom_margin = "200" # How many pixels will be cropped from the top side of the frame in real-time mode.
+fswebcam_device = "/dev/video0" # This setting determines the video device that 'fswebcam' will use to take images in real-time mode.
 fswebcam_flags = "--set brightness=50%" # These are command flags that will be added to the end of the FSWebcam command. You can use these to customize how FSWebcam takes images in real-time mode based on your camera set up.
 audio_alerts = True # This setting determines whether or not Predator will make use of sounds to inform the user of events.
 webhook = "" # This setting can be used to define a webhook that Predator will send a request to when it detects a license plate in real-time mode. See CONFIGURATION.md to learn more about how to use flags in this setting.
+shape_alerts = True # This setting determines whether or not prominent text-based shapes will be displayed for various actions. This is useful in vehicle installations where you may want to see whether or not Predator detected a plate at a glance.
 
 # Default settings
-default_root = "" # If this variable isn't empty, the "root directory" prompt will be skipped when starting in real-time mode. This variable will be used as the root directory.
 default_alert_database = "" # If this variable isn't empty, the "alert database" prompt will be skipped when starting in real-time mode. This variable will be used as the alert database. Add a single space to skip this prompt without specifying a database.
 default_save_license_plates_preference = "" # If this variable isn't empty, the "save license plates" prompt will be skipped when starting in real-time mode. If this variable is set to "y", license plates will be saved.
 default_save_images_preference = "" # If this variable isn't empty, the "save images" prompt will be skipped when starting in real-time mode. If this variable is set to "y", all images will be saved.
@@ -53,9 +55,19 @@ default_license_plate_format = "" # If this variable isn't empty, the "license p
 
 
 
+# ----- Dash-cam mode configuration -----
+dashcam_resolution = "1920x1080" # This setting determines what resolution Predator will attmpt to record at. Be sure that your camera is capable of recording at resolution specified here.
+dashcam_frame_rate = "20" # This setting determines what frame rate Predator will attmpt to record at. Be sure that your camera is capable of recording at the frame rate specified here.
+dashcam_device = "/dev/video0" # This setting defines what camera device Predator will attempt to use when recording video in dash-cam mode.
+dashcam_background_mode = True # This setting determines whether or not Predator will run i's dashcam recording in the background. This should almost always be set to False, since setting it to True will eliminate the user's ability to stop dashcam recording.
+
+
+
 # =============================
 # ----- Configuration End -----
 # =============================
+# Unless you intend to make significantly more in-depth modifications to Predator, you shouldn't change anything outside the 'Configuration' section.
+
 
 
 # Define the function that will be used to clear the screen.
@@ -124,6 +136,7 @@ def validate_plate(plate, template):
 
 
 
+# This function is used to download and process plain-text lists of license plates over a network.
 def download_plate_database(url):
     raw_download_data = urllib.request.urlopen(url).read() # Save the raw data from the URL to a variable.
 
@@ -135,6 +148,75 @@ def download_plate_database(url):
     download_data_list = processed_download_data.split() # Split the downloaded data line-by-line into a Python list.
 
     return download_data_list
+
+
+
+# This is a simple function used to display large ASCII shapes.
+def display_shape(shape):
+    if (shape == "square"):
+        print(style.bold)
+        print("######################")
+        print("######################")
+        print("######################")
+        print("######################")
+        print("######################")
+        print("######################")
+        print("######################")
+        print("######################")
+        print("######################")
+        print("######################")
+        print("######################")
+        print("######################")
+        print(style.end)
+
+    elif (shape == "circle"):
+        print(style.bold)
+        print("        ######")
+        print("     ############")
+        print("   ################")
+        print("  ##################")
+        print(" ####################")
+        print("######################")
+        print("######################")
+        print("######################")
+        print(" ####################")
+        print("  ##################")
+        print("   ################")
+        print("     ############")
+        print("        ######")
+        print(style.end)
+
+    elif (shape == "triangle"):
+        print(style.bold)
+        print("           #")
+        print("          ###")
+        print("         #####")
+        print("        #######")
+        print("       #########")
+        print("      ###########")
+        print("     #############")
+        print("    ###############")
+        print("   #################")
+        print("  ###################")
+        print(" #####################")
+        print("#######################")
+        print(style.end)
+
+    elif (shape == "diamond"):
+        print(style.bold)
+        print("           #")
+        print("          ###")
+        print("         #####")
+        print("        #######")
+        print("       #########")
+        print("      ###########")
+        print("      ###########")
+        print("       #########")
+        print("        #######")
+        print("         #####")
+        print("          ###")
+        print("           #")
+        print(style.end)
 
 
 # Define some styling information
@@ -182,39 +264,47 @@ else:
     print(style.bold + "LPRS" + style.end + "\n")
 
 if (audio_alerts == True):
-    os.system("mpg321 ./assets/sounds/testnoise.mp3 & > /dev/null")
+    os.system("mpg321 ./assets/sounds/testnoise.mp3 > /dev/null 2>&1 &")
 
 
 
 # Run some basic error checks to see if any of the data supplied in the configuration seems wrong.
-
 if (os.path.exists(crop_script_path) == False):
-    print(style.yellow + "Warning: The 'crop_script_path' defined in the configuration section doesn't point to a valid file. Image cropping will be broken." + style.end)
+    print(style.yellow + "Warning: The 'crop_script_path' defined in the configuration section doesn't point to a valid file. Image cropping will be broken. Please make sure the 'crop_script_path' points to a valid file." + style.end)
 
 if (int(left_margin) < 0 or int(right_margin) < 0 or int(bottom_margin) < 0 or int(top_margin) < 0):
-    print(style.yellow + "Warning: One or more of the cropping margins for pre-recorded mode are below 0. This should never happen, and it's likely there's a configuration issue somewhere. Cropping has been disabled." + style.end)
+    print(style.yellow + "Warning: One or more of the cropping margins for pre-recorded mode are below 0. This should never happen, and it's likely there's a configuration issue somewhere. Cropping margins have all been set to 0." + style.end)
     left_margin = "0"
     right_margin = "0"
     bottom_margin = "0"
     top_margin = "0"
 
 if (int(real_time_left_margin) < 0 or int(real_time_right_margin) < 0 or int(real_time_bottom_margin) < 0 or int(real_time_top_margin) < 0):
-    print(style.yellow + "Warning: One or more of the cropping margins for real-time mode are below 0. This should never happen, and it's likely there's a configuration issue somewhere. Cropping has been disabled." + style.end)
+    print(style.yellow + "Warning: One or more of the cropping margins for real-time mode are below 0. This should never happen, and it's likely there's a configuration issue somewhere. Cropping margins have all been set to 0." + style.end)
     real_time_left_margin = "0"
     real_time_right_margin = "0"
     real_time_bottom_margin = "0"
     real_time_top_margin = "0"
+
+if (re.fullmatch("(\d\d\dx\d\d\d)", dashcam_resolution) == None and re.fullmatch("(\d\d\d\dx\d\d\d)", dashcam_resolution) == None and re.fullmatch("(\d\d\d\dx\d\d\d\d)", dashcam_resolution) == None): # Verify that the dashcam_resolution setting matches the format 000x000, 0000x000, or 0000x0000.
+    print(style.yellow + "Warning: The 'dashcam_resolution' specified in the real-time configuration section doesn't seem to align with the '0000x0000' format. It's possible there has been a typo. defaulting to '1280x720'" + style.end)
+    dashcam_resolution = "1280x720"
+
+if (fswebcam_device == ""):
+    print(style.yellow + "Warning: The 'fswebcam_device' specified in the real-time configuration section is blank. It's possible there has been a typo. Defaulting to /dev/video0" + style.end)
+    fswebcam_device = "/dev/video0"
 
 
 
 # Figure out which mode to boot into.
 print("Please select an operating mode.")
 print("1. Pre-recorded")
-print("2. Real time")
+print("2. Real-time")
+print("3. Dash-cam")
 
 # Check to see if the auto_start_mode configuration value is an expected value. If it isn't execution can continue, but the user will need to manually select what mode Predator should start in.
-if (auto_start_mode != "" and auto_start_mode != "1" and auto_start_mode != "2"):
-    print(style.yellow + "Warning: The 'auto_start_mode' configuration value isn't properly set. This value should be blank, '1', or '2'. It's possible there's been a typo." + style.end)
+if (auto_start_mode != "" and auto_start_mode != "1" and auto_start_mode != "2" and auto_start_mode != "3"):
+    print(style.yellow + "Warning: The 'auto_start_mode' configuration value isn't properly set. This value should be blank, '1', '2', or '3'. It's possible there's been a typo." + style.end)
 
 if (auto_start_mode == "1"): # Based on the configuration, Predator will automatically boot into pre-recorded mode.
     print(style.bold + "Automatically starting into pre-recorded mode based on the auto_start_mode configuration value." + style.end)
@@ -222,6 +312,9 @@ if (auto_start_mode == "1"): # Based on the configuration, Predator will automat
 elif (auto_start_mode == "2"): # Based on the configuration, Predator will automatically boot into real-time mode.
     print(style.bold + "Automatically starting into real-time mode based on the auto_start_mode configuration value." + style.end)
     mode_selection = "2"
+elif (auto_start_mode == "3"): # Based on the configuration, Predator will automatically boot into real-time mode.
+    print(style.bold + "Automatically starting into dash-cam mode based on the auto_start_mode configuration value." + style.end)
+    mode_selection = "3"
 else: # No 'auto start mode' has been configured, so ask the user to select manually.
     mode_selection = input("Selection: ")
 
@@ -447,7 +540,7 @@ if (mode_selection == "1"): # The user has selected to boot into pre-recorded mo
 
 
 
-elif (mode_selection == "2"): # The user has selected to boot into real time mode.
+elif (mode_selection == "2"): # Real-time mode
 
     # Configure the user's preferences for this session.
     if (default_root != ""): # Check to see if the user has configured a default for this preference.
@@ -533,9 +626,9 @@ elif (mode_selection == "2"): # The user has selected to boot into real time mod
         time.sleep(0.2) # Sleep to give the user time to quit Predator if they want to.
         print("Taking image...")
         if (save_images_preference == True): # Check to see whether or not the user wants to save all images captured by Predator.
-            os.system("fswebcam --no-banner -r " + camera_resolution + " --jpeg 100 " + fswebcam_flags + " " + root + "/realtime_image" + str(i) + ".jpg >/dev/null 2>&1") # Take a photo using FSWebcam, and save it to the root project folder specified by the user.
+            os.system("fswebcam --no-banner -r " + camera_resolution + " -d " + fswebcam_device + " --jpeg 100 " + fswebcam_flags + " " + root + "/realtime_image" + str(i) + ".jpg >/dev/null 2>&1") # Take a photo using FSWebcam, and save it to the root project folder specified by the user.
         else:
-            os.system("fswebcam --no-banner -r " + camera_resolution + " --jpeg 100 " + fswebcam_flags + " " + root + "/realtime_image.jpg >/dev/null 2>&1") # Take a photo using FSWebcam, and save it to the root project folder specified by the user.
+            os.system("fswebcam --no-banner -r " + camera_resolution + " -d " + fswebcam_device + " --jpeg 100 " + fswebcam_flags + " " + root + "/realtime_image.jpg >/dev/null 2>&1") # Take a photo using FSWebcam, and save it to the root project folder specified by the user.
         print("Done.\n----------")
 
 
@@ -548,9 +641,6 @@ elif (mode_selection == "2"): # The user has selected to boot into real time mod
                 os.system(crop_script_path + " " + root + "/realtime_image.jpg " + real_time_left_margin + " " + real_time_right_margin + " " + real_time_top_margin + " " + real_time_bottom_margin) # Execute the command to crop the image.
             print("Done.\n----------")
             
-
-
-
 
 
         print("Analyzing image...")
@@ -592,15 +682,27 @@ elif (mode_selection == "2"): # The user has selected to boot into real time mod
                         if (print_invalid_plates == True):
                             print(style.red + plate + style.end) # Print the invalid plate in red.
 
-                if (successfully_found_plate == True):
+
+
+                if (successfully_found_plate == True): # Check to see if a valid plate was detected this round.
                     detected_license_plates.append(detected_plate) # Save the most likely license plate ID to the detected_license_plates list.
-                    print("Detected plate: " + detected_plate + "\n")
+                    print("Detected plate: " + detected_plate + "\n----------")
+
                     if (audio_alerts == True): # Check to see if the user has audio alerts enabled.
-                        os.system("mpg321 ./assets/sounds/platedetected.mp3 & > /dev/null") # Play a subtle alert sound.
+                        os.system("mpg321 ./assets/sounds/platedetected.mp3 > /dev/null 2>&1 &") # Play a subtle alert sound.
+
+                    if (shape_alerts == True):  # Check to see if the user has enabled shape notifications.
+                        display_shape("square")
+
                     new_plate_detected = detected_plate
                         
-                elif (successfully_found_plate == False):
+
+                elif (successfully_found_plate == False): # A plate was found, but none of the guesses matched the 
                     print("A plate was found, but none of the guesses matched the supplied plate format.\n----------")
+
+                    if (shape_alerts == True):  # Check to see if the user has enabled shape notifications.
+                        display_shape("circle")
+
 
         else: # No license plate was detected.
             print("Done.\n----------")
@@ -620,8 +722,12 @@ elif (mode_selection == "2"): # The user has selected to boot into real time mod
                     print("ALERT HIT - " + new_plate_detected)
                     print("===================")
                     print(style.end)
+
+                    if (shape_alerts == True):  # Check to see if the user has enabled shape notifications.
+                        display_shape("triangle")
+
                     if (audio_alerts == True): # Check to see if the user has audio alerts enabled.
-                        os.system("mpg321 ./assets/sounds/alerthit.mp3 & > /dev/null") # Play the prominent alert sound.
+                        os.system("mpg321 ./assets/sounds/alerthit.mp3 & > /dev/null 2>&1 &") # Play the prominent alert sound.
 
 
             if (webhook != None and webhook != ""): # Check to see if the user has specified a webhook to submit detected plates to.
@@ -647,3 +753,34 @@ elif (mode_selection == "2"): # The user has selected to boot into real time mod
                 else:
                     export_data = new_plate_detected + "," + str(round(time.time())) + ",false\n" # Add the individual plate to the export data, followed a timestamp, followed by a line break to prepare for the next plate to be added later.
                 add_to_file(root + "/real_time_plates.csv", export_data) # Add the export data to the end of the file and write it to disk.
+
+
+
+
+
+elif (mode_selection == "3"): # Dash-cam mode
+    # Configure the user's preferences for this session.
+    if (default_root != ""): # Check to see if the user has configured a default for this preference.
+        print(style.bold + "Using default preference for root directory." + style.end)
+        root = default_root
+    else:
+        root = input("Enter the root filepath for this project, without a forward slash at the end: ")
+
+    if (os.path.exists(root) == False): # Check to see if the root directory entered by the user exists.
+        print(style.yellow + "Warning: The root project directory entered doesn't seem to exist. Predator will almost certainly fail." + style.end)
+        input("Press enter to continue...")
+
+
+    print("\nStarting dashcam recording on " + dashcam_device + " at " + dashcam_resolution + "@" + dashcam_frame_rate + "fps to " + root + "/predator_dashcam.mkv")
+    print(style.italic + "Press Ctrl+C to stop recording and quit Predator." + style.end)
+
+    if (dashcam_background_mode == False):
+        os.system("ffmpeg -f v4l2 -framerate " + dashcam_frame_rate + " -video_size " + dashcam_resolution + " -input_format mjpeg -i " + dashcam_device + " " + root + "/predator_dashcam.mkv > /dev/null 2>&1") # Run dashcam recording in the foreground.
+    elif (dashcam_background_mode == True):
+        os.system("ffmpeg -f v4l2 -framerate " + dashcam_frame_rate + " -video_size " + dashcam_resolution + " -input_format mjpeg -i " + dashcam_device + " " + root + "/predator_dashcam.mkv > /dev/null 2>&1 &") # Run dashcam recording in the background.
+        print("Background recording mode is enabled. Recording has started.")
+        print("Exiting Predator...")
+
+
+else: # The user has selected an unrecognized mode.
+    print(style.yellow + "Warning: Invalid mode selected." + style.end)
