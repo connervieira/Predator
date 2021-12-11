@@ -20,7 +20,7 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Audio based alerts.
 - [X] The ability to automatically submit plates detected in real-time to a webhook.
 - [X] Statistics viewer.
-- [ ] Add the ability to record video without processing plates in real-time.
+- [X] Add the ability to record video without processing plates in real-time.
 
 
 # Hypothetical
