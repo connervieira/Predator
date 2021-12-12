@@ -21,7 +21,7 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] The ability to automatically submit plates detected in real-time to a webhook.
 - [X] Statistics viewer.
 - [X] Add the ability to record video without processing plates in real-time.
-- [ ] The ability to correlate license plate detections with GPS data from a GPX file.
+- [X] The ability to correlate license plate detections with GPS data from a GPX file.
 
 
 # Hypothetical

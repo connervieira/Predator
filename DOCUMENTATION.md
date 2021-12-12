@@ -90,9 +90,20 @@ After configuring Predator, you can try it out for the first time!
         - Next, you'll be asked whether or not you want to save the license plates detected by Predator in real-time mode. When this turned on, Predator will automatically save every plate it detects in a file named `real_time_plates.csv` in the root project directory, along with a timestamp and whether or not the plate was in the alert database you specified before.
             - This file follows this format: `PLATE,timestamp,alert_status`
         - Next, you'll be asked whether or not you want Predator to save every image it takes in real-time mode. For sake of storage, this should usually be turned off, but there may be times where you want Predator to act somewhat like a timelapse dashcam, and save every image it takes to the root project folder.
-        - Finally, you'll be asked for a license plate format example. Filling out this value is highly recommended, since it will greatly reduce the number of incorrectly read plates. If this is left blank, no formatting validation will be used.
+        - Next, you'll be asked for a license plate format example. Filling out this value is highly recommended, since it will greatly reduce the number of incorrectly read plates. If this is left blank, no formatting validation will be used.
             - This value can be set to any alphanumeric string. For example, if all the plates in your state have 3 letters followed by 4 numbers, you could set this value to "AAA0000" or "ABC1234". Both values will work the exact same way.
             - For sake of simplicity, you can also just enter the license plate of another car in your state or region. Since Predator only looks to see whether a character is a number or letter, not the character itself, "EGY4011" will act identically to "AAA0000".
+        - Next, you'll be prompted to enter the start time of the video.
+            - This value is optional, but you'll need to enter it if you want to enable GPX correlation.
+            - This value takes the format of `YYYY-mm-dd HH:MM:SS`
+                - If this format is not matched, it's likely Predator will fail.
+            - This value needs to be as exact as possible, since any deviation from reality could break GPX correlation, should you enable it.
+            - Example: `2021-5-21 19:32:15`
+        - Provided you enter a date and time for the 'video start time' preference described above, you'll now be given the option to specify a GPX file.
+            - If you want to enable GPX correlation, enter the file name of a GPX file in the root project directory.
+            - If left blank, GPX correlation will be disabled.
+            - The GPX file specified should cover the entire duration that the video was recorded.
+            - Example: `MyLocationRecording.gpx`
     - Dash-cam mode:
         - In dash-cam mode, you'll only be asked for a root project directory. Simply create an empty folder, and specify it's full absolute path here.
             - Example: `/home/cvieira/Downloads/MyProjectFolder`

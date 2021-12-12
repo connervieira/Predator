@@ -5,15 +5,13 @@ import sys
 import urllib.request
 import re
 import validators
-
-
+import datetime
+from xml.dom import minidom
 
 
 # ===============================
 # ----- Configuration Start -----
 # ===============================
-
-# Each configuration value in this section has a short description beside it. However, for more information on each value, see the CONFIGURATION.md document.
 
 
 # ----- General configuration -----
@@ -24,11 +22,13 @@ default_root = "" # If this variable isn't empty, the "root directory" prompt wi
 
 
 
+
 # ----- Pre-recorded mode configuration -----
 left_margin = "700" # How many pixels will be cropped on the left side of the frame in pre-recorded mode.
 right_margin = "700" # How many pixels will be cropped on the right side of the frame in pre-recorded mode.
 top_margin = "700" # How many pixels will be cropped on the top of the frame in pre-recorded mode.
 bottom_margin = "300" # How many pixels will be cropped on the bottom of the frame in pre-recorded mode.
+
 
 
 
@@ -55,25 +55,56 @@ default_license_plate_format = "" # If this variable isn't empty, the "license p
 
 
 
+
 # ----- Dash-cam mode configuration -----
 dashcam_resolution = "1920x1080" # This setting determines what resolution Predator will attmpt to record at. Be sure that your camera is capable of recording at resolution specified here.
 dashcam_frame_rate = "20" # This setting determines what frame rate Predator will attmpt to record at. Be sure that your camera is capable of recording at the frame rate specified here.
 dashcam_device = "/dev/video0" # This setting defines what camera device Predator will attempt to use when recording video in dash-cam mode.
-dashcam_background_mode = False # This setting determines whether or not Predator will run i's dashcam recording in the background. This should almost always be set to False, since setting it to True will eliminate the user's ability to stop dashcam recording.
-dashcam_background_mode_realtime = False # This setting determines whether or not Predator will automatically start recording dash-cam video in the background when starting in real-time mode. This setting will only make a difference if 'dashcam_background_mode' is set to true, and 'fswebcam_device' and 'dashcam_device' are different.
+dashcam_background_mode = False # This setting determines whether or not Predator will start the dash-cam recording process in the background. This should almost always be set to False, since setting it to True will remove the user's ability to stop dash-cam recording by pressing 'Ctrl + C'
+dashcam_background_mode_realtime = False # This setting determines whether dash-cam recording will automatically start when dashcam_background_mode is set to True, and the user selects real-time mode. It should be noted that running dash-cam recording and real-time mode simutaneously is only possible with two cameras connected.
 
 
-
-# =============================
+# ===============================
 # ----- Configuration End -----
-# =============================
-# Unless you intend to make significantly more in-depth modifications to Predator, you shouldn't change anything outside the 'Configuration' section.
+# ===============================
+
+# Unless you intend to make extensive changes to Predator, you shouldn't change anything outside the configuration section above.
+
+
+
+
+
+
+# This function will be used to process GPX files into a Python dictionary.
+def process_gpx(gpx_file):
+    gpx_file = open(gpx_file, 'r') # Open the GPX document.
+
+    xmldoc = minidom.parse(gpx_file) # Load the full XML GPX document.
+
+    track = xmldoc.getElementsByTagName('trkpt') # Get all of the location information from the GPX document.
+    timing = xmldoc.getElementsByTagName('time') # Get all of the timing information from the GPX document.
+
+    gpx_data = {} 
+
+    for i in range(0, len(timing)): # Iterate through each point in the GPX file.
+        point_lat = track[i].getAttribute('lat') # Get the latitude for this point.
+        point_lon = track[i].getAttribute('lon') # Get the longitude for this point.
+        point_time = str(timing[i].toxml().replace("<time>", "").replace("</time>", "").replace("Z", "").replace("T", " ")) # Get the time for this point in human readable text format.
+
+        point_time = round(time.mktime(datetime.datetime.strptime(point_time, "%Y-%m-%d %H:%M:%S").timetuple())) # Convert the human readable timestamp into a Unix timestamp.
+
+        gpx_data[point_time] = {"lat":point_lat, "lon":point_lon} # Add this point to the decoded GPX data.
+
+
+    return gpx_data
+
 
 
 
 # Define the function that will be used to clear the screen.
 def clear():
     os.system("clear")
+
 
 
 # Define the function that will be used to save files for exported data.
@@ -327,12 +358,29 @@ else: # No 'auto start mode' has been configured, so ask the user to select manu
 
 
 
+# Intial setup has been completed, and Predator will now load into the specified mode.
+
+
+
+
 if (mode_selection == "1"): # The user has selected to boot into pre-recorded mode.
     # Get the required information from the user.
     root = input("Enter the root filepath for this project, without a forward slash at the end: ")
     video = input("Please enter the file name of the video you would like to scan for license plates: ")
     framerate = float(input("Please enter how many seconds you want to wait between taking frames to analyze: "))
     license_plate_format = input("Please enter the license plate format you would like to scan for. Leave blank for all: ")
+    video_start_time = input("Optionally, enter the date and time that the specified video recording started (YYYY-mm-dd HH:MM:SS): ") # Ask the user when the video recording started so we can correlate it's frames to a GPX file.
+    if (video_start_time != ""):
+        gpx_file = input("If you'd like to enable GPX correlation, please enter the file name of the GPX file associated with the video. Leave this blank to disable GPS correlation: ")
+    else:
+        gpx_file = ""
+
+
+    if (video_start_time == ""): # If the video_start_time preference was left blank, then default to 0.
+        video_start_time = 0
+    else:
+        video_start_time = round(time.mktime(datetime.datetime.strptime(video_start_time, "%Y-%m-%d %H:%M:%S").timetuple())) # Convert the video_start_time human readable date and time into a Unix timestamp.
+        
 
 
 
@@ -343,6 +391,10 @@ if (mode_selection == "1"): # The user has selected to boot into pre-recorded mo
 
     if (os.path.exists(root + "/" + video) == False): # Check to see if the video file name supplied by the user actually exists in the root project folder.
         print(style.yellow + "Warning: The video file name entered doesn't seem to exist. Predator will almost certainly fail." + style.end)
+        input("Press enter to continue...")
+
+    if (gpx_file != "" and os.path.exists(root + "/" + gpx_file) == False): # Check to see if the GPX file name supplied by the user actually exists in the root project folder.
+        print(style.yellow + "Warning: The GPX file name entered doesn't seem to exist. Predator will almost certainly encounter issues." + style.end)
         input("Press enter to continue...")
 
     if (len(license_plate_format) > 12): # Check to see if the license plate template supplied by the user abnormally long.
@@ -422,6 +474,25 @@ if (mode_selection == "1"): # The user has selected to boot into pre-recorded mo
 
 
 
+    # Correlate the detected license plates with a GPX file.
+    frame_locations = {} # Create a blank database that will be used during the process
+    if (gpx_file != ""): # Check to make sure the user actually supplied a GPX file.
+        print("Processing location data...")
+        decoded_gpx_data = process_gpx(root + "/" + gpx_file) # Decode the data from the GPX file.
+        iteration = 0 # Set the iteration counter to 0 so we can add one to it each frame we iterate through.
+        for element in lpr_scan: # Iterate through each frame.
+            iteration = iteration + 1 # Add one to the iteration counter.
+            frame_timestamp = video_start_time + (iteration * framerate) # Calculate the timestamp of this frame.
+            if (decoded_gpx_data[frame_timestamp] != None): # Check to see that the timestamp for this frame exists in the GPX data.
+                frame_locations[frame_timestamp] = [decoded_gpx_data[frame_timestamp], lpr_scan[element]]
+            else:
+                frame_locations[frame_timestamp] = ["X", lpr_scan[element]]
+                print(style.yellow + "Warning: There is no GPX data matching the timestamp of frame " + element + ". Does the GPX file specified line up with the video?" + style.end)
+        print("Done.\n")
+
+
+
+
     # Analysis has been completed. Next, the user will choose what to do with the analysis data.
 
 
@@ -436,6 +507,8 @@ if (mode_selection == "1"): # The user has selected to boot into pre-recorded mo
         print("2. Export data")
         print("3. Manage raw analysis data")
         print("4. View statistics")
+        if (gpx_file != ""):
+            print("5. Display license plate GPS locations")
 
         selection = input("Selection: ")
         clear()
@@ -534,11 +607,35 @@ if (mode_selection == "1"): # The user has selected to boot into pre-recorded mo
 
             input("\nPress enter to continue...") # Wait for the user to press enter before repeating the menu loop.
 
+
         elif (selection == "4"):
             print("Frames analyzed: " + str(len(raw_lpr_scan)))
             print("Plates found: " + str(len(plates_detected)))
 
             input("\nPress enter to continue...") # Wait for the user to press enter before repeating the menu loop.
+
+
+        elif (selection == "5" and gpx_file != ""):
+            print("Please select an option")
+            print("0. Back")
+            print("1. View raw license plate location data")
+
+            selection = input("Selection: ")
+
+            if (selection == "0"):
+                print("Returning to main menu.")
+
+            elif (selection == "1"):
+                print(frame_locations)
+
+            else:
+                print(style.yellow + "Warning: Invalid selection." + style.end)
+
+
+            input("\nPress enter to continue...") # Wait for the user to press enter before repeating the menu loop.
+
+
+
         else:
             print(style.yellow + "Warning: Invalid selection." + style.end)
             input("\nPress enter to continue...") # Wait for the user to press enter before repeating the menu loop.
