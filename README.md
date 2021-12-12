@@ -7,17 +7,15 @@ A front end for OpenALPR designed to detect and record license plates in both pr
 
 ## Disclaimer
 
-While Predator is reliable and resilient, you should not use it for safety critical tasks. Do not depend on Predator to autheticate cars at entry points, detect intruders, or monitor criminal activity.
+While Predator is reliable and resilient, you should not use it for safety critical tasks. Do not depend on Predator to autheticate cars at entry points, detect intruders, or monitor criminal activity unless you are fully prepared for it to fail.
 
 
 ## Description
 
-[OpenALPR](https://github.com/openalpr/openalpr) is an open source utility designed to detect license plates, and return possible text from them. While it's a fantastic program, it's not exactly adept at managing large amounts of data on it's own. That's where Predator comes in.
-
-Predator is a front-end for OpenALPR designed to run on Linux that takes large (or small) videos, and uses OpenALPR to scan for license plates efficiently. While high end systems with high resolution cameras would make for an ideal set up, Predator can comfortably run on consumer hardware. Predator can operate in two possible modes: pre-recorded mode and real-time mode. In pre-recorded mode, Predator takes pre-recorded video files and scans them for license plates based on user-entered criteria. Contrarily, real-time mode uses a camera to take and analyze frames in real-time. Real-time mode can record license plates detected and display alerts if a plate matches an entry in a customizable database.
+Predator is a powerful camera and video processing tool designed to detect license plates in both real-time and in pre-recorded videos. Predator uses OpenALPR as it's back-end, and adds dozens of powerful features ontop of OpenALPR's already strong performance. Predator is designed to process large amounts of video efficiently on both high end hardware and affordable, low-power device, which makes it extremely versatile. It's designed to be highly customizable, allowing it to fit into any use case, ranging from a static video processing workstation, to a fully offline mobile real-time detection system.
 
 
-## Features
+## General Features
 
 ### Lightweight
 
@@ -25,7 +23,7 @@ Predator is a command line utility that uses very little resources, allowing the
 
 ### Offline
 
-Predator works entirely offline, and never even connects to the internet at all.
+Predator works entirely offline, and never needs to connect to the internet to function. Predator only ever makes network requests when the user actively asks it to download information from a network host.
 
 ### Free
 
@@ -54,6 +52,30 @@ Predator is deliberately designed to be multipurpose. It can operate both as an 
 ### Customizable
 
 Predator is extremely customizable, making it easy to fit into any use case.
+
+### Mobile
+
+Predator is designed to support low-energy-usage hardware so that it can be easily installed in a vehicle.
+
+### Location Aware
+
+Predator supports GPX files to allow for correlating license plates detected in pre-recorded video to their physical coordinates.
+
+### Alerts
+
+Predator supports real-time alerts, allowing the user to be notified when a license plate matching one on a list is detected. This can be used to detect employee vehicles, spot vehicles involved in AMBER alerts, etc.
+
+### Safe
+
+Predator comes with several features that improve safety in vehicle-based installation. Predator supports displaying large recognizable shapes to tell the driver of important events at a glance. Predator even supports recognizable audible alerts, eliminating the need to look away from the road all-together.
+
+### Dash-cam
+
+Predator comes with a dash-cam mode, allowing for customizable real-time recording without processing license plates. Dash-cam videos can later be processed by Predator in pre-recorded mode.
+
+### Headless Ready
+
+While Predator comes with a straight forward interface, it can be fully configured to run in headless mode, without any user interaction necessary. This makes it perfect for vehicle installations, where the driver wants Predator to automatically start when the vehicle turns on without any user input.
 
 
 ## Screenshots
