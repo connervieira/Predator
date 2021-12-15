@@ -835,7 +835,7 @@ elif (mode_selection == "2"): # Real-time mode
                         display_shape("triangle")
 
                     if (audio_alerts == True): # Check to see if the user has audio alerts enabled.
-                        os.system("mpg321 ./assets/sounds/alerthit.mp3 & > /dev/null 2>&1 &") # Play the prominent alert sound.
+                        os.system("mpg321 ./assets/sounds/alerthit.mp3 > /dev/null 2>&1 &") # Play the prominent alert sound.
 
 
             if (webhook != None and webhook != ""): # Check to see if the user has specified a webhook to submit detected plates to.
