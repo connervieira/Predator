@@ -2,11 +2,11 @@ import os
 import time
 import subprocess
 import sys
-import urllib.request
-import re
-import validators
+import urllib.request # Required to make network requests
+import re # Required to use Regex
+import validators # Required to validate URLs
 import datetime
-from xml.dom import minidom
+from xml.dom import minidom # Required for processing GPX data
 
 
 # ===============================
