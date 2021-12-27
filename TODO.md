@@ -22,6 +22,7 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Statistics viewer.
 - [X] Add the ability to record video without processing plates in real-time.
 - [X] The ability to correlate license plate detections with GPS data from a GPX file.
+- [ ] Push notification support.
 
 
 # Hypothetical
