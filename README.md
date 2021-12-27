@@ -77,6 +77,10 @@ Predator comes with a dash-cam mode, allowing for customizable real-time recordi
 
 While Predator comes with a straight forward interface, it can be fully configured to run in headless mode, without any user interaction necessary. This makes it perfect for vehicle installations, where the driver wants Predator to automatically start when the vehicle turns on without any user input.
 
+### Push Notifications
+
+Predator is capable of using a Gotify server to send push notifications for certain events. This ensures that you'll always be up to date when license plates are detected, even if your specific Predator set-up doesn't have a display or audio system connected.
+
 
 ## Screenshots
 

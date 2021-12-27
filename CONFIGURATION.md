@@ -88,6 +88,7 @@ Configuration values in this section are settings specific to real-time mode.
         - `http://localhost/app.php?plate=[L]&time=[T]&alert=[A]`
         - `http://domain.tld/app/[L]`
 
+
 ### Real-time Mode Default Settings
 
 Settings in the 'default settings' section allow you to configure Predator to skip some or all of the preferences prompts that appear when launching Predator in real-time mode. By configuring all of the default settings, as well as the `auto_start_mode` setting described above in the "General" section, it's possible to get Predator to start 100% autonomously after it's been executed.
@@ -119,6 +120,24 @@ Settings in the 'default settings' section allow you to configure Predator to sk
         - It should be noted that some regions will have varying license plate formatting guidelines. In this case, setting this preference could inadvertently cause Predator to filter out valid plates.
             - If you want to skip the preference prompt associated with this setting, but you don't want to supply a license plate format, set this preference to a single space.
                 - Example: `default_license_plate_format = " "`
+
+
+### Real-time Mode Push Notification Settings
+
+All settings in this section are related to network-based push notifications via Gotify.
+
+- `push_notifications_enabled`
+    - This setting determines whether or not Predator will attempt to send push notifications using a Gotify server.
+    - This value is a boolean value, and should only ever be set to `True` or `False`
+- `gotify_server`
+    - This setting specifies the Gotify server that Predator will attempt to use. It should include the protocol and port number.
+    - This value must be configured if `push_notifications_enabled` is set to `True`
+    - Example:
+- `gotify_application_token`
+    - This setting specifies the Gotify application token that Predator will attempt to use to send notifications through the specified Gotify server.
+    - This value must be configured if `push_notifications_enabled` is set to `True`
+    - Example:
+        `AJrhgGs83mL22kZ`
 
 ## Dash-cam Mode Configuration
 

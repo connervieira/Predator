@@ -102,3 +102,4 @@ This update adds 'dash-cam mode' to Predator, which allows it to record video wi
 - Changed the audio backend from Python playsound to mpg321 in order to fix audio on Raspberry Pi.
 - Fixed an issue where the 'separate line' wouldn't appear under detected plates in real-time mode.
 - Added a hyphen to 'Real-time' in the mode selection menu.
+- Added native support for push notifications via Gotify.

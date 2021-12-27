@@ -23,6 +23,7 @@ default_root = "" # If this variable isn't empty, the "root directory" prompt wi
 
 
 
+
 # ----- Pre-recorded mode configuration -----
 left_margin = "700" # How many pixels will be cropped on the left side of the frame in pre-recorded mode.
 right_margin = "700" # How many pixels will be cropped on the right side of the frame in pre-recorded mode.
@@ -52,6 +53,11 @@ default_alert_database = "" # If this variable isn't empty, the "alert database"
 default_save_license_plates_preference = "" # If this variable isn't empty, the "save license plates" prompt will be skipped when starting in real-time mode. If this variable is set to "y", license plates will be saved.
 default_save_images_preference = "" # If this variable isn't empty, the "save images" prompt will be skipped when starting in real-time mode. If this variable is set to "y", all images will be saved.
 default_license_plate_format = "" # If this variable isn't empty, the "license plate format" prompt will be skipped when starting in real-time mode. This variable will be used as the license plate format.
+
+# Push notification settings
+push_notifications_enabled = False # This setting determines whether or not Predator will attempt to use Gotify to broadcast notifications for certain events.
+gotify_server = "" # This setting specifies the server address of the desired Gotify server, and should include the protocol (Ex: http://) and port (Ex: 80).
+gotify_application_token = "" # This setting specifies the Gotify application token that Predator will use to broadcast notifications.
 
 
 
@@ -298,6 +304,9 @@ else:
 if (audio_alerts == True):
     os.system("mpg321 ./assets/sounds/testnoise.mp3 > /dev/null 2>&1 &")
 
+if (push_notifications_enabled == True):
+    os.system("curl -X POST '" + gotify_server + "/message?token=" + gotify_application_token + "' -F 'title=Predator' -F 'message=Predator has been started.' > /dev/null 2>&1 &")
+
 
 
 # Run some basic error checks to see if any of the data supplied in the configuration seems wrong.
@@ -326,10 +335,17 @@ if (fswebcam_device == ""):
     print(style.yellow + "Warning: The 'fswebcam_device' specified in the real-time configuration section is blank. It's possible there has been a typo. Defaulting to /dev/video0" + style.end)
     fswebcam_device = "/dev/video0"
 
-
 if (dashcam_background_mode_realtime == True and dashcam_background_mode == True and dashcam_device == fswebcam_device):
-    print(style.yellow + "Warning: The 'dashcam_background_mode_realtime' is turned on, but the same recording device has been specified for 'dashcam_device' and 'fswebcam_device'. Predator can't use the same device for two different tasks. Background dash-cam recording in real-time mode has been disabled." + style.end)
+    print(style.yellow + "Warning: The 'dashcam_background_mode_realtime' setting is turned on, but the same recording device has been specified for 'dashcam_device' and 'fswebcam_device'. Predator can't use the same device for two different tasks. Background dash-cam recording in real-time mode has been disabled." + style.end)
     dashcam_background_mode_realtime = False
+
+if (push_notifications_enabled == True):
+    if (gotify_server == "" or gotify_server == None):
+        print(style.yellow + "Warning: The 'push_notifications_enabled' setting is turned on, but the 'gotify_server' hasn't been set. Push notifications have been disabled." + style.end)
+        push_notifications_enabled = False
+    if (gotify_application_token == "" or gotify_application_token == None):
+        print(style.yellow + "Warning: The 'push_notifications_enabled' setting is turned on, but the 'gotify_application_token' hasn't been set. Push notifications have been disabled." + style.end)
+        push_notifications_enabled = False
 
 
 
@@ -799,6 +815,9 @@ elif (mode_selection == "2"): # Real-time mode
                     if (audio_alerts == True): # Check to see if the user has audio alerts enabled.
                         os.system("mpg321 ./assets/sounds/platedetected.mp3 > /dev/null 2>&1 &") # Play a subtle alert sound.
 
+                    if (push_notifications_enabled == True): # Check to see if the user has Gotify notifications enabled.
+                        os.system("curl -X POST '" + gotify_server + "/message?token=" + gotify_application_token + "' -F 'title=Predator' -F 'message=A license plate has been detected: " + detected_plate + "' > /dev/null 2>&1 &")
+
                     if (shape_alerts == True):  # Check to see if the user has enabled shape notifications.
                         display_shape("square")
 
@@ -836,6 +855,9 @@ elif (mode_selection == "2"): # Real-time mode
 
                     if (audio_alerts == True): # Check to see if the user has audio alerts enabled.
                         os.system("mpg321 ./assets/sounds/alerthit.mp3 > /dev/null 2>&1 &") # Play the prominent alert sound.
+
+                    if (push_notifications_enabled == True): # Check to see if the user has Gotify notifications enabled.
+                        os.system("curl -X POST '" + gotify_server + "/message?token=" + gotify_application_token + "' -F 'title=Predator' -F 'message=A license plate in the alert database has been detected: " + detected_plate + "' > /dev/null 2>&1 &")
 
 
             if (webhook != None and webhook != ""): # Check to see if the user has specified a webhook to submit detected plates to.
