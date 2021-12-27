@@ -24,12 +24,15 @@ This is the installation process for Predator and all of it's dependencies.
     - `pip3 install validators`
 6. Install the `mpg321` package.
     - `sudo apt-get install mpg321`
-7. Download Predator.
+7. Optionally, install software to remotely manage Predator.
+    - If you're installing Predator on a Raspberry Pi, you may find it useful to install a program like [RaspAP](https://github.com/RaspAP/raspap-webgui) in order to remotely manage your Predator instance, and eliminate the need for a full keyboard and display.
+    - Predator works entirely via command line, meaning any set up that enables SSH access to the host will allow for remote management of Predator.
+8. Download Predator.
     - Predator can be downloaded either from the V0LT website, or from it's GitHub page. The download straight from the V0LT website is recommended for sake of stability and completeness, but you're free to use GitHub as well if you're OK with using a less stable version of Predator.
     - V0LT website: <https://v0lttech.com/predator.php>
     - GitHub page: <https://v0lttech.com/predator.php>
         - `git clone https://github.com/connervieira/Predator`
-8. Extract Predator
+9. Extract Predator
     - After downloading Predator, regardless of where you get it from, extract it from the compressed archive (if necessary), and place it somewhere on your filesystem.
 
 
