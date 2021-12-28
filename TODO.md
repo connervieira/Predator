@@ -23,6 +23,7 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Add the ability to record video without processing plates in real-time.
 - [X] The ability to correlate license plate detections with GPS data from a GPX file.
 - [X] Push notification support.
+- [X] Add support for using multiple recording devices in dash-cam mode.
 
 
 # Hypothetical
@@ -30,5 +31,4 @@ These are the features actively planned for Predator and are likely to be added 
 These are features that require more in-depth changes, and are purely hypothetical.
 
 - [ ] The ability to process multiple sequential videos at once.
-- [ ] De-duplication of license plates that aren't identical, but are very similar and likely to be invalid repeats of the same plate.
-- [ ] The ability to black out parts of frames in real-time and pre-recorded mode to further refine where Predator will scan for license plates.
+- [ ] A program to remotely start and close Predator.
