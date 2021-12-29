@@ -909,7 +909,7 @@ elif (mode_selection == "3"): # Dash-cam mode
     if (dashcam_background_mode == False): # If the user has specified that background recording is turned off, then run the FFMPEG recording command in the foreground.
         print(style.italic + "Press Ctrl+C to stop recording and quit Predator." + style.end)
         os.system("ffmpeg -f v4l2 -framerate " + dashcam_frame_rate + " -video_size " + dashcam_resolution + " -input_format mjpeg -i " + dashcam_device[0] + " " + root + "/predator_dashcam.mkv > /dev/null 2>&1") # Run dashcam recording in the foreground using the first dashcam_device.
-        print(style.yellow + "Warning: Video recording has unexpectedly stopped. Video is not currently being recorded, and you should attempt to diagnose why the issue is occurring before continuing." + style.end) # Alert the user if the command above finishes running, since it should run indefinitely until cancelled.
+        print(style.yellow + "Warning: Video recording has stopped." + style.end) # Alert the user if the command above finishes running, since it should run indefinitely until cancelled.
 
     elif (dashcam_background_mode == True): # 
         iteration_counter = 0 # Set the iteration counter to 0 so that we can increment it for each recording device specified.

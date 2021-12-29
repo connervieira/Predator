@@ -96,10 +96,13 @@ December 8th, 2021
 
 This update adds 'dash-cam mode' to Predator, which allows it to record video without processing license plates in real-time. This allows you to use your Predator system as a dash-cam while driving, then analyze the video later using 'pre-recorded mode'.
 
+December 29th, 2021
+
 - Added dash-cam mode, with customizable resolution, frame rate, and recording device.
     - In dash-cam mode, Predator will record video in real-time to a video file, but it will not process it. This is useful if you run Predator on a low-powered device, and want to process the video at a later time.
+    - Multiple recording devices can be used simultaneously using background recording.
 - Added the ability to correlate pre-recorded video analysis with a GPX file.
+- Added native support for push notifications via Gotify.
 - Changed the audio backend from Python playsound to mpg321 in order to fix audio on Raspberry Pi.
 - Fixed an issue where the 'separate line' wouldn't appear under detected plates in real-time mode.
 - Added a hyphen to 'Real-time' in the mode selection menu.
-- Added native support for push notifications via Gotify.
