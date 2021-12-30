@@ -63,6 +63,7 @@ December 6th, 2021
     - License plate validation now uses a function for easy customization. For example, the state of Ohio typically follows the format of AAA0000 on their license plates, while other states don't, so the function allows you to submit a plate along side a validation format template.
     - There is now a preference prompt for both pre-recorded and real-time mode that asks for a license plate validation template/example.
 
+
 ## Version 3.0
 
 ### Hard-wire Update
@@ -90,6 +91,7 @@ December 8th, 2021
 - Added warning messages when the user enters an invalid selection in pre-recorded mode.
 - Added a simple statistics viewer for pre-recorded mode.
 
+
 ## Version 4.0
 
 ### Dashcam Update
@@ -106,3 +108,13 @@ December 29th, 2021
 - Changed the audio backend from Python playsound to mpg321 in order to fix audio on Raspberry Pi.
 - Fixed an issue where the 'separate line' wouldn't appear under detected plates in real-time mode.
 - Added a hyphen to 'Real-time' in the mode selection menu.
+
+
+
+## Version 5.0
+
+### Object-Recognition Update
+
+This update gives Predator the ability to recognize objects other than license plates.
+
+(Release date: to be determined)
