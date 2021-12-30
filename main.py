@@ -1,12 +1,18 @@
 import os
 import time
-import subprocess
+import subprocess # Required for starting some shell commands
 import sys
 import urllib.request # Required to make network requests
 import re # Required to use Regex
 import validators # Required to validate URLs
-import datetime
+import datetime # Required for converting between timestamps and human readable date/time information
 from xml.dom import minidom # Required for processing GPX data
+import json # Required to pretty-print dictionaries
+
+import silence_tensorflow.auto # Silences tensorflow warnings
+import cv2 # Required for object recognition (not license plate recognition)
+import cvlib as cv # Required for object recognition (not license plate recognition)
+from cvlib.object_detection import draw_bbox # Required for object recognition (not license plate recognition)
 
 
 # ===============================
@@ -17,7 +23,7 @@ from xml.dom import minidom # Required for processing GPX data
 # ----- General configuration -----
 crop_script_path = str(os.path.dirname(__file__)) + "/crop_image" # Path to the cropping script in the Predator directory.
 ascii_art_header = True # This setting determines whether or not the large ASCII art Predator title will show on start-up. When set to False, a small, normal text title will appear instead. This is useful when running Predator on a device with a small display to avoid weird formatting.
-auto_start_mode = "" # This variable determines whether or not automatically start in a particular mode. When empty, the user will be prompted whether to start in pre-recorded mode or in real-time mode. When set to "1", Predator will automatically select and start pre-recorded mode when launched. When set to "2", Predator will automatically select and start real-time mode when launched. When set to "3", Predator will start into dashcam-mode when launched.
+auto_start_mode = "1" # This variable determines whether or not automatically start in a particular mode. When empty, the user will be prompted whether to start in pre-recorded mode or in real-time mode. When set to "1", Predator will automatically select and start pre-recorded mode when launched. When set to "2", Predator will automatically select and start real-time mode when launched. When set to "3", Predator will start into dashcam-mode when launched.
 default_root = "" # If this variable isn't empty, the "root directory" prompt will be skipped when starting Predator. This variable will be used as the root directory. This variable only affects real-time mode and dash-cam mode.
 
 
@@ -381,10 +387,15 @@ else: # No 'auto start mode' has been configured, so ask the user to select manu
 
 if (mode_selection == "1"): # The user has selected to boot into pre-recorded mode.
     # Get the required information from the user.
-    root = input("Enter the root filepath for this project, without a forward slash at the end: ")
+    if (default_root != ""): # Check to see if the user has configured a default root directory path.
+        print(style.bold + "Using default preference for root directory." + style.end)
+        root = default_root
+    else:
+        root = input("Enter the root filepath for this project, without a forward slash at the end: ")
     video = input("Please enter the file name of the video you would like to scan for license plates: ")
     framerate = float(input("Please enter how many seconds you want to wait between taking frames to analyze: "))
     license_plate_format = input("Please enter the license plate format you would like to scan for. Leave blank for all: ")
+    object_recognition_preference = input("Would you like Predator to count vehicles in each frame? (y/n): ")
     video_start_time = input("Optionally, enter the date and time that the specified video recording started (YYYY-mm-dd HH:MM:SS): ") # Ask the user when the video recording started so we can correlate it's frames to a GPX file.
     if (video_start_time != ""):
         gpx_file = input("If you'd like to enable GPX correlation, please enter the file name of the GPX file associated with the video. Leave this blank to disable GPS correlation: ")
@@ -396,6 +407,11 @@ if (mode_selection == "1"): # The user has selected to boot into pre-recorded mo
         video_start_time = 0
     else:
         video_start_time = round(time.mktime(datetime.datetime.strptime(video_start_time, "%Y-%m-%d %H:%M:%S").timetuple())) # Convert the video_start_time human readable date and time into a Unix timestamp.
+
+    if (object_recognition_preference.lower() == "y"): # Change the 'object_recognition_preference' to a boolean for easier manipulation.
+        object_recognition_preference = True
+    else:
+        object_recognition_preference = False
         
 
 
@@ -442,6 +458,26 @@ if (mode_selection == "1"): # The user has selected to boot into pre-recorded mo
     for frame in frames:
         os.system(crop_script_path + " " + root + "/frames/" + frame + " " + left_margin + " " + right_margin + " " + top_margin + " " + bottom_margin)
     print("Done.\n")
+
+
+
+    # If enabled, count how many vehicles are in each frame.
+    if (object_recognition_preference == True):
+        print("Running object recognition...")
+        time.sleep(1) # Wait for a short period of time to allow the images to finish saving.
+        object_count = {} # Create an empty dictionary that will hold each frame and the object recognition counts.
+        for frame in frames: # Iterate through each frame.
+            object_count[frame] = {} # Initial the dictionary for this frame.
+            frame_path = root + "/frames/" + frame # Set the file path of the current frame.
+            image = cv2.imread(frame_path) # Load the frame.
+            object_recognition_bounding_box, object_recognition_labels, object_recognition_confidence = cv.detect_common_objects(image) # Anaylze the image.
+            for object_recognized in object_recognition_labels: # Iterate through each object recognized.
+                if (object_recognized in object_count[frame]):
+                    object_count[frame][object_recognized] = object_count[frame][object_recognized] + 1
+                else:
+                    object_count[frame][object_recognized] = 1
+
+        print("Done.\n")
 
 
 
@@ -521,10 +557,12 @@ if (mode_selection == "1"): # The user has selected to boot into pre-recorded mo
         print("0. Quit")
         print("1. View data")
         print("2. Export data")
-        print("3. Manage raw analysis data")
+        print("3. Manage raw plate analysis data")
         print("4. View statistics")
+        if (object_recognition_preference == True):
+            print("5. View object recognition information")
         if (gpx_file != ""):
-            print("5. Display license plate GPS locations")
+            print("6. Display license plate GPS locations")
 
         selection = input("Selection: ")
         clear()
@@ -631,7 +669,27 @@ if (mode_selection == "1"): # The user has selected to boot into pre-recorded mo
             input("\nPress enter to continue...") # Wait for the user to press enter before repeating the menu loop.
 
 
-        elif (selection == "5" and gpx_file != ""):
+        elif (selection == "5" and object_recognition_preference == True): # The user has chosen to view object recognition data.
+            print("Please select an option")
+            print("0. Back")
+            print("1. View raw data")
+            print("2. Display raw data formatted")
+
+            selection = input("Selection: ")
+
+            if (selection == "0"):
+                print("Returning to main menu.")
+            elif (selection == "1"):
+                print(object_count)
+            elif (selection == "2"):
+                print(json.dumps(object_count, indent=4))
+            else:
+                print(style.yellow + "Warning: Invalid selection." + style.end)
+            
+            input("\nPress enter to continue...") # Wait for the user to press enter before repeating the menu loop.
+
+
+        elif (selection == "6" and gpx_file != ""): # The user has chosen to view GPX data.
             print("Please select an option")
             print("0. Back")
             print("1. View raw license plate location data")

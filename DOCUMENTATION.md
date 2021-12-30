@@ -20,8 +20,9 @@ This is the installation process for Predator and all of it's dependencies.
 4. Install FSWebcam
     - Predator uses FSWebcam to access cameras when using real-time mode.
     - You can install FSWebcam using the following command on a Debian based Linux machine: `sudo apt-get install fswebcam`
-5. Install the `validators` Python package.
-    - `pip3 install validators`
+5. Install the required Python packages.
+    - `pip3 install validators opencv-python-headless==4.5.3.56 cvlib tensorflow keras silence-tensorflow`
+    - `pip3 install opencv-python-headless==4.5.3.56`
 6. Install the `mpg321` package.
     - `sudo apt-get install mpg321`
 7. Optionally, install software to remotely manage Predator.
@@ -77,11 +78,17 @@ After configuring Predator, you can try it out for the first time!
             - Example: `/home/cvieira/Downloads/MyProjectFolder`
         - Next, you'll be asked to enter the file name of the video you want to analyze. This video should be placed in the root project directory you just specified.
             - Example: `MyVideo.mp4`
-        - Finally, you'll be asked how many second you want to wait between frames for analysis. Since it would be inefficient to process every single frame of video, this value is used to only take frames every N seconds. You can think of this value as "only process a frame every N seconds of video"
-        - Example: `2` will take a frame to process every 2 seconds of video. This would break up a 10 second video into 5 frames.
-        - Finally, you'll be asked for a license plate format example. Filling out this value is highly recommended, since it will greatly reduce the number of incorrectly read plates. If this is left blank, no formatting validation will be used.
+        - Next, you'll be asked how many second you want to wait between frames for analysis. Since it would be inefficient to process every single frame of video, this value is used to only take frames every N seconds. You can think of this value as "only process a frame every N seconds of video"
+            - Example: `2` will take a frame to process every 2 seconds of video. This would break up a 10 second video into 5 frames.
+        - Next, you'll be asked whether or not you want Predator to count how many vehicles (not license plates) it spots in each frame.
+            - This will slow down processing time significantly, but might be useful.
+        - Next, you'll be asked for a license plate format example. Filling out this value is highly recommended, since it will greatly reduce the number of incorrectly read plates. If this is left blank, no formatting validation will be used.
             - This value can be set to any alphanumeric string. For example, if all the plates in your state have 3 letters followed by 4 numbers, you could set this value to "AAA0000" or "ABC1234". Both values will work the exact same way.
             - For sake of simplicity, you can also just enter the license plate of another car in your state or region. Since Predator only looks to see whether a character is a number or letter, not the character itself, "EGY4011" will act identically to "AAA0000".
+        - Finally, you'll be asked for the time and date that the specified video recording started.
+            - This preference takes the following format: YYYY-mm-dd HH:MM:SS
+            - This preference is optional but will enabled the GPX file preference.
+                - If you wish to correlate license plates to location data from a GPX file, simply enter the GPX file name at the prompt. Otherwise, leave it blank.
     - Real-time mode:
         - First, you'll be asked to set the root project folder. Simply create an empty folder, then place any files you want to use later into it. Specify the absolute path to this folder here.
             - Example: `/home/cvieira/Downloads/MyProjectFolder`

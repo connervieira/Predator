@@ -118,3 +118,6 @@ December 29th, 2021
 This update gives Predator the ability to recognize objects other than license plates.
 
 (Release date: to be determined)
+
+- Added support for object recognition and counting in pre-recorded mode.
+- Made it so pre-recorded mode will follow the `default_root` setting.
