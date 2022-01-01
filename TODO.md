@@ -24,7 +24,9 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] The ability to correlate license plate detections with GPS data from a GPX file.
 - [X] Push notification support.
 - [X] Add support for using multiple recording devices in dash-cam mode.
-- [ ] Add basic object recognition.
+- [X] Add basic object recognition.
+- [ ] Add the ability to toggle saving object recognition data to disk.
+- [ ] Add the ability to toggle verbose file saving data.
 
 
 # Hypothetical
