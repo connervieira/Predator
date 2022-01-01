@@ -1,6 +1,6 @@
 # Predator
 
-A front end for OpenALPR designed to detect and record license plates in both pre-recorded and real-time video.
+A vision system primarily designed to read license plates in both pre-recorded and real-time video.
 
 ![Predator LPRS header](./assets/images/branding/PredatorHeaderLight.svg)
 
