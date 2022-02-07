@@ -23,7 +23,7 @@ from cvlib.object_detection import draw_bbox # Required for object recognition (
 # ----- General configuration -----
 crop_script_path = str(os.path.dirname(__file__)) + "/crop_image" # Path to the cropping script in the Predator directory.
 ascii_art_header = True # This setting determines whether or not the large ASCII art Predator title will show on start-up. When set to False, a small, normal text title will appear instead. This is useful when running Predator on a device with a small display to avoid weird formatting.
-auto_start_mode = "1" # This variable determines whether or not automatically start in a particular mode. When empty, the user will be prompted whether to start in pre-recorded mode or in real-time mode. When set to "1", Predator will automatically select and start pre-recorded mode when launched. When set to "2", Predator will automatically select and start real-time mode when launched. When set to "3", Predator will start into dashcam-mode when launched.
+auto_start_mode = "" # This variable determines whether or not automatically start in a particular mode. When empty, the user will be prompted whether to start in pre-recorded mode or in real-time mode. When set to "1", Predator will automatically select and start pre-recorded mode when launched. When set to "2", Predator will automatically select and start real-time mode when launched. When set to "3", Predator will start into dashcam-mode when launched.
 default_root = "" # If this variable isn't empty, the "root directory" prompt will be skipped when starting Predator. This variable will be used as the root directory. This variable only affects real-time mode and dash-cam mode.
 
 
@@ -59,6 +59,7 @@ default_alert_database = "" # If this variable isn't empty, the "alert database"
 default_save_license_plates_preference = "" # If this variable isn't empty, the "save license plates" prompt will be skipped when starting in real-time mode. If this variable is set to "y", license plates will be saved.
 default_save_images_preference = "" # If this variable isn't empty, the "save images" prompt will be skipped when starting in real-time mode. If this variable is set to "y", all images will be saved.
 default_license_plate_format = "" # If this variable isn't empty, the "license plate format" prompt will be skipped when starting in real-time mode. This variable will be used as the license plate format.
+default_realtime_object_recognition = "" # If this variable isn't empty, then the "real-time object detection" prompt will be skipped when starting in real-time mode. If this variable is set to "y", object recognition will be turned on.
 
 # Push notification settings
 push_notifications_enabled = False # This setting determines whether or not Predator will attempt to use Gotify to broadcast notifications for certain events.
@@ -187,7 +188,7 @@ def download_plate_database(url):
     # Process the downloaded data step by step to form a list of all of the plates in the database.
     processed_download_data = str(raw_download_data) # Convert the downloaded data to a string.
     processed_download_data = processed_download_data.replace("\\n", "\n") # Replace the indicated line-breaks with true line-breaks.
-    processed_download_data = re.sub('([^A-Z0-9\\n\\r])+', '', processed_download_data) # Remove all chracters except capital letters, numbers, and line-breaks.
+    processed_download_data = re.sub('([^A-Z0-9\\n\\r*])+', '', processed_download_data) # Remove all chracters except capital letters, numbers, and line-breaks.
 
     download_data_list = processed_download_data.split() # Split the downloaded data line-by-line into a Python list.
 
@@ -757,6 +758,13 @@ elif (mode_selection == "2"): # Real-time mode
     else:
         license_plate_format = input("Please enter the license plate format you would like to scan for. Leave blank for all: ")
 
+    if (default_realtime_object_recognition != ""): # Check to see if the user has configured a default for this preference.
+        print(style.bold + "Using default preference for real-time object recognition." + style.end)
+        if (default_realtime_object_recognition != ""):
+            realtime_object_recognition = default_realtime_object_recognition
+    else:
+        realtime_object_recognition = input("Would you like to enable real-time object recognition? (y/n): ")
+
 
     # Save yes/no preferences as boolean values for easier access.
     if (save_license_plates_preference.lower() == "y"):
@@ -768,6 +776,11 @@ elif (mode_selection == "2"): # Real-time mode
         save_images_preference = True
     else:
         save_images_preference = False
+
+    if (realtime_object_recognition.lower() == "y"):
+        realtime_object_recognition = True
+    else:
+        realtime_object_recognition = False
 
 
 
@@ -806,9 +819,13 @@ elif (mode_selection == "2"): # Real-time mode
 
     i = 0 # Set the increment counter to 0 so we can increment it by one each time Predator analyzes a plate.
 
+
+
     while True: # Run in a loop forever.
 
         time.sleep(0.2) # Sleep to give the user time to quit Predator if they want to.
+
+        # Take an image using the camera device specified in the configuration.
         print("Taking image...")
         if (save_images_preference == True): # Check to see whether or not the user wants to save all images captured by Predator.
             os.system("fswebcam --no-banner -r " + camera_resolution + " -d " + fswebcam_device + " --jpeg 100 " + fswebcam_flags + " " + root + "/realtime_image" + str(i) + ".jpg >/dev/null 2>&1") # Take a photo using FSWebcam, and save it to the root project folder specified by the user.
@@ -818,6 +835,7 @@ elif (mode_selection == "2"): # Real-time mode
 
 
 
+        # If enabled, crop the frame down.
         if (real_time_cropping_enabled == True): # Check to see if the user has enabled cropping in real-time mode.
             print("Cropping frame...")
             if (save_images_preference == True): # Check to see whether or not the user wants to save all images captured by Predator.
@@ -828,17 +846,15 @@ elif (mode_selection == "2"): # Real-time mode
             
 
 
+        # Run license plate analysis on the captured frame.
         print("Analyzing image...")
         time.sleep(0.2) # Sleep to give the user time to quit Predator if they want to.
-
         if (save_images_preference == True): # Check to see whether or not the user wants to save all images captured by Predator.
             analysis_command = "alpr -n " + realtime_guesses  + " " + root + "/realtime_image" + str(i) + ".jpg | awk '{print $2}'" # Prepare the analysis command so we can run it next.
         else:
             analysis_command = "alpr -n " + realtime_guesses  + " " + root + "/realtime_image.jpg | awk '{print $2}'" # Prepare the analysis command so we can run it next.
 
-
-
-        i = i + 1 # Increment the counter.
+        i = i + 1 # Increment the counter for this cycle so we can count how many images we've analyzed during this session.
         new_plate_detected = "" # This variable will be used to determine whether or not a plate was detected this round. If no plate is detected, this will remain blank. If a plate is detected, it will change to be that plate. This is used to determine whether or not the database of detected plates needs to updated.
 
         reading_output = str(os.popen(analysis_command).read()) # Run the OpenALPR command, and save it's output to reading_output.
@@ -867,8 +883,6 @@ elif (mode_selection == "2"): # Real-time mode
                         if (print_invalid_plates == True):
                             print(style.red + plate + style.end) # Print the invalid plate in red.
 
-
-
                 if (successfully_found_plate == True): # Check to see if a valid plate was detected this round.
                     detected_license_plates.append(detected_plate) # Save the most likely license plate ID to the detected_license_plates list.
                     print("Detected plate: " + detected_plate + "\n----------")
@@ -884,16 +898,35 @@ elif (mode_selection == "2"): # Real-time mode
 
                     new_plate_detected = detected_plate
                         
-
-                elif (successfully_found_plate == False): # A plate was found, but none of the guesses matched the 
+                elif (successfully_found_plate == False): # A plate was found, but none of the guesses matched the formatting guidelines provided by the user.
                     print("A plate was found, but none of the guesses matched the supplied plate format.\n----------")
 
                     if (shape_alerts == True):  # Check to see if the user has enabled shape notifications.
                         display_shape("circle")
 
-
         else: # No license plate was detected.
             print("Done.\n----------")
+
+
+
+
+        # If enabled, run object recognition on the captured frame.
+        if (realtime_object_recognition == True):
+            print("Running object recognition...")
+            object_count = {} # Create an empty dictionary that will hold each frame and the object recognition counts.
+            if (save_images_preference == True): # Check to see whether or not the user wants to save all images captured by Predator.
+                frame_path = root + "/realtime_image" + str(i) + ".jpg" # Set the file path of the current frame.
+            else:
+                frame_path = root + "/realtime_image.jpg" # Set the file path of the current frame.
+
+            image = cv2.imread(frame_path) # Load the frame.
+            object_recognition_bounding_box, object_recognition_labels, object_recognition_confidence = cv.detect_common_objects(image) # Anaylze the image.
+            objects_identified = str(object_recognition_labels)
+            if (objects_identified != "[]"): # Check to see that there were actually identified objects.
+                print("Objects identified: " + objects_identified)
+                export_data = str(round(time.time())) + "," + objects_identified + "\n" # Add the timestamp to the export data, followed by the object's detected, followed by a line break to prepare for the next entry to be added later.
+                add_to_file(root + "/real_time_object_detection.csv", export_data) # Add the export data to the end of the file and write it to disk.
+            print("Done\n----------")
 
 
 
