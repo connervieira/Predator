@@ -22,7 +22,6 @@ This is the installation process for Predator and all of it's dependencies.
     - You can install FSWebcam using the following command on a Debian based Linux machine: `sudo apt-get install fswebcam`
 5. Install the required Python packages.
     - `pip3 install validators opencv-python-headless==4.5.3.56 cvlib tensorflow keras silence-tensorflow`
-    - `pip3 install opencv-python-headless==4.5.3.56`
 6. Install the `mpg321` package.
     - `sudo apt-get install mpg321`
 7. Optionally, install software to remotely manage Predator.
