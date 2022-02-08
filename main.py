@@ -1,5 +1,5 @@
-import os
-import time
+import os # Required to interact with certain operating system functions
+import time # Required to add delays and handle dates/times
 import subprocess # Required for starting some shell commands
 import sys
 import urllib.request # Required to make network requests
@@ -8,6 +8,7 @@ import validators # Required to validate URLs
 import datetime # Required for converting between timestamps and human readable date/time information
 from xml.dom import minidom # Required for processing GPX data
 import json # Required to pretty-print dictionaries
+import fnmatch # Required to use wildcards to check strings
 
 import silence_tensorflow.auto # Silences tensorflow warnings
 import cv2 # Required for object recognition (not license plate recognition)
@@ -933,18 +934,8 @@ elif (mode_selection == "2"): # Real-time mode
         active_alert = False # Reset the alert status to false so we can check for alerts on the current plate (if one was detected) next.
         if (new_plate_detected != ""): # Check to see that the new_plate_detected variable isn't blank. This variable will only have a string if a plate was detected this round.
 
-            for alert_plate in alert_database_list: # Run through every plate in the alert plate database supplied by the user. If no database was supplied, this list will be empty, and will not run.
-                alert_plate_incorrect_characters = False # Reset the invalid character indicator to "False" before iterating though each character in the detected plate.
-                if (len(new_plate_detected) == len(alert_plate)): # Make sure the license plate detected and the current plate in the alert database are the same length.
-                    character_iteration_counter = 0 # This variable will be counted up by one for each character iterated through.
-                    for character in new_plate_detected: # Iterate through each character in the plate detected.
-                        if (character == new_plate_detected[character_iteration_counter] or new_plate_detected[character_iteration_counter] == "*"): # Make sure each character in the plate detected and the entry in the alert database matches, or that the alert database entry has a '*' wildcard in this place.
-                            pass # This particular character matches, so continue the analysis.
-                        else:
-                            alert_plate_incorrect_characters = True # If the character in the detected plate doesn't match a certain character in the alert database entry, indicate that one or more characters is wrong.
-                        character_iteration_counter = character_iteration_counter + 1 # Iterate the character position counter by 1.
-                        
-                if (alert_plate_incorrect_characters == False): # Check to see that all of the characters in the detected plate match this alert database entry, as analyzed previously.
+            for alert_plate in alert_database_list: # Run through every plate in the alert plate database supplied by the user. If no database was supplied, this list will be empty, and will not run.                        
+                if (fnmatch.fnmatch(new_plate_detected, alert_plate)): # Check to see the detected plate matches this particular plate in the alert database, taking wildcards into account.
                     active_alert = True # If the plate does exist in the alert database, indicate that there is an active alert by changing this variable to True. This will reset on the next round.
 
                     # Display an alert that is starkly different from the rest of the console output.
