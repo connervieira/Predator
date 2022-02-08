@@ -121,4 +121,4 @@ This update gives Predator the ability to recognize objects other than license p
 
 - Added support for object recognition and counting in pre-recorded mode.
 - Made it so pre-recorded mode will follow the `default_root` setting.
-- The '\*' character is now allowed to be used in online alert databases, but it's currently not a functional wildcard.
+- Alert databases can now contain wildcards to further refine plate alerts.
