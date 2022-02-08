@@ -189,7 +189,7 @@ def download_plate_database(url):
     # Process the downloaded data step by step to form a list of all of the plates in the database.
     processed_download_data = str(raw_download_data) # Convert the downloaded data to a string.
     processed_download_data = processed_download_data.replace("\\n", "\n") # Replace the indicated line-breaks with true line-breaks.
-    processed_download_data = re.sub('([^A-Z0-9\\n\\r*])+', '', processed_download_data) # Remove all chracters except capital letters, numbers, and line-breaks.
+    processed_download_data = re.sub('([^A-Z0-9\\n\\r\*\-\?\\[\\]])+', '', processed_download_data) # Remove all chracters except capital letters, numbers, and line-breaks.
 
     download_data_list = processed_download_data.split() # Split the downloaded data line-by-line into a Python list.
 
