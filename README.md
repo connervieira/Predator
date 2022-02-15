@@ -47,7 +47,7 @@ Since Predator is open source, self hosted, offline, and self contained, you can
 
 ### Multipurpose
 
-Predator is deliberately designed to be multipurpose. It can operate both as an analysis tool for pre-recorded video, as well as a real-time monitoring program.
+Predator is deliberately designed to be multipurpose. It can operate both as an analysis tool for pre-recorded video, as well as a real-time monitoring program. Predator can even act as a standalone dashcam when license plate reading is unnecessary.
 
 ### Customizable
 
