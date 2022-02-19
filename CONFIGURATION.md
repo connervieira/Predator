@@ -87,6 +87,13 @@ Configuration values in this section are settings specific to real-time mode.
     - Examples:
         - `http://localhost/app.php?plate=[L]&time=[T]&alert=[A]`
         - `http://domain.tld/app/[L]`
+- `shape_alerts`
+    - This setting determines whether or not Predator will use large shapes printed to the console to indicate certain important events.
+    - When set to `True`, Predator will use things like large ASCII circles, squares, and triangles to indicate when a plate has been detected, when an alert has been triggered, and when a plate has been read, but failed validation.
+    - If you intend on using Predator in a vehicle, this setting can drastically reduce the time it takes for you to look at the console output in order to figure out what Predator is doing.
+- `save_real_time_object_recognition`
+    - This setting determines whether or not Predator will save all of the objects it recognizes to disk while running in real-time mode.
+    - When this is set to `False`, the objects recognized will only be printed to the console, and won't be saved to a file.
 
 
 ### Real-time Mode Default Settings

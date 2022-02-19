@@ -120,5 +120,6 @@ This update gives Predator the ability to recognize objects other than license p
 (Release date: to be determined)
 
 - Added support for object recognition and counting in pre-recorded mode.
+- Added support for object recognition and counting in real-time mode.
 - Made it so pre-recorded mode will follow the `default_root` setting.
 - Alert databases can now contain wildcards to further refine plate alerts.

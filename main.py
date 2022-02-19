@@ -63,6 +63,7 @@ fswebcam_flags = "--set brightness=50%" # These are command flags that will be a
 audio_alerts = True # This setting determines whether or not Predator will make use of sounds to inform the user of events.
 webhook = "" # This setting can be used to define a webhook that Predator will send a request to when it detects a license plate in real-time mode. See CONFIGURATION.md to learn more about how to use flags in this setting.
 shape_alerts = True # This setting determines whether or not prominent text-based shapes will be displayed for various actions. This is useful in vehicle installations where you may want to see whether or not Predator detected a plate at a glance.
+save_real_time_object_recognition = True # This setting determines whether or not Predator will save the objects detected in real-time mode to a file. When this is turned off, object recognition data will only be printed to the console.
 
 # Default settings
 default_alert_database = "" # If this variable isn't empty, the "alert database" prompt will be skipped when starting in real-time mode. This variable will be used as the alert database. Add a single space to skip this prompt without specifying a database.
@@ -741,7 +742,9 @@ elif (mode_selection == "2"): # Real-time mode
             if (objects_identified != "[]"): # Check to see that there were actually identified objects.
                 print("Objects identified: " + objects_identified)
                 export_data = str(round(time.time())) + "," + objects_identified + "\n" # Add the timestamp to the export data, followed by the object's detected, followed by a line break to prepare for the next entry to be added later.
-                add_to_file(root + "/real_time_object_detection.csv", export_data) # Add the export data to the end of the file and write it to disk.
+                if (save_real_time_object_recognition == True): # Check to make sure the user has configured Predator to save recognized objects to disk.
+                    add_to_file(root + "/real_time_object_detection.csv", export_data) # Add the export data to the end of the file and write it to disk.
+                
             print("Done\n----------")
 
 
