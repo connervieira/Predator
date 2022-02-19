@@ -1,3 +1,9 @@
+# Predator LPRS
+# main.py
+
+print("Loading Predator LPRS...")
+
+
 import os # Required to interact with certain operating system functions
 import time # Required to add delays and handle dates/times
 import subprocess # Required for starting some shell commands
@@ -15,8 +21,8 @@ import cv2 # Required for object recognition (not license plate recognition)
 import cvlib as cv # Required for object recognition (not license plate recognition)
 from cvlib.object_detection import draw_bbox # Required for object recognition (not license plate recognition)
 
-import utils
-style = utils.style
+import utils # Import the utils.py scripts
+style = utils.style # Load the style from the utils script
 
 
 # ===============================
@@ -96,6 +102,7 @@ dashcam_background_mode_realtime = False # This setting determines whether dash-
 
 
 # Display the start-up intro header.
+clear()
 if (ascii_art_header == True): # Check to see whether the user has configured there to be a large ASCII art header, or a standard text header.
     print(style.red + style.bold)
     print(" /$$$$$$$  /$$$$$$$  /$$$$$$$$ /$$$$$$$   /$$$$$$  /$$$$$$$$ /$$$$$$  /$$$$$$$ ")
