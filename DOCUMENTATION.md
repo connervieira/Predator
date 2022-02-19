@@ -30,7 +30,7 @@ This is the installation process for Predator and all of it's dependencies.
 8. Download Predator.
     - Predator can be downloaded either from the V0LT website, or from it's GitHub page. The download straight from the V0LT website is recommended for sake of stability and completeness, but you're free to use GitHub as well if you're OK with using a less stable version of Predator.
     - V0LT website: <https://v0lttech.com/predator.php>
-    - GitHub page: <https://v0lttech.com/predator.php>
+    - GitHub page: <https://github.com/connervieira/Predator>
         - `git clone https://github.com/connervieira/Predator`
 9. Extract Predator
     - After downloading Predator, regardless of where you get it from, extract it from the compressed archive (if necessary), and place it somewhere on your filesystem.
