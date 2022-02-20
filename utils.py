@@ -1,5 +1,17 @@
 # This script contains several funtions and classes used in main.py
 
+import os # Required to interact with certain operating system functions
+import time # Required to add delays and handle dates/times
+import subprocess # Required for starting some shell commands
+import sys
+import urllib.request # Required to make network requests
+import re # Required to use Regex
+import validators # Required to validate URLs
+import datetime # Required for converting between timestamps and human readable date/time information
+from xml.dom import minidom # Required for processing GPX data
+import json # Required to pretty-print dictionaries
+import fnmatch # Required to use wildcards to check strings
+
 
 # This function will be used to process GPX files into a Python dictionary.
 def process_gpx(gpx_file):

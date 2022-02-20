@@ -1,7 +1,7 @@
 # Predator LPRS
 # main.py
 
-print("Loading Predator LPRS...")
+print("Loading Predator...")
 
 
 import os # Required to interact with certain operating system functions
@@ -12,7 +12,6 @@ import urllib.request # Required to make network requests
 import re # Required to use Regex
 import validators # Required to validate URLs
 import datetime # Required for converting between timestamps and human readable date/time information
-from xml.dom import minidom # Required for processing GPX data
 import json # Required to pretty-print dictionaries
 import fnmatch # Required to use wildcards to check strings
 
@@ -21,8 +20,18 @@ import cv2 # Required for object recognition (not license plate recognition)
 import cvlib as cv # Required for object recognition (not license plate recognition)
 from cvlib.object_detection import draw_bbox # Required for object recognition (not license plate recognition)
 
+
+
 import utils # Import the utils.py scripts
 style = utils.style # Load the style from the utils script
+clear = utils.clear # Load the screen clearing function from the utils script
+process_gpx = utils.process_gpx # Load the GPX processing function from the utils script
+save_to_file = utils.save_to_file # Load the file saving function from the utils script
+add_to_file = utils.add_to_file # Load the file appending function from the utils script
+validate_plate = utils.validate_plate # Load the plate validation function from the utils script
+download_plate_database = utils.download_plate_database # Load the plate database downloading function from the utils script
+display_shape = utils.display_shape # Down the shape displaying function from the utils script
+
 
 
 # ===============================
@@ -115,36 +124,34 @@ if (ascii_art_header == True): # Check to see whether the user has configured th
     print("| $$      | $$  | $$| $$$$$$$$| $$$$$$$/| $$  | $$   | $$  |  $$$$$$/| $$  | $$")
     print("|__/      |__/  |__/|________/|_______/ |__/  |__/   |__/   \______/ |__/  |__/" + style.end + style.bold)
 
-    print("                              _    ___ ___  ___ ")
-    print("                             | |  | _ \ _ \/ __|")
-    print("                             | |__|  _/   /\__ \\")
-    print("                             |____|_| |_|_\\|___/")
+    print("")
+    print("                            COMPUTER VISION SYSTEM")
     print(style.end)
     print("\n")
-else:
-    print(style.red + style.bold + "Predator" + style.end)
-    print(style.bold + "LPRS" + style.end + "\n")
+else: # If the user his disabled the large ASCII art header, then show a simple title header with minimal styling.
+    print(style.red + style.bold + "PREDATOR" + style.end)
+    print(style.bold + "Computer Vision System" + style.end + "\n")
 
-if (audio_alerts == True):
-    os.system("mpg321 ./assets/sounds/testnoise.mp3 > /dev/null 2>&1 &")
+if (audio_alerts == True): # Check to see if the user has audio alerts enabled.
+    os.system("mpg321 ./assets/sounds/testnoise.mp3 > /dev/null 2>&1 &") # Play a calm start-up noise.
 
-if (push_notifications_enabled == True):
-    os.system("curl -X POST '" + gotify_server + "/message?token=" + gotify_application_token + "' -F 'title=Predator' -F 'message=Predator has been started.' > /dev/null 2>&1 &")
+if (push_notifications_enabled == True): # Check to see if the user has push notifications enabled.
+    os.system("curl -X POST '" + gotify_server + "/message?token=" + gotify_application_token + "' -F 'title=Predator' -F 'message=Predator has been started.' > /dev/null 2>&1 &") # Send a push notification via Gotify indicating that Predator has started.
 
 
 
 # Run some basic error checks to see if any of the data supplied in the configuration seems wrong.
-if (os.path.exists(crop_script_path) == False):
+if (os.path.exists(crop_script_path) == False): # Check to see that the cropping script exists at the path specified by the user in the configuration.
     print(style.yellow + "Warning: The 'crop_script_path' defined in the configuration section doesn't point to a valid file. Image cropping will be broken. Please make sure the 'crop_script_path' points to a valid file." + style.end)
 
-if (int(left_margin) < 0 or int(right_margin) < 0 or int(bottom_margin) < 0 or int(top_margin) < 0):
+if (int(left_margin) < 0 or int(right_margin) < 0 or int(bottom_margin) < 0 or int(top_margin) < 0): # Check to make sure that all of the pre-recorded mode cropping margins are positive numbers.
     print(style.yellow + "Warning: One or more of the cropping margins for pre-recorded mode are below 0. This should never happen, and it's likely there's a configuration issue somewhere. Cropping margins have all been set to 0." + style.end)
     left_margin = "0"
     right_margin = "0"
     bottom_margin = "0"
     top_margin = "0"
 
-if (int(real_time_left_margin) < 0 or int(real_time_right_margin) < 0 or int(real_time_bottom_margin) < 0 or int(real_time_top_margin) < 0):
+if (int(real_time_left_margin) < 0 or int(real_time_right_margin) < 0 or int(real_time_bottom_margin) < 0 or int(real_time_top_margin) < 0): # Check to make sure that all of the real-time mode cropping margins are positive numbers.
     print(style.yellow + "Warning: One or more of the cropping margins for real-time mode are below 0. This should never happen, and it's likely there's a configuration issue somewhere. Cropping margins have all been set to 0." + style.end)
     real_time_left_margin = "0"
     real_time_right_margin = "0"
@@ -155,19 +162,19 @@ if (re.fullmatch("(\d\d\dx\d\d\d)", dashcam_resolution) == None and re.fullmatch
     print(style.yellow + "Warning: The 'dashcam_resolution' specified in the real-time configuration section doesn't seem to align with the '0000x0000' format. It's possible there has been a typo. defaulting to '1280x720'" + style.end)
     dashcam_resolution = "1280x720"
 
-if (fswebcam_device == ""):
+if (fswebcam_device == ""): # Check to make sure that a camera device has been specified in the real-time configuration section.
     print(style.yellow + "Warning: The 'fswebcam_device' specified in the real-time configuration section is blank. It's possible there has been a typo. Defaulting to /dev/video0" + style.end)
     fswebcam_device = "/dev/video0"
 
-if (dashcam_background_mode_realtime == True and dashcam_background_mode == True and dashcam_device[0] == fswebcam_device):
+if (dashcam_background_mode_realtime == True and dashcam_background_mode == True and dashcam_device[0] == fswebcam_device): # If Predator is configured to run background dashcam recording in real-time mode, then make sure the the dashcam camera device and real-time camera device are different.
     print(style.yellow + "Warning: The 'dashcam_background_mode_realtime' setting is turned on, but the same recording device has been specified for 'dashcam_device' and 'fswebcam_device'. Predator can't use the same device for two different tasks. Background dash-cam recording in real-time mode has been disabled." + style.end)
     dashcam_background_mode_realtime = False
 
-if (push_notifications_enabled == True):
-    if (gotify_server == "" or gotify_server == None):
+if (push_notifications_enabled == True): # Check to see if the user has Gotify notifications turned on in the configuration.
+    if (gotify_server == "" or gotify_server == None): # Check to see if the gotify server has been left blank
         print(style.yellow + "Warning: The 'push_notifications_enabled' setting is turned on, but the 'gotify_server' hasn't been set. Push notifications have been disabled." + style.end)
         push_notifications_enabled = False
-    if (gotify_application_token == "" or gotify_application_token == None):
+    if (gotify_application_token == "" or gotify_application_token == None): # Check to see if the Gotify application token has been left blank.
         print(style.yellow + "Warning: The 'push_notifications_enabled' setting is turned on, but the 'gotify_application_token' hasn't been set. Push notifications have been disabled." + style.end)
         push_notifications_enabled = False
 
@@ -198,7 +205,17 @@ else: # No 'auto start mode' has been configured, so ask the user to select manu
 
 
 
+
 # Intial setup has been completed, and Predator will now load into the specified mode.
+
+
+
+
+
+
+
+
+
 
 
 
@@ -368,29 +385,31 @@ if (mode_selection == "1"): # The user has selected to boot into pre-recorded mo
 
     input("Press enter to continue...")
 
-    while True:
+    while True: # Run the pre-recorded mode menu in a loop forever until the user exits.
         clear()
 
+
+        # Show the main menu for handling data collected in pre-recorded mode.
         print("Please select an option")
         print("0. Quit")
         print("1. View data")
         print("2. Export data")
         print("3. Manage raw plate analysis data")
         print("4. View statistics")
-        if (object_recognition_preference == True):
+        if (object_recognition_preference == True): # If object recognition is enabled, show it as an option in the main menu.
             print("5. View object recognition information")
-        if (gpx_file != ""):
+        if (gpx_file != ""): # If a GPX file was supplied for analysis, then show it as an option in the main menu.
             print("6. Display license plate GPS locations")
 
         selection = input("Selection: ")
         clear()
 
 
-        if (selection == "0"):
+        if (selection == "0"): # If the user selects option 0 on the main menu, then exit Predator.
             print("Shutting down...")
             break
 
-        elif (selection == "1"):
+        elif (selection == "1"): # If the user selects option 1 on the main menu, then load the data viewing menu.
             print("Please select an option")
             print("0. Back")
             print("1. View raw Python data")
@@ -418,7 +437,7 @@ if (mode_selection == "1"): # The user has selected to boot into pre-recorded mo
 
             input("\nPress enter to continue...") # Wait for the user to press enter before repeating the menu loop.
             
-        elif (selection == "2"):
+        elif (selection == "2"): # If the user selects option 2 on the main menu, then load the data exporting menu.
             print("Please select an option")
             print("0. Back")
             print("1. Export raw Python data")
@@ -456,13 +475,13 @@ if (mode_selection == "1"): # The user has selected to boot into pre-recorded mo
             input("\nPress enter to continue...") # Wait for the user to press enter before repeating the menu loop.
 
 
-        elif (selection == "3"):
+        elif (selection == "3"): # If the user selects option 3 on the main menu, then show the raw plate analysis data menu.
             print("Please select an option")
             print("0. Back")
-            print("1. View raw data")
-            print("2. Export raw data")
+            print("1. View raw license plate data")
+            print("2. Export raw license plate data")
 
-            selection = input("Selection: ")
+            selection = input("Selection: ") # Prompt the user for their selection
 
             if (selection == "0"):
                 print("Returning to main menu.")
@@ -471,7 +490,7 @@ if (mode_selection == "1"): # The user has selected to boot into pre-recorded mo
                 print(raw_lpr_scan)
 
             elif (selection == "2"):
-                save_to_file(root + "/export.txt", str(raw_lpr_scan)) # Save to disk.
+                save_to_file(root + "/export.txt", str(raw_lpr_scan)) # Save raw license plate analysis data to disk.
                 
             else:
                 print(style.yellow + "Warning: Invalid selection." + style.end)
@@ -480,14 +499,14 @@ if (mode_selection == "1"): # The user has selected to boot into pre-recorded mo
             input("\nPress enter to continue...") # Wait for the user to press enter before repeating the menu loop.
 
 
-        elif (selection == "4"):
+        elif (selection == "4"): # If the user selects option 4 on the main menu, then show the statstics for this session.
             print("Frames analyzed: " + str(len(raw_lpr_scan)))
             print("Plates found: " + str(len(plates_detected)))
 
             input("\nPress enter to continue...") # Wait for the user to press enter before repeating the menu loop.
 
 
-        elif (selection == "5" and object_recognition_preference == True): # The user has chosen to view object recognition data.
+        elif (selection == "5" and object_recognition_preference == True): # If the user selects option 5 on the main menu, and object recognition is enabled, then show the object recognition information menu.
             print("Please select an option")
             print("0. Back")
             print("1. View raw data")
@@ -507,7 +526,7 @@ if (mode_selection == "1"): # The user has selected to boot into pre-recorded mo
             input("\nPress enter to continue...") # Wait for the user to press enter before repeating the menu loop.
 
 
-        elif (selection == "6" and gpx_file != ""): # The user has chosen to view GPX data.
+        elif (selection == "6" and gpx_file != ""): # If the user selects option 6 on the main menu, and a GPX file was supplied for analysis, then show the GPX location data menu.
             print("Please select an option")
             print("0. Back")
             print("1. View raw license plate location data")
@@ -528,14 +547,21 @@ if (mode_selection == "1"): # The user has selected to boot into pre-recorded mo
 
 
 
-        else:
+        else: # If the user selects an unrecognized option on the main menu for pre-recorded mode, then show a warning.
             print(style.yellow + "Warning: Invalid selection." + style.end)
             input("\nPress enter to continue...") # Wait for the user to press enter before repeating the menu loop.
 
 
 
 
-elif (mode_selection == "2"): # Real-time mode
+
+
+
+
+
+# Real-time mode
+
+elif (mode_selection == "2"): # The user has set Predator to boot into real-time mode.
 
     # Configure the user's preferences for this session.
     if (default_root != ""): # Check to see if the user has configured a default for this preference.
@@ -801,7 +827,16 @@ elif (mode_selection == "2"): # Real-time mode
 
 
 
-elif (mode_selection == "3"): # Dash-cam mode
+
+
+
+
+
+# Dash-cam mode
+
+elif (mode_selection == "3"): # The user has set Predator to boot into dash-cam mode.
+
+
     # Configure the user's preferences for this session.
     if (default_root != ""): # Check to see if the user has configured a default for this preference.
         print(style.bold + "Using default preference for root directory." + style.end)
@@ -814,7 +849,8 @@ elif (mode_selection == "3"): # Dash-cam mode
         input("Press enter to continue...")
 
 
-    print("\nStarting dashcam recording at " + dashcam_resolution + "@" + dashcam_frame_rate + "fps to " + root + "/predator_dashcam.mkv")
+
+    print("\nStarting dashcam recording at " + dashcam_resolution + "@" + dashcam_frame_rate + "fps to " + root + "/predator_dashcam.mkv") # Print information about the recording settings.
 
     if (dashcam_background_mode == False): # If the user has specified that background recording is turned off, then run the FFMPEG recording command in the foreground.
         print(style.italic + "Press Ctrl+C to stop recording and quit Predator." + style.end)
@@ -829,6 +865,16 @@ elif (mode_selection == "3"): # Dash-cam mode
         print("Background recording mode is enabled. Recording has started.")
         print(style.italic + "Enter 'killall ffmpeg' from the command line to kill the recording process." + style.end)
         print("Exiting Predator...")
+
+
+
+
+
+
+
+
+
+
 
 
 else: # The user has selected an unrecognized mode.
