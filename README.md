@@ -35,11 +35,11 @@ Predator is free and open source from top to bottom, and is 'free software', mea
 
 ### Generic
 
-By design, Predator doesn't require specialized hardware to run. While higher resolution cameras will obviously yield better results, and video format supported by FFMPEG will work with Predator.
+By design, Predator doesn't require specialized hardware to run. While higher resolution cameras will obviously yield better results, any video format supported by FFMPEG will work with Predator.
 
 ### Easy
 
-Predator is designed to be quick and easy to use. Just enter the root path of a project, enter a video name, and configure a few quick preferences, and Predator automatically starts processing videos, detecting plates, validating results, and forming a conveinent, easy to read list of license plates.
+While being technically mindedly will certainly help, Predator doesn't require professional installation or setup to function. As long as you're reasonably experienced with the Linux command line, setting up Predator should be a piece of cake.
 
 ### Private
 
@@ -51,11 +51,11 @@ Predator is deliberately designed to be multipurpose. It can operate both as an 
 
 ### Customizable
 
-Predator is extremely customizable, making it easy to fit into any use case.
+Predator is extremely customizable, making it easy to fit into any use case. Whether you want an intelligence security camera, or a powerful dashcam device, Predator can be adjusted to fit your needs.
 
 ### Mobile
 
-Predator is designed to support low-energy-usage hardware so that it can be easily installed in a vehicle.
+Predator is designed to support low-energy-usage hardware such that it can be easily installed in a vehicle. A single USB port is enough to power an entire Predator system.
 
 ### Location Aware
 
@@ -63,11 +63,11 @@ Predator supports GPX files to allow for correlating license plates detected in 
 
 ### Alerts
 
-Predator supports real-time alerts, allowing the user to be notified when a license plate matching one on a list is detected. This can be used to detect employee vehicles, spot vehicles involved in AMBER alerts, etc.
+Predator supports customizable real-time alerts, allowing the user to be notified when a license plate matching one on a list is detected through an audible sound, a visual cue, webhooks, and even push notifications!
 
 ### Safe
 
-Predator comes with several features that improve safety in vehicle-based installation. Predator supports displaying large recognizable shapes to tell the driver of important events at a glance. Predator even supports recognizable audible alerts, eliminating the need to look away from the road all-together.
+Predator is designed to be safe, regardless of the installation context. It's easy to configure Predator to completely hands free, ensuring that you don't have to look away from the road when Predator runs in a mobile context.
 
 ### Dash-cam
 
@@ -77,10 +77,9 @@ Predator comes with a dash-cam mode, allowing for customizable real-time recordi
 
 While Predator comes with a straight forward interface, it can be fully configured to run in headless mode, without any user interaction necessary. This makes it perfect for vehicle installations, where the driver wants Predator to automatically start when the vehicle turns on without any user input.
 
-### Push Notifications
+### Object Recognition
 
-Predator is capable of using a Gotify server to send push notifications for certain events. This ensures that you'll always be up to date when license plates are detected, even if your specific Predator set-up doesn't have a display or audio system connected.
-
+In addition to license plate scanning, Predator also supports general object recognition. It can collect a list of common objects and save them to a file, making it easy to find important events in recorded video.
 
 ## Screenshots
 
