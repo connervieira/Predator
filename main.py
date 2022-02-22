@@ -230,7 +230,7 @@ if (mode_selection == "1"): # The user has selected to boot into pre-recorded mo
     video = input("Please enter the file name of the video you would like to scan for license plates: ")
     framerate = float(input("Please enter how many seconds you want to wait between taking frames to analyze: "))
     license_plate_format = input("Please enter the license plate format you would like to scan for. Leave blank for all: ")
-    object_recognition_preference = input("Would you like Predator to count vehicles in each frame? (y/n): ")
+    object_recognition_preference = input("Would you like Predator to detect objects in each frame? (y/n): ")
     video_start_time = input("Optionally, enter the date and time that the specified video recording started (YYYY-mm-dd HH:MM:SS): ") # Ask the user when the video recording started so we can correlate it's frames to a GPX file.
     if (video_start_time != ""):
         gpx_file = input("If you'd like to enable GPX correlation, please enter the file name of the GPX file associated with the video. Leave this blank to disable GPS correlation: ")
@@ -392,14 +392,14 @@ if (mode_selection == "1"): # The user has selected to boot into pre-recorded mo
         # Show the main menu for handling data collected in pre-recorded mode.
         print("Please select an option")
         print("0. Quit")
-        print("1. View data")
-        print("2. Export data")
+        print("1. View license plate data")
+        print("2. Export license plate data")
         print("3. Manage raw plate analysis data")
-        print("4. View statistics")
+        print("4. View session statistics")
         if (object_recognition_preference == True): # If object recognition is enabled, show it as an option in the main menu.
-            print("5. View object recognition information")
+            print("5. Manage object recognition data")
         if (gpx_file != ""): # If a GPX file was supplied for analysis, then show it as an option in the main menu.
-            print("6. Display license plate GPS locations")
+            print("6. Manage license plate GPS data")
 
         selection = input("Selection: ")
         clear()
@@ -409,7 +409,7 @@ if (mode_selection == "1"): # The user has selected to boot into pre-recorded mo
             print("Shutting down...")
             break
 
-        elif (selection == "1"): # If the user selects option 1 on the main menu, then load the data viewing menu.
+        elif (selection == "1"): # If the user selects option 1 on the main menu, then load the license pl atedata viewing menu.
             print("Please select an option")
             print("0. Back")
             print("1. View raw Python data")
@@ -437,7 +437,7 @@ if (mode_selection == "1"): # The user has selected to boot into pre-recorded mo
 
             input("\nPress enter to continue...") # Wait for the user to press enter before repeating the menu loop.
             
-        elif (selection == "2"): # If the user selects option 2 on the main menu, then load the data exporting menu.
+        elif (selection == "2"): # If the user selects option 2 on the main menu, then load the license plate data exporting menu.
             print("Please select an option")
             print("0. Back")
             print("1. Export raw Python data")
@@ -509,8 +509,9 @@ if (mode_selection == "1"): # The user has selected to boot into pre-recorded mo
         elif (selection == "5" and object_recognition_preference == True): # If the user selects option 5 on the main menu, and object recognition is enabled, then show the object recognition information menu.
             print("Please select an option")
             print("0. Back")
-            print("1. View raw data")
-            print("2. Display raw data formatted")
+            print("1. Display raw object recognition data")
+            print("2. Display object recognition data")
+            print("3. Export object recognition data to file")
 
             selection = input("Selection: ")
 
@@ -520,6 +521,8 @@ if (mode_selection == "1"): # The user has selected to boot into pre-recorded mo
                 print(object_count)
             elif (selection == "2"):
                 print(json.dumps(object_count, indent=4))
+            elif (selection == "3"):
+                save_to_file(root + "/pre_recorded_object_detection.json", json.dumps(object_count, indent=4)) # Save to disk.
             else:
                 print(style.yellow + "Warning: Invalid selection." + style.end)
             
