@@ -25,7 +25,7 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Push notification support.
 - [X] Add support for using multiple recording devices in dash-cam mode.
 - [X] Add basic object recognition.
-- [ ] Add the ability to toggle saving object recognition data to disk.
+- [X] Add the ability to toggle saving object recognition data to disk.
 - [ ] Add the ability to toggle verbose file saving data.
 
 

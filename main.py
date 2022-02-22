@@ -219,6 +219,7 @@ else: # No 'auto start mode' has been configured, so ask the user to select manu
 
 
 
+# Pre-recorded mode
 
 if (mode_selection == "1"): # The user has selected to boot into pre-recorded mode.
     # Get the required information from the user.
@@ -226,14 +227,14 @@ if (mode_selection == "1"): # The user has selected to boot into pre-recorded mo
         print(style.bold + "Using default preference for root directory." + style.end)
         root = default_root
     else:
-        root = input("Enter the root filepath for this project, without a forward slash at the end: ")
-    video = input("Please enter the file name of the video you would like to scan for license plates: ")
-    framerate = float(input("Please enter how many seconds you want to wait between taking frames to analyze: "))
-    license_plate_format = input("Please enter the license plate format you would like to scan for. Leave blank for all: ")
-    object_recognition_preference = input("Would you like Predator to detect objects in each frame? (y/n): ")
-    video_start_time = input("Optionally, enter the date and time that the specified video recording started (YYYY-mm-dd HH:MM:SS): ") # Ask the user when the video recording started so we can correlate it's frames to a GPX file.
+        root = input("Project root directory path: ")
+    video = input("Video file name: ")
+    framerate = float(input("Optional: Frame analysis interval: "))
+    license_plate_format = input("Optional: License plate validation format: ")
+    object_recognition_preference = input("Enable object recognition (y/n): ")
+    video_start_time = input("Optional: Video starting time (YYYY-mm-dd HH:MM:SS): ") # Ask the user when the video recording started so we can correlate it's frames to a GPX file.
     if (video_start_time != ""):
-        gpx_file = input("If you'd like to enable GPX correlation, please enter the file name of the GPX file associated with the video. Leave this blank to disable GPS correlation: ")
+        gpx_file = input("Optional: GPX file path: ")
     else:
         gpx_file = ""
 
@@ -571,7 +572,7 @@ elif (mode_selection == "2"): # The user has set Predator to boot into real-time
         print(style.bold + "Using default preference for root directory." + style.end)
         root = default_root
     else:
-        root = input("Enter the root filepath for this project, without a forward slash at the end: ")
+        root = input("Project root directory path: ")
 
     if (default_alert_database != ""): # Check to see if the user has configured a default for this preference.
         print(style.bold + "Using default preference for alert database." + style.end)
@@ -580,19 +581,19 @@ elif (mode_selection == "2"): # The user has set Predator to boot into real-time
         else:
             alert_database = default_alert_database
     else:
-        alert_database = input("Enter the file name of the database you would like to scan for alerts. Leave blank for none. If a compatible URL entered, the database will be downloaded from the URL: ")
+        alert_database = input("Optional: License plate alert database: ")
 
     if (default_save_license_plates_preference != ""): # Check to see if the user has configured a default for this preference.
         print(style.bold + "Using default preference for license plate saving." + style.end)
         save_license_plates_preference = default_save_license_plates_preference
     else:
-        save_license_plates_preference = input("Would you like to save all of the license plates detected? (y/n): ")
+        save_license_plates_preference = input("Optional: Enable license plate saving (y/n): ")
 
     if (default_save_images_preference != ""): # Check to see if the user has configured a default for this preference.
         print(style.bold + "Using default preference for image saving." + style.end)
         save_images_preference = default_save_images_preference
     else:
-        save_images_preference = input("Would you like to save all of the images taken? (y/n): ")
+        save_images_preference = input("Optional: Enable image saving: (y/n): ")
 
 
     if (default_license_plate_format != ""): # Check to see if the user has configured a default for this preference.
@@ -602,7 +603,7 @@ elif (mode_selection == "2"): # The user has set Predator to boot into real-time
         else:
             license_plate_format = default_license_plate_format
     else:
-        license_plate_format = input("Please enter the license plate format you would like to scan for. Leave blank for all: ")
+        license_plate_format = input("Optional: License plate validation format: ")
 
     if (default_realtime_object_recognition != ""): # Check to see if the user has configured a default for this preference.
         print(style.bold + "Using default preference for real-time object recognition." + style.end)
@@ -845,7 +846,7 @@ elif (mode_selection == "3"): # The user has set Predator to boot into dash-cam 
         print(style.bold + "Using default preference for root directory." + style.end)
         root = default_root
     else:
-        root = input("Enter the root filepath for this project, without a forward slash at the end: ")
+        root = input("Project root directory path: ")
 
     if (os.path.exists(root) == False): # Check to see if the root directory entered by the user exists.
         print(style.yellow + "Warning: The root project directory entered doesn't seem to exist. Predator will almost certainly fail." + style.end)
