@@ -8,21 +8,22 @@ This document contains the information you need to know to set up and use Predat
 This is the installation process for Predator and all of it's dependencies.
 
 1. Install OpenALPR
-    - Since Predator is a front-end for OpenALPR, you'll need to install it for it to work properly.
+    - Since Predator depends on OpenALPR as the core of its license plate recognition, you'll need to install it for it to work properly.
     - You can learn about the OpenALPR installation process at <https://github.com/openalpr/openalpr>
-    - After installing, you should be able to run OpenALPR using the `alpr` command.
+    - After installing, you should be able to run OpenALPR using the `alpr` command. If not, Predator won't be able to run OpenALPR, and will fail to analyze license plates.
 2. Install FFMPEG
     - Predator uses FFMPEG to process videos.
     - You can install FFMPEG using the following command on a Debian based Linux machine: `sudo apt-get install ffmpeg`
 3. Install ImageMagick
-    - Predator uses ImageMagick to manipulate frames of video.
+    - Predator uses ImageMagick to manipulate still frames of video.
     - You can learn about the ImageMagick installation process at <https://imagemagick.org/script/download.php>
 4. Install FSWebcam
-    - Predator uses FSWebcam to access cameras when using real-time mode.
+    - Predator uses FSWebcam to access cameras when using real-time mode and dash-cam mode.
     - You can install FSWebcam using the following command on a Debian based Linux machine: `sudo apt-get install fswebcam`
 5. Install the required Python packages.
     - `pip3 install validators opencv-python-headless==4.5.3.56 cvlib tensorflow keras silence-tensorflow`
 6. Install the `mpg321` package.
+    - Predator requires mpg321 in order to play audio effects for alerts.
     - `sudo apt-get install mpg321`
 7. Optionally, install software to remotely manage Predator.
     - If you're installing Predator on a Raspberry Pi, you may find it useful to install a program like [RaspAP](https://github.com/RaspAP/raspap-webgui) in order to remotely manage your Predator instance, and eliminate the need for a full keyboard and display.
@@ -46,6 +47,7 @@ After installing Predator, you'll need to do some quick configuration to be able
 2. Configure the real-time camera resolution.
     - The `camera_resolution` setting determines the resolution that Predator will use in real-time mode.
     - This setting should usually be set to the maximum resolution supported by the camera, but there might be situations in which it makes sense to reduce this to save storage.
+    - Make sure this setting isn't configured to be something higher than the camera's maximum supported resolution. If it is, Predator might run into errors..
 3. Configure other optional values.
     - All configuration values are explained extensively in the CONFIGURING.md document.
     - Make changes to any of the configuration values to better fit your usage context.
@@ -58,7 +60,7 @@ After configuring Predator, you can try it out for the first time!
 1. Run Predator
     - To run Predator, simply navigate to it's folder, then run `main.py` using the `python3` command.
         - `python3 main.py`
-    - After Predator starts, you should see a large banner reading 'PREDATOR LPRS'
+    - After Predator starts, you should see a large banner displaying the Predator name.
 2. Select a mode
     - Predator can operate a three possible modes.
         - Pre-recorded mode
@@ -66,6 +68,7 @@ After configuring Predator, you can try it out for the first time!
             - Use this mode to analyze dash-cam video, whether it be from a generic dash-cam or from Predator running in dash-cam mode.
         - Real-time mode
             - In this mode, Predator will use a connected camera to detect license plates in real-time.
+            - In real-time mode, Predator will repeatedly take still frames to analyze, and will not record video..
         - Dash-cam mode
             - In this mode, Predator will operate like a dash-cam, and simply record video without processing it.
             - This mode can be used to record video to be used analyzed with pre-recorded mode later.
