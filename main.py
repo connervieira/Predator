@@ -321,9 +321,9 @@ if (mode_selection == "1"): # The user has selected to boot into pre-recorded mo
     print("Scanning for license plates...")
     lpr_scan = {} # Create an empty dictionary that will hold each frame and the potential license plates IDs.
     for frame in frames:
-        analysis_command = "alpr -n 5 " + root + "/frames/" + frame + " | awk '{print $2}'"
-        reading_output = str(os.popen(analysis_command).read())
-        lpr_scan[frame] = reading_output.split()
+        analysis_command = "alpr -n 5 " + root + "/frames/" + frame + " | awk '{print $2}'" # Set up the OpenALPR command.
+        reading_output = str(os.popen(analysis_command).read()) # Record the raw output from the OpenALPR command.
+        lpr_scan[frame] = reading_output.split() # Split the OpenALPR command output into an array.
     print("Done.\n")
 
 
@@ -340,7 +340,7 @@ if (mode_selection == "1"): # The user has selected to boot into pre-recorded mo
         for i in range(0,len(lpr_scan)): # Run repeatedly to make sure the list shifting around doesn't mix anything up.
             for plate in lpr_scan[frame]:
                 if (validate_plate(plate, license_plate_format) == False and license_plate_format != ""): # Remove the plate if it fails the validation test (and the license plate format isn't blank).
-                    lpr_scan[frame].remove(plate)
+                    lpr_scan[frame].remove(plate) # Since the plate failed the validation test, delete it from the array.
     print("Done.\n")
 
 
@@ -350,7 +350,7 @@ if (mode_selection == "1"): # The user has selected to boot into pre-recorded mo
     plates_detected = [] # Create an empty list that the detected plates will be added to.
     for frame in lpr_scan:
         if (len(lpr_scan[frame]) >= 1): # Only grab the first plate if a plate was detected at all.
-            plates_detected.append(lpr_scan[frame][0])
+            plates_detected.append(lpr_scan[frame][0]) # Add the first plate in the list of plate guesses from OpenALPR to the list of plates detected by Predator.
     print("Done.\n")
 
 
@@ -388,7 +388,6 @@ if (mode_selection == "1"): # The user has selected to boot into pre-recorded mo
 
     while True: # Run the pre-recorded mode menu in a loop forever until the user exits.
         clear()
-
 
         # Show the main menu for handling data collected in pre-recorded mode.
         print("Please select an option")
@@ -662,7 +661,7 @@ elif (mode_selection == "2"): # The user has set Predator to boot into real-time
         alert_database_list = [] # Set the alert database to an empty list.
 
 
-    detected_license_plates = [] # Create an empty dictionary that will hold each frame and the potential license plates IDs.
+    detected_license_plates = [] # Create an empty dictionary that will hold each frame and the potential license plate strings.
 
     i = 0 # Set the increment counter to 0 so we can increment it by one each time Predator analyzes a plate.
 
