@@ -4,7 +4,7 @@ This document contains a series of questions you may have concerning Predator.
 
 **What is Predator?**
 
-    In short, Predator is a utility for detecting license plates, both in real-time, and by scanning a pre-recorded video.
+    In short, Predator is a utility for detecting license plates, both in real-time, and by scanning a pre-recorded video. Predator is also capable of general object recognition, and can identify objects like vehicles, traffic lights, pedestrians, and dozens of others.
 
 **I have a problem with Predator and I need help.**
 
@@ -12,7 +12,7 @@ This document contains a series of questions you may have concerning Predator.
 
 **Who is Predator designed for?**
 
-    Predator is designed for hobbyists, tech enthusiasts, and regular individuals. It's designed for those who are curious about how many cars they pass, and for those who want to keep an eye out for cars reported as AMBER alerts and stolen vehicles. It's for those who want to log everyone who enters their driveway, and for those who want alerts when their friends and family arrive at their house.
+    Predator is designed for hobbyists, tech enthusiasts, and regular individuals. It's designed for those who are curious about how many cars they pass, and for those who want a customizable, extensible camera platform to build on top of. It's for those who want to log everyone who enters their driveway, and for those who want alerts when their friends and family arrive at their house. It's for people who want to tinker and experiment with computer vision technology in a powerful and easy way.
 
 **Who is Predator not designed for?**
 
@@ -28,11 +28,11 @@ This document contains a series of questions you may have concerning Predator.
 
 **Can I buy a prebuilt device running Predator?**
 
-    Currently, no. However, in the future, prebuilt Predator devices might be turned into a reality. For now, if you want information on what parts to purchase, see the `HARDWARE.md` document.
+    Currently, no. However, in the future, prebuilt Predator devices might be turned into a reality through the Predator Apex program (see `APEX.md`). For now, if you want information on what parts to purchase, see the `HARDWARE.md` document.
 
 **What operating systems is Predator compatible with?**
 
-    Officially, Predator is only compatible with Linux based operating systems, and is primarily designed for Debian based distributions (though other distributions should work smoothly as well). However, if you're ok with a few hiccups, its also reasonably possible to install Predator on MacOS. Since Predator and all of its dependencies are all open source, it's technically possible to get it to work on Windows, but you'll have to re-write a significant portion of it to get everything working. In short, Predator on Linux works great, Predator on MacOS will probably work, and Predator in Windows would take extensive effort and modifications.
+    Officially, Predator is only compatible with Linux based operating systems, and is primarily designed for Debian based distributions (though other distributions should work smoothly as well). However, if you're ok with a few hiccups, its also reasonably possible to install Predator on MacOS. Since Predator and all of its dependencies are all open source, it's technically possible to get it to work on Windows, but you'll have to re-write a significant portion of it to get everything working as intended. In short, Predator on Linux works great, Predator on MacOS will probably work, and Predator in Windows would take extensive effort and modifications.
 
 **Why is Predator written in Python, and not something more efficient, like C++?**
 
@@ -47,10 +47,11 @@ This document contains a series of questions you may have concerning Predator.
     Predator is a fairly complex program, but below is a list of the general steps Predator takes when processing video, whether it be in real-time or a pre-recorded sample.
 
     1. Depending on the mode, Predator will either load a pre-recorded video, or connect to a camera and stream video that way.
-    2. Predator then splits the video, regardless of it's source, into individual frames at a regular interval.
-    3. Next, Predator crops each frame down based on it's configuration in order to remove unnecessary data.
+    2. Predator then splits the video, regardless of its source, into individual frames at a regular interval.
+    3. Next, Predator crops each frame down based on its configuration in order to remove unnecessary data.
     4. Next, Predator uses OpenALPR to locate all potential plates.
     5. Next, Predator uses OpenALPR to interpret the plates detected, and makes a guess as to their contents.
     6. After OpenALPR finishes, Predator forms a list of the most likely plates guesses.
     7. Predator then uses various methods of validation to filter out plates that are unlikely to be correct.
     8. Finally, Predator removes plates it believes to be invalid, and creates a list of (hopefully) correctly detected plates.
+    9. After this, Predator might save the plates to a database, send a push notification to a Gotify server, play an audio alert, any any number of other customizable actions.
