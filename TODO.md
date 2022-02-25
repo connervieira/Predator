@@ -34,4 +34,4 @@ These are the features actively planned for Predator and are likely to be added 
 These are features that require more in-depth changes, and are purely hypothetical.
 
 - [ ] The ability to process multiple sequential videos at once.
-- [ ] A program to remotely start and close Predator.
+- [ ] A GUI front-end in addition to the existing command line interface.
