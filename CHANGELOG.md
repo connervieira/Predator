@@ -115,9 +115,9 @@ December 29th, 2021
 
 ### Object-Recognition Update
 
-This update gives Predator the ability to recognize objects other than license plates.
+This update gives Predator the ability to recognize objects other than license plates, including cars, trucks, traffic lights, pedestrians, and dozens of other common items.
 
-(Release date: to be determined)
+March 1st, 2022
 
 - Added support for object recognition and counting in pre-recorded mode.
 - Added support for object recognition and counting in real-time mode.
