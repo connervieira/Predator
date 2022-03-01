@@ -33,5 +33,6 @@ These are the features actively planned for Predator and are likely to be added 
 
 These are features that require more in-depth changes, and are purely hypothetical.
 
+- [ ] Add "Management Mode" which allows the user to execute administrative actions of Predator, like clearing root project folders.
 - [ ] The ability to process multiple sequential videos at once.
 - [ ] A GUI front-end in addition to the existing command line interface.
