@@ -26,7 +26,8 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Add support for using multiple recording devices in dash-cam mode.
 - [X] Add basic object recognition.
 - [X] Add the ability to toggle saving object recognition data to disk.
-- [ ] Add the ability to toggle verbose file saving data.
+- [X] Add the ability to toggle verbose file saving data.
+- [ ] Fix Raspberry Pi AI packages.
 
 
 # Hypothetical

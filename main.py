@@ -44,6 +44,7 @@ crop_script_path = str(os.path.dirname(__file__)) + "/crop_image" # Path to the 
 ascii_art_header = True # This setting determines whether or not the large ASCII art Predator title will show on start-up. When set to False, a small, normal text title will appear instead. This is useful when running Predator on a device with a small display to avoid weird formatting.
 auto_start_mode = "" # This variable determines whether or not automatically start in a particular mode. When empty, the user will be prompted whether to start in pre-recorded mode or in real-time mode. When set to "1", Predator will automatically select and start pre-recorded mode when launched. When set to "2", Predator will automatically select and start real-time mode when launched. When set to "3", Predator will start into dashcam-mode when launched.
 default_root = "" # If this variable isn't empty, the "root directory" prompt will be skipped when starting Predator. This variable will be used as the root directory. This variable only affects real-time mode and dash-cam mode.
+silence_file_saving = False # This setting determines whether log messages about file saving will be printed to console. Set this to True to silence the messages indicating whether or not files were successfully saved or updated.
 
 
 
@@ -455,19 +456,19 @@ if (mode_selection == "1"): # The user has selected to boot into pre-recorded mo
             elif (selection == "1"): # Export raw plate data.
                 export_data = str(plates_detected)
 
-                save_to_file(root + "/export.txt", export_data) # Save to disk.
+                save_to_file(root + "/export.txt", export_data, silence_file_saving) # Save to disk.
             
             elif (selection == "2"): # Export plate data as a list with one plate per line.
                 for plate in plates_detected:
                     export_data = export_data + plate + "\n"
 
-                save_to_file(root + "/export.txt", export_data) # Save to disk.
+                save_to_file(root + "/export.txt", export_data, silence_file_saving) # Save to disk.
 
             elif (selection == "3"): # Export plate data as CSV (add comma after each plate)
                 for plate in plates_detected:
                     export_data = export_data + plate + ",\n"
 
-                save_to_file(root + "/export.txt", export_data) # Save to disk.
+                save_to_file(root + "/export.txt", export_data, silence_file_saving) # Save to disk.
 
             else:
                 print(style.yellow + "Warning: Invalid selection." + style.end)
@@ -490,7 +491,7 @@ if (mode_selection == "1"): # The user has selected to boot into pre-recorded mo
                 print(raw_lpr_scan)
 
             elif (selection == "2"):
-                save_to_file(root + "/export.txt", str(raw_lpr_scan)) # Save raw license plate analysis data to disk.
+                save_to_file(root + "/export.txt", str(raw_lpr_scan), silence_file_saving) # Save raw license plate analysis data to disk.
                 
             else:
                 print(style.yellow + "Warning: Invalid selection." + style.end)
@@ -522,7 +523,7 @@ if (mode_selection == "1"): # The user has selected to boot into pre-recorded mo
             elif (selection == "2"):
                 print(json.dumps(object_count, indent=4))
             elif (selection == "3"):
-                save_to_file(root + "/pre_recorded_object_detection.json", json.dumps(object_count, indent=4)) # Save to disk.
+                save_to_file(root + "/pre_recorded_object_detection.json", json.dumps(object_count, indent=4), silence_file_saving) # Save to disk.
             else:
                 print(style.yellow + "Warning: Invalid selection." + style.end)
             
@@ -772,7 +773,7 @@ elif (mode_selection == "2"): # The user has set Predator to boot into real-time
                 print("Objects identified: " + objects_identified)
                 export_data = str(round(time.time())) + "," + objects_identified + "\n" # Add the timestamp to the export data, followed by the object's detected, followed by a line break to prepare for the next entry to be added later.
                 if (save_real_time_object_recognition == True): # Check to make sure the user has configured Predator to save recognized objects to disk.
-                    add_to_file(root + "/real_time_object_detection.csv", export_data) # Add the export data to the end of the file and write it to disk.
+                    add_to_file(root + "/real_time_object_detection.csv", export_data, silence_file_saving) # Add the export data to the end of the file and write it to disk.
                 
             print("Done\n----------")
 
@@ -824,7 +825,7 @@ elif (mode_selection == "2"): # The user has set Predator to boot into real-time
                     export_data = new_plate_detected + "," + str(round(time.time())) + ",true\n" # Add the individual plate to the export data, followed a timestamp, followed by a line break to prepare for the next plate to be added later.
                 else:
                     export_data = new_plate_detected + "," + str(round(time.time())) + ",false\n" # Add the individual plate to the export data, followed a timestamp, followed by a line break to prepare for the next plate to be added later.
-                add_to_file(root + "/real_time_plates.csv", export_data) # Add the export data to the end of the file and write it to disk.
+                add_to_file(root + "/real_time_plates.csv", export_data, silence_file_saving) # Add the export data to the end of the file and write it to disk.
 
 
 

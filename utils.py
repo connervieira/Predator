@@ -46,18 +46,20 @@ def clear():
 
 
 # Define the function that will be used to save files for exported data.
-def save_to_file(file_name, contents):
+def save_to_file(file_name, contents, silence=False):
     fh = None
     success = False
     try:
         fh = open(file_name, 'w')
         fh.write(contents)
         success = True   
-        print("Successfully saved at " + file_name + ".")
+        if (silence == False):
+            print("Successfully saved at " + file_name + ".")
     except IOError as e:
         success = False
-        print(e)
-        print("Failed to save!")
+        if (silence == False):
+            print(e)
+            print("Failed to save!")
     finally:
         try:
             if fh:
@@ -69,18 +71,20 @@ def save_to_file(file_name, contents):
 
 
 # Define the fuction that will be used to add to the end of a file.
-def add_to_file(file_name, contents):
+def add_to_file(file_name, contents, silence=False):
     fh = None
     success = False
     try:
         fh = open(file_name, 'a')
         fh.write(contents)
-        success = True   
-        print("Successfully saved at " + file_name + ".")
+        success = True
+        if (silence == False):
+            print("Successfully saved at " + file_name + ".")
     except IOError as e:
         success = False
-        print(e)
-        print("Failed to save!")
+        if (silence == False):
+            print(e)
+            print("Failed to save!")
     finally:
         try:
             if fh:
