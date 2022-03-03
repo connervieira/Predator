@@ -46,6 +46,11 @@ After installing Predator, you should do some quick configuration in order to ge
 2. Make configuration changes
     - All configuration values are explained extensively in the CONFIGURING.md document.
     - Make changes to any of the configuration values to better fit your usage context.
+3. Depending on the platform, Predator might not be able to locate the `config.json` file. If you encounter issues during the steps described in the "Usage" section, you may need to manually set Predator's directory in `main.py`
+    - At the top of the `main.py` script, you should see a variable titled `predator_root_directory`. By default, a Python function is used to find the current directory of the script.
+    - If you receive errors related to missing files when trying to run Predator, try setting this variable to a static file path.
+    - Example:
+        - `predator_root_directory = "/home/user/Predator/"`
 
 
 ## Usage

@@ -136,3 +136,4 @@ This update makes some technical improvements to Predator, and improves its effi
 *Release date: To be determined*
 
 - Moved the Predator configuration to `config.json` in order to improve organization and extensibility.
+- Adjusted the default settings to reduce the amount of configuration that needs to be done for most use cases.
