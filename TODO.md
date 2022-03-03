@@ -27,7 +27,7 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Add basic object recognition.
 - [X] Add the ability to toggle saving object recognition data to disk.
 - [X] Add the ability to toggle verbose file saving data.
-- [ ] Move configuration from main.py to a separate files for better extensibility.
+- [X] Move configuration from main.py to a separate files for better extensibility.
 - [ ] Fix Raspberry Pi AI packages.
 
 

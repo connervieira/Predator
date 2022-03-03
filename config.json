@@ -1,0 +1,45 @@
+{
+    "general": {
+        "ascii_art_header": true,
+        "auto_start_mode": "",
+        "default_root": "",
+        "silence_file_saving": false
+    },
+    "prerecorded": {
+        "left_margin": "700",
+        "right_margin": "700",
+        "top_margin": "700",
+        "bottom_margin": "300"
+    },
+    "realtime": {
+        "print_invalid_plates": false,
+        "realtime_guesses": "10",
+        "camera_resolution": "1920x1080",
+        "real_time_cropping_enabled": false,
+        "real_time_left_margin": "400",
+        "real_time_right_margin": "400",
+        "real_time_top_margin": "200",
+        "real_time_bottom_margin": "200",
+        "fswebcam_device": "/dev/video0",
+        "fswebcam_flags": "--set brightness=70%",
+        "audio_alerts": false,
+        "webhook": "",
+        "shape_alerts": true,
+        "save_real_time_object_recognition": true,
+        "default_alert_database": "",
+        "default_save_license_plates_preference": "",
+        "default_save_images_preference": "",
+        "default_license_plate_format": "",
+        "default_realtime_object_recognition": "",
+        "push_notifications_enabled": false,
+        "gotify_server": "",
+        "gotify_application_token": ""
+    },
+    "dashcam": {
+        "dashcam_resolution": "1920x1080",
+        "dashcam_frame_rate": "20",
+        "dashcam_device": ["/dev/video0"],
+        "dashcam_background_mode": false,
+        "dashcam_background_mode_realtime": false
+    }
+}

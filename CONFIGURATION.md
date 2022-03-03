@@ -1,17 +1,12 @@
 # Configuration
 
-This document describes the configuration values found at the top of the `main.py` script in-depth.
+This document describes the configuration values found `config.json`.
 
 
 ## General Configuration
 
 This section of configuration values will effect Predator's general operation.
 
-- `crop_script_path`
-    - This value is a string that points to the crop\_image script's exact file path. This script is typically located in the Predator folder.
-    - Set this variable to an absolute file path pointing to the crop\_image script.
-    - Example:
-        - `/home/user/Predator/crop_image`
 - `ascii_art_header`
     - This value is a boolean that determines whether or not Predator will display a large ASCII art banner on start up. When set to `False`, the ASCII art banner will be replaced with a small, normal text title.
     - This setting may be useful to change in the event that Predator is being run on a device with a tiny display, where a large ASCII art header might cause formatting issues.

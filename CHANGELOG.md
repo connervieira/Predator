@@ -125,3 +125,14 @@ March 1st, 2022
 - Alert databases can now contain wildcards to further refine plate alerts.
 - Simplified the start-up prompts for all modes.
 - Clarified some menu prompts in pre-recorded mode.
+
+
+## Version 6.0
+
+### Technical Improvements Update
+
+This update makes some technical improvements to Predator, and improves its efficiency and organization.
+
+*Release date: To be determined*
+
+- Moved the Predator configuration to `config.json` in order to improve organization and extensibility.

@@ -39,16 +39,11 @@ This is the installation process for Predator and all of it's dependencies.
 
 ## Configuration
 
-After installing Predator, you'll need to do some quick configuration to be able to use it properly.
+After installing Predator, you should do some quick configuration in order to get the most out of it.
 
 1. Open the Predator configuration
-    - Open the `main.py` file in the Predator folder using your text editor of choice.
-    - Navigate to the top of the document, and locate the 'CONFIGURATION START' section.
-2. Configure the real-time camera resolution.
-    - The `camera_resolution` setting determines the resolution that Predator will use in real-time mode.
-    - This setting should usually be set to the maximum resolution supported by the camera, but there might be situations in which it makes sense to reduce this to save storage.
-    - Make sure this setting isn't configured to be something higher than the camera's maximum supported resolution. If it is, Predator might run into errors..
-3. Configure other optional values.
+    - Open the `config.json` file in the Predator folder using your text editor of choice.
+2. Make configuration changes
     - All configuration values are explained extensively in the CONFIGURING.md document.
     - Make changes to any of the configuration values to better fit your usage context.
 
