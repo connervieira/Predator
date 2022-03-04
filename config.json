@@ -33,7 +33,12 @@
         "default_realtime_object_recognition": "",
         "push_notifications_enabled": false,
         "gotify_server": "",
-        "gotify_application_token": ""
+        "gotify_application_token": "",
+        "status_lighting": {
+            "alert": "",
+            "warning": "",
+            "normal": ""
+        }
     },
     "dashcam": {
         "dashcam_resolution": "1920x1080",

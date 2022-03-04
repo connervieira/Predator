@@ -27,15 +27,19 @@ import cv2 # Required for object recognition (not license plate recognition)
 import cvlib as cv # Required for object recognition (not license plate recognition)
 from cvlib.object_detection import draw_bbox # Required for object recognition (not license plate recognition)
 
-import utils # Import the utils.py scripts
-style = utils.style # Load the style from the utils script
-clear = utils.clear # Load the screen clearing function from the utils script
-process_gpx = utils.process_gpx # Load the GPX processing function from the utils script
-save_to_file = utils.save_to_file # Load the file saving function from the utils script
-add_to_file = utils.add_to_file # Load the file appending function from the utils script
-validate_plate = utils.validate_plate # Load the plate validation function from the utils script
-download_plate_database = utils.download_plate_database # Load the plate database downloading function from the utils script
-display_shape = utils.display_shape # Down the shape displaying function from the utils script
+import utils # Import the utils.py scripts.
+style = utils.style # Load the style from the utils script.
+clear = utils.clear # Load the screen clearing function from the utils script.
+process_gpx = utils.process_gpx # Load the GPX processing function from the utils script.
+save_to_file = utils.save_to_file # Load the file saving function from the utils script.
+add_to_file = utils.add_to_file # Load the file appending function from the utils script.
+validate_plate = utils.validate_plate # Load the plate validation function from the utils script.
+download_plate_database = utils.download_plate_database # Load the plate database downloading function from the utils script.
+display_shape = utils.display_shape # Load the shape displaying function from the utils script.
+
+import lighting # Import the lighting.py scripts
+update_status_lighting = lighting.update_status_lighting # Load the status lighting update function from the lighting script.
+
 
 
 
@@ -802,11 +806,11 @@ elif (mode_selection == "2"): # The user has set Predator to boot into real-time
                 url = url.replace("[A]", str(active_alert)) # Replace "[A]" with the current alert status.
 
                 try: # Try sending a request to the webook.
-                    webhook_response = urllib.request.urlopen(url).getcode() # Save the raw data from the URL to a variable.
+                    webhook_response = urllib.request.urlopen(url).getcode() # Save the raw data from the request to a variable.
                 except Exception as e:
                     webhook_response = e
 
-                if (str(webhook_response) != "200"): # If the webhook didn't respond with a 200 code, warn the user that there was an error.
+                if (str(webhook_response) != "200"): # If the webhook didn't respond with a 200 code; Warn the user that there was an error.
                     print(style.yellow + "Warning: Unable to submit data to webhook. Response code: " + str(webhook_response.getcode()) + style.end)
 
 
