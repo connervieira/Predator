@@ -2,6 +2,7 @@
 
 This document contains credits to all of the software Predator depends on to function.
 
+## Dependencies
 
 ### OpenALPR
 
