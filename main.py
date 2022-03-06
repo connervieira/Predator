@@ -91,6 +91,10 @@ push_notifications_enabled = config["realtime"]["push_notifications_enabled"] # 
 gotify_server = config["realtime"]["gotify_server"] # This setting specifies the server address of the desired Gotify server, and should include the protocol (Ex: http://) and port (Ex: 80).
 gotify_application_token = config["realtime"]["gotify_application_token"] # This setting specifies the Gotify application token that Predator will use to broadcast notifications.
 
+status_lighting_enabled = config["realtime"]["status_lighting_enabled"]
+status_lighting_base_url = config["realtime"]["status_lighting_base_url"]
+status_lighting_values = config["realtime"]["status_lighting_values"]
+
 
 
 # ----- Dash-cam mode configuration -----
@@ -704,6 +708,19 @@ elif (mode_selection == "2"): # The user has set Predator to boot into real-time
         reading_output = str(os.popen(analysis_command).read()) # Run the OpenALPR command, and save it's output to reading_output.
         reading_output_plates = reading_output.split() # Take the output of the OpenALPR command (the detected plates), and save it as a Python array.
 
+
+
+
+
+        # Reset the status lighting to normal before processing the license plate data from OpenALPR.
+        if (status_lighting_enabled == True): # Check to see if status lighting alerts are enabled in the Predator configuration.
+            update_status_lighting("normal") # Run the function to update the status lighting.
+
+
+
+
+
+        # Process information from the OpenALPR license plate analysis command.
         if (len(reading_output_plates) >= 2): # Check to see if a license plate was actually detected.
             reading_output_plates.remove(reading_output_plates[0]) # Remove the first element of the output, since it isn't a plate. The first value will always be the first line of the ALPR output, which doesn't include plates.
             
@@ -739,6 +756,9 @@ elif (mode_selection == "2"): # The user has set Predator to boot into real-time
 
                     if (shape_alerts == True):  # Check to see if the user has enabled shape notifications.
                         display_shape("square")
+
+                    if (status_lighting_enabled == True): # Check to see if status lighting alerts are enabled in the Predator configuration.
+                        update_status_lighting("warning") # Run the function to update the status lighting.
 
                     new_plate_detected = detected_plate
                         
@@ -795,6 +815,9 @@ elif (mode_selection == "2"): # The user has set Predator to boot into real-time
 
                     if (audio_alerts == True): # Check to see if the user has audio alerts enabled.
                         os.system("mpg321 ./assets/sounds/alerthit.mp3 > /dev/null 2>&1 &") # Play the prominent alert sound.
+
+                    if (status_lighting_enabled == True): # Check to see if status lighting alerts are enabled in the Predator configuration.
+                        update_status_lighting("alert") # Run the function to update the status lighting.
 
                     if (push_notifications_enabled == True): # Check to see if the user has Gotify notifications enabled.
                         os.system("curl -X POST '" + gotify_server + "/message?token=" + gotify_application_token + "' -F 'title=Predator' -F 'message=A license plate in the alert database has been detected: " + detected_plate + "' > /dev/null 2>&1 &")

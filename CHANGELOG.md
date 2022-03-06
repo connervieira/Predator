@@ -129,11 +129,12 @@ March 1st, 2022
 
 ## Version 6.0
 
-### Technical Improvements Update
+### User Interaction Update
 
-This update makes some technical improvements to Predator, and improves its efficiency and organization.
+This update makes some technical improvements to Predator, and improves the efficiency and organization of user interaction.
 
 *Release date: To be determined*
 
 - Moved the Predator configuration to `config.json` in order to improve organization and extensibility.
 - Adjusted the default settings to reduce the amount of configuration that needs to be done for most use cases.
+- Added support for RGB status lighting support.

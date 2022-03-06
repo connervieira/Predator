@@ -10,7 +10,7 @@ config = json.load(open(predator_root_directory + "/config.json")) # Load the co
 
 
 def update_status_lighting(url_id):
-    status_lighting_update_url = config["realtime"]["status_lighting_base_url"].replace("[U]", config["realtime"]["status_lighting"]) # Prepare the URL where a request will be sent in order to update the status lighting.
+    status_lighting_update_url = config["realtime"]["status_lighting_base_url"].replace("[U]", config["realtime"]["status_lighting_values"]) # Prepare the URL where a request will be sent in order to update the status lighting.
     if (validators.url(status_lighting_update_url)): # Check to make sure the URL ID supplied actually resolves to a valid URL in the configuration database.
         try: # Try sending a request to the URL.
             webhook_response = urllib.request.urlopen(status_lighting_update_url).getcode() # Save the raw data from the request to a variable.

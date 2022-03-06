@@ -36,7 +36,7 @@
         "gotify_application_token": "",
         "status_lighting_enabled": false,
         "status_lighting_base_url": "http://10.3.141.1/win&A=255",
-        "status_lighting": {
+        "status_lighting_values": {
             "alert": "[U]&R=255&G=0&B=0",
             "warning": "[U]R=255&G=150&B=0",
             "normal": "[U]R=0&G=255&B=0"
