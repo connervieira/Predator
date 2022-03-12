@@ -1,10 +1,14 @@
 import validators # Required to validating URLs
 import urllib.request # Required to send network requests
+import json # Required to process JSON data
+import os # Required to interact with certain operating system functions
 
 import utils # Import the utils.py script
 style = utils.style # Load the style from the utils script
 clear = utils.clear # Load the screen clearing function from the utils script
 
+
+predator_root_directory = str(os.path.dirname(__file__)) # This variable determines the folder path of the root Predator directory. This should usually automatically recognize itself, but it if it doesn't, you can change it manually.
 
 config = json.load(open(predator_root_directory + "/config.json")) # Load the configuration database.
 

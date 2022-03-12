@@ -4,6 +4,10 @@
 print("Loading Predator...")
 
 
+import os # Required to interact with certain operating system functions
+import json # Required to process JSON data
+
+
 predator_root_directory = str(os.path.dirname(__file__)) # This variable determines the folder path of the root Predator directory. This should usually automatically recognize itself, but it if it doesn't, you can change it manually.
 
 
@@ -11,7 +15,6 @@ config = json.load(open(predator_root_directory + "/config.json")) # Load the co
 
 
 
-import os # Required to interact with certain operating system functions
 import time # Required to add delays and handle dates/times
 import subprocess # Required for starting some shell commands
 import sys
@@ -19,7 +22,6 @@ import urllib.request # Required to make network requests
 import re # Required to use Regex
 import validators # Required to validate URLs
 import datetime # Required for converting between timestamps and human readable date/time information
-import json # Required to pretty-print dictionaries
 import fnmatch # Required to use wildcards to check strings
 
 import silence_tensorflow.auto # Silences tensorflow warnings
