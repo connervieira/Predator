@@ -8,7 +8,7 @@ import os # Required to interact with certain operating system functions
 import json # Required to process JSON data
 
 
-predator_root_directory = str(os.path.dirname(__file__)) # This variable determines the folder path of the root Predator directory. This should usually automatically recognize itself, but it if it doesn't, you can change it manually.
+predator_root_directory = str(os.path.dirname(os.path.realpath(__file__))) # This variable determines the folder path of the root Predator directory. This should usually automatically recognize itself, but it if it doesn't, you can change it manually.
 
 
 config = json.load(open(predator_root_directory + "/config.json")) # Load the configuration database from config.json
@@ -24,10 +24,11 @@ import validators # Required to validate URLs
 import datetime # Required for converting between timestamps and human readable date/time information
 import fnmatch # Required to use wildcards to check strings
 
-import silence_tensorflow.auto # Silences tensorflow warnings
-import cv2 # Required for object recognition (not license plate recognition)
-import cvlib as cv # Required for object recognition (not license plate recognition)
-from cvlib.object_detection import draw_bbox # Required for object recognition (not license plate recognition)
+if (config["general"]["disable_object_recognition"] == False):
+    import silence_tensorflow.auto # Silences tensorflow warnings
+    import cv2 # Required for object recognition (not license plate recognition)
+    import cvlib as cv # Required for object recognition (not license plate recognition)
+    from cvlib.object_detection import draw_bbox # Required for object recognition (not license plate recognition)
 
 import utils # Import the utils.py scripts.
 style = utils.style # Load the style from the utils script.
@@ -54,6 +55,7 @@ ascii_art_header = config["general"]["ascii_art_header"] # This setting determin
 auto_start_mode = config["general"]["auto_start_mode"] # This variable determines whether or not automatically start in a particular mode. When empty, the user will be prompted whether to start in pre-recorded mode or in real-time mode. When set to "1", Predator will automatically select and start pre-recorded mode when launched. When set to "2", Predator will automatically select and start real-time mode when launched. When set to "3", Predator will start into dashcam-mode when launched.
 default_root = config["general"]["default_root"] # If this variable isn't empty, the "root directory" prompt will be skipped when starting Predator. This variable will be used as the root directory. This variable only affects real-time mode and dash-cam mode.
 silence_file_saving = config["general"]["silence_file_saving"] # This setting determines whether log messages about file saving will be printed to console. Set this to True to silence the messages indicating whether or not files were successfully saved or updated.
+disable_object_recognition = config["general"]["disable_object_recognition"] # This setting is responsible for globally disabling object recognition (TensorFlow and OpenCV) in the event that it isn't supported on a particular platform. When set to true, any features involving object recognition, other than license plate recognition, will be disabled.
 
 
 
@@ -235,7 +237,10 @@ if (mode_selection == "1"): # The user has selected to boot into pre-recorded mo
     video = input("Video file name: ")
     framerate = float(input("Optional: Frame analysis interval: "))
     license_plate_format = input("Optional: License plate validation format: ")
-    object_recognition_preference = input("Enable object recognition (y/n): ")
+    if (disable_object_recognition == True): # Check to see whether or not object recognition has been globally disabled in the Predator configuration.
+        print(style.yellow + "Warning: Skipping object recognition prompt, since object recognition has been globally disabled in the Predator configuration. Adjust the `disable_object_recognition` configuration value to change this." + style.end)
+    else:
+        object_recognition_preference = input("Enable object recognition (y/n): ")
     video_start_time = input("Optional: Video starting time (YYYY-mm-dd HH:MM:SS): ") # Ask the user when the video recording started so we can correlate it's frames to a GPX file.
     if (video_start_time != ""):
         gpx_file = input("Optional: GPX file path: ")
@@ -302,7 +307,7 @@ if (mode_selection == "1"): # The user has selected to boot into pre-recorded mo
 
 
     # If enabled, count how many vehicles are in each frame.
-    if (object_recognition_preference == True):
+    if (object_recognition_preference == True and disable_object_recognition == False):
         print("Running object recognition...")
         time.sleep(1) # Wait for a short period of time to allow the images to finish saving.
         object_count = {} # Create an empty dictionary that will hold each frame and the object recognition counts.
@@ -608,12 +613,15 @@ elif (mode_selection == "2"): # The user has set Predator to boot into real-time
     else:
         license_plate_format = input("Optional: License plate validation format: ")
 
-    if (default_realtime_object_recognition != ""): # Check to see if the user has configured a default for this preference.
-        print(style.bold + "Using default preference for real-time object recognition." + style.end)
-        if (default_realtime_object_recognition != ""):
-            realtime_object_recognition = default_realtime_object_recognition
+    if (disable_object_recognition == True): # Check to see whether or not object recognition has been globally disabled in the Predator configuration.
+        print(style.yellow + "Warning: Skipping object recognition prompt, since object recognition has been globally disabled in the Predator configuration. Adjust the `disable_object_recognition` configuration value to change this." + style.end)
     else:
-        realtime_object_recognition = input("Would you like to enable real-time object recognition? (y/n): ")
+        if (default_realtime_object_recognition != ""): # Check to see if the user has configured a default for this preference.
+            print(style.bold + "Using default preference for real-time object recognition." + style.end)
+            if (default_realtime_object_recognition != ""):
+                realtime_object_recognition = default_realtime_object_recognition
+        else:
+            realtime_object_recognition = input("Would you like to enable real-time object recognition? (y/n): ")
 
 
     # Save yes/no preferences as boolean values for easier access.
@@ -777,7 +785,7 @@ elif (mode_selection == "2"): # The user has set Predator to boot into real-time
 
 
         # If enabled, run object recognition on the captured frame.
-        if (realtime_object_recognition == True):
+        if (realtime_object_recognition == True and disable_object_recognition == False):
             print("Running object recognition...")
             object_count = {} # Create an empty dictionary that will hold each frame and the object recognition counts.
             if (save_images_preference == True): # Check to see whether or not the user wants to save all images captured by Predator.

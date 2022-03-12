@@ -8,7 +8,7 @@ style = utils.style # Load the style from the utils script
 clear = utils.clear # Load the screen clearing function from the utils script
 
 
-predator_root_directory = str(os.path.dirname(__file__)) # This variable determines the folder path of the root Predator directory. This should usually automatically recognize itself, but it if it doesn't, you can change it manually.
+predator_root_directory = str(os.path.dirname(os.path.realpath(__file__))) # This variable determines the folder path of the root Predator directory. This should usually automatically recognize itself, but it if it doesn't, you can change it manually.
 
 config = json.load(open(predator_root_directory + "/config.json")) # Load the configuration database.
 

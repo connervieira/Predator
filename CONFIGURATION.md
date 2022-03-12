@@ -8,7 +8,7 @@ This document describes the configuration values found `config.json`.
 This section of configuration values will effect Predator's general operation.
 
 - `ascii_art_header`
-    - This value is a boolean that determines whether or not Predator will display a large ASCII art banner on start up. When set to `False`, the ASCII art banner will be replaced with a small, normal text title.
+    - This value is a boolean that determines whether or not Predator will display a large ASCII art banner on start up. When set to `false`, the ASCII art banner will be replaced with a small, normal text title.
     - This setting may be useful to change in the event that Predator is being run on a device with a tiny display, where a large ASCII art header might cause formatting issues.
 - `auto_start_mode`
     - This setting is a string determines which mode (if any) that Predator will automatically load into when being started.
@@ -23,6 +23,14 @@ This section of configuration values will effect Predator's general operation.
 - `default_root`
     - When this default setting isn't empty, Predator will use it's value as the default root project directory path, and will skip the 'root directory' prompt when running Predator in real-time mode and dash-cam mode.
     - This setting has no effect on pre-recorded mode.
+- `silence_file_saving`
+    - This setting determines whether or not Predator will display informational messages about file saving.
+    - When this is set to `true`, Predator won't show information or notices when it saves information to disk.
+    - Under normal circumstances, this setting should be set to `false` in order to allow Predator to inform the user when it saves files, and whether or not errors were encountered.
+- `disable_object_recognition`
+    - This setting can be used to globally disable object recognition (Tensorflow and OpenCV).
+    - If you're on a platform that doesn't support OpenCV or Tensorflow, then you can set this to 'true' in order to prevent errors while using Predator.
+    - Under normal usage, this should be set to `false`, since this will allow Predator to use it's full functionality.
 
 
 ## Pre-recorded Mode Configuration
@@ -42,7 +50,7 @@ Configuration values in this section are settings specific to real-time mode.
 
 - `print_invalid_plates`
     - This setting is a boolean that determines whether or not Predator will print every guess it makes as to the contents of a license plates, even if those guesses are invalidated by the license plate format sample.
-    - This setting is usually set to False, but there may be some situations in which it would make sense to turn it on for sake of troubleshooting.
+    - This setting is usually set to `false`, but there may be some situations in which it would make sense to turn it on for sake of troubleshooting.
         - In the event that you consistently get Predator to identify a plate, but it can't find a valid guess as to what its contents are, turning this on can help you figure out what Predator thinks its seeing.
 - `realtime_guesses`
     - This setting is a number in the form of a string that determines how many OpenALPR guesses Predator will take into account when analyzing a plate.
@@ -71,24 +79,24 @@ Configuration values in this section are settings specific to real-time mode.
     - For more information on what this setting can be used for, see the FSWebcam documentation by running `man fswebcam`.
 - `audio_alerts`
     - This setting determines whether or not Predator will make use of audible alerts.
-    - With this is set to `True`, Predator will play subtle alert noises when a plate is detected, and much more prominent noises when a plate in an alert database is detected.
+    - With this is set to `true`, Predator will play subtle alert noises when a plate is detected, and much more prominent noises when a plate in an alert database is detected.
 - `webhook`
     - This setting is used to define a webhook that Predator will send a request to when it detects a license plate in real-time mode.
     - This setting should either be left blank, or be set to a URL.
     - Flags can be used to supply information to the webhook.
         - Predator will replace `[L]` with the detected license plate.
         - Predator will replace `[T]` with the current time as a Unix epoch timestamp.
-        - Predator will replace `[A]` with the alert status of the plate (`True` or `False`).
+        - Predator will replace `[A]` with the alert status of the plate (`true` or `false`).
     - Examples:
         - `http://localhost/app.php?plate=[L]&time=[T]&alert=[A]`
         - `http://domain.tld/app/[L]`
 - `shape_alerts`
     - This setting determines whether or not Predator will use large shapes printed to the console to indicate certain important events.
-    - When set to `True`, Predator will use things like large ASCII circles, squares, and triangles to indicate when a plate has been detected, when an alert has been triggered, and when a plate has been read, but failed validation.
+    - When set to `true`, Predator will use things like large ASCII circles, squares, and triangles to indicate when a plate has been detected, when an alert has been triggered, and when a plate has been read, but failed validation.
     - If you intend on using Predator in a vehicle, this setting can drastically reduce the time it takes for you to look at the console output in order to figure out what Predator is doing.
 - `save_real_time_object_recognition`
     - This setting determines whether or not Predator will save all of the objects it recognizes to disk while running in real-time mode.
-    - When this is set to `False`, the objects recognized will only be printed to the console, and won't be saved to a file.
+    - When this is set to `false`, the objects recognized will only be printed to the console, and won't be saved to a file.
 
 
 ### Real-time Mode Default Settings
@@ -130,14 +138,14 @@ All settings in this section are related to network-based push notifications via
 
 - `push_notifications_enabled`
     - This setting determines whether or not Predator will attempt to send push notifications using a Gotify server.
-    - This value is a boolean value, and should only ever be set to `True` or `False`
+    - This value is a boolean value, and should only ever be set to `true` or `false`
 - `gotify_server`
     - This setting specifies the Gotify server that Predator will attempt to use. It should include the protocol and port number.
-    - This value must be configured if `push_notifications_enabled` is set to `True`
+    - This value must be configured if `push_notifications_enabled` is set to `true`
     - Example:
 - `gotify_application_token`
     - This setting specifies the Gotify application token that Predator will attempt to use to send notifications through the specified Gotify server.
-    - This value must be configured if `push_notifications_enabled` is set to `True`
+    - This value must be configured if `push_notifications_enabled` is set to `true`
     - Example:
         `AJrhgGs83mL22kZ`
 
@@ -158,10 +166,10 @@ All settings in this section are related to network-based push notifications via
     - Example: `dashcam_device = "/dev/video0"`
 - `dashcam_background_mode`
     - This setting determines whether or not Predator will record dash-cam video as a background process.
-    - When this is set to True, and dash-cam mode is selected, Predator will launch the recording process as a background task, then close.
-    - This setting should almost always be False, since setting it to True will remove the user's ability to stop the recording process by pressing `Ctrl + C`.
+    - When this is set to `true`, and dash-cam mode is selected, Predator will launch the recording process as a background task, then close.
+    - This setting should almost always be `false`, since setting it to `true` will remove the user's ability to stop the recording process by pressing `Ctrl + C`.
         - To close the recording process, enter the command `killall ffmpeg` into the standard console. However, keep in mind that this will forcefully close all instances of the FFMPEG process, and potentially corrupt videos, even if they are unrelated to Predator.
 - `dashcam_background_mode_realtime`
     - This setting determines whether Predator will automatically enabled background dashcam recording when starting in real-time mode.
-    - This setting will only have an effect if `dashcam_background_mode` has been set to True as well.
+    - This setting will only have an effect if `dashcam_background_mode` has been set to `true` as well.
     - Note that Predator can only use one recording device for one task at a time, so if you run real-time mode with background recording enabled, you'll need to specify two different devices by changing `fswebcam_device` and `dashcam_device`.

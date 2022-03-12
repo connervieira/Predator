@@ -138,3 +138,4 @@ This update makes some technical improvements to Predator, and improves the effi
 - Moved the Predator configuration to `config.json` in order to improve organization and extensibility.
 - Adjusted the default settings to reduce the amount of configuration that needs to be done for most use cases.
 - Added support for RGB status lighting support.
+- Added a configuration setting for globally disabling OpenCV and Tensorflow.
