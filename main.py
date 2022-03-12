@@ -25,10 +25,13 @@ import datetime # Required for converting between timestamps and human readable 
 import fnmatch # Required to use wildcards to check strings
 
 if (config["general"]["disable_object_recognition"] == False):
-    import silence_tensorflow.auto # Silences tensorflow warnings
-    import cv2 # Required for object recognition (not license plate recognition)
-    import cvlib as cv # Required for object recognition (not license plate recognition)
-    from cvlib.object_detection import draw_bbox # Required for object recognition (not license plate recognition)
+    try:
+        import silence_tensorflow.auto # Silences tensorflow warnings
+        import cv2 # Required for object recognition (not license plate recognition)
+        import cvlib as cv # Required for object recognition (not license plate recognition)
+        from cvlib.object_detection import draw_bbox # Required for object recognition (not license plate recognition)
+    except Exception:
+        print (Exception)
 
 import utils # Import the utils.py scripts.
 style = utils.style # Load the style from the utils script.
