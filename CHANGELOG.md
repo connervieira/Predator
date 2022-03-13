@@ -139,3 +139,9 @@ This update makes some technical improvements to Predator, and improves the effi
 - Adjusted the default settings to reduce the amount of configuration that needs to be done for most use cases.
 - Added support for RGB status lighting support.
 - Added a configuration setting for globally disabling OpenCV and Tensorflow.
+- Changed the import process for Tensorflow and OpenCV to allow for failure without terminating Predator.
+- Adjusted the status messages in real-time mode to more accurate represent the current processing step.
+- Added the ability to export license plate GPX location data collected in pre-recorded mode.
+- Added a new 'Management Mode', which allows the user to run basic system management tasks from inside the Predator interface.
+    - Users can now view files in a given Predator project folder.
+    - Users can copy any combination of Predator project files to any directory on the system, including an external drive.

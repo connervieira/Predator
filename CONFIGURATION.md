@@ -12,10 +12,12 @@ This section of configuration values will effect Predator's general operation.
     - This setting may be useful to change in the event that Predator is being run on a device with a tiny display, where a large ASCII art header might cause formatting issues.
 - `auto_start_mode`
     - This setting is a string determines which mode (if any) that Predator will automatically load into when being started.
-    - There are 3 possible values this can be set to.
+    - There are 4 possible values this can be set to, not including being left blank.
         - When set to an empty string, Predator will prompt the user to select a mode each time it starts. This is the default.
+        - When set to "0", Predator will skip the 'mode' prompt, and automatically boot into management mode.
         - When set to "1", Predator will skip the 'mode' prompt, and automatically boot into pre-recorded mode.
         - When set to "2", Predator will skip the 'mode' prompt, and automatically boot into real-time mode.
+        - When set to "2", Predator will skip the 'mode' prompt, and automatically boot into dash-cam mode.
     - It may be useful to change this setting in several different situations:
         - If you only ever use the same mode when using Predator, setting this to your preferred mode can save time.
         - When installing Predator in a vehicle, this setting can allow Predator to load without any user input.

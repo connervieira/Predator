@@ -1,4 +1,4 @@
-# Predator LPRS
+# Predator
 # main.py
 
 print("Loading Predator...")
@@ -57,7 +57,7 @@ update_status_lighting = lighting.update_status_lighting # Load the status light
 # ----- General configuration -----
 crop_script_path = predator_root_directory + "/crop_image" # Path to the cropping script in the Predator directory.
 ascii_art_header = config["general"]["ascii_art_header"] # This setting determines whether or not the large ASCII art Predator title will show on start-up. When set to False, a small, normal text title will appear instead. This is useful when running Predator on a device with a small display to avoid weird formatting.
-auto_start_mode = config["general"]["auto_start_mode"] # This variable determines whether or not automatically start in a particular mode. When empty, the user will be prompted whether to start in pre-recorded mode or in real-time mode. When set to "1", Predator will automatically select and start pre-recorded mode when launched. When set to "2", Predator will automatically select and start real-time mode when launched. When set to "3", Predator will start into dashcam-mode when launched.
+auto_start_mode = config["general"]["auto_start_mode"] # This variable determines whether or not automatically start in a particular mode. When empty, the user will be prompted whether to start in pre-recorded mode or in real-time mode. When set to "0", Predator will automatically start into management mode when launched. When set to "1", Predator will automatically select and start pre-recorded mode when launched. When set to "2", Predator will automatically select and start real-time mode when launched. When set to "3", Predator will start into dashcam-mode when launched.
 default_root = config["general"]["default_root"] # If this variable isn't empty, the "root directory" prompt will be skipped when starting Predator. This variable will be used as the root directory. This variable only affects real-time mode and dash-cam mode.
 silence_file_saving = config["general"]["silence_file_saving"] # This setting determines whether log messages about file saving will be printed to console. Set this to True to silence the messages indicating whether or not files were successfully saved or updated.
 disable_object_recognition = config["general"]["disable_object_recognition"] # This setting is responsible for globally disabling object recognition (TensorFlow and OpenCV) in the event that it isn't supported on a particular platform. When set to true, any features involving object recognition, other than license plate recognition, will be disabled.
@@ -193,15 +193,20 @@ if (push_notifications_enabled == True): # Check to see if the user has Gotify n
 
 # Figure out which mode to boot into.
 print("Please select an operating mode.")
+print("0. Management")
 print("1. Pre-recorded")
 print("2. Real-time")
 print("3. Dash-cam")
 
 # Check to see if the auto_start_mode configuration value is an expected value. If it isn't execution can continue, but the user will need to manually select what mode Predator should start in.
-if (auto_start_mode != "" and auto_start_mode != "1" and auto_start_mode != "2" and auto_start_mode != "3"):
-    print(style.yellow + "Warning: The 'auto_start_mode' configuration value isn't properly set. This value should be blank, '1', '2', or '3'. It's possible there's been a typo." + style.end)
+if (auto_start_mode != "" and auto_start_mode != "0" and auto_start_mode != "1" and auto_start_mode != "2" and auto_start_mode != "3"):
+    print(style.yellow + "Warning: The 'auto_start_mode' configuration value isn't properly set. This value should be blank, '0', '1', '2', or '3'. It's possible there's been a typo." + style.end)
 
-if (auto_start_mode == "1"): # Based on the configuration, Predator will automatically boot into pre-recorded mode.
+
+if (auto_start_mode == "0"): # Based on the configuration, Predator will automatically boot into management mode.
+    print(style.bold + "Automatically starting into management mode based on the auto_start_mode configuration value." + style.end)
+    mode_selection = "0"
+elif (auto_start_mode == "1"): # Based on the configuration, Predator will automatically boot into pre-recorded mode.
     print(style.bold + "Automatically starting into pre-recorded mode based on the auto_start_mode configuration value." + style.end)
     mode_selection = "1"
 elif (auto_start_mode == "2"): # Based on the configuration, Predator will automatically boot into real-time mode.
@@ -227,12 +232,186 @@ else: # No 'auto start mode' has been configured, so ask the user to select manu
 
 
 
+if (mode_selection == "0"): # The user has selected to boot into management mode.
+    if (default_root != ""): # Check to see if the user has configured a default root directory path.
+        print(style.bold + "Using default preference for root directory." + style.end)
+        root = default_root
+    else:
+        root = input("Project root directory path: ")
+
+    # Run some validation to make sure the information just entered by the user is correct.
+    if (os.path.exists(root) == False): # Check to see if the root directory entered by the user exists.
+        print(style.yellow + "Warning: The root project directory entered doesn't seem to exist. Predator will almost certainly fail." + style.end)
+        input("Press enter to continue...")
+
+
+    while True:
+        clear()
+        print("Please select an option")
+        print("0. Quit")
+        print("1. File Management")
+
+        selection = input("Selection: ")
+
+        if (selection == "0"): # The user has selected to quit Predator.
+            break # Break the 'while true' loop to terminate Predator.
+
+        elif (selection == "1"): # The user has selected the "File Management" option.
+            print("    Please select an option")
+            print("    0. Back")
+            print("    1. View")
+            print("    2. Copy")
+            print("    3. Delete")
+            selection = input("    Selection: ")
+
+            if (selection == "0"): # The user has selected to return back to the previous menu.
+                pass # Do nothing, and just finish this loop.
+            elif (selection == "1"): # The user has selected the "view files" option.
+                os.system("ls -1 " + root) # Run the 'ls' command in the project root directory.
+            elif (selection == "2"): # The user has selected the "copy files" option.
+
+                # Reset all of the file selections to un-selected.
+                copy_management_configuration = False
+                copy_prerecorded_processed_frames = False
+                copy_prerecorded_gpx_files = False
+                copy_prerecorded_license_plate_analysis_data = False
+                copy_prerecorded_object_recognition_data = False
+                copy_prerecorded_license_plate_location_data = False
+                copy_realtime_images = False
+                copy_realtime_object_recognition_data  = False
+                copy_realtime_license_plate_recognition_data = False
+                copy_dashcam_video = False
+
+                while True: # Run the "copy files" menu on a loop forever until the user is finished selecting files.
+                    clear() # Clear the console output before each loop.
+                    print("Please select which files to copy")
+                    print("0. Continue")
+                    print("")
+                    print("===== Management Mode =====")
+                    if (copy_management_configuration == True):
+                        print("M1. [X] Configuration files")
+                    else:
+                        print("M1. [ ] Configuration files")
+                    print("")
+                    print("===== Pre-recorded Mode =====")
+                    if (copy_prerecorded_processed_frames == True):
+                        print("P1. [X] Processed video frames")
+                    else:
+                        print("P1. [ ] Processed video frames")
+                    if (copy_prerecorded_gpx_files == True):
+                        print("P2. [X] GPX files")
+                    else:
+                        print("P2. [ ] GPX files")
+                    if (copy_prerecorded_license_plate_analysis_data == True):
+                        print("P3. [X] License plate analysis data files")
+                    else:
+                        print("P3. [ ] License plate analysis data files")
+                    if (copy_prerecorded_object_recognition_data == True):
+                        print("P4. [X] Object recognition data files")
+                    else:
+                        print("P4. [ ] Object recognition data files")
+                    if (copy_prerecorded_license_plate_location_data == True):
+                        print("P5. [X] License plate location data files")
+                    else:
+                        print("P5. [ ] License plate location data files")
+                    print("")
+                    print("===== Real-time Mode =====")
+                    if (copy_realtime_images == True):
+                        print("R1. [X] Captured images")
+                    else:
+                        print("R1. [ ] Captured images")
+                    if (copy_realtime_object_recognition_data == True):
+                        print("R2. [X] Object recognition data files")
+                    else:
+                        print("R2. [ ] Object recognition data files")
+                    if (copy_realtime_license_plate_recognition_data == True):
+                        print("R3. [X] License plate recognition data files")
+                    else:
+                        print("R3. [ ] License plate recognition data files")
+                    print("")
+                    print("===== Dash-cam Mode =====")
+                    if (copy_dashcam_video == True):
+                        print("D1. [X] Dash-cam videos")
+                    else:
+                        print("D1. [ ] Dash-cam videos")
+
+                    selection = input("Selection: ") # Prompt the user for a selection.
+
+
+                    if (selection == "0"):
+                        break
+
+                    # Toggle the file indicated by the user.
+                    elif (selection.lower() == "m1"):
+                        copy_management_configuration = not copy_management_configuration
+                    elif (selection.lower() == "p1"):
+                        copy_prerecorded_processed_frames = not copy_prerecorded_processed_frames
+                    elif (selection.lower() == "p2"):
+                        copy_prerecorded_gpx_files = not copy_prerecorded_gpx_files
+                    elif (selection.lower() == "p3"):
+                        copy_prerecorded_license_plate_analysis_data = not copy_prerecorded_license_plate_analysis_data
+                    elif (selection.lower() == "p4"):
+                        copy_prerecorded_object_recognition_data = not copy_prerecorded_object_recognition_data
+                    elif (selection.lower() == "p5"):
+                        copy_prerecorded_license_plate_location_data = not copy_prerecorded_license_plate_location_data
+                    elif (selection.lower() == "r1"):
+                        copy_realtime_images = not copy_realtime_images
+                    elif (selection.lower() == "r2"):
+                        copy_realtime_object_recognition_data = not copy_realtime_object_recognition_data
+                    elif (selection.lower() == "r3"):
+                        copy_realtime_license_plate_recognition_data = not copy_realtime_license_plate_recognition_data
+                    elif (selection.lower() == "d1"):
+                        copy_dashcam_video = not copy_dashcam_video
+                
+
+                # Prompt the user for the copying destination.
+                copy_destination = "" # Set the copy_destination as a blank placeholder.
+                while os.path.exists(copy_destination) == False: # Repeatedly ask the user for a valid copy destination until they enter one that is valid.
+                    copy_destination = input("Destination path: ") # Prompt the user for a destination path.
+
+
+                # Copy the files as per the user's inputs.
+                print("Copying files...")
+                if (copy_management_configuration):
+                    os.system("cp " + predator_root_directory + "/config.json " + copy_destination)
+                if (copy_prerecorded_processed_frames):
+                    os.system("cp -r " + root + "/frames " + copy_destination)
+                if (copy_prerecorded_gpx_files):
+                    os.system("cp " + root + "/*.gpx " + copy_destination)
+                if (copy_prerecorded_license_plate_analysis_data):
+                    os.system("cp " + root + "/pre_recorded_license_plate_export.* " + copy_destination)
+                if (copy_prerecorded_object_recognition_data):
+                    os.system("cp " + root + "/pre_recorded_object_detection_export.* " + copy_destination)
+                if (copy_prerecorded_license_plate_location_data):
+                    os.system("cp " + root + "/pre_recorded_license_plate_location_data_export.* " + copy_destination)
+                if (copy_realtime_images):
+                    os.system("cp " + root + "/realtime_image* " + copy_destination)
+                if (copy_realtime_object_recognition_data):
+                    os.system("cp " + root + "/real_time_object_detection* " + copy_destination)
+                if (copy_realtime_license_plate_recognition_data):
+                    os.system("cp " + root + "/real_time_plates* " + copy_destination)
+                if (copy_dashcam_video):
+                    os.system("cp " + root + "/predator_dashcam* " + copy_destination)
+                print("Files have finished copying.")
+
+
+            elif (selection == "3"): # The user has selected the "delete files" option. TODO
+                pass
+            else: # The user has selected an invalid option in the file management menu.
+                print(style.yellow + "Warning: Invalid selection." + style.end)
+
+        else: # The user has selected an invalid option in the main management menu.
+            print(style.yellow + "Warning: Invalid selection." + style.end)
+
+        input("\nPress enter to continue...") # Wait for the user to press enter before repeating the management menu loop.
+
+
 
 
 
 # Pre-recorded mode
 
-if (mode_selection == "1"): # The user has selected to boot into pre-recorded mode.
+elif (mode_selection == "1"): # The user has selected to boot into pre-recorded mode.
     # Get the required information from the user.
     if (default_root != ""): # Check to see if the user has configured a default root directory path.
         print(style.bold + "Using default preference for root directory." + style.end)
@@ -469,19 +648,19 @@ if (mode_selection == "1"): # The user has selected to boot into pre-recorded mo
             elif (selection == "1"): # Export raw plate data.
                 export_data = str(plates_detected)
 
-                save_to_file(root + "/export.txt", export_data, silence_file_saving) # Save to disk.
+                save_to_file(root + "/pre_recorded_license_plate_export.txt", export_data, silence_file_saving) # Save to disk.
             
             elif (selection == "2"): # Export plate data as a list with one plate per line.
                 for plate in plates_detected:
                     export_data = export_data + plate + "\n"
 
-                save_to_file(root + "/export.txt", export_data, silence_file_saving) # Save to disk.
+                save_to_file(root + "/pre_recorded_license_plate_export.txt", export_data, silence_file_saving) # Save to disk.
 
             elif (selection == "3"): # Export plate data as CSV (add comma after each plate)
                 for plate in plates_detected:
                     export_data = export_data + plate + ",\n"
 
-                save_to_file(root + "/export.txt", export_data, silence_file_saving) # Save to disk.
+                save_to_file(root + "/pre_recorded_license_plate_export.csv", export_data, silence_file_saving) # Save to disk.
 
             else:
                 print(style.yellow + "Warning: Invalid selection." + style.end)
@@ -504,7 +683,7 @@ if (mode_selection == "1"): # The user has selected to boot into pre-recorded mo
                 print(raw_lpr_scan)
 
             elif (selection == "2"):
-                save_to_file(root + "/export.txt", str(raw_lpr_scan), silence_file_saving) # Save raw license plate analysis data to disk.
+                save_to_file(root + "/pre_recorded_license_plate_export.txt", str(raw_lpr_scan), silence_file_saving) # Save raw license plate analysis data to disk.
                 
             else:
                 print(style.yellow + "Warning: Invalid selection." + style.end)
@@ -536,7 +715,7 @@ if (mode_selection == "1"): # The user has selected to boot into pre-recorded mo
             elif (selection == "2"):
                 print(json.dumps(object_count, indent=4))
             elif (selection == "3"):
-                save_to_file(root + "/pre_recorded_object_detection.json", json.dumps(object_count, indent=4), silence_file_saving) # Save to disk.
+                save_to_file(root + "/pre_recorded_object_detection_export.json", json.dumps(object_count, indent=4), silence_file_saving) # Save to disk.
             else:
                 print(style.yellow + "Warning: Invalid selection." + style.end)
             
@@ -547,6 +726,7 @@ if (mode_selection == "1"): # The user has selected to boot into pre-recorded mo
             print("Please select an option")
             print("0. Back")
             print("1. View raw license plate location data")
+            print("2. Export raw license plate location data")
 
             selection = input("Selection: ")
 
@@ -555,6 +735,9 @@ if (mode_selection == "1"): # The user has selected to boot into pre-recorded mo
 
             elif (selection == "1"):
                 print(frame_locations)
+
+            elif (selection == "2"):
+                save_to_file(root + "/pre_recorded_license_plate_location_data_export.txt", frame_locations, silence_file_saving) # Save to disk.
 
             else:
                 print(style.yellow + "Warning: Invalid selection." + style.end)

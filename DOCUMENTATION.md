@@ -64,14 +64,17 @@ After configuring Predator, you can try it out for the first time!
         - `python3 main.py`
     - After Predator starts, you should see a large banner displaying the Predator name.
 2. Select a mode
-    - Predator can operate a three possible modes.
-        - Pre-recorded mode
+    - Predator can operate in 4 possible modes.
+        - Management mode (Mode 0)
+            - This mode isn't a main operating mode for Predator, and simply exists for doing basic management tasks.
+            - In situations where Predator is hard-installed, like in a vehicle or security system, this mode makes it easy to clear folders, copy files, and maintain Predator without having to remove the central processor.
+        - Pre-recorded mode (Mode 1)
             - In this mode, Predator will analyze a pre-recorded video clip that you provide. This video can be in any format supported by FFMPEG.
             - Use this mode to analyze dash-cam video, whether it be from a generic dash-cam or from Predator running in dash-cam mode.
-        - Real-time mode
+        - Real-time mode (Mode 2)
             - In this mode, Predator will use a connected camera to detect license plates in real-time.
             - In real-time mode, Predator will repeatedly take still frames to analyze, and will not record video..
-        - Dash-cam mode
+        - Dash-cam mode (Mode 3)
             - In this mode, Predator will operate like a dash-cam, and simply record video without processing it.
             - This mode can be used to record video to be used analyzed with pre-recorded mode later.
     - Select a mode by entering the number associated with it in the selection menu.

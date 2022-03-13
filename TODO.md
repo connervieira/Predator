@@ -28,8 +28,8 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Add the ability to toggle saving object recognition data to disk.
 - [X] Add the ability to toggle verbose file saving data.
 - [X] Move configuration from main.py to a separate files for better extensibility.
-- [ ] Add support for LED status lights that indicate important Predator events discretely.
-- [ ] Fix Raspberry Pi AI packages.
+- [X] Fix Raspberry Pi AI packages.
+- [X] Add support for LED status lights that indicate important Predator events discretely.
 
 
 # Hypothetical
