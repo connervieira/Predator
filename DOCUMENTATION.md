@@ -22,6 +22,8 @@ This is the installation process for Predator and all of it's dependencies.
     - You can install FSWebcam using the following command on a Debian based Linux machine: `sudo apt-get install fswebcam`
 5. Install the required Python packages.
     - `pip3 install validators opencv-python-headless==4.5.3.56 cvlib tensorflow keras silence-tensorflow`
+    - When tested on a Raspberry Pi 3, this step caused some issues. If you receive errors related to OpenCV when attempting to run Predator later, try uninstalling OpenCV Headless and replace it with the standard OpenCV library.
+        - `pip3 uninstall opencv-python-headless; pip3 install opencv-python`
 6. Install the `mpg321` package.
     - Predator requires mpg321 in order to play audio effects for alerts.
     - `sudo apt-get install mpg321`
@@ -47,8 +49,8 @@ After installing Predator, you should do some quick configuration in order to ge
     - All configuration values are explained extensively in the CONFIGURING.md document.
     - Make changes to any of the configuration values to better fit your usage context.
 3. Depending on the platform, Predator might not be able to locate the `config.json` file. If you encounter issues during the steps described in the "Usage" section, you may need to manually set Predator's directory in `main.py`
-    - At the top of the `main.py` script, you should see a variable titled `predator_root_directory`. By default, a Python function is used to find the current directory of the script.
-    - If you receive errors related to missing files when trying to run Predator, try setting this variable to a static file path.
+    - At the top of the `main.py` and `lighting.py` scripts, you should see a variable titled `predator_root_directory`. By default, a Python function is used to find the current directory of the script.
+    - If you receive errors related to missing configuration files when trying to run Predator, try setting this variable to a static file path.
     - Example:
         - `predator_root_directory = "/home/user/Predator/"`
 
