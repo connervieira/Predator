@@ -24,15 +24,6 @@ import validators # Required to validate URLs
 import datetime # Required for converting between timestamps and human readable date/time information
 import fnmatch # Required to use wildcards to check strings
 
-if (config["general"]["disable_object_recognition"] == False):
-    try:
-        import silence_tensorflow.auto # Silences tensorflow warnings
-        import cv2 # Required for object recognition (not license plate recognition)
-        import cvlib as cv # Required for object recognition (not license plate recognition)
-        from cvlib.object_detection import draw_bbox # Required for object recognition (not license plate recognition)
-    except Exception:
-        print (Exception)
-
 import utils # Import the utils.py scripts.
 style = utils.style # Load the style from the utils script.
 clear = utils.clear # Load the screen clearing function from the utils script.
@@ -42,10 +33,21 @@ add_to_file = utils.add_to_file # Load the file appending function from the util
 validate_plate = utils.validate_plate # Load the plate validation function from the utils script.
 download_plate_database = utils.download_plate_database # Load the plate database downloading function from the utils script.
 display_shape = utils.display_shape # Load the shape displaying function from the utils script.
+countdown = utils.countdown # Load the timer countdown function from the utils script.
+
+if (config["general"]["disable_object_recognition"] == False): # Check to see whether or not object recognition (Tensorflow/OpenCV) has been globally disabled.
+    try: # "Try" to import Tensorflow and OpenCV; Don't quit the entire program if an error is encountered.
+        import silence_tensorflow.auto # Silences tensorflow warnings
+        import cv2 # Required for object recognition (not license plate recognition)
+        import cvlib as cv # Required for object recognition (not license plate recognition)
+        from cvlib.object_detection import draw_bbox # Required for object recognition (not license plate recognition)
+    except Exception:
+        print (Exception) # Display the exception that was encountered
+        countdown(3) # Start a countdown to allow the user to see the error, then continue loading.
+
 
 import lighting # Import the lighting.py scripts
 update_status_lighting = lighting.update_status_lighting # Load the status lighting update function from the lighting script.
-
 
 
 
@@ -708,7 +710,7 @@ elif (mode_selection == "2"): # The user has set Predator to boot into real-time
 
 
         # Run license plate analysis on the captured frame.
-        print("Analyzing image...")
+        print("Running license plate recognition...")
         time.sleep(0.2) # Sleep to give the user time to quit Predator if they want to.
         if (save_images_preference == True): # Check to see whether or not the user wants to save all images captured by Predator.
             analysis_command = "alpr -n " + realtime_guesses  + " " + root + "/realtime_image" + str(i) + ".jpg | awk '{print $2}'" # Prepare the analysis command so we can run it next.

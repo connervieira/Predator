@@ -214,3 +214,10 @@ class style:
 
     # Define styling end marker
     end = '\033[0m'
+
+
+# Define a function for running a countdown timer.
+def countdown(timer):
+    for iteration in range(1, timer + 1): # Loop however many times specified by the `timer` variable.
+        print(str(timer - iteration + 1)) # Display the current countdown number for this iteration, but subtracting the current iteration count from the total timer length.
+        time.sleep(1) # Wait for 1 second.
