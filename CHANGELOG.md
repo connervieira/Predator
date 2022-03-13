@@ -145,3 +145,4 @@ This update makes some technical improvements to Predator, and improves the effi
 - Added a new 'Management Mode', which allows the user to run basic system management tasks from inside the Predator interface.
     - Users can now view files in a given Predator project folder.
     - Users can copy any combination of Predator project files to any directory on the system, including an external drive.
+    - Users can delete any combination of Predator project files from any project directory.

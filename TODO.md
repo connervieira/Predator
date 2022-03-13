@@ -30,12 +30,12 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Move configuration from main.py to a separate files for better extensibility.
 - [X] Fix Raspberry Pi AI packages.
 - [X] Add support for LED status lights that indicate important Predator events discretely.
+- [X] Add "Management Mode" which allows the user to execute administrative actions of Predator, like clearing root project folders.
 
 
 # Hypothetical
 
 These are features that require more in-depth changes, and are purely hypothetical.
 
-- [ ] Add "Management Mode" which allows the user to execute administrative actions of Predator, like clearing root project folders.
 - [ ] The ability to process multiple sequential videos at once.
 - [ ] A GUI front-end in addition to the existing command line interface.

@@ -52,7 +52,7 @@ update_status_lighting = lighting.update_status_lighting # Load the status light
 
 
 
-# Configuration
+# Load the configuration values from the config file.
 
 # ----- General configuration -----
 crop_script_path = predator_root_directory + "/crop_image" # Path to the cropping script in the Predator directory.
@@ -282,7 +282,7 @@ if (mode_selection == "0"): # The user has selected to boot into management mode
                 copy_realtime_license_plate_recognition_data = False
                 copy_dashcam_video = False
 
-                while True: # Run the "copy files" menu on a loop forever until the user is finished selecting files.
+                while True: # Run the "copy files" selection menu on a loop forever until the user is finished selecting files.
                     clear() # Clear the console output before each loop.
                     print("Please select which files to copy")
                     print("0. Continue")
@@ -395,8 +395,129 @@ if (mode_selection == "0"): # The user has selected to boot into management mode
                 print("Files have finished copying.")
 
 
-            elif (selection == "3"): # The user has selected the "delete files" option. TODO
-                pass
+            elif (selection == "3"): # The user has selected the "delete files" option.
+                # Reset all of the file selections to un-selected.
+                delete_management_custom = False
+                delete_prerecorded_processed_frames = False
+                delete_prerecorded_gpx_files = False
+                delete_prerecorded_license_plate_analysis_data = False
+                delete_prerecorded_object_recognition_data = False
+                delete_prerecorded_license_plate_location_data = False
+                delete_realtime_images = False
+                delete_realtime_object_recognition_data  = False
+                delete_realtime_license_plate_recognition_data = False
+                delete_dashcam_video = False
+
+                while True: # Run the "delete files" selection menu on a loop forever until the user is finished selecting files.
+                    clear() # Clear the console output before each loop.
+                    print("Please select which files to delete")
+                    print("0. Continue")
+                    print("")
+                    if (delete_management_custom == True):
+                        print("M1. [X] Custom file-name (Specified in next step)")
+                    else:
+                        print("M1. [ ] Custom file-name (Specified in next step)")
+                    print("")
+                    print("===== Pre-recorded Mode =====")
+                    if (delete_prerecorded_processed_frames == True):
+                        print("P1. [X] Processed video frames")
+                    else:
+                        print("P1. [ ] Processed video frames")
+                    if (delete_prerecorded_gpx_files == True):
+                        print("P2. [X] GPX files")
+                    else:
+                        print("P2. [ ] GPX files")
+                    if (delete_prerecorded_license_plate_analysis_data == True):
+                        print("P3. [X] License plate analysis data files")
+                    else:
+                        print("P3. [ ] License plate analysis data files")
+                    if (delete_prerecorded_object_recognition_data == True):
+                        print("P4. [X] Object recognition data files")
+                    else:
+                        print("P4. [ ] Object recognition data files")
+                    if (delete_prerecorded_license_plate_location_data == True):
+                        print("P5. [X] License plate location data files")
+                    else:
+                        print("P5. [ ] License plate location data files")
+                    print("")
+                    print("===== Real-time Mode =====")
+                    if (delete_realtime_images == True):
+                        print("R1. [X] Captured images")
+                    else:
+                        print("R1. [ ] Captured images")
+                    if (delete_realtime_object_recognition_data == True):
+                        print("R2. [X] Object recognition data files")
+                    else:
+                        print("R2. [ ] Object recognition data files")
+                    if (delete_realtime_license_plate_recognition_data == True):
+                        print("R3. [X] License plate recognition data files")
+                    else:
+                        print("R3. [ ] License plate recognition data files")
+                    print("")
+                    print("===== Dash-cam Mode =====")
+                    if (delete_dashcam_video == True):
+                        print("D1. [X] Dash-cam videos")
+                    else:
+                        print("D1. [ ] Dash-cam videos")
+
+                    selection = input("Selection: ") # Prompt the user for a selection.
+
+                    if (selection == "0"):
+                        break
+
+                    # Toggle the file indicated by the user.
+                    elif (selection.lower() == "m1"):
+                        delete_management_custom = not delete_management_custom
+                    elif (selection.lower() == "p1"):
+                        delete_prerecorded_processed_frames = not delete_prerecorded_processed_frames
+                    elif (selection.lower() == "p2"):
+                        delete_prerecorded_gpx_files = not delete_prerecorded_gpx_files
+                    elif (selection.lower() == "p3"):
+                        delete_prerecorded_license_plate_analysis_data = not delete_prerecorded_license_plate_analysis_data
+                    elif (selection.lower() == "p4"):
+                        delete_prerecorded_object_recognition_data = not delete_prerecorded_object_recognition_data
+                    elif (selection.lower() == "p5"):
+                        delete_prerecorded_license_plate_location_data = not delete_prerecorded_license_plate_location_data
+                    elif (selection.lower() == "r1"):
+                        delete_realtime_images = not delete_realtime_images
+                    elif (selection.lower() == "r2"):
+                        delete_realtime_object_recognition_data = not delete_realtime_object_recognition_data
+                    elif (selection.lower() == "r3"):
+                        delete_realtime_license_plate_recognition_data = not delete_realtime_license_plate_recognition_data
+                    elif (selection.lower() == "d1"):
+                        delete_dashcam_video = not delete_dashcam_video
+
+                if (delete_management_custom):
+                    delete_custom_file_name = input("Please specify the name of the additional file you'd like to delete from the current project folder: ")
+
+                # Delete the files as per the user's inputs, after confirming the deletion process.
+                if (input("Are you sure you want to delete the selected files permanently? (y/n): ").lower() == "y"):
+                    print("Deleting files...")
+                    if (delete_management_custom):
+                        os.system("rm -r " + root + "/" + delete_custom_file_name)
+                    if (delete_prerecorded_processed_frames):
+                        os.system("rm -r " + root + "/frames")
+                    if (delete_prerecorded_gpx_files):
+                        os.system("rm " + root + "/*.gpx")
+                    if (delete_prerecorded_license_plate_analysis_data):
+                        os.system("rm " + root + "/pre_recorded_license_plate_export.*")
+                    if (delete_prerecorded_object_recognition_data):
+                        os.system("rm " + root + "/pre_recorded_object_detection_export.*")
+                    if (delete_prerecorded_license_plate_location_data):
+                        os.system("rm " + root + "/pre_recorded_license_plate_location_data_export.*")
+                    if (delete_realtime_images):
+                        os.system("rm " + root + "/realtime_image*")
+                    if (delete_realtime_object_recognition_data):
+                        os.system("rm " + root + "/real_time_object_detection*")
+                    if (delete_realtime_license_plate_recognition_data):
+                        os.system("rm " + root + "/real_time_plates*")
+                    if (delete_dashcam_video):
+                        os.system("rm " + root + "/predator_dashcam*")
+                    print("Files have finished deleting.")
+                else:
+                    print("No files have been deleted.")
+
+
             else: # The user has selected an invalid option in the file management menu.
                 print(style.yellow + "Warning: Invalid selection." + style.end)
 
