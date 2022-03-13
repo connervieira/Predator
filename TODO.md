@@ -31,6 +31,7 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Fix Raspberry Pi AI packages.
 - [X] Add support for LED status lights that indicate important Predator events discretely.
 - [X] Add "Management Mode" which allows the user to execute administrative actions of Predator, like clearing root project folders.
+- [ ] Add the ability to change configuration values from nanagement mode.
 
 
 # Hypothetical
