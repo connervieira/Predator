@@ -1,18 +1,18 @@
 # Apex
 
-This document briefly explains Predator Apex, the pre-built hardware program for Predator LPRS.
+This document briefly explains Predator Apex, the paid hardware program for Predator LPRS.
 
 
 ## Disclaimer
 
-Predator Apex is by no means a mass produced product, and is not intended to be a consumer device. Each Predator Apex model is hand assembled with extremely limited resources. Think of Predator Apex as a quick and easy way to get started with the Predator system, not as a commercial product. Predator Apex is great for tinkerers and tech enthusiasts, not for people who want a simple, plug-and-play experience.
+Predator Apex is by no means a mass produced product, and is not intended to be a consumer device. Each Predator Apex model is hand assembled with extremely limited resources. Think of Predator Apex as a quick and easy way to get started with the Predator system, not as a commercial product. Predator Apex is great for tinkerers and tech enthusiasts who just want everything they need to get started, not for people who want a simple, plug-and-play experience.
 
 
 ## Description
 
 Predator is a powerful, multipurpose system capable of scanning license plates in pre-recorded video, analyzing real-time video streams, and running as a fully-featured dash-cam. While this versatility provides huge amounts of customization for technical users and hobbyists, the majority of users probably want a pre-configured setup as a starting point. That's where Predator Apex is useful.
 
-Predator Apex is a collection of prebuilt hardware devices that come preconfigured with the Predator software. All Predator Apex devices use basic off-the-shelf parts, and are designed to be repairable, modifiable, and customizable, just like the Predator software itself.
+Predator Apex is a collection of prebuilt hardware devices and that come preconfigured with the Predator software, as well as one-on-one services to aid in DIY assembly of a Predator system. All Predator Apex devices use basic off-the-shelf parts, and are designed to be repairable, modifiable, and customizable, just like the Predator software itself.
 
 
 ## Documentation

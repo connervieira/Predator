@@ -136,14 +136,18 @@ After configuring Predator, you can try it out for the first time!
 4. Run Predator
     - After finishing setting up your preferences, Predator will begin running automatically. Below you'll see information for all operation modes of Predator.
         - Pre-recorded mode
-            - You should note that while Predator is running it's analysis, you'll notice a folder named 'frames' appear in the project folder. Individual frames will begin to appear in this folder as Predator runs. Do not modify or delete these, since Predator will repeatedly access and modify these during the course of it's analysis. After analysis completes, you can safely delete these files.
-            - After Predator finishes running, you'll be prompted to "Press enter to continue". After pressing enter, you'll see the analysis menu.
+            - You should note that while Predator is running it's analysis, you'll notice a folder named 'frames' appear in the project folder. Individual frames will begin to appear in this folder as Predator runs. Do not modify or delete these, since Predator will repeatedly access and modify these during the course of it's analysis. After analysis completes, you can safely delete these files either manually, or by using Predator's management mode.
+            - After Predator finishes running, you'll be sent to the analysis menu.
                 - This menu allows you to manage, view, export, and manipulate the data collected in the current session.
+                - To navigate this menu, simply enter the ID number of the menu item you want to select.
         - Real-time mode
-            - While in real-time mode, Predator will run in an endless loop until quit by holding `Ctrl + C` for a few seconds, until you see a standard command prompt again.
+            - While in real-time mode, Predator will run in an endless loop until quit by holding `Ctrl + C` for a few seconds.
                 - Since Predator launches some of it's dependencies in different threads, pressing `Ctrl + C` a single time might not kill the entire Predator system.
+                - Simply hold `Ctrl + C` until you see a Linux command prompt again.
             - When a license plate is detected, Predator will display it on screen.
                 - Depending on the preferences, Predator might also display a large ASCII shape to make it easier to see important information at a glance.
+                - Depending on the preferences, Predator might play an audio sound indicating the type of plate detected.
+                - Depending on the preferences, Predator might submit the license plate detected to a webhook and/or push notification service.
                 - Depending on the preferences for the session, Predator might also save images taken and the license plates detected.
                     - Images taken will be saved as `realtime_imageN.jpg` in the root project folder. If saving images is turned on, 'N' with the sequential image number. Otherwise, the N will be removed.
                     - Saved license plates will be saved to `real_time_plates.csv` in the root project folder.
@@ -151,4 +155,5 @@ After configuring Predator, you can try it out for the first time!
         - Dash-cam mode
             - In dash-cam mode, Predator will record video indefinitely until either disk space runs out, or `Ctrl + C` is pressed.
             - Predator will not detect license plates in this mode. However, you can use video recorded in this mode with pre-recorded mode in order to scan for license plates at a later date.
-            - The dash-cam video recorded will be saved to the project folder as predator_dashcam.mkv
+            - The dash-cam video recorded will be saved to the project folder as `predator_dashcam.mkv`.
+                - If background recording is enabled, and multiple camera devices are specified, Predator will record to multiple files. Each file will be named `predator_dashcamN.mkv`, where N is the camera ID number.
