@@ -129,9 +129,9 @@ March 1st, 2022
 
 ## Version 6.0
 
-### User Interaction Update
+### Management Update
 
-This update makes some technical improvements to Predator, and improves the efficiency and organization of user interaction.
+This update adds "Management Mode", and improves the efficiency and organization of various user interfaces.
 
 *Release date: To be determined*
 
@@ -146,3 +146,7 @@ This update makes some technical improvements to Predator, and improves the effi
     - Users can now view files in a given Predator project folder.
     - Users can copy any combination of Predator project files to any directory on the system, including an external drive.
     - Users can delete any combination of Predator project files from any project directory.
+    - Users can view system information, like Predator's current configuration, the current operating system, processor specifications, RAM information, etc.
+- Completely re-organized and re-structured the pre-recorded mode menu in order to make the process drastically easier to understand and use.
+    - The main menu is now grouped into sections for license plate data, object recognition data, location data, and statistics.
+    - Tabs are used to indicate sub-menus, and to visually distinguish them from previous menus while making it easy for the user to determine where they are in the menu system.

@@ -250,6 +250,7 @@ if (mode_selection == "0"): # The user has selected to boot into management mode
         print("Please select an option")
         print("0. Quit")
         print("1. File Management")
+        print("2. Information")
 
         selection = input("Selection: ")
 
@@ -392,6 +393,8 @@ if (mode_selection == "0"): # The user has selected to boot into management mode
                     os.system("cp " + root + "/real_time_plates* " + copy_destination)
                 if (copy_dashcam_video):
                     os.system("cp " + root + "/predator_dashcam* " + copy_destination)
+
+                clear()
                 print("Files have finished copying.")
 
 
@@ -413,6 +416,7 @@ if (mode_selection == "0"): # The user has selected to boot into management mode
                     print("Please select which files to delete")
                     print("0. Continue")
                     print("")
+                    print("===== Management Mode =====")
                     if (delete_management_custom == True):
                         print("M1. [X] Custom file-name (Specified in next step)")
                     else:
@@ -513,6 +517,8 @@ if (mode_selection == "0"): # The user has selected to boot into management mode
                         os.system("rm " + root + "/real_time_plates*")
                     if (delete_dashcam_video):
                         os.system("rm " + root + "/predator_dashcam*")
+
+                    clear()
                     print("Files have finished deleting.")
                 else:
                     print("No files have been deleted.")
@@ -520,6 +526,24 @@ if (mode_selection == "0"): # The user has selected to boot into management mode
 
             else: # The user has selected an invalid option in the file management menu.
                 print(style.yellow + "Warning: Invalid selection." + style.end)
+
+
+
+        elif (selection == "2"): # The user has selected the "Information" option. TODO
+            print("    Please select an option")
+            print("    0. Back")
+            print("    1. Neofetch")
+            print("    2. Print Current Configuration")
+            selection = input("    Selection: ")
+            if (selection == "0"): # The user has selected to return back to the previous menu.
+                pass # Do nothing, and just finish this loop.
+            elif (selection == "1"): # The user has selected the "neofetch" option.
+                os.system("neofetch")
+            elif (selection == "2"): # The user has selected the "print configuration" option.
+                os.system("cat " + predator_root_directory + "/config.json")
+            else: # The user has selected an invalid option in the information menu.
+                print(style.yellow + "Warning: Invalid selection." + style.end)
+
 
         else: # The user has selected an invalid option in the main management menu.
             print(style.yellow + "Warning: Invalid selection." + style.end)
@@ -548,7 +572,7 @@ elif (mode_selection == "1"): # The user has selected to boot into pre-recorded 
         object_recognition_preference = input("Enable object recognition (y/n): ")
     video_start_time = input("Optional: Video starting time (YYYY-mm-dd HH:MM:SS): ") # Ask the user when the video recording started so we can correlate it's frames to a GPX file.
     if (video_start_time != ""):
-        gpx_file = input("Optional: GPX file path: ")
+        gpx_file = input("Optional: GPX file name: ")
     else:
         gpx_file = ""
 
@@ -706,17 +730,11 @@ elif (mode_selection == "1"): # The user has selected to boot into pre-recorded 
         # Show the main menu for handling data collected in pre-recorded mode.
         print("Please select an option")
         print("0. Quit")
-        print("1. View license plate data")
-        print("2. Export license plate data")
-        print("3. Manage raw plate analysis data")
+        print("1. Manage license plate data")
+        print("2. Manage object recognition data")
+        print("3. Manage license plate GPS data")
         print("4. View session statistics")
-        if (object_recognition_preference == True): # If object recognition is enabled, show it as an option in the main menu.
-            print("5. Manage object recognition data")
-        if (gpx_file != ""): # If a GPX file was supplied for analysis, then show it as an option in the main menu.
-            print("6. Manage license plate GPS data")
-
         selection = input("Selection: ")
-        clear()
 
 
         if (selection == "0"): # If the user selects option 0 on the main menu, then exit Predator.
@@ -724,148 +742,173 @@ elif (mode_selection == "1"): # The user has selected to boot into pre-recorded 
             break
 
         elif (selection == "1"): # If the user selects option 1 on the main menu, then load the license pl atedata viewing menu.
-            print("Please select an option")
-            print("0. Back")
-            print("1. View raw Python data")
-            print("2. View as list")
-            print("3. View as CSV")
+            print("    Please select an option")
+            print("    0. Back")
+            print("    1. View data")
+            print("    2. Export data")
+            selection = input("    Selection: ")
+
+            if (selection == "1"): # The user has opened the license plate data viewing menu.
+                print("        Please select an option")
+                print("        0. Back")
+                print("        1. View as Python data")
+                print("        2. View as list")
+                print("        3. View as CSV")
+                print("        4. View as raw data")
             
-            selection = input("Selection: ")
+                selection = input("        Selection: ")
 
-            if (selection == "0"):
-                print("Returning to main menu.")
+                if (selection == "0"):
+                    print("Returning to main menu.")
+                elif (selection == "1"): # The user has selected to view license plate data as Python data.
+                    print(str(plates_detected))
+                elif (selection == "2"): # The user has selected to view license plate data as a list.
+                    for plate in plates_detected:
+                        print(plate)
+                elif (selection == "3"): # The user has selected to view license plate data as CSV data.
+                    for plate in plates_detected:
+                        print(plate + ",")
+                elif (selection == "4"): # The user has selected to view license plate data as raw data.
+                    print(raw_lpr_scan)
+                else:
+                    print(style.yellow + "Warning: Invalid selection." + style.end)
 
-            elif (selection == "1"): # Print raw plate data.
-                print(plates_detected)
+            elif (selection == "2"): # The user has opened the license plate data exporting menu.
+                print("        Please select an option")
+                print("        0. Back")
+                print("        1. Export as Python data")
+                print("        2. Export as list")
+                print("        3. Export as CSV")
+                print("        4. Export as raw data")
+                selection = input("        Selection: ")
 
-            elif (selection == "2"): # Print plate data as a list with one plate per line.
-                for plate in plates_detected:
-                    print(plate)
+                export_data = "" # Create a blank variable to store the export data.
 
-            elif (selection == "3"): # Print plate data as CSV (add a comma after each plate)
-                for plate in plates_detected:
-                    print(plate + ",")
-
-            else:
-                print(style.yellow + "Warning: Invalid selection." + style.end)
-
-            input("\nPress enter to continue...") # Wait for the user to press enter before repeating the menu loop.
-            
-        elif (selection == "2"): # If the user selects option 2 on the main menu, then load the license plate data exporting menu.
-            print("Please select an option")
-            print("0. Back")
-            print("1. Export raw Python data")
-            print("2. Export as list")
-            print("3. Export as CSV")
-            
-            selection = input("Selection: ")
-
-
-            export_data = "" # Create a blank variable to store the export data.
-
-            if (selection == "0"):
-                print("Returning to main menu.")
-
-            elif (selection == "1"): # Export raw plate data.
-                export_data = str(plates_detected)
-
-                save_to_file(root + "/pre_recorded_license_plate_export.txt", export_data, silence_file_saving) # Save to disk.
-            
-            elif (selection == "2"): # Export plate data as a list with one plate per line.
-                for plate in plates_detected:
-                    export_data = export_data + plate + "\n"
-
-                save_to_file(root + "/pre_recorded_license_plate_export.txt", export_data, silence_file_saving) # Save to disk.
-
-            elif (selection == "3"): # Export plate data as CSV (add comma after each plate)
-                for plate in plates_detected:
-                    export_data = export_data + plate + ",\n"
-
-                save_to_file(root + "/pre_recorded_license_plate_export.csv", export_data, silence_file_saving) # Save to disk.
-
-            else:
-                print(style.yellow + "Warning: Invalid selection." + style.end)
+                if (selection == "0"):
+                    print("Returning to main menu.")
+                elif (selection == "1"): # The user has selected to export license plate data as Python data.
+                    export_data = str(plates_detected)
+                    save_to_file(root + "/pre_recorded_license_plate_export.txt", export_data, silence_file_saving) # Save to disk.
+                elif (selection == "2"): # The user has selected to export license plate data as a list.
+                    for plate in plates_detected:
+                        export_data = export_data + plate + "\n"
+                    save_to_file(root + "/pre_recorded_license_plate_export.txt", export_data, silence_file_saving) # Save to disk.
+                elif (selection == "3"): # The user has selected to export license plate data as CSV data.
+                    for plate in plates_detected:
+                        export_data = export_data + plate + ",\n"
+                    save_to_file(root + "/pre_recorded_license_plate_export.csv", export_data, silence_file_saving) # Save to disk.
+                elif (selection == "4"): # The user has selected to export license plate data as raw data.
+                    save_to_file(root + "/pre_recorded_license_plate_export.txt", str(raw_lpr_scan), silence_file_saving) # Save raw license plate analysis data to disk.
+                else:
+                    print(style.yellow + "Warning: Invalid selection." + style.end)
 
             input("\nPress enter to continue...") # Wait for the user to press enter before repeating the menu loop.
 
 
-        elif (selection == "3"): # If the user selects option 3 on the main menu, then show the raw plate analysis data menu.
-            print("Please select an option")
-            print("0. Back")
-            print("1. View raw license plate data")
-            print("2. Export raw license plate data")
+        elif (selection == "2" and object_recognition_preference == True): # The user has selected to manage object recognition data.
+            if (object_recognition_preference == True):
+                print("    Please select an option")
+                print("    0. Back")
+                print("    1. View data")
+                print("    2. Export data")
+                selection = input("    Selection: ")
 
-            selection = input("Selection: ") # Prompt the user for their selection
+                if (selection == "1"): # The user has selected to view object recognition data.
+                    print("        Please select an option")
+                    print("        0. Back")
+                    print("        1. View as Python data")
+                    print("        2. View as JSON data")
+                    selection = input("        Selection: ")
 
-            if (selection == "0"):
-                print("Returning to main menu.")
+                    if (selection == "0"):
+                        print("Returning to main menu.")
+                    elif (selection == "1"):
+                        print(object_count)
+                    elif (selection == "2"):
+                        print(json.dumps(object_count, indent=4))
+                    else:
+                        print(style.yellow + "Warning: Invalid selection." + style.end)
 
-            elif (selection == "1"):
-                print(raw_lpr_scan)
+                elif (selection == "2"): # The user has selected to export object recognition data.
+                    print("        Please select an option")
+                    print("        0. Back")
+                    print("        1. Export as Python data")
+                    print("        2. Export as JSON data")
+                    selection = input("Selection: ")
 
-            elif (selection == "2"):
-                save_to_file(root + "/pre_recorded_license_plate_export.txt", str(raw_lpr_scan), silence_file_saving) # Save raw license plate analysis data to disk.
-                
+                    if (selection == "0"):
+                        print("Returning to main menu.")
+                    elif (selection == "1"):
+                        save_to_file(root + "/pre_recorded_object_detection_export.txt", str(object_count), silence_file_saving) # Save to disk.
+                    elif (selection == "2"):
+                        save_to_file(root + "/pre_recorded_object_detection_export.json", json.dumps(object_count, indent=4), silence_file_saving) # Save to disk.
+                    else:
+                        print(style.yellow + "Warning: Invalid selection." + style.end)
+
+                else: # The user has selected an invalid option in the object recognition data management menu.
+                    print(style.yellow + "Warning: Invalid selection." + style.end)
+
+            else: # The user has selected the object recognition data management menu, but object recognition has been disabled.
+                print(style.yellow + "Warning: Object recognition has been disabled. There is not object recogntion data to manage." + style.end)
+
+            input("\nPress enter to continue...") # Wait for the user to press enter before repeating the menu loop.
+
+
+        elif (selection == "3"): # The user has selected to manage GPX location information.
+            if (gpx_file != ""): # Check to see if a GPX file was provided for analysis.
+                print("    Please select an option")
+                print("    0. Back")
+                print("    1. View data")
+                print("    2. Export data")
+                selection = input("    Selection: ")
+
+                if (selection == "0"):
+                    print("Returning to main menu.")
+                elif (selection == "1"): # The user has selected to view GPX location information.
+                    print("        Please select an option")
+                    print("        0. Back")
+                    print("        1. View as Python data")
+                    print("        2. View as JSON data")
+                    selection = input("        Selection: ")
+
+                    if (selection == 0):
+                        print("Returning to main menu.")
+                    elif (selection == "1"):
+                        print(frame_locations)
+                    elif (selection == "2"):
+                        print(json.dumps(frame_locations, indent=4))
+                    else:
+                        print(style.yellow + "Warning: Invalid selection." + style.end)
+
+                elif (selection == "2"): # The user has selected to export GPX location information.
+                    print("        Please select an option")
+                    print("        0. Back")
+                    print("        1. Export as Python data")
+                    print("        2. Export as JSON data")
+                    selection = input("        Selection: ")
+
+                    if (selection == 0):
+                        print("Returning to main menu.")
+                    elif (selection == "1"):
+                        save_to_file(root + "/pre_recorded_license_plate_location_data_export.txt", frame_locations, silence_file_saving) # Save to disk.
+                    elif (selection == "2"):
+                        save_to_file(root + "/pre_recorded_license_plate_location_data_export.json", json.dumps(frame_locations, indent=4), silence_file_saving) # Save to disk.
+                    else:
+                        print(style.yellow + "Warning: Invalid selection." + style.end)
+
+                else:
+                    print(style.yellow + "Warning: Invalid selection." + style.end)
+
             else:
-                print(style.yellow + "Warning: Invalid selection." + style.end)
-
+                print(style.yellow + "Warning: GPX processing has been disabled since a GPX file wasn't provided. There is not GPX location data to manage." + style.end)
 
             input("\nPress enter to continue...") # Wait for the user to press enter before repeating the menu loop.
 
 
         elif (selection == "4"): # If the user selects option 4 on the main menu, then show the statstics for this session.
-            print("Frames analyzed: " + str(len(raw_lpr_scan)))
-            print("Plates found: " + str(len(plates_detected)))
-
+            print("    Frames analyzed: " + str(len(raw_lpr_scan)))
+            print("    Plates found: " + str(len(plates_detected)))
             input("\nPress enter to continue...") # Wait for the user to press enter before repeating the menu loop.
-
-
-        elif (selection == "5" and object_recognition_preference == True): # If the user selects option 5 on the main menu, and object recognition is enabled, then show the object recognition information menu.
-            print("Please select an option")
-            print("0. Back")
-            print("1. Display raw object recognition data")
-            print("2. Display object recognition data")
-            print("3. Export object recognition data to file")
-
-            selection = input("Selection: ")
-
-            if (selection == "0"):
-                print("Returning to main menu.")
-            elif (selection == "1"):
-                print(object_count)
-            elif (selection == "2"):
-                print(json.dumps(object_count, indent=4))
-            elif (selection == "3"):
-                save_to_file(root + "/pre_recorded_object_detection_export.json", json.dumps(object_count, indent=4), silence_file_saving) # Save to disk.
-            else:
-                print(style.yellow + "Warning: Invalid selection." + style.end)
-            
-            input("\nPress enter to continue...") # Wait for the user to press enter before repeating the menu loop.
-
-
-        elif (selection == "6" and gpx_file != ""): # If the user selects option 6 on the main menu, and a GPX file was supplied for analysis, then show the GPX location data menu.
-            print("Please select an option")
-            print("0. Back")
-            print("1. View raw license plate location data")
-            print("2. Export raw license plate location data")
-
-            selection = input("Selection: ")
-
-            if (selection == "0"):
-                print("Returning to main menu.")
-
-            elif (selection == "1"):
-                print(frame_locations)
-
-            elif (selection == "2"):
-                save_to_file(root + "/pre_recorded_license_plate_location_data_export.txt", frame_locations, silence_file_saving) # Save to disk.
-
-            else:
-                print(style.yellow + "Warning: Invalid selection." + style.end)
-
-
-            input("\nPress enter to continue...") # Wait for the user to press enter before repeating the menu loop.
-
 
 
         else: # If the user selects an unrecognized option on the main menu for pre-recorded mode, then show a warning.
