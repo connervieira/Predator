@@ -63,6 +63,11 @@ After configuring Predator, you can try it out for the first time!
     - To run Predator, simply navigate to it's folder, then run `main.py` using the `python3` command.
         - `python3 main.py`
     - After Predator starts, you should see a large banner displaying the Predator name.
+    - To force Predator to start into a particular mode, add the mode number to the end of the command.
+        - Example: `python3 main.py 3`
+            - This command will force Predator to start into mode #3, which is dash-cam mode.
+        - To learn more about each mode, see the mode descriptions below.
+        - This command-line argument will override the `auto_start_mode` configuration value.
 2. Select a mode
     - Predator can operate in 4 possible modes.
         - Management mode (Mode 0)

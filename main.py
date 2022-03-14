@@ -202,18 +202,21 @@ print("3. Dash-cam")
 if (auto_start_mode != "" and auto_start_mode != "0" and auto_start_mode != "1" and auto_start_mode != "2" and auto_start_mode != "3"):
     print(style.yellow + "Warning: The 'auto_start_mode' configuration value isn't properly set. This value should be blank, '0', '1', '2', or '3'. It's possible there's been a typo." + style.end)
 
+if (len(sys.argv) > 1):
+    if (sys.argv[1] == "0" or sys.argv[1] == "1" or sys.argv[1] == "2" or sys.argv[1] == "3"): # Check to see if a mode override was specified in the Predator command arguments.
+        auto_start_mode = sys.argv[1] # Set the automatic start mode to the mode specified by the command line argument.
 
 if (auto_start_mode == "0"): # Based on the configuration, Predator will automatically boot into management mode.
-    print(style.bold + "Automatically starting into management mode based on the auto_start_mode configuration value." + style.end)
+    print(style.bold + "Automatically starting into management mode." + style.end)
     mode_selection = "0"
 elif (auto_start_mode == "1"): # Based on the configuration, Predator will automatically boot into pre-recorded mode.
-    print(style.bold + "Automatically starting into pre-recorded mode based on the auto_start_mode configuration value." + style.end)
+    print(style.bold + "Automatically starting into pre-recorded mode." + style.end)
     mode_selection = "1"
 elif (auto_start_mode == "2"): # Based on the configuration, Predator will automatically boot into real-time mode.
-    print(style.bold + "Automatically starting into real-time mode based on the auto_start_mode configuration value." + style.end)
+    print(style.bold + "Automatically starting into real-time mode." + style.end)
     mode_selection = "2"
 elif (auto_start_mode == "3"): # Based on the configuration, Predator will automatically boot into real-time mode.
-    print(style.bold + "Automatically starting into dash-cam mode based on the auto_start_mode configuration value." + style.end)
+    print(style.bold + "Automatically starting into dash-cam mode." + style.end)
     mode_selection = "3"
 else: # No 'auto start mode' has been configured, so ask the user to select manually.
     mode_selection = input("Selection: ")

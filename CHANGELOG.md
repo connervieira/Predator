@@ -150,3 +150,10 @@ This update adds "Management Mode", and improves the efficiency and organization
 - Completely re-organized and re-structured the pre-recorded mode menu in order to make the process drastically easier to understand and use.
     - The main menu is now grouped into sections for license plate data, object recognition data, location data, and statistics.
     - Tabs are used to indicate sub-menus, and to visually distinguish them from previous menus while making it easy for the user to determine where they are in the menu system.
+- Added the ability to override the `auto_start_mode` configuration value using a command line argument.
+    - The user can enter a number after the command used to start Predator in order to pre-select a mode that will override the `auto_start_mode` setting.
+    - Examples:
+        - Start into management mode: `python3 main.py 0`
+        - Start into pre-recorded mode: `python3 main.py 1`
+        - Start into real-time mode: `python3 main.py 2`
+        - Start into dash-cam mode: `python3 main.py 3`
