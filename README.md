@@ -63,7 +63,7 @@ Predator supports GPX files to allow for correlating license plates detected in 
 
 ### Alerts
 
-Predator supports customizable real-time alerts, allowing the user to be notified when a license plate matching one on a list is detected through an audible sound, a visual cue, webhooks, and even push notifications!
+Predator supports customizable real-time alerts, allowing the user to be notified when a license plate matching one on a list is detected through audible sound alerts, visual cues, webhooks, and even push notifications!
 
 ### Safe
 
