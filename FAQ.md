@@ -6,6 +6,10 @@ This document contains a series of questions you may have concerning Predator.
 
     In short, Predator is a utility for detecting license plates, both in real-time, and by scanning a pre-recorded video. Predator is also capable of general object recognition, and can identify objects like vehicles, traffic lights, pedestrians, and dozens of others.
 
+**How do I install Predator?**
+
+    For installation and setup instructions, check tte DOCUMENTATION.md document.
+
 **I have a problem with Predator and I need help.**
 
     If you're encountering an issue with Predator, first ensure that you've followed all of the steps described in the `DOCUMENTATION.md` document for setting up Predator. If your issue persists, try to work out its source. The majority of Predator issues can be traced back to one of it's dependencies not working properly. Check that OpenALPR, FSWebcam, and FFMPEG are all working properly. If you still can't resolve your issue, contact V0LT support using the information found at <https://v0lttech.com/contact.php>. From there, you can find various contact methods for V0LT, including instant messaging over Matrix, and email with optional PGP encryption.
@@ -24,11 +28,7 @@ This document contains a series of questions you may have concerning Predator.
 
 **How much does Predator cost?**
 
-    The Predator software itself is completely free, and has absolutely no subscriptions. However, you may still need to purchase hardware for Predator to run on.
-
-**Can I buy a prebuilt device running Predator?**
-
-    Currently, no. However, in the future, prebuilt Predator devices might be turned into a reality through the Predator Apex program (see `APEX.md`). For now, if you want information on what parts to purchase, see the `HARDWARE.md` document.
+    The Predator software itself is completely free, and has absolutely no subscriptions. However, you may still need to purchase hardware for Predator to run on. You can either assemble hardware yourself, or purchase pre-made models through Predator Apex (see APEX.md)
 
 **What operating systems is Predator compatible with?**
 
@@ -55,3 +55,6 @@ This document contains a series of questions you may have concerning Predator.
     7. Predator then uses various methods of validation to filter out plates that are unlikely to be correct.
     8. Finally, Predator removes plates it believes to be invalid, and creates a list of (hopefully) correctly detected plates.
     9. After this, Predator might save the plates to a database, send a push notification to a Gotify server, play an audio alert, any any number of other customizable actions.
+
+**How many cameras can Predator use at one time?**
+    This is a bit of a complex question, but in short, as many as you want. More specifically, Predator will use as many cameras as your OS, USB controller, and processor allow. In practice, this means that Predator can usually run at least two USB cameras at once, even on low powered devices like the Raspberry Pi.
