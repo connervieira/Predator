@@ -32,8 +32,8 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Add support for LED status lights that indicate important Predator events discretely.
 - [X] Add "Management Mode" which allows the user to execute administrative actions of Predator, like clearing root project folders.
 - [X] Re-organize the pre-recorded mode menu.
-- [ ] Add the ability to change configuration values from nanagement mode.
-- [ ] Update real-time dashcam background recording.
+- [X] Add the ability to change configuration values from nanagement mode.
+- [X] Update real-time dashcam background recording.
 
 
 # Hypothetical

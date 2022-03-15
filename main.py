@@ -177,9 +177,15 @@ if (fswebcam_device == ""): # Check to make sure that a camera device has been s
     print(style.yellow + "Warning: The 'fswebcam_device' specified in the real-time configuration section is blank. It's possible there has been a typo. Defaulting to /dev/video0" + style.end)
     fswebcam_device = "/dev/video0"
 
-if (dashcam_background_mode_realtime == True and dashcam_device[0] == fswebcam_device): # If Predator is configured to run background dashcam recording in real-time mode, then make sure the the dashcam camera device and real-time camera device are different.
-    print(style.yellow + "Warning: The 'dashcam_background_mode_realtime' setting is turned on, but the same recording device has been specified for 'dashcam_device' and 'fswebcam_device'. Predator can't use the same device for two different tasks. Background dash-cam recording in real-time mode has been disabled." + style.end)
-    dashcam_background_mode_realtime = False
+
+shared_realtime_dashcam_device = False
+for device in dashcam_device:
+    if (dashcam_background_mode_realtime == True and dashcam_device[device] == fswebcam_device): # If Predator is configured to run background dashcam recording in real-time mode, then make sure the the dashcam camera device and real-time camera device are different.
+        shared_realtime_dashcam_device = True
+        dashcam_background_mode_realtime = False
+if (shared_realtime_dashcam_device == True):
+        print(style.yellow + "Warning: The 'dashcam_background_mode_realtime' setting is turned on, but the same recording device has been specified for 'dashcam_device' and 'fswebcam_device'. Predator can't use the same device for two different tasks. Background dash-cam recording in real-time mode has been temporarily disabled." + style.end)
+
 
 if (push_notifications_enabled == True): # Check to see if the user has Gotify notifications turned on in the configuration.
     if (gotify_server == "" or gotify_server == None): # Check to see if the gotify server has been left blank
@@ -562,7 +568,7 @@ if (mode_selection == "0"): # The user has selected to boot into management mode
                     print("    '" + style.bold + str(section) + style.end + "'") # If the entry is a list, display it in bold.
                 else:
                     print("    '" + style.italic + str(section) + style.end + "'") # If the entry is not a list (meaning it's an actual configuration value), display it in italics.
-            selection1 = input("    Selection (Tier 1): ")
+            selection1 = input("=== Selection (Tier 1): ")
 
             if (selection1 in config): # Check to make sure the section entered by the user actually exists in the configuration database.
                 if (type(config[selection1]) is dict or type(config[selection1]) is list): # Check to make sure the current selection is a dictionary or list before trying to iterate through it.
@@ -572,7 +578,7 @@ if (mode_selection == "0"): # The user has selected to boot into management mode
                             print("        '" + style.bold + str(section) + style.end + "'") # If the entry is a list, display it in bold.
                         else:
                             print("        '" + style.italic + str(section) + style.end + "': '" + str(config[selection1][section]) + "'") # If the entry is not a list (meaning it's an actual configuration value), display it in italics.
-                    selection2 = input("        Selection (Tier 2): ")
+                    selection2 = input("======= Selection (Tier 2): ")
                     if selection2 in config[selection1]: # Check to make sure the section entered by the user actually exists in the configuration database.
                         if (type(config[selection1][selection2]) is dict or type(config[selection1][selection2]) is list): # Check to make sure the current selection is a dictionary or list before trying to iterate through it.
                             print("            Please enter the name of a configuration section to edit")
@@ -581,7 +587,7 @@ if (mode_selection == "0"): # The user has selected to boot into management mode
                                     print("            '" + style.bold + str(section) + style.end + "'") # If the entry is a list, display it in bold.
                                 else:
                                     print("            '" + style.italic + str(section) + style.end + "': '" + str(config[selection1][selection2][section]) + "'") # If the entry is not a list (meaning it's an actual configuration value), display it in italics.
-                            selection3 = input("            Selection (Tier 3): ")
+                            selection3 = input("=========== Selection (Tier 3): ")
                             if selection3 in config[selection1][selection2]: # Check to make sure the section entered by the user actually exists in the configuration database.
                                 if (type(config[selection1][selection2][selection3]) is dict or type(config[selection1][selection2][selection3]) is list): # Check to make sure the current selection is a dictionary or list before trying to iterate through it.
                                     print("                Please enter the name of a configuration section to edit")
@@ -590,23 +596,81 @@ if (mode_selection == "0"): # The user has selected to boot into management mode
                                             print("                '" + style.bold + str(section) + style.end + "'") # If the entry is a list, display it in bold.
                                         else:
                                             print("                '" + style.italic + str(section) + style.end + "': '" + str(config[selection1][selection2][selection3][section]) + "'") # If the entry is not a list (meaning it's an actual configuration value), display it in italics.
-                                    selection3 = input("                Selection (Tier 4): ")
+                                    selection4 = input("=============== Selection (Tier 4): ")
                                 else: # If the current selection isn't a dictionary or list, assume that it's an configuration entry. (Tier 3)
-                                    print("                " + str(config[selection1][selection2][selection3]))
-                                    # TODO
+                                    print("                Current Value: " + str(config[selection1][selection2][selection3]))
+                                    if (type(config[selection1][selection2][selection3]) == str):
+                                        config[selection1][selection2][selection3] = str(input("                New Value (String): "))
+                                    elif (type(config[selection1][selection2][selection3]) == bool):
+                                        new_value = input("                New Value (Boolean): ")
+                                        if (new_value[0].lower() == "t" or new_value[0].lower() == "y"):
+                                            config[selection1][selection2][selection3] = True
+                                        elif (new_value[0].lower() == "f" or new_value[0].lower() == "n"):
+                                            config[selection1][selection2][selection3] = False 
+                                        else:
+                                            config[selection1][selection2][selection3] = False 
+                                            print(style.warning + "Warning: This configuration value is a boolean variable, but a non-boolean value was entered. Defaulting to 'false'.")
+                                    elif (type(config[selection1][selection2][selection3]) == int):
+                                        config[selection1][selection2][selection3] = int(input("                New Value (Integer): "))
+                                    elif (type(config[selection1][selection2][selection3]) == float):
+                                        config[selection1][selection2][selection3] = float(input("                New Value (Float): "))
+                                    else:
+                                        print(style.red + "Error: This configuration value didn't match any known variable type. This error should never occur and there's almost certainly a bug." + style.end)
                         else: # If the current selection isn't a dictionary or list, assume that it's an configuration entry. (Tier 2)
-                            print("            " + str(config[selection1][selection2]))
-                            # TODO
-                else: # If the current selection isn't a dictionary or list, assume that it's an configuration entry. (Tier 1)
-                    print("        " + str(config[selection1]))
-                    # TODO
+                            print("            Current Value: " + str(config[selection1][selection2]))
+                            if (type(config[selection1][selection2]) == str):
+                                config[selection1][selection2] = str(input("            New Value (String): "))
+                            elif (type(config[selection1][selection2]) == bool):
+                                new_value = input("            New Value (Boolean): ")
+                                if (new_value[0].lower() == "t" or new_value[0].lower() == "y"):
+                                    config[selection1][selection2] = True
+                                elif (new_value[0].lower() == "f" or new_value[0].lower() == "n"):
+                                    config[selection1][selection2] = False 
+                                else:
+                                    config[selection1][selection2] = False 
+                                    print(style.warning + "Warning: This configuration value is a boolean variable, but a non-boolean value was entered. Defaulting to 'false'.")
+                            elif (type(config[selection1][selection2]) == int):
+                                config[selection1][selection2] = int(input("            New Value (Integer): "))
+                            elif (type(config[selection1][selection2]) == float):
+                                config[selection1][selection2] = float(input("            New Value (Float): "))
+                            else:
+                                print(style.red + "Error: This configuration value didn't match any known variable type. This error should never occur and there's almost certainly a bug.." + style.end)
 
+                else: # If the current selection isn't a dictionary or list, assume that it's an configuration entry. (Tier 1)
+                    print("        Current Value: " + str(config[selection1]))
+                    if (type(config[selection1]) == str):
+                        config[selection1] = str(input("            New Value (String): "))
+                    elif (type(config[selection1]) == bool):
+                        new_value = input("            New Value (Boolean): ")
+                        if (new_value[0].lower() == "t" or new_value[0].lower() == "y"):
+                            config[selection1] = True
+                        elif (new_value[0].lower() == "f" or new_value[0].lower() == "n"):
+                            config[selection1] = False 
+                        else:
+                            config[selection1] = False 
+                            print(style.warning + "Warning: This configuration value is a boolean variable, but a non-boolean value was entered. Defaulting to 'false'.")
+                    elif (type(config[selection1]) == int):
+                        config[selection1] = int(input("            New Value (Integer): "))
+                    elif (type(config[selection1]) == float):
+                        config[selection1] = float(input("            New Value (Float): "))
+                    else:
+                        print(style.red + "Error: This configuration value didn't match any known variable type. This error should never occur and there's almost certainly a bug.." + style.end)
+                    config[selection1] = input("        New Value: ")
+
+
+            config_file = open(predator_root_directory + "/config.json", "w") # Open the configuration file.
+            json.dump(config, config_file, indent=4) # Dump the JSON data into the configuration file on the disk.
+            config_file.close() # Close the configuration file.
+            config = json.load(open(predator_root_directory + "/config.json")) # Load the configuration database from config.json
 
 
         else: # The user has selected an invalid option in the main management menu.
             print(style.yellow + "Warning: Invalid selection." + style.end)
 
         input("\nPress enter to continue...") # Wait for the user to press enter before repeating the management menu loop.
+
+
+
 
 
 
@@ -1062,10 +1126,13 @@ elif (mode_selection == "2"): # The user has set Predator to boot into real-time
 
 
     if (dashcam_background_mode_realtime == True): # Check to see if the user has enabled auto dashcam background recording in real-time mode.
+        dashcam_process = [] # Create a placeholder list to store the dashcam processes.
         iteration_counter = 0 # Set the iteration counter to 0 so that we can increment it for each recording device specified.
         for device in dashcam_device: # Run through each camera device specified in the configuration, and launch an FFMPEG recording instance for it.
+            dashcam_process.append(subprocess.Popen(["ffmpeg", "-y", "-nostdin", "-loglevel" , "error", "-f", "v4l2", "-framerate", dashcam_frame_rate, "-video_size", dashcam_resolution, "-input_format", "mjpeg", "-i",  dashcam_device[device], root + "/predator_dashcam_" + str(int(time.time())) + "_camera" + str(iteration_counter) + ".mkv"], shell=False))
             iteration_counter = iteration_counter + 1 # Iterate the counter. This value will be used to create unique file names for each recorded video.
-            os.system("ffmpeg -f v4l2 -framerate " + dashcam_frame_rate + " -video_size " + dashcam_resolution + " -input_format mjpeg -i " + device + " " + root + "/predator_dashcam" + str(iteration_counter) + ".mkv > /dev/null 2>&1 &") # Run dashcam recording in the background.
+            print("Started background dashcam recording on " + str(dashcam_device[device])) # Inform the user that recording was initiation for this camera device.
+
         print("Started background dash-cam recording.")
 
 
@@ -1303,9 +1370,9 @@ elif (mode_selection == "3"): # The user has set Predator to boot into dash-cam 
     dashcam_process = [] # Create a placeholder list to store the dashcam processes.
     iteration_counter = 0 # Set the iteration counter to 0 so that we can increment it for each recording device specified.
     for device in dashcam_device: # Run through each camera device specified in the configuration, and launch an FFMPEG recording instance for it.
-        dashcam_process.append(subprocess.Popen(["ffmpeg", "-y", "-nostdin", "-loglevel" , "error", "-f", "v4l2", "-framerate", dashcam_frame_rate, "-video_size", dashcam_resolution, "-input_format", "mjpeg", "-i",  device, root + "/predator_dashcam_" + str(int(time.time())) + "_camera" + str(iteration_counter) + ".mkv"], shell=False))
+        dashcam_process.append(subprocess.Popen(["ffmpeg", "-y", "-nostdin", "-loglevel" , "error", "-f", "v4l2", "-framerate", dashcam_frame_rate, "-video_size", dashcam_resolution, "-input_format", "mjpeg", "-i",  dashcam_device[device], root + "/predator_dashcam_" + str(int(time.time())) + "_camera" + str(iteration_counter) + ".mkv"], shell=False))
         iteration_counter = iteration_counter + 1 # Iterate the counter. This value will be used to create unique file names for each recorded video.
-        print("Started recording on " + str(device)) # Inform the user that recording was initiation for this camera device.
+        print("Started recording on " + str(dashcam_device[device])) # Inform the user that recording was initiation for this camera device.
 
     input("Press enter to cancel recording...") # Wait for the user to press enter before continuing, since continuing will cause Predator to terminate, causing the dashcam recording process(es) to stop as well.
     iteration_counter = 0 # Set the iteration counter to 0 so that we can increment it for each recording device specified.
