@@ -150,10 +150,12 @@ After configuring Predator, you can try it out for the first time!
                 - Depending on the preferences, Predator might submit the license plate detected to a webhook and/or push notification service.
                 - Depending on the preferences for the session, Predator might also save images taken and the license plates detected.
                     - Images taken will be saved as `realtime_imageN.jpg` in the root project folder. If saving images is turned on, 'N' with the sequential image number. Otherwise, the N will be removed.
-                    - Saved license plates will be saved to `real_time_plates.csv` in the root project folder.
+                    - Saved license plates will be saved to `real_time_plates.csv` in the root project folder, provided license plate saving is enabled.
                 - If a plate detected is in the alert database specified during the preferences stage earlier, it will show a large alert message in the console output.
         - Dash-cam mode
             - In dash-cam mode, Predator will record video indefinitely until either disk space runs out, or `Ctrl + C` is pressed.
             - Predator will not detect license plates in this mode. However, you can use video recorded in this mode with pre-recorded mode in order to scan for license plates at a later date.
-            - The dash-cam video recorded will be saved to the project folder as `predator_dashcam.mkv`.
-                - If background recording is enabled, and multiple camera devices are specified, Predator will record to multiple files. Each file will be named `predator_dashcamN.mkv`, where N is the camera ID number.
+            - The dash-cam video recorded will be saved to the project folder as `predator_dashcam_TIME_CHANNEL.mkv`.
+                - `TIME` is replaced by a Unix timestamp of when the file was created.
+                - `CHANNEL` is replaced by the number of the camera device used.
+                    - For example, if you have two camera devices running simultaneously, the first camera will be represented as camera 1, and the second camera will be represented as camera 2.

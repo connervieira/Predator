@@ -71,7 +71,7 @@ Predator is designed to be safe, regardless of the installation context. It's ea
 
 ### Dash-cam
 
-Predator comes with a dash-cam mode, allowing for customizable real-time recording without processing license plates. Dash-cam videos can later be processed by Predator in pre-recorded mode.
+Predator comes with a dash-cam mode, allowing for customizable real-time recording without processing license plates. Dash-cam videos can later be processed by Predator in pre-recorded mode. Predator's dash-cam mode allows for multi-channel recording, making it easy to simultaneously record multiple angles using multiple cameras.
 
 ### Headless Ready
 

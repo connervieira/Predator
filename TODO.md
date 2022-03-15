@@ -33,6 +33,7 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Add "Management Mode" which allows the user to execute administrative actions of Predator, like clearing root project folders.
 - [X] Re-organize the pre-recorded mode menu.
 - [ ] Add the ability to change configuration values from nanagement mode.
+- [ ] Update real-time dashcam background recording.
 
 
 # Hypothetical

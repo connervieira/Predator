@@ -44,10 +44,9 @@
         }
     },
     "dashcam": {
-        "dashcam_resolution": "1920x1080",
-        "dashcam_frame_rate": "20",
+        "dashcam_resolution": "720x480",
+        "dashcam_frame_rate": "10",
         "dashcam_device": ["/dev/video0"],
-        "dashcam_background_mode": false,
         "dashcam_background_mode_realtime": false
     }
 }

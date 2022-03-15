@@ -166,12 +166,6 @@ All settings in this section are related to network-based push notifications via
 - `dashcam_device`
     - This setting defines what camera device Predator will attempt to use when recording video in dash-cam mode.
     - Example: `dashcam_device = "/dev/video0"`
-- `dashcam_background_mode`
-    - This setting determines whether or not Predator will record dash-cam video as a background process.
-    - When this is set to `true`, and dash-cam mode is selected, Predator will launch the recording process as a background task, then close.
-    - This setting should almost always be `false`, since setting it to `true` will remove the user's ability to stop the recording process by pressing `Ctrl + C`.
-        - To close the recording process, enter the command `killall ffmpeg` into the standard console. However, keep in mind that this will forcefully close all instances of the FFMPEG process, and potentially corrupt videos, even if they are unrelated to Predator.
 - `dashcam_background_mode_realtime`
     - This setting determines whether Predator will automatically enabled background dashcam recording when starting in real-time mode.
-    - This setting will only have an effect if `dashcam_background_mode` has been set to `true` as well.
-    - Note that Predator can only use one recording device for one task at a time, so if you run real-time mode with background recording enabled, you'll need to specify two different devices by changing `fswebcam_device` and `dashcam_device`.
+    - Note that Predator can only use each recording device for one task at a time, so if you run real-time mode with background recording enabled, you'll need to specify two different devices by changing `fswebcam_device` and `dashcam_device`.
