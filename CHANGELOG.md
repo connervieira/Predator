@@ -146,7 +146,8 @@ This update adds "Management Mode", and improves the efficiency and organization
     - Users can now view files in a given Predator project folder.
     - Users can copy any combination of Predator project files to any directory on the system, including an external drive.
     - Users can delete any combination of Predator project files from any project directory.
-    - Users can view system information, like Predator's current configuration, the current operating system, processor specifications, RAM information, etc.
+    - Users can view system information, like Predator's current configuration, the current operating system, processor specifications, RAM information, disk usage, etc.
+    - The Predator configuration (config.json file) can now be edited directly from within Predator, using a built in editing interface.
 - Completely re-organized and re-structured the pre-recorded mode menu in order to make the process drastically easier to understand and use.
     - The main menu is now grouped into sections for license plate data, object recognition data, location data, and statistics.
     - Tabs are used to indicate sub-menus, and to visually distinguish them from previous menus while making it easy for the user to determine where they are in the menu system.
@@ -157,3 +158,8 @@ This update adds "Management Mode", and improves the efficiency and organization
         - Start into pre-recorded mode: `python3 main.py 1`
         - Start into real-time mode: `python3 main.py 2`
         - Start into dash-cam mode: `python3 main.py 3`
+- Completely re-structured the dashcam recording system.
+    - Multiple dashcam devices can now be used simultaneously without having to force FFMPEG to quit.
+    - 'Background dashcam recording' has been removed, as it's no longer necessary.
+    - Multiple camera devices can now be used during background realtime mode dashcam recording.
+    - Dashcam recording can now be halted through Predator, without having to terminate Predator.
