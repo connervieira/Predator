@@ -34,6 +34,7 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Re-organize the pre-recorded mode menu.
 - [X] Add the ability to change configuration values from nanagement mode.
 - [X] Update real-time dashcam background recording.
+- [X] Add more configuration values to better refine Predator's functionality.
 
 
 # Hypothetical

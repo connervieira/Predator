@@ -10,6 +10,9 @@ This section of configuration values will effect Predator's general operation.
 - `ascii_art_header`
     - This value is a boolean that determines whether or not Predator will display a large ASCII art banner on start up. When set to `false`, the ASCII art banner will be replaced with a small, normal text title.
     - This setting may be useful to change in the event that Predator is being run on a device with a tiny display, where a large ASCII art header might cause formatting issues.
+- `custom_startup_message`
+    - This setting is a string used to set a custom start-up message that display after the initial Predator start-up header.
+    - By default, this is left blank, but you can use this to show a custom message to the user when Predator starts.
 - `auto_start_mode`
     - This setting is a string determines which mode (if any) that Predator will automatically load into when being started.
     - There are 4 possible values this can be set to, not including being left blank.

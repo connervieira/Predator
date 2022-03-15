@@ -58,6 +58,7 @@ update_status_lighting = lighting.update_status_lighting # Load the status light
 # ----- General configuration -----
 crop_script_path = predator_root_directory + "/crop_image" # Path to the cropping script in the Predator directory.
 ascii_art_header = config["general"]["ascii_art_header"] # This setting determines whether or not the large ASCII art Predator title will show on start-up. When set to False, a small, normal text title will appear instead. This is useful when running Predator on a device with a small display to avoid weird formatting.
+custom_startup_message = config["general"]["custom_startup_message"] # This setting determines whether or not the large ASCII art Predator title will show on start-up. When set to False, a small, normal text title will appear instead. This is useful when running Predator on a device with a small display to avoid weird formatting.
 auto_start_mode = config["general"]["auto_start_mode"] # This variable determines whether or not automatically start in a particular mode. When empty, the user will be prompted whether to start in pre-recorded mode or in real-time mode. When set to "0", Predator will automatically start into management mode when launched. When set to "1", Predator will automatically select and start pre-recorded mode when launched. When set to "2", Predator will automatically select and start real-time mode when launched. When set to "3", Predator will start into dashcam-mode when launched.
 default_root = config["general"]["default_root"] # If this variable isn't empty, the "root directory" prompt will be skipped when starting Predator. This variable will be used as the root directory. This variable only affects real-time mode and dash-cam mode.
 silence_file_saving = config["general"]["silence_file_saving"] # This setting determines whether log messages about file saving will be printed to console. Set this to True to silence the messages indicating whether or not files were successfully saved or updated.
@@ -137,11 +138,15 @@ if (ascii_art_header == True): # Check to see whether the user has configured th
     print("|__/      |__/  |__/|________/|_______/ |__/  |__/   |__/   \______/ |__/  |__/" + style.end + style.bold)
     print("")
     print("                            COMPUTER VISION SYSTEM")
+    if (custom_startup_message != ""): # Only display the line for the custom message if the user has defined one.
+        print("")
+        print(custom_startup_message) # Show the user's custom defined start-up message.
     print(style.end)
-    print("\n")
 else: # If the user his disabled the large ASCII art header, then show a simple title header with minimal styling.
     print(style.red + style.bold + "PREDATOR" + style.end)
     print(style.bold + "Computer Vision System" + style.end + "\n")
+    if (custom_startup_message != ""): # Only display the line for the custom message if the user has defined one.
+        print(custom_startup_message) # Show the user's custom defined start-up message.
 
 if (audio_alerts == True): # Check to see if the user has audio alerts enabled.
     os.system("mpg321 ./assets/sounds/testnoise.mp3 > /dev/null 2>&1 &") # Play a calm start-up noise.

@@ -1,6 +1,7 @@
 {
     "general": {
         "ascii_art_header": true,
+        "custom_startup_message": "",
         "auto_start_mode": "",
         "default_root": "",
         "silence_file_saving": false,
