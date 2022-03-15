@@ -23,6 +23,7 @@ import re # Required to use Regex
 import validators # Required to validate URLs
 import datetime # Required for converting between timestamps and human readable date/time information
 import fnmatch # Required to use wildcards to check strings
+import psutil # Required to get disk usage information
 
 import utils # Import the utils.py scripts.
 style = utils.style # Load the style from the utils script.
@@ -253,6 +254,7 @@ if (mode_selection == "0"): # The user has selected to boot into management mode
         print("0. Quit")
         print("1. File Management")
         print("2. Information")
+        print("3. Configuration")
 
         selection = input("Selection: ")
 
@@ -536,6 +538,7 @@ if (mode_selection == "0"): # The user has selected to boot into management mode
             print("    0. Back")
             print("    1. Neofetch")
             print("    2. Print Current Configuration")
+            print("    3. Disk Usage")
             selection = input("    Selection: ")
             if (selection == "0"): # The user has selected to return back to the previous menu.
                 pass # Do nothing, and just finish this loop.
@@ -543,8 +546,61 @@ if (mode_selection == "0"): # The user has selected to boot into management mode
                 os.system("neofetch")
             elif (selection == "2"): # The user has selected the "print configuration" option.
                 os.system("cat " + predator_root_directory + "/config.json")
+            elif (selection == "3"): # The user has selected the "disk usage" option.
+                print("Free space: " + str(round(((psutil.disk_usage(path=root).free)/1000000000)*100)/100) + "GB") # Display the free space on the storage device containing the current root project folder.
+                print("Used space: " + str(round(((psutil.disk_usage(path=root).used)/1000000000)*100)/100) + "GB") # Display the used space on the storage device containing the current root project folder.
+                print("Total space: " + str(round(((psutil.disk_usage(path=root).total)/1000000000)*100)/100) + "GB") # Display the total space on the storage device containing the current root project folder.
             else: # The user has selected an invalid option in the information menu.
-                print(style.yellow + "Warning: Invalid selection." + style.end)
+                print(style.yellow + "Warning: Invalid selection." + style.end) # Inform the user that they have selected an invalid option.
+            
+
+
+        elif (selection == "3"): # The user has selected the "Configuration" option.
+            print("    Please enter the name of a configuration section to edit")
+            for section in config: # Iterate through each top-level section of the configuration database, and display them all to the user.
+                if (type(config[section]) is list or type(config[section]) is dict): # Check to see if the current section we're iterating over is a list.
+                    print("    '" + style.bold + str(section) + style.end + "'") # If the entry is a list, display it in bold.
+                else:
+                    print("    '" + style.italic + str(section) + style.end + "'") # If the entry is not a list (meaning it's an actual configuration value), display it in italics.
+            selection1 = input("    Selection (Tier 1): ")
+
+            if (selection1 in config): # Check to make sure the section entered by the user actually exists in the configuration database.
+                if (type(config[selection1]) is dict or type(config[selection1]) is list): # Check to make sure the current selection is a dictionary or list before trying to iterate through it.
+                    print("        Please enter the name of a configuration section to edit")
+                    for section in config[selection1]: # Iterate through each second-level section of the configuration database, and display them all to the user.
+                        if (type(config[selection1][section]) is list or type(config[selection1][section]) is dict): # Check to see if the current section we're iterating over is a list.
+                            print("        '" + style.bold + str(section) + style.end + "'") # If the entry is a list, display it in bold.
+                        else:
+                            print("        '" + style.italic + str(section) + style.end + "': '" + str(config[selection1][section]) + "'") # If the entry is not a list (meaning it's an actual configuration value), display it in italics.
+                    selection2 = input("        Selection (Tier 2): ")
+                    if selection2 in config[selection1]: # Check to make sure the section entered by the user actually exists in the configuration database.
+                        if (type(config[selection1][selection2]) is dict or type(config[selection1][selection2]) is list): # Check to make sure the current selection is a dictionary or list before trying to iterate through it.
+                            print("            Please enter the name of a configuration section to edit")
+                            for section in config[selection1][selection2]: # Iterate through each third-level section of the configuration database, and display them all to the user.
+                                if (type(config[selection1][selection2][section]) is list or type(config[selection1][selection2][section]) is dict): # Check to see if the current section we're iterating over is a list.
+                                    print("            '" + style.bold + str(section) + style.end + "'") # If the entry is a list, display it in bold.
+                                else:
+                                    print("            '" + style.italic + str(section) + style.end + "': '" + str(config[selection1][selection2][section]) + "'") # If the entry is not a list (meaning it's an actual configuration value), display it in italics.
+                            selection3 = input("            Selection (Tier 3): ")
+                            if selection3 in config[selection1][selection2]: # Check to make sure the section entered by the user actually exists in the configuration database.
+                                if (type(config[selection1][selection2][selection3]) is dict or type(config[selection1][selection2][selection3]) is list): # Check to make sure the current selection is a dictionary or list before trying to iterate through it.
+                                    print("                Please enter the name of a configuration section to edit")
+                                    for section in config[selection1][selection2][selection3]: # Iterate through each third-level section of the configuration database, and display them all to the user.
+                                        if (type(config[selection1][selection2][selection3][section]) is list or type(config[selection1][selection2][selection3][section]) is dict): # Check to see if the current section we're iterating over is a list.
+                                            print("                '" + style.bold + str(section) + style.end + "'") # If the entry is a list, display it in bold.
+                                        else:
+                                            print("                '" + style.italic + str(section) + style.end + "': '" + str(config[selection1][selection2][selection3][section]) + "'") # If the entry is not a list (meaning it's an actual configuration value), display it in italics.
+                                    selection3 = input("                Selection (Tier 4): ")
+                                else: # If the current selection isn't a dictionary or list, assume that it's an configuration entry. (Tier 3)
+                                    print("                " + str(config[selection1][selection2][selection3]))
+                                    # TODO
+                        else: # If the current selection isn't a dictionary or list, assume that it's an configuration entry. (Tier 2)
+                            print("            " + str(config[selection1][selection2]))
+                            # TODO
+                else: # If the current selection isn't a dictionary or list, assume that it's an configuration entry. (Tier 1)
+                    print("        " + str(config[selection1]))
+                    # TODO
+
 
 
         else: # The user has selected an invalid option in the main management menu.
