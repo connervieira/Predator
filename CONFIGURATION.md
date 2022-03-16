@@ -49,7 +49,7 @@ Configuration values in this section are settings specific to pre-recorded mode.
 
 - `left_margin`, `right_margin`, `top_margin`, `bottom_margin`
     - This value determines how many pixels will be cropped from each side of each frame in pre-recorded mode.
-    - This value should be specified as tight as reasonably possible to make Predator as accurate as it can be.
+    - This value should be specified as tight as reasonably possible to make Predator as accurate and efficient as it can be.
     - In most videos there will be a portion of the frame in which a license plate would never reasonably appear.
         - For example, in dash-cam video, there will rarely be a license plate in the top half of the frame when the camera is mounted facing straight forward.
 
@@ -67,10 +67,10 @@ Configuration values in this section are settings specific to real-time mode.
     - The higher this number is, the more likely Predator is to guess a plate incorrectly. The lower this number is, the less likely Predator will be to find a valid guess at all.
     - By default this value is set to 10, which tends to be a healthy balance for the majority of tasks.
 - `camera_resoultion`
-    - This setting is a string defines the resolution that FSWebcam will use when taking images through the connected camera.
+    - This setting is a string that defines the resolution that FSWebcam will use when taking images through the connected camera.
     - It takes the format of `width x height`, with no spaces.
     - Example:
-        - `1920x1080`
+        - `"1920x1080"`
 - `real_time_left_margin`, `real_time_right_margin`, `real_time_top_margin`, `real_time_bottom_margin`
     - This value determines how many pixels will be cropped from each side of each frame in real-time mode.
     - This value should be specified as tight as reasonably possible to make Predator as accurate as it can be.
@@ -80,18 +80,18 @@ Configuration values in this section are settings specific to real-time mode.
         - For example, in dash-cam video, there will rarely be a license plate in the top half of the frame when the camera is mounted facing straight forward.
 - `fswebcam_device`
     - This setting simply determines the video device that Predator will use FSWebcam to access.
-    - This should almost always be set to `"/dev/video0"`, but there may be some situations it which it would make sense to change this, like in the case that you have two cameras.
+    - This should almost always be set to `"/dev/video0"`, but there may be some situations it which it would make sense to change this, such as when you want to run multiple cameras.
 - `fswebcam_flags`
     - This setting specifies any additional arguments that you want to add to the FSWebcam command in real-time mode.
     - This setting can be used to fine tune the way FSWebcam handles your camera.
     - Example:
-        - `--set brightness=100% -F 15 -S 5`
+        - `"--set brightness=100% -F 15 -S 5"`
     - For more information on what this setting can be used for, see the FSWebcam documentation by running `man fswebcam`.
 - `audio_alerts`
     - This setting determines whether or not Predator will make use of audible alerts.
     - With this is set to `true`, Predator will play subtle alert noises when a plate is detected, and much more prominent noises when a plate in an alert database is detected.
 - `webhook`
-    - This setting is used to define a webhook that Predator will send a request to when it detects a license plate in real-time mode.
+    - This setting is a string used to define a webhook that Predator will send a request to when it detects a license plate in real-time mode.
     - This setting should either be left blank, or be set to a URL.
     - Flags can be used to supply information to the webhook.
         - Predator will replace `[L]` with the detected license plate.
@@ -118,8 +118,8 @@ Settings in the 'default settings' section allow you to configure Predator to sk
     - The 'alert database' preference specifies a file path to a plain text file containing a list of license plates that Predator should alert for.
         - The text file should simply contain one license plate per line, and no other characters.
     - Just like the standard prompt that appears when loading Predator, this setting also accepts URLs to alert databases hosted over a network.
-    - If you want to skip the 'alert database' prompt without supply a database, simply set this variable to a single space.
-        - Example: `default_alert_database = " "`
+    - If you want to skip the 'alert database' prompt without supplying a database, simply set this variable to a single space.
+        - Example: `"default_alert_database": " "`
 - `default_save_license_plates_preference`
     - When this default setting isn't empty, Predator will use it's value as the default license plate saving preference, and will skip the 'license plate saving preference' prompt when running Predator in real-time mode.
     - The 'license plate saving' preference specifies whether or not Predator will write each of the license plates it detects to the root project directory.
@@ -136,10 +136,10 @@ Settings in the 'default settings' section allow you to configure Predator to sk
         - For example, license plates in the state of Ohio generally follow the pattern of 3 letters followed by 4 numbers. In Ohio, this preference might be set to `AAA0000` to filter out plate guesses that don't match the most common formatting pattern.
         - This preference only considers the type of each character, not the character itself.
             - In other words, `AAA0000` and `ABC1234` will function identically.
-            - This means you can simply enter a random plate from a car located in the region you're scanning in to have a reasonably good chance at matching your region's formatting guidelines for license plates.
+            - This also means you can simply enter a random plate from a car located in the region you're scanning in to have a reasonably good chance at matching your region's formatting guidelines for license plates.
         - It should be noted that some regions will have varying license plate formatting guidelines. In this case, setting this preference could inadvertently cause Predator to filter out valid plates.
             - If you want to skip the preference prompt associated with this setting, but you don't want to supply a license plate format, set this preference to a single space.
-                - Example: `default_license_plate_format = " "`
+                - Example: `"default_license_plate_format": " "`
 
 
 ### Real-time Mode Push Notification Settings
@@ -160,22 +160,46 @@ All settings in this section are related to network-based push notifications via
         `AJrhgGs83mL22kZ`
 
 
+### Real-time Mode Status Lighting Settings
+
+In order to better integrate with an existing system, Predator can communicate with LEDs via GET requests to display basic information.
+
+- `status_lighting_enabled`
+    - This setting is simply a boolean value that determines whether or not Predator will attempt to make use of LED status lights
+    - If you don't have status lighting set up, then leave this configuration value set to `false` to prevent Predator from attempting to update non-existent status lights.
+- `status_lighting_base_url`
+    - This is the base part of the URL that Predator will send requests to in order to update the status lighting.
+    - By default, this setting is set to the default router IP address of the "WLED" lighting controller software. However, you should be able to modify it to fit any lighting controller software that supports GET network requests.
+    - This is that value that precedes the `status_lighting_values` entries explained below.
+- `status_lighting_values`
+    - These are individual values that will be appended to the `status_lighting_base_url` setting described above in order to form the URL that Predator will send a request to.
+    - This is where you specify what RGB colors Predator will use for each status indication.
+        - The "alert" status is used when Predator detects a license plate in an alert database.
+        - The "notice" status is used when Predator detects any valid license plate.
+        - The "normal" status is used when Predator is running, and hasn't detected any license plates in the past processing cycle.
+
+
 
 ## Dash-cam Mode Configuration
 
 - `dashcam_resolution`
     - This setting determines what resolution Predator will attmpt to record at.
     - Be sure that your camera is capable of recording at resolution specified here. If you set an unsupported resolution, it's likely Predator will fail and not record anything.
-    - Example: `dashcam_resolution = "1920x1080"`
+    - Example: `"dashcam_resolution": "1920x1080"`
 - `dashcam_frame_rate`
     - This setting determines what frame rate Predator will attmpt to record at.
     - Even though this setting is a number, it should be entered as a string with quotes around it. See the example below for more context.
     - Be sure that your camera is capable of recording at the frame rate specified here. If you set an unsupported frame rate, it's likely Predator will fail and not record anything.
     - If you enter a frame rate too slow for the encoder, it might automatically be sped to a higher frame rate.
-    - Example: `dashcam_frame_rate = "30"`
+    - Example: `"dashcam_frame_rate": "30"`
 - `dashcam_device`
-    - This setting defines what camera device Predator will attempt to use when recording video in dash-cam mode.
-    - Example: `dashcam_device = "/dev/video0"`
+    - This setting contains the camera devices Predator will attempt to use when recording video in dash-cam mode.
+    - Each entry under this setting should contain a device identifier/name, as well as a reference to the device itself.
+    - Example:
+        - `"main_camera": "/dev/video0"`
+        - `"secondary_camera": "/dev/video1"`
+    - The device name will be appended to any video file names in order to give the user a quick indication of which camera recorded each file.
+    - Note: While you can specify an infinite number of cameras here, be aware that Predator might not be able to record with all of them. Bottlenecks like processor speed, RAM, and USB controller capabilities can cause issues with high numbers of cameras. Be sure to test your configuration before you start using it formally.
 - `dashcam_background_mode_realtime`
     - This setting determines whether Predator will automatically enabled background dashcam recording when starting in real-time mode.
     - Note that Predator can only use each recording device for one task at a time, so if you run real-time mode with background recording enabled, you'll need to specify two different devices by changing `fswebcam_device` and `dashcam_device`.
