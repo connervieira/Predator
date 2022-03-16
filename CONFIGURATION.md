@@ -36,6 +36,11 @@ This section of configuration values will effect Predator's general operation.
     - This setting can be used to globally disable object recognition (Tensorflow and OpenCV).
     - If you're on a platform that doesn't support OpenCV or Tensorflow, then you can set this to 'true' in order to prevent errors while using Predator.
     - Under normal usage, this should be set to `false`, since this will allow Predator to use it's full functionality.
+- `modes_enabled`
+    - This setting determines whether or not each mode is activated in Predator.
+    - When the value for a particular mode is set to `false`, that mode's option will be hidden from the mode selection menu shown to the user when Predator starts, and the auto-start-mode command line arguments won't allow the user to boot Predator directly to that mode.
+    - Under normal circumstances, all of these settings should be left as 'true', in order to enable full functionality of Predator, but there may be certain situations in which is useful to block certain modes from starting.
+        - This setting is not intended to a be a security feature. It's completely trivial to bypass this setting by simply modifying the configuration file directly.
 
 
 ## Pre-recorded Mode Configuration
@@ -153,6 +158,8 @@ All settings in this section are related to network-based push notifications via
     - This value must be configured if `push_notifications_enabled` is set to `true`
     - Example:
         `AJrhgGs83mL22kZ`
+
+
 
 ## Dash-cam Mode Configuration
 

@@ -127,6 +127,7 @@ March 1st, 2022
 - Clarified some menu prompts in pre-recorded mode.
 
 
+
 ## Version 6.0
 
 ### Management Update
@@ -147,7 +148,7 @@ This update adds "Management Mode", and improves the efficiency and organization
     - Users can copy any combination of Predator project files to any directory on the system, including an external drive.
     - Users can delete any combination of Predator project files from any project directory.
     - Users can view system information, like Predator's current configuration, the current operating system, processor specifications, RAM information, disk usage, etc.
-    - The Predator configuration (config.json file) can now be edited directly from within Predator, using a built in editing interface.
+    - The Predator configuration (`config.json` file) can now be edited directly from within Predator, using a built in editing interface.
 - Completely re-organized and re-structured the pre-recorded mode menu in order to make the process drastically easier to understand and use.
     - The main menu is now grouped into sections for license plate data, object recognition data, location data, and statistics.
     - Tabs are used to indicate sub-menus, and to visually distinguish them from previous menus while making it easy for the user to determine where they are in the menu system.
@@ -163,3 +164,6 @@ This update adds "Management Mode", and improves the efficiency and organization
     - 'Background dashcam recording' has been removed, as it's no longer necessary.
     - Multiple camera devices can now be used during background realtime mode dashcam recording.
     - Dashcam recording can now be halted through Predator, without having to terminate Predator.
+- Added several new configuration values.
+    - The `custom_startup_message` setting allows for a custom message to be shown to the user when Predator starts up.
+    - The `modes_enabled` setting allows the user to individually enable and disable each of Predator's 4 modes.

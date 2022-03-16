@@ -5,7 +5,13 @@
         "auto_start_mode": "",
         "default_root": "",
         "silence_file_saving": false,
-        "disable_object_recognition": false
+        "disable_object_recognition": false,
+        "modes_enabled": {
+            "management": true,
+            "prerecorded": true,
+            "realtime": true,
+            "dashcam": true
+        }
     },
     "prerecorded": {
         "left_margin": "700",

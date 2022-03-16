@@ -63,6 +63,10 @@ auto_start_mode = config["general"]["auto_start_mode"] # This variable determine
 default_root = config["general"]["default_root"] # If this variable isn't empty, the "root directory" prompt will be skipped when starting Predator. This variable will be used as the root directory. This variable only affects real-time mode and dash-cam mode.
 silence_file_saving = config["general"]["silence_file_saving"] # This setting determines whether log messages about file saving will be printed to console. Set this to True to silence the messages indicating whether or not files were successfully saved or updated.
 disable_object_recognition = config["general"]["disable_object_recognition"] # This setting is responsible for globally disabling object recognition (TensorFlow and OpenCV) in the event that it isn't supported on a particular platform. When set to true, any features involving object recognition, other than license plate recognition, will be disabled.
+management_mode_enabled = config["general"]["modes_enabled"]["management"] # This setting is used to prevent management mode from being loaded from the user menu or command line arguments of Predator.
+prerecorded_mode_enabled = config["general"]["modes_enabled"]["prerecorded"] # This setting is used to prevent prerecorded mode from being loaded from the user menu or command line arguments of Predator.
+realtime_mode_enabled = config["general"]["modes_enabled"]["realtime"] # This setting is used to prevent realtime mode from being loaded from the user menu or command line arguments of Predator.
+dashcam_mode_enabled = config["general"]["modes_enabled"]["dashcam"] # This setting is used to prevent dashcam mode from being loaded from the user menu or command line arguments of Predator.
 
 
 
@@ -204,10 +208,14 @@ if (push_notifications_enabled == True): # Check to see if the user has Gotify n
 
 # Figure out which mode to boot into.
 print("Please select an operating mode.")
-print("0. Management")
-print("1. Pre-recorded")
-print("2. Real-time")
-print("3. Dash-cam")
+if (management_mode_enabled == True): # Only show the Management mode option if it's enabled in the Predator configuration.
+    print("0. Management")
+if (prerecorded_mode_enabled == True): # Only show the Pre-recorded mode option if it's enabled in the Predator configuration.
+    print("1. Pre-recorded")
+if (realtime_mode_enabled == True): # Only show the Real-time mode option if it's enabled in the Predator configuration.
+    print("2. Real-time")
+if (dashcam_mode_enabled == True): # Only show Dash-cam mode option if it's enabled in the Predator configuration.
+    print("3. Dash-cam")
 
 # Check to see if the auto_start_mode configuration value is an expected value. If it isn't execution can continue, but the user will need to manually select what mode Predator should start in.
 if (auto_start_mode != "" and auto_start_mode != "0" and auto_start_mode != "1" and auto_start_mode != "2" and auto_start_mode != "3"):
@@ -217,16 +225,16 @@ if (len(sys.argv) > 1):
     if (sys.argv[1] == "0" or sys.argv[1] == "1" or sys.argv[1] == "2" or sys.argv[1] == "3"): # Check to see if a mode override was specified in the Predator command arguments.
         auto_start_mode = sys.argv[1] # Set the automatic start mode to the mode specified by the command line argument.
 
-if (auto_start_mode == "0"): # Based on the configuration, Predator will automatically boot into management mode.
+if (auto_start_mode == "0" and management_mode_enabled == True): # Based on the configuration, Predator will automatically boot into management mode.
     print(style.bold + "Automatically starting into management mode." + style.end)
     mode_selection = "0"
-elif (auto_start_mode == "1"): # Based on the configuration, Predator will automatically boot into pre-recorded mode.
+elif (auto_start_mode == "1" and prerecorded_mode_enabled == True): # Based on the configuration, Predator will automatically boot into pre-recorded mode.
     print(style.bold + "Automatically starting into pre-recorded mode." + style.end)
     mode_selection = "1"
-elif (auto_start_mode == "2"): # Based on the configuration, Predator will automatically boot into real-time mode.
+elif (auto_start_mode == "2" and realtime_mode_enabled == True): # Based on the configuration, Predator will automatically boot into real-time mode.
     print(style.bold + "Automatically starting into real-time mode." + style.end)
     mode_selection = "2"
-elif (auto_start_mode == "3"): # Based on the configuration, Predator will automatically boot into real-time mode.
+elif (auto_start_mode == "3" and dashcam_mode_enabled == True): # Based on the configuration, Predator will automatically boot into real-time mode.
     print(style.bold + "Automatically starting into dash-cam mode." + style.end)
     mode_selection = "3"
 else: # No 'auto start mode' has been configured, so ask the user to select manually.
@@ -246,7 +254,7 @@ else: # No 'auto start mode' has been configured, so ask the user to select manu
 
 
 
-if (mode_selection == "0"): # The user has selected to boot into management mode.
+if (mode_selection == "0" and management_mode_enabled == True): # The user has selected to boot into management mode.
     if (default_root != ""): # Check to see if the user has configured a default root directory path.
         print(style.bold + "Using default preference for root directory." + style.end)
         root = default_root
@@ -683,7 +691,7 @@ if (mode_selection == "0"): # The user has selected to boot into management mode
 
 # Pre-recorded mode
 
-elif (mode_selection == "1"): # The user has selected to boot into pre-recorded mode.
+elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user has selected to boot into pre-recorded mode.
     # Get the required information from the user.
     if (default_root != ""): # Check to see if the user has configured a default root directory path.
         print(style.bold + "Using default preference for root directory." + style.end)
@@ -1056,7 +1064,7 @@ elif (mode_selection == "1"): # The user has selected to boot into pre-recorded 
 
 # Real-time mode
 
-elif (mode_selection == "2"): # The user has set Predator to boot into real-time mode.
+elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has set Predator to boot into real-time mode.
 
     # Configure the user's preferences for this session.
     if (default_root != ""): # Check to see if the user has configured a default for this preference.
@@ -1354,7 +1362,7 @@ elif (mode_selection == "2"): # The user has set Predator to boot into real-time
 
 # Dash-cam mode
 
-elif (mode_selection == "3"): # The user has set Predator to boot into dash-cam mode.
+elif (mode_selection == "3" and dashcam_mode_enabled == True): # The user has set Predator to boot into dash-cam mode.
 
     # Configure the user's preferences for this session.
     if (default_root != ""): # Check to see if the user has configured a default for this preference.
