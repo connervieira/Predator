@@ -111,6 +111,11 @@ status_lighting_enabled = config["realtime"]["status_lighting_enabled"]
 status_lighting_base_url = config["realtime"]["status_lighting_base_url"]
 status_lighting_values = config["realtime"]["status_lighting_values"]
 
+# Audio alert settings
+alert_sounds_startup = config["realtime"]["alert_sounds"]["startup"]
+alert_sounds_notification = config["realtime"]["alert_sounds"]["notification"]
+alert_sounds_alert = config["realtime"]["alert_sounds"]["alert"]
+
 
 
 # ----- Dash-cam mode configuration -----
@@ -153,7 +158,7 @@ else: # If the user his disabled the large ASCII art header, then show a simple 
         print(custom_startup_message) # Show the user's custom defined start-up message.
 
 if (audio_alerts == True): # Check to see if the user has audio alerts enabled.
-    os.system("mpg321 ./assets/sounds/testnoise.mp3 > /dev/null 2>&1 &") # Play a calm start-up noise.
+    os.system("mpg321 " + alert_sounds_startup + " > /dev/null 2>&1 &") # Play a calm start-up noise.
 
 if (push_notifications_enabled == True): # Check to see if the user has push notifications enabled.
     os.system("curl -X POST '" + gotify_server + "/message?token=" + gotify_application_token + "' -F 'title=Predator' -F 'message=Predator has been started.' > /dev/null 2>&1 &") # Send a push notification via Gotify indicating that Predator has started.
@@ -1262,7 +1267,7 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
                     print("Detected plate: " + detected_plate + "\n----------")
 
                     if (audio_alerts == True): # Check to see if the user has audio alerts enabled.
-                        os.system("mpg321 ./assets/sounds/platedetected.mp3 > /dev/null 2>&1 &") # Play a subtle alert sound.
+                        os.system("mpg321 " + alert_sounds_notice + " > /dev/null 2>&1 &") # Play a subtle alert sound.
 
                     if (push_notifications_enabled == True): # Check to see if the user has Gotify notifications enabled.
                         os.system("curl -X POST '" + gotify_server + "/message?token=" + gotify_application_token + "' -F 'title=Predator' -F 'message=A license plate has been detected: " + detected_plate + "' > /dev/null 2>&1 &")
@@ -1327,7 +1332,7 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
                         display_shape("triangle")
 
                     if (audio_alerts == True): # Check to see if the user has audio alerts enabled.
-                        os.system("mpg321 ./assets/sounds/alerthit.mp3 > /dev/null 2>&1 &") # Play the prominent alert sound.
+                        os.system("mpg321 " + alert_sounds_alert + " > /dev/null 2>&1 &") # Play the prominent alert sound.
 
                     if (status_lighting_enabled == True): # Check to see if status lighting alerts are enabled in the Predator configuration.
                         update_status_lighting("alert") # Run the function to update the status lighting.

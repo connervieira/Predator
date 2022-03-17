@@ -30,7 +30,7 @@
         "real_time_bottom_margin": "200",
         "fswebcam_device": "/dev/video0",
         "fswebcam_flags": "--set brightness=70%",
-        "audio_alerts": false,
+        "audio_alerts": true,
         "webhook": "",
         "shape_alerts": true,
         "save_real_time_object_recognition": true,
@@ -48,6 +48,11 @@
             "alert": "[U]&R=255&G=0&B=0",
             "warning": "[U]R=255&G=150&B=0",
             "normal": "[U]R=0&G=255&B=0"
+        },
+        "alert_sounds": {
+            "startup": "./assets/sounds/testnoise.mp3",
+            "notification": "./assets/sounds/platedetected.mp3",
+            "alert": "./assets/sounds/alerthit.mp3"
         }
     },
     "dashcam": {

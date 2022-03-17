@@ -90,6 +90,12 @@ Configuration values in this section are settings specific to real-time mode.
 - `audio_alerts`
     - This setting determines whether or not Predator will make use of audible alerts.
     - With this is set to `true`, Predator will play subtle alert noises when a plate is detected, and much more prominent noises when a plate in an alert database is detected.
+- `alert_sounds`
+    - This setting contains the file paths to each of the various alert sounds Predator uses to inform the user of important events.
+    - Each alert sound is used in different contexts.
+        - The "startup" sound is played when Predator finishes loading at startup.
+        - The "notice" sound is played when Predator detects a valid license plate that isn't in an alert database.
+        - The "alert" sound is played when Predator detects a valid license plate that is in an alert database.
 - `webhook`
     - This setting is a string used to define a webhook that Predator will send a request to when it detects a license plate in real-time mode.
     - This setting should either be left blank, or be set to a URL.
