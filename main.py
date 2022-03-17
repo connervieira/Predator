@@ -555,17 +555,26 @@ if (mode_selection == "0" and management_mode_enabled == True): # The user has s
         elif (selection == "2"): # The user has selected the "Information" option.
             print("    Please select an option")
             print("    0. Back")
-            print("    1. Neofetch")
-            print("    2. Print Current Configuration")
-            print("    3. Disk Usage")
+            print("    1. About")
+            print("    2. Neofetch")
+            print("    3. Print Current Configuration")
+            print("    4. Disk Usage")
             selection = input("    Selection: ")
             if (selection == "0"): # The user has selected to return back to the previous menu.
                 pass # Do nothing, and just finish this loop.
-            elif (selection == "1"): # The user has selected the "neofetch" option.
+            elif (selection == "1"): # The user has selected the "about" option.
+                clear()
+                print(style.bold + "============" + style.end)
+                print(style.bold + "  Predator" + style.end)
+                print(style.bold + "    V0LT" + style.end)
+                print(style.bold + "    V6.0" + style.end)
+                print(style.bold + "   GPL v3" + style.end)
+                print(style.bold + "============" + style.end)
+            elif (selection == "2"): # The user has selected the "neofetch" option.
                 os.system("neofetch")
-            elif (selection == "2"): # The user has selected the "print configuration" option.
+            elif (selection == "3"): # The user has selected the "print configuration" option.
                 os.system("cat " + predator_root_directory + "/config.json")
-            elif (selection == "3"): # The user has selected the "disk usage" option.
+            elif (selection == "4"): # The user has selected the "disk usage" option.
                 print("Free space: " + str(round(((psutil.disk_usage(path=root).free)/1000000000)*100)/100) + "GB") # Display the free space on the storage device containing the current root project folder.
                 print("Used space: " + str(round(((psutil.disk_usage(path=root).used)/1000000000)*100)/100) + "GB") # Display the used space on the storage device containing the current root project folder.
                 print("Total space: " + str(round(((psutil.disk_usage(path=root).total)/1000000000)*100)/100) + "GB") # Display the total space on the storage device containing the current root project folder.

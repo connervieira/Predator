@@ -1,5 +1,7 @@
 # Predator
 
+**V0LT**
+
 A vision system primarily designed to read license plates in both pre-recorded and real-time video.
 
 ![Predator LPRS header](./assets/images/branding/PredatorHeaderLight.svg)
@@ -8,6 +10,8 @@ A vision system primarily designed to read license plates in both pre-recorded a
 ## Disclaimer
 
 While Predator is reliable and resilient, you should not use it for safety critical tasks. Do not depend on Predator to autheticate cars at entry points, detect intruders, or monitor criminal activity unless you are fully prepared for it to fail.
+
+Predator doesn't come with any warranty, and you're completely responsible for any damages caused by it's (mis)use. Please use reasonable discretion when installing and using Predator.
 
 
 ## Description

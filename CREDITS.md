@@ -1,6 +1,6 @@
 # Credits
 
-This document contains credits to all of the software Predator depends on to function.
+Predator is primarily developed by V0LT. However, this wouldn't be possible without the hardwork of dozens of other projects. This document contains credits to all of the software Predator depends on to function.
 
 ## Dependencies
 
