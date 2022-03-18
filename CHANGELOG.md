@@ -136,10 +136,8 @@ This update adds "Management Mode", and improves the efficiency and organization
 
 *Release date: To be determined*
 
-- Moved the Predator configuration to `config.json` in order to improve organization and extensibility.
 - Adjusted the default settings to reduce the amount of configuration that needs to be done for most use cases.
-- Added support for RGB status lighting support.
-- Added a configuration setting for globally disabling OpenCV and Tensorflow.
+- Added support for customizable RGB status lighting.
 - Changed the import process for Tensorflow and OpenCV to allow for failure without terminating Predator.
 - Adjusted the status messages in real-time mode to more accurate represent the current processing step.
 - Added the ability to export license plate GPX location data collected in pre-recorded mode.
@@ -148,8 +146,9 @@ This update adds "Management Mode", and improves the efficiency and organization
     - Users can copy any combination of Predator project files to any directory on the system, including an external drive.
     - Users can delete any combination of Predator project files from any project directory.
     - Users can view system information, like Predator's current configuration, the current operating system, processor specifications, RAM information, disk usage, etc.
-    - The Predator configuration (`config.json` file) can now be edited directly from within Predator, using a built in editing interface.
-- Completely re-organized and re-structured the pre-recorded mode menu in order to make the process drastically easier to understand and use.
+    - Moved the Predator configuration to `config.json` in order to improve organization and extensibility.
+        - The Predator configuration (`config.json` file) can now be edited directly from within Predator using a built in editing interface, or using an external text/JSON editor.
+- Completely re-organized and re-structured the pre-recorded mode analysis menu in order to make the process drastically easier to understand and use.
     - The main menu is now grouped into sections for license plate data, object recognition data, location data, and statistics.
     - Tabs are used to indicate sub-menus, and to visually distinguish them from previous menus while making it easy for the user to determine where they are in the menu system.
 - Added the ability to override the `auto_start_mode` configuration value using a command line argument.
@@ -167,3 +166,7 @@ This update adds "Management Mode", and improves the efficiency and organization
 - Added several new configuration values.
     - The `custom_startup_message` setting allows for a custom message to be shown to the user when Predator starts up.
     - The `modes_enabled` setting allows the user to individually enable and disable each of Predator's 4 modes.
+    - Audio alerts are now much more configurable, and allow for custom sound effects and for each sound effect to be repeated multiple times, if desired.
+    - The `real_time_image_rotation` configuration value allows the user to have Predator rotate each image it captures in real-time mode before cropping it.
+        - This means that Predator now use cameras that are mounted at an angle for license plate analysis.
+    - Added a configuration setting for globally disabling OpenCV and Tensorflow.

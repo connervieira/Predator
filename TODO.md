@@ -1,6 +1,6 @@
 # To-Do
 
-This document explains features that may be added to Predator in the future.
+This document quickly explains features that may be added to Predator in the future. This is an informal document, and it's typically used as a simple task tracker, not as changelog or official feature list.
 
 
 ## Planned
@@ -17,9 +17,9 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Real-time alerts for detected license plates based on a text file.
 - [X] The ability to configure Predator to automatically start up in real-time mode using pre-configured preferences.
 - [X] The ability to download alert databases from the internet.
-- [X] Audio based alerts.
+- [X] Add audio based alerts.
 - [X] The ability to automatically submit plates detected in real-time to a webhook.
-- [X] Statistics viewer.
+- [X] Add statistics viewer to pre-recorded mode.
 - [X] Add the ability to record video without processing plates in real-time.
 - [X] The ability to correlate license plate detections with GPS data from a GPX file.
 - [X] Push notification support.

@@ -87,6 +87,7 @@ real_time_left_margin = config["realtime"]["real_time_left_margin"] # How many p
 real_time_right_margin = config["realtime"]["real_time_right_margin"] # How many pixels will be cropped from the right side of the frame in real-time mode.
 real_time_top_margin = config["realtime"]["real_time_top_margin"] # How many pixels will be cropped from the bottom side of the frame in real-time mode.
 real_time_bottom_margin = config["realtime"]["real_time_bottom_margin"] # How many pixels will be cropped from the top side of the frame in real-time mode.
+real_time_image_rotation = config["realtime"]["real_time_image_rotation"] # How many degrees clockwise the image will be rotated in real-time mode.
 fswebcam_device = config["realtime"]["fswebcam_device"] # This setting determines the video device that 'fswebcam' will use to take images in real-time mode.
 fswebcam_flags = config["realtime"]["fswebcam_flags"] # These are command flags that will be added to the end of the FSWebcam command. You can use these to customize how FSWebcam takes images in real-time mode based on your camera set up.
 audio_alerts = config["realtime"]["audio_alerts"] # This setting determines whether or not Predator will make use of sounds to inform the user of events.
@@ -112,9 +113,15 @@ status_lighting_base_url = config["realtime"]["status_lighting_base_url"]
 status_lighting_values = config["realtime"]["status_lighting_values"]
 
 # Audio alert settings
-alert_sounds_startup = config["realtime"]["alert_sounds"]["startup"]
-alert_sounds_notification = config["realtime"]["alert_sounds"]["notification"]
-alert_sounds_alert = config["realtime"]["alert_sounds"]["alert"]
+alert_sounds_startup = config["realtime"]["startup_sound"]["path"]
+alert_sounds_startup_repeat = config["realtime"]["startup_sound"]["repeat"]
+alert_sounds_startup_delay = config["realtime"]["startup_sound"]["delay"]
+alert_sounds_notification = config["realtime"]["notification_sound"]["path"]
+alert_sounds_notification_repeat = config["realtime"]["notification_sound"]["repeat"]
+alert_sounds_notification_delay = config["realtime"]["notification_sound"]["delay"]
+alert_sounds_alert = config["realtime"]["alert_sound"]["path"]
+alert_sounds_alert_repeat = config["realtime"]["alert_sound"]["delay"]
+alert_sounds_alert_delay = config["realtime"]["alert_sound"]["repeat"]
 
 
 
@@ -157,8 +164,10 @@ else: # If the user his disabled the large ASCII art header, then show a simple 
     if (custom_startup_message != ""): # Only display the line for the custom message if the user has defined one.
         print(custom_startup_message) # Show the user's custom defined start-up message.
 
-if (audio_alerts == True): # Check to see if the user has audio alerts enabled.
-    os.system("mpg321 " + alert_sounds_startup + " > /dev/null 2>&1 &") # Play a calm start-up noise.
+if (audio_alerts == True and int(alert_sounds_startup_repeat) > 0): # Check to see if the user has audio alerts enabled.
+    for i in range(0, int(alert_sounds_startup_repeat)): # Repeat the sound several times, if the configuration says to.
+        os.system("mpg321 " + alert_sounds_startup + " > /dev/null 2>&1 &") # Play the sound specified for this alert type in the configuration.
+        time.sleep(float(alert_sounds_startup_delay)) # Wait before playing the sound again.
 
 if (push_notifications_enabled == True): # Check to see if the user has push notifications enabled.
     os.system("curl -X POST '" + gotify_server + "/message?token=" + gotify_application_token + "' -F 'title=Predator' -F 'message=Predator has been started.' > /dev/null 2>&1 &") # Send a push notification via Gotify indicating that Predator has started.
@@ -1201,6 +1210,20 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
 
 
 
+
+
+        # If necessary, rotate the image.
+        if (str(real_time_image_rotation) != "0"): # Check to make sure that rotating the image is actually necessary so processing time isn't wasted if the user doesn't have the rotating setting configured.
+            print("Rotating image...")
+            if (save_images_preference == True): # Check to see whether or not the user wants to save all images captured by Predator.
+                os.system("convert " + root + "/realtime_image" + str(i) + ".jpg -rotate " + real_time_image_rotation + " " + root + "/realtime_image" + str(i) + ".jpg") # Execute the command to rotate the image, based on the configuration.
+            else:
+                os.system("convert " + root + "/realtime_image.jpg -rotate " + real_time_image_rotation + " " + root + "/realtime_image.jpg") # Execute the command to rotate the image, based on the configuration.
+            print("Done.\n----------")
+
+
+
+
         # If enabled, crop the frame down.
         if (real_time_cropping_enabled == True): # Check to see if the user has enabled cropping in real-time mode.
             print("Cropping frame...")
@@ -1266,8 +1289,10 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
                     detected_license_plates.append(detected_plate) # Save the most likely license plate ID to the detected_license_plates list.
                     print("Detected plate: " + detected_plate + "\n----------")
 
-                    if (audio_alerts == True): # Check to see if the user has audio alerts enabled.
-                        os.system("mpg321 " + alert_sounds_notice + " > /dev/null 2>&1 &") # Play a subtle alert sound.
+                    if (audio_alerts == True and int(alert_sounds_notice_repeat) > 0): # Check to see if the user has audio alerts enabled.
+                        for i in range(0, int(alert_sounds_notice_repeat)): # Repeat the sound several times, if the configuration says to.
+                            os.system("mpg321 " + alert_sounds_notice + " > /dev/null 2>&1 &") # Play the sound specified for this alert type in the configuration.
+                            time.sleep(float(alert_sounds_notice_delay)) # Wait before playing the sound again.
 
                     if (push_notifications_enabled == True): # Check to see if the user has Gotify notifications enabled.
                         os.system("curl -X POST '" + gotify_server + "/message?token=" + gotify_application_token + "' -F 'title=Predator' -F 'message=A license plate has been detected: " + detected_plate + "' > /dev/null 2>&1 &")
@@ -1333,6 +1358,11 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
 
                     if (audio_alerts == True): # Check to see if the user has audio alerts enabled.
                         os.system("mpg321 " + alert_sounds_alert + " > /dev/null 2>&1 &") # Play the prominent alert sound.
+
+                    if (audio_alerts == True and int(alert_sounds_alert_repeat) > 0): # Check to see if the user has audio alerts enabled.
+                        for i in range(0, int(alert_sounds_alert_repeat)): # Repeat the sound several times, if the configuration says to.
+                            os.system("mpg321 " + alert_sounds_alert + " > /dev/null 2>&1 &") # Play the sound specified for this alert type in the configuration.
+                            time.sleep(float(alert_sounds_alert_delay)) # Wait before playing the sound again.
 
                     if (status_lighting_enabled == True): # Check to see if status lighting alerts are enabled in the Predator configuration.
                         update_status_lighting("alert") # Run the function to update the status lighting.

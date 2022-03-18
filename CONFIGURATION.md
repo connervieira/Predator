@@ -78,6 +78,12 @@ Configuration values in this section are settings specific to real-time mode.
         - Use of optical zoom and framing will lead to higher quality images for Predator to process.
     - In most videos there will be a portion of the frame in which a license plate would never reasonably appear.
         - For example, in dash-cam video, there will rarely be a license plate in the top half of the frame when the camera is mounted facing straight forward.
+    - Note: The cropping process takes place after the rotating process described under `real_time_image_rotation`.
+- `real_time_image_rotation`
+    - This setting can be used to rotate images if your camera is mounted at an angle.
+    - Set this value to a number between 0 and 360 in order to rotate your images a certain number of degrees clockwise.
+        - For example, setting this value to '180' would flip the image upside down.
+    - Note: The rotating process takes place before the cropping process.
 - `fswebcam_device`
     - This setting simply determines the video device that Predator will use FSWebcam to access.
     - This should almost always be set to `"/dev/video0"`, but there may be some situations it which it would make sense to change this, such as when you want to run multiple cameras.
@@ -90,12 +96,17 @@ Configuration values in this section are settings specific to real-time mode.
 - `audio_alerts`
     - This setting determines whether or not Predator will make use of audible alerts.
     - With this is set to `true`, Predator will play subtle alert noises when a plate is detected, and much more prominent noises when a plate in an alert database is detected.
-- `alert_sounds`
-    - This setting contains the file paths to each of the various alert sounds Predator uses to inform the user of important events.
-    - Each alert sound is used in different contexts.
-        - The "startup" sound is played when Predator finishes loading at startup.
-        - The "notice" sound is played when Predator detects a valid license plate that isn't in an alert database.
-        - The "alert" sound is played when Predator detects a valid license plate that is in an alert database.
+- `startup_sound`, `notification_sound`, `alert_sound`
+    - These are the audio sound effects played when `audio_alerts` is enabled.
+        - `startup_sound` is the sound played just after Predator finishes loading.
+        - `notification_sound` is the sound played when a valid plate is detected in real-time mode, and the plate is not in an alert database.
+        - `alert_sound` is the sound played when a valid plate is detected, and the plate is in an alert database.
+    - The `path` value should be set to the file path of the audio file you want to play.
+    - The `repeat` value should be set to how many times you want the sound effect to be repeated.
+        - Under normal circumstances, this value should just be "1", but there might be some cases in which you want to play a particular sound repeatedly.
+    - The `delay` value determines how long Predator will wait, in seconds, between repetitions, if `reptition` is set to more than 1.
+        - Note that this delay includes the time it takes for the previous instances of the sound effect to play.
+        - For example, if the audio clip you're repeating takes 2 seconds to play, and you want a 1 second delay between audio clips, this setting should be 3 seconds.
 - `webhook`
     - This setting is a string used to define a webhook that Predator will send a request to when it detects a license plate in real-time mode.
     - This setting should either be left blank, or be set to a URL.
