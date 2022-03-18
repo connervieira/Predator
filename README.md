@@ -1,6 +1,6 @@
 # Predator
 
-**V0LT**
+**Copyright 2022 V0LT - Conner Vieira**
 
 A vision system primarily designed to read license plates in both pre-recorded and real-time video.
 
