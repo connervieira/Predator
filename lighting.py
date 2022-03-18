@@ -24,4 +24,4 @@ def update_status_lighting(url_id):
         if (str(webhook_response) != "200"): # If the server didn't respond with a 200 code; Warn the user that there was an error.
             print(style.yellow + "Warning: Unable to update status lighting. Response code: " + str(webhook_response.getcode()) + style.end)
     else:
-            print(style.yellow + "Warning: Unable to update status lighting. Invalid URL configured for " + url_id + style.end) # Display a warning that the URL was invalid, and no network request was sent.
+        print(style.yellow + "Warning: Unable to update status lighting. Invalid URL configured for " + url_id + style.end) # Display a warning that the URL was invalid, and no network request was sent.
