@@ -36,6 +36,7 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Update real-time dashcam background recording.
 - [X] Add more configuration values to better refine Predator's functionality.
 - [X] Add the ability to configure custom alert sounds.
+- [ ] Add the ability for Predator to detect multiple license plates per frame in real-time mode.
 
 
 # Hypothetical
