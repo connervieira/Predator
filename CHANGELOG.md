@@ -179,3 +179,4 @@ This update adds "Management Mode", and improves the efficiency and organization
 - Changed the order in which object recognition and ALPR processing take place.
 - Added the ability to detect and process multiple license per frame in real-time mode.
     - Added the `print_detected_plate_count` configuration value to allow the user to change whether or not Predator will display the count of how many license plates it detectes each round.
+    - This makes Predator significantly more efficient by increasing the amount of plates that can be detected per processing cycle, without significantly increasing the time required to process each cycle.

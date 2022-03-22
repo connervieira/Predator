@@ -1359,7 +1359,7 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
                 if (successfully_found_plate == True): # Check to see if a valid plate was detected this round after the validation process ran.
                     detected_license_plates.append(detected_plate) # Save the most likely license plate ID to the detected_license_plates complete list.
                     new_plate_detected.append(detected_plate) # Save the most likely license plate ID to this round's new_plate_detected list.
-                    print("Detected plate: " + detected_plate + "\n----------") # Print the detected plate.
+                    print("Detected plate: " + detected_plate) # Print the detected plate.
 
                     if (audio_alerts == True and int(alert_sounds_notice_repeat) > 0): # Check to see if the user has audio alerts enabled.
                         for i in range(0, int(alert_sounds_notice_repeat)): # Repeat the sound several times, if the configuration says to.
@@ -1385,8 +1385,10 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
 
 
         else: # No license plate was detected at all.
-            print("Done.\n----------")
+            print("Done.")
 
+
+        print("----------") # Print a dividing line after processing license plate analysis data.
 
 
 
