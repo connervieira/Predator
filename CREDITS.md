@@ -38,10 +38,3 @@ ImageMagick is one of the most popular command-line image manipulating tools, an
 FSWebcam is a simple utility designed to make interacting with external cameras as easy as possible. FSWebcam is the utility Predator uses to access connected cameras in real-time mode.
 
 <http://www.sanslogic.co.uk/fswebcam/>
-
-
-### GNU AWK
-
-AWK is a GNU utility for manipulating text. Predator uses AWK to handle data output by OpenALPR during image processing.
-
-<https://www.gnu.org/software/gawk/>

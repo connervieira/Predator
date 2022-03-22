@@ -24,7 +24,7 @@
         "delay_between_rounds": "0.2",
         "print_invalid_plates": false,
         "print_detected_plate_count": false,
-        "realtime_guesses": "10",
+        "realtime_guesses": "20",
         "alerts_ignore_validation": true,
         "camera_resolution": "1920x1080",
         "real_time_cropping_enabled": false,

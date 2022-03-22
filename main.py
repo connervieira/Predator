@@ -789,9 +789,10 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
 
 
 
+
+
     # Split the supplied video into individual frames based on the user's input
     frame_split_command = "mkdir " + root + "/frames; ffmpeg -i " + root + "/" + video + " -r " + str(1/framerate) + " " + root + "/frames/output%04d.png -loglevel quiet"
-
     clear()
     print("Splitting video into discrete images...")
     os.system(frame_split_command)
@@ -839,10 +840,22 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
     print("Scanning for license plates...")
     lpr_scan = {} # Create an empty dictionary that will hold each frame and the potential license plates IDs.
     for frame in frames:
-        analysis_command = "alpr -n 5 " + root + "/frames/" + frame + " | awk '{print $2}'" # Set up the OpenALPR command.
-        reading_output = str(os.popen(analysis_command).read()) # Record the raw output from the OpenALPR command.
-        lpr_scan[frame] = reading_output.split() # Split the OpenALPR command output into an array.
+        lpr_scan[frame] = [] # Set the license plate recognition information for this frame to an empty list as a placeholder.
+        analysis_command = "alpr -j -n 5 " + root + "/frames/" + frame # Set up the OpenALPR command.
+        reading_output = str(os.popen(analysis_command).read()) # Run the command, and record the raw output string.
+        reading_output = json.loads(reading_output) # Convert the JSON string from the command output to actual JSON data that Python can manipulate.
+
+        # Organize all of the detected license plates and their list of potential guess candidates to a dictionary to make them easier to manipulate.
+        all_current_plate_guesses = {} # Create an empty place-holder dictionary that will be used to store all of the potential plates and their guesses.
+        for detected_plate in reading_output["results"]: # Iterate through each potential plate detected by the OpenALPR command.
+            all_current_plate_guesses[detected_plate["plate_index"]] = [] # Create an empty list for this plate so we can add all the potential plate guesses to it in the next step.
+            for plate_guess in detected_plate["candidates"]: # Iterate through each plate guess candidate for each potential plate detected.
+                all_current_plate_guesses[detected_plate["plate_index"]].append(plate_guess["plate"]) # Add the current plate guess candidate to the list of plate guesses.
+
+        if (len(all_current_plate_guesses) > 0): # Only add data to the current frame if data actually exists to add in the first place.
+            lpr_scan[frame] = all_current_plate_guesses[0] # Collect the information for only the first plate detected by OpenALPR.
     print("Done.\n")
+
 
 
 
@@ -852,14 +865,14 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
 
     # Check the possible plate IDs and validate based on general Ohio plate formatting.
     print("Validating license plates...")
-
     for frame in lpr_scan: # Iterate through each frame of video in the database of scanned plates.
-        lpr_scan[frame].remove(lpr_scan[frame][0]) # Remove the first element in the data, since it will never be a license plate. The first line of output for open ALPR doesn't contain license plates.
-        for i in range(0,len(lpr_scan)): # Run repeatedly to make sure the list shifting around doesn't mix anything up.
-            for plate in lpr_scan[frame]:
+        for i in range(0,len(lpr_scan)): # Run repeatedly to make sure the list shifting around doesn't lead to invalid license plates being skipped.
+            for plate in lpr_scan[frame]: # Iterate through each plate detected per frame.
                 if (validate_plate(plate, license_plate_format) == False and license_plate_format != ""): # Remove the plate if it fails the validation test (and the license plate format isn't blank).
                     lpr_scan[frame].remove(plate) # Since the plate failed the validation test, delete it from the array.
     print("Done.\n")
+
+
 
 
 
@@ -1316,7 +1329,7 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
 
             image = cv2.imread(frame_path) # Load the frame.
             object_recognition_bounding_box, object_recognition_labels, object_recognition_confidence = cv.detect_common_objects(image) # Anaylze the image.
-            objects_identified = str(object_recognition_labels)
+            objects_identified = str(object_recognition_labels) # Convert the list of objects identified into a plain string.
             if (objects_identified != "[]"): # Check to see that there were actually identified objects.
                 print("Objects identified: " + objects_identified)
                 export_data = str(round(time.time())) + "," + objects_identified + "\n" # Add the timestamp to the export data, followed by the object's detected, followed by a line break to prepare for the next entry to be added later.
@@ -1457,7 +1470,7 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
 
 
         # If enabled, submit data about each newly detected plate to a network server.
-        print("Submitting data to web-hook...")
+        print("Submitting data to webhook...")
         for each_new_plate_detected in new_plate_detected: # Iterate through each plate that was detected this round.
             if (webhook != None and webhook != ""): # Check to see if the user has specified a webhook to submit detected plates to.
                 url = webhook.replace("[L]", each_new_plate_detected) # Replace "[L]" with the license plate detected.
