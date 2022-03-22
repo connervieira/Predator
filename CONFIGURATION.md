@@ -67,6 +67,8 @@ Configuration values in this section are settings specific to real-time mode.
     - This setting is a boolean that determines whether or not Predator will print every guess it makes as to the contents of a license plates, even if those guesses are invalidated by the license plate format sample.
     - This setting is usually set to `false`, but there may be some situations in which it would make sense to turn it on for sake of troubleshooting.
         - In the event that you consistently get Predator to identify a plate, but it can't find a valid guess as to what its contents are, turning this on can help you figure out what Predator thinks its seeing.
+- `print_detected_plate_count`
+    - This setting is a boolean that determines whether or not Predator will show how many plates are detected in each frame while operating in real-time mode.
 - `realtime_guesses`
     - This setting is a number in the form of a string that determines how many OpenALPR guesses Predator will take into account when analyzing a plate.
     - The higher this number is, the more likely Predator is to guess a plate incorrectly. The lower this number is, the less likely Predator will be to find a valid guess at all.
@@ -123,7 +125,8 @@ Configuration values in this section are settings specific to real-time mode.
     - Flags can be used to supply information to the webhook.
         - Predator will replace `[L]` with the detected license plate.
         - Predator will replace `[T]` with the current time as a Unix epoch timestamp.
-        - Predator will replace `[A]` with the alert status of the plate (`true` or `false`).
+        - Predator will replace `[A]` with the current alert status (`true` or `false`).
+            - Note that if multiple license plates are detected simultaneously, and one of them is in an alert database, then all of the license plates detected that frame will be marked as `true` for alert status, regardless of whether the individual plates are actually in the alert database themselves.
     - Examples:
         - `http://localhost/app.php?plate=[L]&time=[T]&alert=[A]`
         - `http://domain.tld/app/[L]`

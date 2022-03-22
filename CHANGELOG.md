@@ -174,3 +174,8 @@ This update adds "Management Mode", and improves the efficiency and organization
     - The `real_time_image_rotation` configuration value allows the user to have Predator rotate each image it captures in real-time mode before cropping it.
         - This means that Predator now use cameras that are mounted at an angle for license plate analysis.
     - Added a configuration setting for globally disabling OpenCV and Tensorflow.
+- Fixed an issue where various tasks, like push notifications, audio alerts, shape alerts, and webhooks wouldn't be completed if license plate validation was turned off.
+- Switched real-time mode over to a JSON back-end using OpenALPR in order to improve efficiency, stability, and to make further feature additions easier.
+- Changed the order in which object recognition and ALPR processing take place.
+- Added the ability to detect and process multiple license per frame in real-time mode.
+    - Added the `print_detected_plate_count` configuration value to allow the user to change whether or not Predator will display the count of how many license plates it detectes each round.

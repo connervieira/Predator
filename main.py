@@ -96,6 +96,7 @@ bottom_margin = config["prerecorded"]["bottom_margin"] # How many pixels will be
 clear_between_rounds = config["realtime"]["clear_between_rounds"] # This setting determines whether or not Predator will clear the output screen between analysis rounds in real-time mode.
 delay_between_rounds = config["realtime"]["delay_between_rounds"] # This setting defines how long Predator will wait in between analysis rounds in real-time mode.
 print_invalid_plates = config["realtime"]["print_invalid_plates"] # In real-time mode, print all plates that get invalided by the formatting rules in red. When this is set to false, only valid plates are displayed.
+print_detected_plate_count = config["realtime"]["print_detected_plate_count"] # This setting determines whether or not Predator will print how many license plates it detects in each frame while operating in real-time mode.
 realtime_guesses = config["realtime"]["realtime_guesses"] # This setting determines how many guesses Predator will make per plate in real-time mode. The higher this number, the less accurate guesses will be, but the more likely it will be that a plate matching the formatting guidelines is found.
 alerts_ignore_validation = config["realtime"]["alerts_ignore_validation"] # This setting determines whether alerts will respect or ignore the license plate validation formatting template.
 camera_resolution = config["realtime"]["camera_resolution"] # This is the resolution you want to use when taking images using the connected camera. Under normal circumstances, this should be the maximum resoultion supported by your camera.
@@ -1207,9 +1208,8 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
         alert_database_list = [] # Set the alert database to an empty list.
 
 
-    detected_license_plates = [] # Create an empty dictionary that will hold each frame and the potential license plate strings.
-
-    i = 0 # Set the increment counter to 0 so we can increment it by one each time Predator analyzes a plate.
+    detected_license_plates = [] # Create an empty list that will hold each license plate detected by Predator during this session.
+    i = 0 # Set the increment counter to 0 so we can increment it by one each time Predator analyzes a frame.
 
 
 
@@ -1259,19 +1259,39 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
             
 
 
+
+
         # Run license plate analysis on the captured frame.
         print("Running license plate recognition...")
         time.sleep(0.2) # Sleep to give the user time to quit Predator if they want to.
         if (save_images_preference == True): # Check to see whether or not the user wants to save all images captured by Predator.
-            analysis_command = "alpr -n " + realtime_guesses  + " " + root + "/realtime_image" + str(i) + ".jpg | awk '{print $2}'" # Prepare the analysis command so we can run it next.
+            analysis_command = "alpr -j -n " + realtime_guesses  + " " + root + "/realtime_image" + str(i) + ".jpg'" # Prepare the analysis command so we can run it next.
         else:
-            analysis_command = "alpr -n " + realtime_guesses  + " " + root + "/realtime_image.jpg | awk '{print $2}'" # Prepare the analysis command so we can run it next.
+            analysis_command = "alpr -j -n " + realtime_guesses  + " " + root + "/realtime_image.jpg" # Prepare the analysis command so we can run it next.
 
         i = i + 1 # Increment the counter for this cycle so we can count how many images we've analyzed during this session.
-        new_plate_detected = "" # This variable will be used to determine whether or not a plate was detected this round. If no plate is detected, this will remain blank. If a plate is detected, it will change to be that plate. This is used to determine whether or not the database of detected plates needs to updated.
+        new_plate_detected = [] # This variable will be used to determine whether or not a plate was detected this round. If no plate is detected, this will remain blank. If a plate is detected, it will change to be that plate. This is used to determine whether or not the database of detected plates needs to updated.
 
         reading_output = str(os.popen(analysis_command).read()) # Run the OpenALPR command, and save it's output to reading_output.
-        reading_output_plates = reading_output.split() # Take the output of the OpenALPR command (the detected plates), and save it as a Python array.
+        reading_output = json.loads(reading_output) # Convert the JSON string from the command output to actual JSON data that Python can manipulate.
+
+
+
+
+        # Organize all of the detected license plates and their list of potential guess candidates to a dictionary to make them easier to manipulate.
+        all_current_plate_guesses = {} # Create an empty place-holder dictionary that will be used to store all of the potential plates and their guesses.
+        for detected_plate in reading_output["results"]: # Iterate through each potential plate detected by the OpenALPR command.
+            all_current_plate_guesses[detected_plate["plate_index"]] = [] # Create an empty list for this plate so we can add all the potential plate guesses to it in the next step.
+            for plate_guess in detected_plate["candidates"]: # Iterate through each plate guess candidate for each potential plate detected.
+                all_current_plate_guesses[detected_plate["plate_index"]].append(plate_guess["plate"]) # Add the current plate guess candidate to the list of plate guesses.
+
+        if (print_detected_plate_count == True): # Only print the number of plates detected this round if it's enabled in the configuration.
+            print("Number of plates detected: " + str(len(all_current_plate_guesses))) # Show the number of plates detected this round.
+
+        print("Done\n----------")
+
+
+
 
 
 
@@ -1281,62 +1301,6 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
         if (status_lighting_enabled == True): # Check to see if status lighting alerts are enabled in the Predator configuration.
             update_status_lighting("normal") # Run the function to update the status lighting.
 
-
-
-
-
-        # Process information from the OpenALPR license plate analysis command.
-        if (len(reading_output_plates) >= 2): # Check to see if a license plate was actually detected.
-            reading_output_plates.remove(reading_output_plates[0]) # Remove the first element of the output, since it isn't a plate. The first value will always be the first line of the ALPR output, which doesn't include plates.
-            
-            if (license_plate_format == ""): # If the user didn't supply a license plate format, then skip license plate validation.
-                detected_plate = str(reading_output_plates[1]) # Grab the most likely detected plate as the 'detected plate'.
-                detected_license_plates.append(detected_plate) # Save the most likely license plate ID to the detected_license_plates list.
-                print("Detected plate: " + detected_plate + "\n") # Print the plate detected.
-                new_plate_detected = detected_plate
-            else: # If the user did supply a license plate format, then check all of the results against the formatting example.
-                successfully_found_plate = False
-                for plate in reading_output_plates: # Iterate through each plate and grab the first plate that matches the plate formatting guidelines as the 'detected plate'.
-                    if (validate_plate(plate, license_plate_format)): # Check to see whether or not the plate passes the validation based on the format specified by the user.
-                        # The plate was valid
-                        detected_plate = plate
-                        successfully_found_plate = True
-                        if (print_invalid_plates == True):
-                            print(style.green + plate + style.end) # Print the valid plate in green.
-                        break
-                    else:
-                        # The plate was invalid, in that it didn't align with the user-supplied formatting guidelines.
-                        if (print_invalid_plates == True):
-                            print(style.red + plate + style.end) # Print the invalid plate in red.
-
-                if (successfully_found_plate == True): # Check to see if a valid plate was detected this round.
-                    detected_license_plates.append(detected_plate) # Save the most likely license plate ID to the detected_license_plates list.
-                    print("Detected plate: " + detected_plate + "\n----------")
-
-                    if (audio_alerts == True and int(alert_sounds_notice_repeat) > 0): # Check to see if the user has audio alerts enabled.
-                        for i in range(0, int(alert_sounds_notice_repeat)): # Repeat the sound several times, if the configuration says to.
-                            os.system("mpg321 " + alert_sounds_notice + " > /dev/null 2>&1 &") # Play the sound specified for this alert type in the configuration.
-                            time.sleep(float(alert_sounds_notice_delay)) # Wait before playing the sound again.
-
-                    if (push_notifications_enabled == True): # Check to see if the user has Gotify notifications enabled.
-                        os.system("curl -X POST '" + gotify_server + "/message?token=" + gotify_application_token + "' -F 'title=Predator' -F 'message=A license plate has been detected: " + detected_plate + "' > /dev/null 2>&1 &")
-
-                    if (shape_alerts == True):  # Check to see if the user has enabled shape notifications.
-                        display_shape("square")
-
-                    if (status_lighting_enabled == True): # Check to see if status lighting alerts are enabled in the Predator configuration.
-                        update_status_lighting("warning") # Run the function to update the status lighting.
-
-                    new_plate_detected = detected_plate
-                        
-                elif (successfully_found_plate == False): # A plate was found, but none of the guesses matched the formatting guidelines provided by the user.
-                    print("A plate was found, but none of the guesses matched the supplied plate format.\n----------")
-
-                    if (shape_alerts == True):  # Check to see if the user has enabled shape notifications.
-                        display_shape("circle")
-
-        else: # No license plate was detected.
-            print("Done.\n----------")
 
 
 
@@ -1364,39 +1328,106 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
 
 
 
-        # Run any tasks that need to be completed (alert database checking, webhooks, notifications), since a plate was detected this round
+        # Process information from the OpenALPR license plate analysis command.
+
+        print("Processing license plate recognition data...")
+        if (len(all_current_plate_guesses) > 0): # Check to see if at least one license plate was actually detected.
+            for individual_detected_plate in all_current_plate_guesses: # Iterate through each individual plate detected in the image frame.
+                successfully_found_plate = False # Reset the 'sucessfully_found_plate` variable to 'False'. This will be changed back if a valid plate is detected.
+
+                # Run validation according to the configuration on the plate(s) detected.
+                if (license_plate_format == ""): # If the user didn't supply a license plate format, then skip license plate validation.
+                    detected_plate = str(all_current_plate_guesses[individual_detected_plate][1]) # Grab the most likely detected plate as the 'detected plate'.
+                    successfully_found_plate = True # Plate validation wasn't needed, so the fact that a plate existed at all means a valid plate was detected. Indicate that a plate was successfully found this round.
+
+                else: # If the user did supply a license plate format, then check all of the results against the formatting example.
+                    for plate_guess in all_current_plate_guesses[individual_detected_plate]: # Iterate through each plate and grab the first plate that matches the plate formatting guidelines as the 'detected plate'.
+                        if (validate_plate(plate_guess, license_plate_format)): # Check to see whether or not the plate passes the validation based on the format specified by the user.
+                            detected_plate = plate_guess # Grab the validated plate as the 'detected plate'.
+                            successfully_found_plate = True # The plate was successfully validated, so indicate that a plate was successfully found this round.
+                            if (print_invalid_plates == True): # Only print the invalid plate if the configuration says to do so.
+                                print(style.green + plate_guess + style.end) # Print the valid plate in green.
+                            break
+                        else: # This particular plate guess is invalid, since it didn't align with the user-supplied formatting guidelines.
+                            if (print_invalid_plates == True): # Only print the invalid plate if the configuration says to do so.
+                                print(style.red + plate_guess + style.end) # Print the invalid plate in red.
+
+
+
+
+                # Run the appropriate tasks, based on whether or not a valid license plate was detected.
+                if (successfully_found_plate == True): # Check to see if a valid plate was detected this round after the validation process ran.
+                    detected_license_plates.append(detected_plate) # Save the most likely license plate ID to the detected_license_plates complete list.
+                    new_plate_detected.append(detected_plate) # Save the most likely license plate ID to this round's new_plate_detected list.
+                    print("Detected plate: " + detected_plate + "\n----------") # Print the detected plate.
+
+                    if (audio_alerts == True and int(alert_sounds_notice_repeat) > 0): # Check to see if the user has audio alerts enabled.
+                        for i in range(0, int(alert_sounds_notice_repeat)): # Repeat the sound several times, if the configuration says to.
+                            os.system("mpg321 " + alert_sounds_notice + " > /dev/null 2>&1 &") # Play the sound specified for this alert type in the configuration.
+                            time.sleep(float(alert_sounds_notice_delay)) # Wait before playing the sound again.
+
+                    if (push_notifications_enabled == True): # Check to see if the user has Gotify notifications enabled.
+                        os.system("curl -X POST '" + gotify_server + "/message?token=" + gotify_application_token + "' -F 'title=Predator' -F 'message=A license plate has been detected: " + detected_plate + "' > /dev/null 2>&1 &") # Send a push notification via Gotify.
+
+                    if (shape_alerts == True):  # Check to see if the user has enabled shape notifications.
+                        display_shape("square") # Display an ASCII square in the output.
+
+                    if (status_lighting_enabled == True): # Check to see if status lighting alerts are enabled in the Predator configuration.
+                        update_status_lighting("warning") # Run the function to update the status lighting.
+
+
+
+                elif (successfully_found_plate == False): # A plate was found, but none of the guesses matched the formatting guidelines provided by the user.
+                    print("A plate was found, but none of the guesses matched the supplied plate format.\n----------")
+
+                    if (shape_alerts == True):  # Check to see if the user has enabled shape notifications.
+                        display_shape("circle") # Display an ASCII circle in the output.
+
+
+        else: # No license plate was detected at all.
+            print("Done.\n----------")
+
+
+
+
+
+        # Check the plate(s) detected this around against the alert database, if necessary.
+        print("Checking license plate data against alert database...")
         active_alert = False # Reset the alert status to false so we can check for alerts on the current plate (if one was detected) next.
-        if (new_plate_detected != ""): # Check to see that the new_plate_detected variable isn't blank. This variable will only have a string if a plate was detected this round.
-            if (alerts_ignore_validation == True): # If the user has enabled alerts that ignore license plate validation, then check each of the OpenALPR guesses against the license plate alert database.
+        if (alerts_ignore_validation == True): # If the user has enabled alerts that ignore license plate validation, then check each of the OpenALPR guesses against the license plate alert database.
+            if (len(all_current_plate_guesses) > 0): # Check to see that the all_current_plate_guesses variable isn't empty. This variable will only have entries if a plate was detected this round.
                 for alert_plate in alert_database_list: # Run through every plate in the alert plate database supplied by the user. If no database was supplied, this list will be empty, and will not run.                        
-                    for guessed_plate in reading_output_plates: # Run through each of the plate guesses generated by OpenALPR, regardless of whether or not they are valid according to the plate formatting guideline.
-                        if (fnmatch.fnmatch(guessed_plate, alert_plate)): # Check to see this detected plate guess matches this particular plate in the alert database, taking wildcards into account.
-                            active_alert = True # If the plate does exist in the alert database, indicate that there is an active alert by changing this variable to True. This will reset on the next round.
+                    for individual_detected_plate in all_current_plate_guesses: # Iterate through each of the plates detected this round, regardless of whether or not they were validated.
+                        for individual_detected_plate_guess in all_current_plate_guesses[individual_detected_plate]: # Run through each of the plate guesses generated by OpenALPR, regardless of whether or not they are valid according to the plate formatting guideline.
+                            if (fnmatch.fnmatch(individual_detected_plate_guess, alert_plate)): # Check to see this detected plate guess matches this particular plate in the alert database, taking wildcards into account.
+                                active_alert = True # If the plate does exist in the alert database, indicate that there is an active alert by changing this variable to True. This will reset on the next round.
 
-                            # Display an alert that is starkly different from the rest of the console output.
-                            print(style.yellow + style.bold)
-                            print("===================")
-                            print("ALERT HIT - " + guessed_plate)
-                            print("===================")
-                            print(style.end)
+                                # Display an alert that is starkly different from the rest of the console output to make it stand out visually to the user.
+                                print(style.yellow + style.bold)
+                                print("===================")
+                                print("ALERT HIT - " + str(individual_detected_plate_guess))
+                                print("===================")
+                                print(style.end)
 
-                            if (shape_alerts == True):  # Check to see if the user has enabled shape notifications.
-                                display_shape("triangle")
+                                if (shape_alerts == True):  # Check to see if the user has enabled shape notifications.
+                                    display_shape("triangle") # Display an ASCII triangle in the output.
 
-                            if (audio_alerts == True and int(alert_sounds_alert_repeat) > 0): # Check to see if the user has audio alerts enabled.
-                                for i in range(0, int(alert_sounds_alert_repeat)): # Repeat the sound several times, if the configuration says to.
-                                    os.system("mpg321 " + alert_sounds_alert + " > /dev/null 2>&1 &") # Play the sound specified for this alert type in the configuration.
-                                    time.sleep(float(alert_sounds_alert_delay)) # Wait before playing the sound again.
+                                if (audio_alerts == True and int(alert_sounds_alert_repeat) > 0): # Check to see if the user has audio alerts enabled.
+                                    for i in range(0, int(alert_sounds_alert_repeat)): # Repeat the sound several times, if the configuration says to.
+                                        os.system("mpg321 " + alert_sounds_alert + " > /dev/null 2>&1 &") # Play the sound specified for this alert type in the configuration.
+                                        time.sleep(float(alert_sounds_alert_delay)) # Wait before playing the sound again.
 
-                            if (status_lighting_enabled == True): # Check to see if status lighting alerts are enabled in the Predator configuration.
-                                update_status_lighting("alert") # Run the function to update the status lighting.
+                                if (status_lighting_enabled == True): # Check to see if status lighting alerts are enabled in the Predator configuration.
+                                    update_status_lighting("alert") # Run the function to update the status lighting.
 
-                            if (push_notifications_enabled == True): # Check to see if the user has Gotify notifications enabled.
-                                os.system("curl -X POST '" + gotify_server + "/message?token=" + gotify_application_token + "' -F 'title=Predator' -F 'message=A license plate in the alert database has been detected: " + detected_plate + "' > /dev/null 2>&1 &")
+                                if (push_notifications_enabled == True): # Check to see if the user has Gotify notifications enabled.
+                                    os.system("curl -X POST '" + gotify_server + "/message?token=" + gotify_application_token + "' -F 'title=Predator' -F 'message=A license plate in the alert database has been detected: " + str(individual_detected_plate_guess) + "' > /dev/null 2>&1 &") # Send a push notification using Gotify.
 
-            else: #  If the user has disabled alerts that ignore license plate validation, then only check the validated plate against the alert database.
-                for alert_plate in alert_database_list: # Run through every plate in the alert plate database supplied by the user. If no database was supplied, this list will be empty, and will not run.                        
-                    if (fnmatch.fnmatch(new_plate_detected, alert_plate)): # Check to see the validated detected plate matches this particular plate in the alert database, taking wildcards into account.
+
+        else: #  If the user has disabled alerts that ignore license plate validation, then only check the validated plate against the alert database.
+            for alert_plate in alert_database_list: # Run through every plate in the alert plate database supplied by the user. If no database was supplied, this list will be empty, and will not run.                        
+                for each_new_plate_detected in new_plate_detected: # Iterate through each plate that was detected and validated this round.
+                    if (fnmatch.fnmatch(each_new_plate_detected, alert_plate)): # Check to see the validated detected plate matches this particular plate in the alert database, taking wildcards into account.
                         active_alert = True # If the plate does exist in the alert database, indicate that there is an active alert by changing this variable to True. This will reset on the next round.
 
                         # Display an alert that is starkly different from the rest of the console output.
@@ -1407,7 +1438,7 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
                         print(style.end)
 
                         if (shape_alerts == True):  # Check to see if the user has enabled shape notifications.
-                            display_shape("triangle")
+                            display_shape("triangle") # Display an ASCII triangle in the output.
 
                         if (audio_alerts == True and int(alert_sounds_alert_repeat) > 0): # Check to see if the user has audio alerts enabled.
                             for i in range(0, int(alert_sounds_alert_repeat)): # Repeat the sound several times, if the configuration says to.
@@ -1418,13 +1449,16 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
                             update_status_lighting("alert") # Run the function to update the status lighting.
 
                         if (push_notifications_enabled == True): # Check to see if the user has Gotify notifications enabled.
-                            os.system("curl -X POST '" + gotify_server + "/message?token=" + gotify_application_token + "' -F 'title=Predator' -F 'message=A license plate in the alert database has been detected: " + detected_plate + "' > /dev/null 2>&1 &")
+                            os.system("curl -X POST '" + gotify_server + "/message?token=" + gotify_application_token + "' -F 'title=Predator' -F 'message=A license plate in the alert database has been detected: " + detected_plate + "' > /dev/null 2>&1 &") # Send a push notification using Gotify.
+        print("Done.\n----------")
 
 
 
-            # If enabled, submit data about the detected plate to a network server.
+        # If enabled, submit data about each newly detected plate to a network server.
+        print("Submitting data to web-hook...")
+        for each_new_plate_detected in new_plate_detected: # Iterate through each plate that was detected this round.
             if (webhook != None and webhook != ""): # Check to see if the user has specified a webhook to submit detected plates to.
-                url = webhook.replace("[L]", detected_plate) # Replace "[L]" with the license plate detected.
+                url = webhook.replace("[L]", each_new_plate_detected) # Replace "[L]" with the license plate detected.
                 url = url.replace("[T]", str(round(time.time()))) # Replace "[T]" with the current timestamp, rounded to the nearest second.
                 url = url.replace("[A]", str(active_alert)) # Replace "[A]" with the current alert status.
 
@@ -1435,18 +1469,23 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
 
                 if (str(webhook_response) != "200"): # If the webhook didn't respond with a 200 code; Warn the user that there was an error.
                     print(style.yellow + "Warning: Unable to submit data to webhook. Response code: " + str(webhook_response.getcode()) + style.end)
+        print("Done.\n----------")
+
 
 
 
 
         # If enabled, save the detected license plate (if any) to a file on disk.
+        print("Saving license plate data to disk...")
         if (save_license_plates_preference == True): # Check to see if the user has the 'save detected license plates' preference enabled.
-            if (new_plate_detected != ""): # Check to see if the new_plate_detected value is blank. If it is blank, that means no new plate was detected this round.
-                if (active_alert == True): # Check to see if the current plate has an active alert.
-                    export_data = new_plate_detected + "," + str(round(time.time())) + ",true\n" # Add the individual plate to the export data, followed a timestamp, followed by a line break to prepare for the next plate to be added later.
-                else:
-                    export_data = new_plate_detected + "," + str(round(time.time())) + ",false\n" # Add the individual plate to the export data, followed a timestamp, followed by a line break to prepare for the next plate to be added later.
-                add_to_file(root + "/real_time_plates.csv", export_data, silence_file_saving) # Add the export data to the end of the file and write it to disk.
+            if (len(new_plate_detected) > 0): # Check to see if the new_plate_detected value is empty. If it is blank, that means no new plate was detected this round.
+                for each_new_plate_detected in new_plate_detected: # Iterate through each plate that was detected this round.
+                    if (active_alert == True): # Check to see if the current plate has an active alert.
+                        export_data = each_new_plate_detected + "," + str(round(time.time())) + ",true\n" # Add the individual plate to the export data, followed a timestamp, followed by a line break to prepare for the next plate to be added later.
+                    else:
+                        export_data = each_new_plate_detected + "," + str(round(time.time())) + ",false\n" # Add the individual plate to the export data, followed a timestamp, followed by a line break to prepare for the next plate to be added later.
+                    add_to_file(root + "/real_time_plates.csv", export_data, silence_file_saving) # Add the export data to the end of the file and write it to disk.
+        print("Done.\n----------")
 
 
 
