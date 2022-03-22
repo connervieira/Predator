@@ -3,7 +3,7 @@
         "ascii_art_header": true,
         "custom_startup_message": "",
         "auto_start_mode": "",
-        "default_root": "/home/cvieira/Downloads",
+        "default_root": "",
         "silence_file_saving": false,
         "disable_object_recognition": false,
         "modes_enabled": {
@@ -62,7 +62,7 @@
         "push_notifications_enabled": false,
         "gotify_server": "",
         "gotify_application_token": "",
-        "status_lighting_enabled": true,
+        "status_lighting_enabled": false,
         "status_lighting_base_url": "http://4.3.2.1/win&A=255",
         "status_lighting_values": {
             "alert": "[U]&R=255&G=0&B=0",
