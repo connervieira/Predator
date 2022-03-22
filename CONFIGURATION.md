@@ -58,6 +58,11 @@ Configuration values in this section are settings specific to pre-recorded mode.
 
 Configuration values in this section are settings specific to real-time mode.
 
+- `clear_between_rounds`
+    - This setting determines whether or not Predator will clear the output screen between analysis rounds during real-time mode.
+- `delay_between_rounds`
+    - This setting changes how long Predator will wait in between analysis rounds.
+    - This should usually be set to something very short, in order to allow Predator to process as much data as possible. However, there might be some cases in which it makes sense to slow down the process to allow the user to see what's happening.
 - `print_invalid_plates`
     - This setting is a boolean that determines whether or not Predator will print every guess it makes as to the contents of a license plates, even if those guesses are invalidated by the license plate format sample.
     - This setting is usually set to `false`, but there may be some situations in which it would make sense to turn it on for sake of troubleshooting.
@@ -66,6 +71,10 @@ Configuration values in this section are settings specific to real-time mode.
     - This setting is a number in the form of a string that determines how many OpenALPR guesses Predator will take into account when analyzing a plate.
     - The higher this number is, the more likely Predator is to guess a plate incorrectly. The lower this number is, the less likely Predator will be to find a valid guess at all.
     - By default this value is set to 10, which tends to be a healthy balance for the majority of tasks.
+- `alerts_ignore_validation`
+    - This setting determines whether alerts will respect or ignore the plate validation format.
+    - When this setting is set to `true`, if a plate fails the validation test, but matches an alert database plate, the alert will be displayed anyway.
+    - When set to `false`, only plates that have passed the validation test will be checked against the alert database.
 - `camera_resoultion`
     - This setting is a string that defines the resolution that FSWebcam will use when taking images through the connected camera.
     - It takes the format of `width x height`, with no spaces.
@@ -107,6 +116,7 @@ Configuration values in this section are settings specific to real-time mode.
     - The `delay` value determines how long Predator will wait, in seconds, between repetitions, if `reptition` is set to more than 1.
         - Note that this delay includes the time it takes for the previous instances of the sound effect to play.
         - For example, if the audio clip you're repeating takes 2 seconds to play, and you want a 1 second delay between audio clips, this setting should be 3 seconds.
+        - If the delay is set to zero, then all of the repetitions will play over top of each-other.
 - `webhook`
     - This setting is a string used to define a webhook that Predator will send a request to when it detects a license plate in real-time mode.
     - This setting should either be left blank, or be set to a URL.

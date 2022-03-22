@@ -164,6 +164,10 @@ This update adds "Management Mode", and improves the efficiency and organization
     - Multiple camera devices can now be used during background realtime mode dashcam recording.
     - Dashcam recording can now be halted through Predator, without having to terminate Predator.
 - Added several new configuration values.
+    - The `clear_between_rounds` setting changes whether or not the output screen is cleared between rounds while running in the real-time mode loop.
+    - The `delay_between_rounds` setting allows the user to define how long Predator will wait in between analysis rounds.
+    - The `alerts_ignore_validation` setting allows alerts to override the license plate validation formatting guideline.
+        - If a detected license plate fails the validation process, but matches a plate in the alert database, an alert can be shown anyways.
     - The `custom_startup_message` setting allows for a custom message to be shown to the user when Predator starts up.
     - The `modes_enabled` setting allows the user to individually enable and disable each of Predator's 4 modes.
     - Audio alerts are now much more configurable, and allow for custom sound effects and for each sound effect to be repeated multiple times, if desired.

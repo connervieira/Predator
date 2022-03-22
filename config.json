@@ -20,15 +20,18 @@
         "bottom_margin": "300"
     },
     "realtime": {
+        "clear_between_rounds": false,
+        "delay_between_rounds": "0.2",
         "print_invalid_plates": false,
         "realtime_guesses": "10",
+        "alerts_ignore_validation": true,
         "camera_resolution": "1920x1080",
         "real_time_cropping_enabled": false,
         "real_time_left_margin": "400",
         "real_time_right_margin": "400",
         "real_time_top_margin": "200",
         "real_time_bottom_margin": "200",
-        "real_time_image_rotation": "90",
+        "real_time_image_rotation": "0",
         "fswebcam_device": "/dev/video0",
         "fswebcam_flags": "--set brightness=70%",
         "audio_alerts": false,
@@ -48,7 +51,7 @@
             "delay": "0.3"
         },
         "webhook": "",
-        "shape_alerts": true,
+        "shape_alerts": false,
         "save_real_time_object_recognition": true,
         "default_alert_database": "",
         "default_save_license_plates_preference": "",
