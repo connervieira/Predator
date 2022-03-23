@@ -13,6 +13,7 @@
 
 
 
+simulated_progress = 0 # TODO REMOVE
 
 
 print("Loading Predator...")
@@ -38,6 +39,11 @@ import validators # Required to validate URLs
 import datetime # Required for converting between timestamps and human readable date/time information
 import fnmatch # Required to use wildcards to check strings
 import psutil # Required to get disk usage information
+import lzma # Required to open and manipulate ExCam database.
+import math # Required to run more complex math functions.
+from geopy.distance import great_circle # Required to calculate distance between locations.
+
+
 
 import utils # Import the utils.py scripts.
 style = utils.style # Load the style from the utils script.
@@ -49,6 +55,10 @@ validate_plate = utils.validate_plate # Load the plate validation function from 
 download_plate_database = utils.download_plate_database # Load the plate database downloading function from the utils script.
 display_shape = utils.display_shape # Load the shape displaying function from the utils script.
 countdown = utils.countdown # Load the timer countdown function from the utils script.
+get_gps_location = utils.get_gps_location # Load the function to get the current GPS location.
+get_distance = utils.get_distance # Load the function to get the distance between to global positions.
+load_traffic_cameras = utils.load_traffic_cameras # Load the function used to load the database of speed and red-light cameras.
+nearby_traffic_cameras = utils.nearby_traffic_cameras # Load the function used to check for nearby traffic cameras.
 
 if (config["general"]["disable_object_recognition"] == False): # Check to see whether or not object recognition (Tensorflow/OpenCV) has been globally disabled.
     try: # "Try" to import Tensorflow and OpenCV; Don't quit the entire program if an error is encountered.
@@ -93,6 +103,7 @@ bottom_margin = config["prerecorded"]["bottom_margin"] # How many pixels will be
 
 
 # ----- Real-time mode configuration -----
+realtime_output_level = int(config["realtime"]["realtime_output_level"]) # This setting determines how much information Predator shows the user while operating in real-time mode.
 clear_between_rounds = config["realtime"]["clear_between_rounds"] # This setting determines whether or not Predator will clear the output screen between analysis rounds in real-time mode.
 delay_between_rounds = config["realtime"]["delay_between_rounds"] # This setting defines how long Predator will wait in between analysis rounds in real-time mode.
 print_invalid_plates = config["realtime"]["print_invalid_plates"] # In real-time mode, print all plates that get invalided by the formatting rules in red. When this is set to false, only valid plates are displayed.
@@ -134,12 +145,30 @@ status_lighting_values = config["realtime"]["status_lighting_values"]
 alert_sounds_startup = config["realtime"]["startup_sound"]["path"]
 alert_sounds_startup_repeat = config["realtime"]["startup_sound"]["repeat"]
 alert_sounds_startup_delay = config["realtime"]["startup_sound"]["delay"]
-alert_sounds_notification = config["realtime"]["notification_sound"]["path"]
-alert_sounds_notification_repeat = config["realtime"]["notification_sound"]["repeat"]
-alert_sounds_notification_delay = config["realtime"]["notification_sound"]["delay"]
+alert_sounds_notice = config["realtime"]["notification_sound"]["path"]
+alert_sounds_notice_repeat = config["realtime"]["notification_sound"]["repeat"]
+alert_sounds_notice_delay = config["realtime"]["notification_sound"]["delay"]
 alert_sounds_alert = config["realtime"]["alert_sound"]["path"]
-alert_sounds_alert_repeat = config["realtime"]["alert_sound"]["delay"]
-alert_sounds_alert_delay = config["realtime"]["alert_sound"]["repeat"]
+alert_sounds_alert_repeat = config["realtime"]["alert_sound"]["repeat"]
+alert_sounds_alert_delay = config["realtime"]["alert_sound"]["delay"]
+alert_sounds_camera1 = config["realtime"]["camera1_sound"]["path"]
+alert_sounds_camera1_repeat = config["realtime"]["camera1_sound"]["repeat"]
+alert_sounds_camera1_delay = config["realtime"]["camera1_sound"]["delay"]
+alert_sounds_camera2 = config["realtime"]["camera2_sound"]["path"]
+alert_sounds_camera2_repeat = config["realtime"]["camera2_sound"]["repeat"]
+alert_sounds_camera2_delay = config["realtime"]["camera2_sound"]["delay"]
+alert_sounds_camera3 = config["realtime"]["camera3_sound"]["path"]
+alert_sounds_camera3_repeat = config["realtime"]["camera3_sound"]["repeat"]
+alert_sounds_camera3_delay = config["realtime"]["camera3_sound"]["delay"]
+
+# Traffic camera alert settings
+traffic_camera_alerts_enabled = config["realtime"]["traffic_camera_alerts_enabled"]
+camera_alert_types_speed = config["realtime"]["camera_alert_types"]["speed"]
+camera_alert_types_redlight = config["realtime"]["camera_alert_types"]["redlight"]
+camera_alert_types_misc = config["realtime"]["camera_alert_types"]["misc"]
+traffic_camera_alert_radius = config["realtime"]["traffic_camera_alert_radius"]
+traffic_camera_database = config["realtime"]["traffic_camera_database"]
+traffic_camera_loaded_radius = config["realtime"]["traffic_camera_loaded_radius"]
 
 
 
@@ -149,6 +178,13 @@ dashcam_frame_rate = config["dashcam"]["dashcam_frame_rate"] # This setting dete
 dashcam_device = config["dashcam"]["dashcam_device"] # This setting defines what camera device(s) Predator will attempt to use when recording video in dash-cam mode.
 dashcam_background_mode_realtime = config["dashcam"]["dashcam_background_mode_realtime"] # This setting determines whether dash-cam recording will automatically start in background mode when user runs real-time mode. It should be noted that running dash-cam recording and real-time mode simutaneously is only possible with two cameras connected, since the same camera device can't be used for both processes.
 
+
+# Load the traffic camera database, if enabled.
+if (traffic_camera_alerts_enabled == True): # Check to see if traffic camera alerts are enabled.
+    loaded_traffic_camera_database = load_traffic_cameras(get_gps_location()[0], get_gps_location()[1], traffic_camera_database, traffic_camera_loaded_radius) # Load all traffic cameras within the configured loading radius.
+
+    #current_location = get_gps_location() # Get the current location.
+    #nearby_traffic_cameras(current_location[0], current_location[1], loaded_traffic_camera_database, traffic_camera_alert_radius) # Get all traffic cameras within the configured radius.
 
 
 
@@ -1237,13 +1273,17 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
 
 
 
+
+
         # Take an image using the camera device specified in the configuration.
-        print("Taking image...")
+        if (realtime_output_level >= 3): # Only display this status message if the output level indicates to do so.
+            print("Taking image...")
         if (save_images_preference == True): # Check to see whether or not the user wants to save all images captured by Predator.
             os.system("fswebcam --no-banner -r " + camera_resolution + " -d " + fswebcam_device + " --jpeg 100 " + fswebcam_flags + " " + root + "/realtime_image" + str(i) + ".jpg >/dev/null 2>&1") # Take a photo using FSWebcam, and save it to the root project folder specified by the user.
         else:
             os.system("fswebcam --no-banner -r " + camera_resolution + " -d " + fswebcam_device + " --jpeg 100 " + fswebcam_flags + " " + root + "/realtime_image.jpg >/dev/null 2>&1") # Take a photo using FSWebcam, and save it to the root project folder specified by the user.
-        print("Done.\n----------")
+        if (realtime_output_level >= 3): # Only display this status message if the output level indicates to do so.
+            print("Done.\n----------")
 
 
 
@@ -1251,31 +1291,36 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
 
         # If necessary, rotate the image.
         if (str(real_time_image_rotation) != "0"): # Check to make sure that rotating the image is actually necessary so processing time isn't wasted if the user doesn't have the rotating setting configured.
-            print("Rotating image...")
+            if (realtime_output_level >= 3): # Only display this status message if the output level indicates to do so.
+                print("Rotating image...")
             if (save_images_preference == True): # Check to see whether or not the user wants to save all images captured by Predator.
                 os.system("convert " + root + "/realtime_image" + str(i) + ".jpg -rotate " + real_time_image_rotation + " " + root + "/realtime_image" + str(i) + ".jpg") # Execute the command to rotate the image, based on the configuration.
             else:
                 os.system("convert " + root + "/realtime_image.jpg -rotate " + real_time_image_rotation + " " + root + "/realtime_image.jpg") # Execute the command to rotate the image, based on the configuration.
-            print("Done.\n----------")
+            if (realtime_output_level >= 3): # Only display this status message if the output level indicates to do so.
+                print("Done.\n----------")
 
 
 
 
         # If enabled, crop the frame down.
         if (real_time_cropping_enabled == True): # Check to see if the user has enabled cropping in real-time mode.
-            print("Cropping frame...")
+            if (realtime_output_level >= 3): # Only display this status message if the output level indicates to do so.
+                print("Cropping frame...")
             if (save_images_preference == True): # Check to see whether or not the user wants to save all images captured by Predator.
                 os.system(crop_script_path + " " + root + "/realtime_image" + str(i) + ".jpg " + real_time_left_margin + " " + real_time_right_margin + " " + real_time_top_margin + " " + real_time_bottom_margin) # Execute the command to crop the image.
             else:
                 os.system(crop_script_path + " " + root + "/realtime_image.jpg " + real_time_left_margin + " " + real_time_right_margin + " " + real_time_top_margin + " " + real_time_bottom_margin) # Execute the command to crop the image.
-            print("Done.\n----------")
+            if (realtime_output_level >= 3): # Only display this status message if the output level indicates to do so.
+                print("Done.\n----------")
             
 
 
 
 
         # Run license plate analysis on the captured frame.
-        print("Running license plate recognition...")
+        if (realtime_output_level >= 3): # Only display this status message if the output level indicates to do so.
+            print("Running license plate recognition...")
         time.sleep(0.2) # Sleep to give the user time to quit Predator if they want to.
         if (save_images_preference == True): # Check to see whether or not the user wants to save all images captured by Predator.
             analysis_command = "alpr -j -n " + realtime_guesses  + " " + root + "/realtime_image" + str(i) + ".jpg'" # Prepare the analysis command so we can run it next.
@@ -1301,7 +1346,8 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
         if (print_detected_plate_count == True): # Only print the number of plates detected this round if it's enabled in the configuration.
             print("Number of plates detected: " + str(len(all_current_plate_guesses))) # Show the number of plates detected this round.
 
-        print("Done\n----------")
+        if (realtime_output_level >= 3): # Only display this status message if the output level indicates to do so.
+            print("Done\n----------")
 
 
 
@@ -1317,10 +1363,121 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
 
 
 
+        # Process traffic camera alerts.
+        if (traffic_camera_alerts_enabled == True): # Check to see if traffic camera alerts are enabled.
+            current_location = get_gps_location() # Get the current location.
+
+
+            # Create placeholders for each camera type so we can add the closet camera for each category in the next step .
+            nearest_speed_camera = {"dst": 10000000.0}
+            nearest_redlight_camera = {"dst": 10000000.0}
+            nearest_misc_camera = {"dst": 10000000.0}
+            nearest_camera = {"dst": 10000000.0}
+
+            nearby_speed_cameras, nearby_redlight_cameras, nearby_misc_cameras = nearby_traffic_cameras(current_location[0], current_location[1], loaded_traffic_camera_database, traffic_camera_alert_radius) # Get all traffic cameras within the configured radius.
+
+            if (camera_alert_types_speed == True): # Only process alerts for speed cameras if enabled in the configuration.
+                for camera in nearby_speed_cameras: # Iterate through all nearby speed cameras.
+                    if (camera["dst"] < nearest_speed_camera["dst"]): # Check to see if the distance to this camera is lower than the current closest camera.
+                        nearest_speed_camera = camera # Make the current camera the new closest camera.
+                for camera in nearby_redlight_cameras: # Iterate through all nearby redlight cameras.
+                    if (camera["dst"] < nearest_redlight_camera["dst"]): # Check to see if the distance to this camera is lower than the current closest camera.
+                        nearest_redlight_camera = camera # Make the current camera the new closest camera.
+                for camera in nearby_misc_cameras: # Iterate through all nearby miscellaneous cameras.
+                    if (camera["dst"] < nearest_misc_camera["dst"]): # Check to see if the distance to this camera is lower than the current closest camera.
+                        nearest_misc_camera = camera # Make the current camera the new closest camera.
+
+
+                if (nearest_speed_camera["dst"] < nearest_redlight_camera["dst"] and nearest_speed_camera["dst"] < nearest_misc_camera["dst"]): # Check to see if the nearest speed camera is closer than nearest of the other camera types
+                    nearest_camera = nearest_speed_camera # Set the overall nearest camera to the nearest speed camera.
+                elif (nearest_redlight_camera["dst"] < nearest_speed_camera["dst"] and nearest_redlight_camera["dst"] < nearest_misc_camera["dst"]): # Check to see if the nearest red-light camera is closer than nearest of the other camera types
+                    nearest_camera = nearest_redlight_camera # Set the overall nearest camera to the nearest red-light camera.
+                elif (nearest_misc_camera["dst"] < nearest_speed_camera["dst"] and nearest_misc_camera["dst"] < nearest_redlight_camera["dst"]): # Check to see if the nearest miscellaneous camera is closer than nearest of the other camera types
+                    nearest_camera = nearest_redlight_camera # Set the overall nearest camera to the nearest miscellaneous camera.
+                else:
+                    print(style.yellow + "Warning: Predator was unable to locate the nearest traffic camera. This condition should never occur, and there's almost certainly a bug in Predator." + style.end)
+
+
+                # Display and play alerts as necessary.
+
+
+                simulated_progress = simulated_progress + 1 # TODO REMOVE
+
+                if (nearest_camera["dst"] < (float(traffic_camera_alert_radius) * 0.1) or simulated_progress > 20): # Check to see if the nearest camera is within 10% of the traffic camera alert radius.
+                    # Update the status lighting to to indicate a camera alert.
+                    if (status_lighting_enabled == True): # Check to see if status lighting alerts are enabled in the Predator configuration.
+                        update_status_lighting("camera") # Run the function to update the status lighting.
+
+                    if (audio_alerts == True and int(alert_sounds_camera3_repeat) > 0): # Check to see if the user has audio alerts enabled.
+                        for i in range(0, int(alert_sounds_camera3_repeat)): # Repeat the sound several times, if the configuration says to.
+                            os.system("mpg321 " + alert_sounds_camera3 + " > /dev/null 2>&1 &") # Play the sound specified for this alert type in the configuration.
+                            time.sleep(float(alert_sounds_camera3_delay)) # Wait before playing the sound again.
+                    print(style.blue + style.bold)
+                    print("=====================")
+                    print("=====================")
+                    print("=====================")
+                    print("NEARBY TRAFFIC CAMERA")
+                    print("Proximity Level: 3")
+                    print("Distance: " + str(round((nearest_camera["dst"]*100)/100)) + " miles")
+                    if (nearest_camera["str"] != None):
+                        print("Street: " + str(nearest_camera["str"]))
+                    if (nearest_camera["spd"] != None):
+                        print("Speed: " + str(nearest_camera["spd"]))
+                    print("=====================")
+                    print("=====================")
+                    print("=====================")
+                    print(style.end + style.end)
+                elif (nearest_camera["dst"] < (float(traffic_camera_alert_radius) * 0.25) or simulated_progress > 10): # Check to see if the nearest camera is within 25% of the traffic camera alert radius.
+                    # Update the status lighting to to indicate a camera alert.
+                    if (status_lighting_enabled == True): # Check to see if status lighting alerts are enabled in the Predator configuration.
+                        update_status_lighting("camera") # Run the function to update the status lighting.
+
+                    if (audio_alerts == True and int(alert_sounds_camera2_repeat) > 0): # Check to see if the user has audio alerts enabled.
+                        for i in range(0, int(alert_sounds_camera2_repeat)): # Repeat the sound several times, if the configuration says to.
+                            os.system("mpg321 " + alert_sounds_camera2 + " > /dev/null 2>&1 &") # Play the sound specified for this alert type in the configuration.
+                            time.sleep(float(alert_sounds_camera2_delay)) # Wait before playing the sound again.
+                    print(style.blue + style.bold)
+                    print("=====================")
+                    print("=====================")
+                    print("NEARBY TRAFFIC CAMERA")
+                    print("Proximity Level: 2")
+                    print("Distance: " + str(round((nearest_camera["dst"]*100)/100)) + " miles")
+                    if (nearest_camera["str"] != None):
+                        print("Street: " + str(nearest_camera["str"]))
+                    if (nearest_camera["spd"] != None):
+                        print("Speed: " + str(nearest_camera["spd"]))
+                    print("=====================")
+                    print("=====================")
+                    print(style.end + style.end)
+                elif (nearest_camera["dst"] < (float(traffic_camera_alert_radius))): # Check to see if the nearest camera is within the traffic camera alert radius.
+                    # Update the status lighting to to indicate a camera alert.
+                    if (status_lighting_enabled == True): # Check to see if status lighting alerts are enabled in the Predator configuration.
+                        update_status_lighting("camera") # Run the function to update the status lighting.
+
+                    if (audio_alerts == True and int(alert_sounds_camera1_repeat) > 0): # Check to see if the user has audio alerts enabled.
+                        for i in range(0, int(alert_sounds_camera1_repeat)): # Repeat the sound several times, if the configuration says to.
+                            os.system("mpg321 " + alert_sounds_camera1 + " > /dev/null 2>&1 &") # Play the sound specified for this alert type in the configuration.
+                            time.sleep(float(alert_sounds_camera1_delay)) # Wait before playing the sound again.
+                    print(style.blue + style.bold)
+                    print("=====================")
+                    print("NEARBY TRAFFIC CAMERA")
+                    print("Proximity Level: 1")
+                    print("Distance: " + str(round((nearest_camera["dst"]*100)/100)) + " miles")
+                    if (nearest_camera["str"] != None):
+                        print("Street: " + str(nearest_camera["str"]))
+                    if (nearest_camera["spd"] != None):
+                        print("Speed: " + str(nearest_camera["spd"]))
+                    print("=====================")
+                    print(style.end + style.end)
+                    #TODO
+
+
+
 
         # If enabled, run object recognition on the captured frame.
         if (realtime_object_recognition == True and disable_object_recognition == False):
-            print("Running object recognition...")
+            if (realtime_output_level >= 3): # Only display this status message if the output level indicates to do so.
+                print("Running object recognition...")
             object_count = {} # Create an empty dictionary that will hold each frame and the object recognition counts.
             if (save_images_preference == True): # Check to see whether or not the user wants to save all images captured by Predator.
                 frame_path = root + "/realtime_image" + str(i) + ".jpg" # Set the file path of the current frame.
@@ -1331,19 +1488,22 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
             object_recognition_bounding_box, object_recognition_labels, object_recognition_confidence = cv.detect_common_objects(image) # Anaylze the image.
             objects_identified = str(object_recognition_labels) # Convert the list of objects identified into a plain string.
             if (objects_identified != "[]"): # Check to see that there were actually identified objects.
-                print("Objects identified: " + objects_identified)
+                if (realtime_output_level >= 2): # Only display this status message if the output level indicates to do so.
+                    print("Objects identified: " + objects_identified)
                 export_data = str(round(time.time())) + "," + objects_identified + "\n" # Add the timestamp to the export data, followed by the object's detected, followed by a line break to prepare for the next entry to be added later.
                 if (save_real_time_object_recognition == True): # Check to make sure the user has configured Predator to save recognized objects to disk.
                     add_to_file(root + "/real_time_object_detection.csv", export_data, silence_file_saving) # Add the export data to the end of the file and write it to disk.
                 
-            print("Done\n----------")
+            if (realtime_output_level >= 3): # Only display this status message if the output level indicates to do so.
+                print("Done\n----------")
 
 
 
 
         # Process information from the OpenALPR license plate analysis command.
 
-        print("Processing license plate recognition data...")
+        if (realtime_output_level >= 3): # Only display this status message if the output level indicates to do so.
+            print("Processing license plate recognition data...")
         if (len(all_current_plate_guesses) > 0): # Check to see if at least one license plate was actually detected.
             for individual_detected_plate in all_current_plate_guesses: # Iterate through each individual plate detected in the image frame.
                 successfully_found_plate = False # Reset the 'sucessfully_found_plate` variable to 'False'. This will be changed back if a valid plate is detected.
@@ -1372,7 +1532,8 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
                 if (successfully_found_plate == True): # Check to see if a valid plate was detected this round after the validation process ran.
                     detected_license_plates.append(detected_plate) # Save the most likely license plate ID to the detected_license_plates complete list.
                     new_plate_detected.append(detected_plate) # Save the most likely license plate ID to this round's new_plate_detected list.
-                    print("Detected plate: " + detected_plate) # Print the detected plate.
+                    if (realtime_output_level >= 2): # Only display this status message if the output level indicates to do so.
+                        print("Detected plate: " + detected_plate) # Print the detected plate.
 
                     if (audio_alerts == True and int(alert_sounds_notice_repeat) > 0): # Check to see if the user has audio alerts enabled.
                         for i in range(0, int(alert_sounds_notice_repeat)): # Repeat the sound several times, if the configuration says to.
@@ -1391,23 +1552,27 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
 
 
                 elif (successfully_found_plate == False): # A plate was found, but none of the guesses matched the formatting guidelines provided by the user.
-                    print("A plate was found, but none of the guesses matched the supplied plate format.\n----------")
+                    if (realtime_output_level >= 2): # Only display this status message if the output level indicates to do so.
+                        print("A plate was found, but none of the guesses matched the supplied plate format.\n----------")
 
                     if (shape_alerts == True):  # Check to see if the user has enabled shape notifications.
                         display_shape("circle") # Display an ASCII circle in the output.
 
 
         else: # No license plate was detected at all.
-            print("Done.")
+            if (realtime_output_level >= 3): # Only display this status message if the output level indicates to do so.
+                print("Done.")
 
 
-        print("----------") # Print a dividing line after processing license plate analysis data.
+        if (realtime_output_level >= 3): # Only display this status message if the output level indicates to do so.
+            print("----------") # Print a dividing line after processing license plate analysis data.
 
 
 
 
         # Check the plate(s) detected this around against the alert database, if necessary.
-        print("Checking license plate data against alert database...")
+        if (realtime_output_level >= 3): # Only display this status message if the output level indicates to do so.
+            print("Checking license plate data against alert database...")
         active_alert = False # Reset the alert status to false so we can check for alerts on the current plate (if one was detected) next.
         if (alerts_ignore_validation == True): # If the user has enabled alerts that ignore license plate validation, then check each of the OpenALPR guesses against the license plate alert database.
             if (len(all_current_plate_guesses) > 0): # Check to see that the all_current_plate_guesses variable isn't empty. This variable will only have entries if a plate was detected this round.
@@ -1418,11 +1583,12 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
                                 active_alert = True # If the plate does exist in the alert database, indicate that there is an active alert by changing this variable to True. This will reset on the next round.
 
                                 # Display an alert that is starkly different from the rest of the console output to make it stand out visually to the user.
-                                print(style.yellow + style.bold)
-                                print("===================")
-                                print("ALERT HIT - " + str(individual_detected_plate_guess))
-                                print("===================")
-                                print(style.end)
+                                if (realtime_output_level >= 1): # Only display this status message if the output level indicates to do so.
+                                    print(style.yellow + style.bold)
+                                    print("===================")
+                                    print("ALERT HIT - " + str(individual_detected_plate_guess))
+                                    print("===================")
+                                    print(style.end + style.end)
 
                                 if (shape_alerts == True):  # Check to see if the user has enabled shape notifications.
                                     display_shape("triangle") # Display an ASCII triangle in the output.
@@ -1445,12 +1611,13 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
                     if (fnmatch.fnmatch(each_new_plate_detected, alert_plate)): # Check to see the validated detected plate matches this particular plate in the alert database, taking wildcards into account.
                         active_alert = True # If the plate does exist in the alert database, indicate that there is an active alert by changing this variable to True. This will reset on the next round.
 
-                        # Display an alert that is starkly different from the rest of the console output.
-                        print(style.yellow + style.bold)
-                        print("===================")
-                        print("ALERT HIT - " + new_plate_detected)
-                        print("===================")
-                        print(style.end)
+                        if (realtime_output_level >= 1): # Only display this status message if the output level indicates to do so.
+                            # Display an alert that is starkly different from the rest of the console output.
+                            print(style.yellow + style.bold)
+                            print("===================")
+                            print("ALERT HIT - " + new_plate_detected)
+                            print("===================")
+                            print(style.end + style.end)
 
                         if (shape_alerts == True):  # Check to see if the user has enabled shape notifications.
                             display_shape("triangle") # Display an ASCII triangle in the output.
@@ -1465,12 +1632,14 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
 
                         if (push_notifications_enabled == True): # Check to see if the user has Gotify notifications enabled.
                             os.system("curl -X POST '" + gotify_server + "/message?token=" + gotify_application_token + "' -F 'title=Predator' -F 'message=A license plate in the alert database has been detected: " + detected_plate + "' > /dev/null 2>&1 &") # Send a push notification using Gotify.
-        print("Done.\n----------")
+        if (realtime_output_level >= 3): # Only display this status message if the output level indicates to do so.
+            print("Done.\n----------")
 
 
 
         # If enabled, submit data about each newly detected plate to a network server.
-        print("Submitting data to webhook...")
+        if (realtime_output_level >= 3): # Only display this status message if the output level indicates to do so.
+            print("Submitting data to webhook...")
         for each_new_plate_detected in new_plate_detected: # Iterate through each plate that was detected this round.
             if (webhook != None and webhook != ""): # Check to see if the user has specified a webhook to submit detected plates to.
                 url = webhook.replace("[L]", each_new_plate_detected) # Replace "[L]" with the license plate detected.
@@ -1484,14 +1653,16 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
 
                 if (str(webhook_response) != "200"): # If the webhook didn't respond with a 200 code; Warn the user that there was an error.
                     print(style.yellow + "Warning: Unable to submit data to webhook. Response code: " + str(webhook_response.getcode()) + style.end)
-        print("Done.\n----------")
+        if (realtime_output_level >= 3): # Only display this status message if the output level indicates to do so.
+            print("Done.\n----------")
 
 
 
 
 
         # If enabled, save the detected license plate (if any) to a file on disk.
-        print("Saving license plate data to disk...")
+        if (realtime_output_level >= 3): # Only display this status message if the output level indicates to do so.
+            print("Saving license plate data to disk...")
         if (save_license_plates_preference == True): # Check to see if the user has the 'save detected license plates' preference enabled.
             if (len(new_plate_detected) > 0): # Check to see if the new_plate_detected value is empty. If it is blank, that means no new plate was detected this round.
                 for each_new_plate_detected in new_plate_detected: # Iterate through each plate that was detected this round.
@@ -1500,7 +1671,8 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
                     else:
                         export_data = each_new_plate_detected + "," + str(round(time.time())) + ",false\n" # Add the individual plate to the export data, followed a timestamp, followed by a line break to prepare for the next plate to be added later.
                     add_to_file(root + "/real_time_plates.csv", export_data, silence_file_saving) # Add the export data to the end of the file and write it to disk.
-        print("Done.\n----------")
+        if (realtime_output_level >= 3): # Only display this status message if the output level indicates to do so.
+            print("Done.\n----------")
 
 
 

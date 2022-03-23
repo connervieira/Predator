@@ -5,7 +5,7 @@ This document contains the information you need to know to set up and use Predat
 
 ## Installation
 
-This is the installation process for Predator and all of it's dependencies.
+This is the installation process for Predator and all of it's dependencies. This process is written assuming you're running a distribution of GNU/Linux, but it's theoretically possible to get Predator to function on MacOS as well.
 
 1. Install OpenALPR
     - Since Predator depends on OpenALPR as the core of its license plate recognition, you'll need to install it for it to work properly.
@@ -14,19 +14,19 @@ This is the installation process for Predator and all of it's dependencies.
 2. Install FFMPEG
     - Predator uses FFMPEG to process videos.
     - You can install FFMPEG using the following command on a Debian based Linux machine: `sudo apt-get install ffmpeg`
-3. Install ImageMagick
-    - Predator uses ImageMagick to manipulate still frames of video.
-    - You can learn about the ImageMagick installation process at <https://imagemagick.org/script/download.php>
-4. Install FSWebcam
+3. Install FSWebcam
     - Predator uses FSWebcam to access cameras when using real-time mode and dash-cam mode.
     - You can install FSWebcam using the following command on a Debian based Linux machine: `sudo apt-get install fswebcam`
+4. Install ImageMagick
+    - Predator uses ImageMagick to manipulate still frames of video.
+    - You can learn about the ImageMagick installation process at <https://imagemagick.org/script/download.php>
 5. Install the required Python packages.
     - `pip3 install validators opencv-python-headless==4.5.3.56 cvlib tensorflow keras silence-tensorflow psutil`
     - When tested on a Raspberry Pi 3, this step caused some issues. If you receive errors related to OpenCV when attempting to run Predator later, try uninstalling OpenCV Headless and replace it with the standard OpenCV library.
         - `pip3 uninstall opencv-python-headless; pip3 install opencv-python`
 6. Install the `mpg321` package.
-    - Predator requires mpg321 in order to play audio effects for alerts.
-    - `sudo apt-get install mpg321`
+    - Predator requires MPG321 in order to play audio effects for alerts.
+    - You can install MPG321 using the following command on a Debian based Linux machine: `sudo apt-get install mpg321`
 7. Optionally, install software to remotely manage Predator.
     - If you're installing Predator on a Raspberry Pi, you may find it useful to install a program like [RaspAP](https://github.com/RaspAP/raspap-webgui) in order to remotely manage your Predator instance, and eliminate the need for a full keyboard and display.
     - Predator works entirely via command line, meaning any set up that enables SSH access to the host will allow for remote management of Predator.
@@ -46,7 +46,7 @@ After installing Predator, you should do some quick configuration in order to ge
 1. Open the Predator configuration
     - Open the `config.json` file in the Predator folder using your text editor of choice.
 2. Make configuration changes
-    - All configuration values are explained extensively in the CONFIGURING.md document.
+    - All configuration values are explained extensively in the [CONFIGURATION.md](CONFIGURATION.md) document.
     - Make changes to any of the configuration values to better fit your usage context.
 3. Depending on the platform, Predator might not be able to locate the `config.json` file. If you encounter issues during the steps described in the "Usage" section, you may need to manually set Predator's directory in `main.py`
     - At the top of the `main.py` and `lighting.py` scripts, you should see a variable titled `predator_root_directory`. By default, a Python function is used to find the current directory of the script.
@@ -71,7 +71,7 @@ After configuring Predator, you can try it out for the first time!
 2. Select a mode
     - Predator can operate in 4 possible modes.
         - Management mode (Mode 0)
-            - This mode isn't a main operating mode for Predator, and simply exists for doing basic management tasks.
+            - This mode isn't a main operating mode for Predator, and simply exists for doing management tasks.
             - In situations where Predator is hard-installed, like in a vehicle or security system, this mode makes it easy to clear folders, copy files, and maintain Predator without having to remove the central processor.
         - Pre-recorded mode (Mode 1)
             - In this mode, Predator will analyze a pre-recorded video clip that you provide. This video can be in any format supported by FFMPEG.
@@ -128,6 +128,9 @@ After configuring Predator, you can try it out for the first time!
             - This value can be set to any alphanumeric string. For example, if all the plates in your state have 3 letters followed by 4 numbers, you could set this value to "AAA0000" or "ABC1234". Both values will work the exact same way.
             - For sake of simplicity, you can also just enter the license plate of another car in your state or region. Since Predator only looks to see whether a character is a number or letter, not the character itself, "EGY4011" will act identically to "AAA0000".
             - If you leave this setting blank, plate format validation will be disabled, and Predator will display/record every license plate it detects, regardless of formatting.
+        - Next, you'll be asked if you want to enable real-time object detection.
+            - Unless you have a good reason to enable this, it's generally advised to leave it disabled, since it can dramatically slow down Predator's processing speed.
+            - When this is enabled, Predator will search each image it takes for common objects, like cars, pedestrians, traffic signals, etc.
     - Dash-cam mode:
         - In dash-cam mode, you'll only be asked for a root project directory. Simply create an empty folder, and specify it's full absolute path here.
             - Example: `/home/cvieira/Downloads/MyProjectFolder`

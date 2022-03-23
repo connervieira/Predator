@@ -58,6 +58,12 @@ Configuration values in this section are settings specific to pre-recorded mode.
 
 Configuration values in this section are settings specific to real-time mode.
 
+- `realtime_output_level`
+    - This setting determines how much information Predator prints to the console while operating in real-time mode.
+    - This setting has 3 different options.
+        - Level "1": Only alerts are displayed.
+        - Level "2": Only detections and other important events are displayed.
+        - Level "3": All messages are displayed.
 - `clear_between_rounds`
     - This setting determines whether or not Predator will clear the output screen between analysis rounds during real-time mode.
 - `delay_between_rounds`
@@ -207,6 +213,31 @@ In order to better integrate with an existing system, Predator can communicate w
         - The "alert" status is used when Predator detects a license plate in an alert database.
         - The "notice" status is used when Predator detects any valid license plate.
         - The "normal" status is used when Predator is running, and hasn't detected any license plates in the past processing cycle.
+
+
+### Real-time Mode Traffic Camera Alert Settings
+
+Predator can notify the user when a speed or red-light camera is nearby, based on GPS data an an ExCam database.
+
+- `traffic_camera_alerts_enabled`
+    - This configuration value determines whether or not traffic camera alerts are enabled.
+    - When this is set to `true`, Predator will use information from the following traffic camera alert settings in order to notify the user of nearby traffic cameras.
+- `camera_alert_types`
+    - This configuration value determines which camera types Predator will consider when displaying alerts to the user. All of the values under this setting should be set to a boolean value indicating whether or not alerts should be shown for each respective camera type.
+    - There are currently 3 types of cameras.
+        - `speed` includes both radar and average speed enforcement cameras.
+        - `redlight` includes traffic light enforcement cameras.
+        - `misc` includes all traffic cameras that don't fall into the other two categories. 
+- `traffic_camera_alert_radius`
+    - This configuration value determines the distance, in miles, at which Predator will alert the user of a speed camera.
+- `traffic_camera_database`
+    - This is a file path pointing to a database of traffic cameras.
+    - The database should be in ExCam format.
+        - For legal reasons, Predator doesn't come packaged with the database. Please review your local laws before installing a speed and red-light camera database.
+- `traffic_camera_loaded_radius`
+    - This is the radius, in miles, that Predator will load traffic cameras from during the initial loading process.
+    - For example, if this value is set to `100`, then Predator will only load traffic cameras in a 100 mile radius from the current location when it boots. If you travel more than 100 miles away from your original location without reloading Predator then you won't get traffic camera alerts.
+    - If you're running Predator on a high performance processor, you can comfortable set this to a very high number, which could be useful on long road trips where you might not restart Predator for hundreds of miles at a time. However, if you're running Predator on a low powered device, like a Raspberry Pi, you should reduce this radius to make Predator faster at checking traffic camera proximity when running in real-time mode.
 
 
 

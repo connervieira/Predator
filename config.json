@@ -20,7 +20,8 @@
         "bottom_margin": "300"
     },
     "realtime": {
-        "clear_between_rounds": false,
+        "realtime_output_level": "2",
+        "clear_between_rounds": true,
         "delay_between_rounds": "0.2",
         "print_invalid_plates": false,
         "print_detected_plate_count": false,
@@ -35,7 +36,7 @@
         "real_time_image_rotation": "0",
         "fswebcam_device": "/dev/video0",
         "fswebcam_flags": "--set brightness=70%",
-        "audio_alerts": false,
+        "audio_alerts": true,
         "startup_sound": {
             "path": "./assets/sounds/testnoise.mp3",
             "repeat": "1",
@@ -51,24 +52,49 @@
             "repeat": "1",
             "delay": "0.3"
         },
+        "camera1_sound": {
+            "path": "./assets/sounds/camera1.mp3",
+            "repeat": "1",
+            "delay": "0.3"
+        },
+        "camera2_sound": {
+            "path": "./assets/sounds/camera2.mp3",
+            "repeat": "1",
+            "delay": "0.3"
+        },
+        "camera3_sound": {
+            "path": "./assets/sounds/camera3.mp3",
+            "repeat": "1",
+            "delay": "0.3"
+        },
         "webhook": "",
         "shape_alerts": false,
         "save_real_time_object_recognition": true,
         "default_alert_database": "",
         "default_save_license_plates_preference": "",
         "default_save_images_preference": "",
-        "default_license_plate_format": "",
+        "default_license_plate_format": "aaa0000",
         "default_realtime_object_recognition": "",
         "push_notifications_enabled": false,
         "gotify_server": "",
         "gotify_application_token": "",
-        "status_lighting_enabled": false,
-        "status_lighting_base_url": "http://4.3.2.1/win&A=255",
+        "status_lighting_enabled": true,
+        "status_lighting_base_url": "http://predatorwled.local/win&A=255",
         "status_lighting_values": {
             "alert": "[U]&R=255&G=0&B=0",
-            "warning": "[U]R=255&G=150&B=0",
-            "normal": "[U]R=0&G=255&B=0"
-        }
+            "warning": "[U]&R=255&G=255&B=0",
+            "normal": "[U]&R=0&G=255&B=0",
+            "camera": "[U]&R=0&G=0&B=255"
+        },
+        "traffic_camera_alerts_enabled": true,
+        "camera_alert_types": {
+            "speed": true,
+            "redlight": true,
+            "misc": true
+        },
+        "traffic_camera_alert_radius": "10",
+        "traffic_camera_database": "/home/cvieira/Downloads/camera_database.excam",
+        "traffic_camera_loaded_radius": "500"
     },
     "dashcam": {
         "dashcam_resolution": "720x480",

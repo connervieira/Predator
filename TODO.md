@@ -43,5 +43,6 @@ These are the features actively planned for Predator and are likely to be added 
 
 These are features that require more in-depth changes, and are purely hypothetical.
 
-- [ ] The ability to process multiple sequential videos at once.
+- [ ] The ability to interface with GPS data in order to provide new features and functionality.
+- [ ] The ability to process multiple videos sequentially in pre-recorded mode.
 - [ ] A GUI front-end in addition to the existing command line interface.

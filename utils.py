@@ -26,6 +26,11 @@ import datetime # Required for converting between timestamps and human readable 
 from xml.dom import minidom # Required for processing GPX data
 import json # Required to pretty-print dictionaries
 import fnmatch # Required to use wildcards to check strings
+import lzma # Required to load ExCam database
+import math # Required to run more complex math calculations
+from geopy.distance import great_circle # Required to calculate distance between locations.
+
+
 
 
 # This function will be used to process GPX files into a Python dictionary.
@@ -231,8 +236,64 @@ class style:
     end = '\033[0m'
 
 
+
+
 # Define a function for running a countdown timer.
 def countdown(timer):
     for iteration in range(1, timer + 1): # Loop however many times specified by the `timer` variable.
         print(str(timer - iteration + 1)) # Display the current countdown number for this iteration, but subtracting the current iteration count from the total timer length.
         time.sleep(1) # Wait for 1 second.
+
+
+
+
+
+
+# Define the function that will be used to get the current GPS coordinates.
+def get_gps_location(): # Placeholder that should be updated at a later date. TODO
+    return 41.4919, -81.6941
+
+
+
+
+# Define a simple function to calculate the approximate distance between two points.
+def get_distance(lat1, lon1, lat2, lon2):
+    return great_circle((lat1, lon1), (lat2, lon2)).miles
+
+
+
+
+
+# Define the function that will be used to get nearby speed, red light, and traffic cameras.
+def load_traffic_cameras(current_lat, current_lon, database_file, radius):
+    with lzma.open(database_file, "rt", encoding="utf-8") as f: # Open the database file.
+        database_lines = list(map(json.loads, f)) # Load the camera database
+        loaded_database_information = [] # Load an empty placeholder database so we can write data to it later.
+        
+        for camera in database_lines: # Iterate through each camera in the database.
+            if ("lat" in camera and "lon" in camera): # Only check this camera if it has a latitude and longitude defined in the database.
+                if (get_distance(current_lat, current_lon, camera['lat'], camera['lon']) < float(radius)): # Check to see if this camera is inside the initial loading radius.
+                    loaded_database_information.append(camera)
+
+    return loaded_database_information # Return the newly edited database information.
+
+
+
+
+def nearby_traffic_cameras(current_lat, current_lon, database_information, radius=1.0):
+    nearby_speed_cameras = []
+    nearby_redlight_cameras = []
+    nearby_misc_cameras = []
+    for camera in database_information: # Iterate through each camera in the loaded database.
+        current_distance = get_distance(current_lat, current_lon, camera['lat'], camera['lon'])
+        if (current_distance < float(radius)): # Only show the camera if it's within a certain radius of the current location.
+            camera["dst"] = current_distance # Save the current distance from this camera to it's data before adding it to the list of nearby speed cameras.
+            if (camera["flg"] == 0 or camera["flg"] == 2 or camera["flg"] == 3): # Check to see if this particular camera is speed related.
+                nearby_speed_cameras.append(camera) # Add this camera to the "nearby speed camera" list.
+            elif (camera["flg"] == 1): # Check to see if this particular camera is red-light related.
+                nearby_redlight_cameras.append(camera) # Add this camera to the "nearby red light camera" list.
+            else:
+                nearby_misc_cameras.append(camera) # Add this camera to the "nearby general traffic camera" list.
+
+    return nearby_speed_cameras, nearby_redlight_cameras, nearby_misc_cameras
+
