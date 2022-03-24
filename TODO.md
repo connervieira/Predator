@@ -37,12 +37,12 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Add more configuration values to better refine Predator's functionality.
 - [X] Add the ability to configure custom alert sounds.
 - [X] Add the ability for Predator to detect multiple license plates per frame in real-time mode.
+- [ ] The ability to interface with GPS data in order to provide new features and functionality.
 
 
 # Hypothetical
 
 These are features that require more in-depth changes, and are purely hypothetical.
 
-- [ ] The ability to interface with GPS data in order to provide new features and functionality.
 - [ ] The ability to process multiple videos sequentially in pre-recorded mode.
 - [ ] A GUI front-end in addition to the existing command line interface.

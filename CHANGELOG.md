@@ -132,7 +132,7 @@ March 1st, 2022
 
 ### Management Update
 
-This update adds "Management Mode", and improves the efficiency and organization of various user interfaces.
+This update adds "Management Mode", and improves the efficiency and organization of various user interfaces. This update also new functionality and several new features.
 
 *Release date: To be determined*
 
@@ -164,6 +164,7 @@ This update adds "Management Mode", and improves the efficiency and organization
     - Multiple camera devices can now be used during background realtime mode dashcam recording.
     - Dashcam recording can now be halted through Predator, without having to terminate Predator.
 - Added several new configuration values.
+    - The `realtime_output_level` setting changes how much information Predator prints to the console when operating in real-time mode.
     - The `clear_between_rounds` setting changes whether or not the output screen is cleared between rounds while running in the real-time mode loop.
     - The `delay_between_rounds` setting allows the user to define how long Predator will wait in between analysis rounds.
     - The `alerts_ignore_validation` setting allows alerts to override the license plate validation formatting guideline.
@@ -181,3 +182,6 @@ This update adds "Management Mode", and improves the efficiency and organization
 - Added the ability to detect and process multiple license per frame in real-time mode.
     - Added the `print_detected_plate_count` configuration value to allow the user to change whether or not Predator will display the count of how many license plates it detectes each round.
     - This makes Predator significantly more efficient by increasing the amount of plates that can be detected per processing cycle, without significantly increasing the time required to process each cycle.
+- Added the ability to alert to nearby speed cameras, red light cameras, and other traffic cameras while operating in real-time mode.
+    - Several configuration values were add to support this feature, including new sound effects.
+- Adjusted the wording of some prompts to better mesh with the over all structure of the user interface.

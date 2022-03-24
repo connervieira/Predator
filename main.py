@@ -1202,7 +1202,7 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
             if (default_realtime_object_recognition != ""):
                 realtime_object_recognition = default_realtime_object_recognition
         else:
-            realtime_object_recognition = input("Would you like to enable real-time object recognition? (y/n): ")
+            realtime_object_recognition = input("Enable real-time object recognition? (y/n): ")
 
 
     # Save yes/no preferences as boolean values for easier access.
