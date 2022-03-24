@@ -21,7 +21,7 @@ This is the installation process for Predator and all of it's dependencies. This
     - Predator uses ImageMagick to manipulate still frames of video.
     - You can learn about the ImageMagick installation process at <https://imagemagick.org/script/download.php>
 5. Install the required Python packages.
-    - `pip3 install validators opencv-python-headless==4.5.3.56 cvlib tensorflow keras silence-tensorflow psutil`
+    - `pip3 install validators opencv-python-headless==4.5.3.56 cvlib tensorflow keras silence-tensorflow psutil gps geopy`
     - When tested on a Raspberry Pi 3, this step caused some issues. If you receive errors related to OpenCV when attempting to run Predator later, try uninstalling OpenCV Headless and replace it with the standard OpenCV library.
         - `pip3 uninstall opencv-python-headless; pip3 install opencv-python`
 6. Install the `mpg321` package.
