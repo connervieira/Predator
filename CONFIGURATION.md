@@ -113,11 +113,14 @@ Configuration values in this section are settings specific to real-time mode.
 - `audio_alerts`
     - This setting determines whether or not Predator will make use of audible alerts.
     - With this is set to `true`, Predator will play subtle alert noises when a plate is detected, and much more prominent noises when a plate in an alert database is detected.
-- `startup_sound`, `notification_sound`, `alert_sound`
+- `startup_sound`, `notification_sound`, `alert_sound`, `camera1_sound`, `camera2_sound`, `camera3_sound`
     - These are the audio sound effects played when `audio_alerts` is enabled.
         - `startup_sound` is the sound played just after Predator finishes loading.
         - `notification_sound` is the sound played when a valid plate is detected in real-time mode, and the plate is not in an alert database.
         - `alert_sound` is the sound played when a valid plate is detected, and the plate is in an alert database.
+        - `camera1_sound` is the sound played to alert the user of a traffic camera (speed/red-light camera) detected at a far distance.
+        - `camera2_sound` is the sound played to alert the user of a traffic camera (speed/red-light camera) detected at a moderate distance.
+        - `camera3_sound` is the sound played to alert the user of a traffic camera (speed/red-light camera) detected at a critically near distance.
     - The `path` value should be set to the file path of the audio file you want to play.
     - The `repeat` value should be set to how many times you want the sound effect to be repeated.
         - Under normal circumstances, this value should just be "1", but there might be some cases in which you want to play a particular sound repeatedly.
