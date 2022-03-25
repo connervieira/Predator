@@ -290,11 +290,11 @@ def get_gps_location(): # Placeholder that should be updated at a later date.
         try: # Don't terminate the entire script if the GPS location fails to be aquired.
             gpsd.connect() # Connect to the GPS daemon.
             gps_data_packet = gpsd.get_current() # Get the current information.
-            return gps_data_packet.position()[0], gps_data_packet.position()[1] # Return the longitude and latitude.
+            return gps_data_packet.position()[0], gps_data_packet.position()[1], gps_data_packet.speed(), gps_data_packet.altitude() # Return the longitude and latitude.
         except: # If the current location can't be established, then return placeholder location data.
-            return 0.0000, 0.0000 # Return a default placeholder location.
+            return 0.0000, 0.0000, 0.0, 0.0 # Return a default placeholder location.
     else: # If GPS is disabled, then this function should never be called, but return a placeholder position regardless.
-        return 0.0000, 0.0000 # Return a default placeholder location.
+        return 0.0000, 0.0000, 0.0, 0.0 # Return a default placeholder location.
 
 
 

@@ -179,6 +179,8 @@ dashcam_background_mode_realtime = config["dashcam"]["dashcam_background_mode_re
 
 
 
+print(get_gps_location())
+input()
 
 
 

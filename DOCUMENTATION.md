@@ -27,9 +27,10 @@ This is the installation process for Predator and all of it's dependencies. This
 6. Install the `mpg321` package.
     - Predator requires MPG321 in order to play audio effects for alerts.
     - You can install MPG321 using the following command on a Debian based Linux machine: `sudo apt-get install mpg321`
-7. Install `GPSD`
+7. Optionally, install `GPSD`
     - GPSD is required in order to handle GPS data.
     - You can install GPSD using this command on a Debian based Linux machine: `sudo apt-get install gpsd gpsd-clients`
+    - It may also be necessary to start GPSD.
 8. Optionally, install software to remotely manage Predator.
     - If you're installing Predator on a Raspberry Pi, you may find it useful to install a program like [RaspAP](https://github.com/RaspAP/raspap-webgui) in order to remotely manage your Predator instance, and eliminate the need for a full keyboard and display.
     - Predator works entirely via command line, meaning any set up that enables SSH access to the host will allow for remote management of Predator.
