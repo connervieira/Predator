@@ -24,13 +24,13 @@ This is the installation process for Predator and all of it's dependencies. This
     - `pip3 install validators opencv-python-headless==4.5.3.56 cvlib tensorflow keras silence-tensorflow psutil gps geopy gpsd-py3`
     - When tested on a Raspberry Pi 3, this step caused some issues. If you receive errors related to OpenCV when attempting to run Predator later, try uninstalling OpenCV Headless and replace it with the standard OpenCV library.
         - `pip3 uninstall opencv-python-headless; pip3 install opencv-python`
-6. Install the `mpg321` package.
+6. Optionally, install the `mpg321` package.
     - Predator requires MPG321 in order to play audio effects for alerts.
     - You can install MPG321 using the following command on a Debian based Linux machine: `sudo apt-get install mpg321`
 7. Optionally, install `GPSD`
-    - GPSD is required in order to handle GPS data.
+    - GPSD is required for Predator to receive GPS data.
     - You can install GPSD using this command on a Debian based Linux machine: `sudo apt-get install gpsd gpsd-clients`
-    - It may also be necessary to start GPSD.
+    - It may also be necessary to start GPSD. You can test to see if GPSD is working properly using the `cgps` command.
 8. Optionally, install software to remotely manage Predator.
     - If you're installing Predator on a Raspberry Pi, you may find it useful to install a program like [RaspAP](https://github.com/RaspAP/raspap-webgui) in order to remotely manage your Predator instance, and eliminate the need for a full keyboard and display.
     - Predator works entirely via command line, meaning any set up that enables SSH access to the host will allow for remote management of Predator.
@@ -52,7 +52,8 @@ After installing Predator, you should do some quick configuration in order to ge
 2. Make configuration changes
     - All configuration values are explained extensively in the [CONFIGURATION.md](CONFIGURATION.md) document.
     - Make changes to any of the configuration values to better fit your usage context.
-3. Depending on the platform, Predator might not be able to locate the `config.json` file. If you encounter issues during the steps described in the "Usage" section, you may need to manually set Predator's directory.
+    - This step is very open-ended. Depending on your situation, you may leave the configuration almost untouched, while other situations might involve intensive changes.
+3. Depending on the platform, Predator might not be able to locate the `config.json` file. If you encounter issues during the steps described in the "Usage" section, you may need to manually set Predator's directory. Under normal circumstances, this shouldn't be necessary.
     - At the top of the `main.py`, `utils.py`, and `lighting.py` scripts, you should see a variable titled `predator_root_directory`. By default, a Python function is used to find the current directory of the script.
     - If you receive errors related to missing configuration files when trying to run Predator, try setting this variable to a static file path.
     - Example:
