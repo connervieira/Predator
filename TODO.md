@@ -37,7 +37,8 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Add more configuration values to better refine Predator's functionality.
 - [X] Add the ability to configure custom alert sounds.
 - [X] Add the ability for Predator to detect multiple license plates per frame in real-time mode.
-- [ ] The ability to interface with GPS data in order to provide new features and functionality.
+- [X] The ability to interface with GPS data in order to provide new features and functionality.
+- [X] Add a shape alert for traffic cameras.
 
 
 # Hypothetical

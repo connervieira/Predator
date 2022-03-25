@@ -13,9 +13,6 @@
 
 
 
-simulated_progress = 0 # TODO REMOVE
-
-
 print("Loading Predator...")
 
 
@@ -123,6 +120,7 @@ audio_alerts = config["realtime"]["audio_alerts"] # This setting determines whet
 webhook = config["realtime"]["webhook"] # This setting can be used to define a webhook that Predator will send a request to when it detects a license plate in real-time mode. See CONFIGURATION.md to learn more about how to use flags in this setting.
 shape_alerts = config["realtime"]["shape_alerts"] # This setting determines whether or not prominent text-based shapes will be displayed for various actions. This is useful in vehicle installations where you may want to see whether or not Predator detected a plate at a glance.
 save_real_time_object_recognition = config["realtime"]["save_real_time_object_recognition"] # This setting determines whether or not Predator will save the objects detected in real-time mode to a file. When this is turned off, object recognition data will only be printed to the console.
+gps_enabled = config["realtime"]["gps_enabled"] # This setting determines whether or not Predator's GPS features are enabled.
 
 # Default settings
 default_alert_database = config["realtime"]["default_alert_database"] # If this variable isn't empty, the "alert database" prompt will be skipped when starting in real-time mode. This variable will be used as the alert database. Add a single space to skip this prompt without specifying a database.
@@ -179,13 +177,17 @@ dashcam_device = config["dashcam"]["dashcam_device"] # This setting defines what
 dashcam_background_mode_realtime = config["dashcam"]["dashcam_background_mode_realtime"] # This setting determines whether dash-cam recording will automatically start in background mode when user runs real-time mode. It should be noted that running dash-cam recording and real-time mode simutaneously is only possible with two cameras connected, since the same camera device can't be used for both processes.
 
 
+
+
+
+
+
 # Load the traffic camera database, if enabled.
 if (traffic_camera_alerts_enabled == True): # Check to see if traffic camera alerts are enabled.
     loaded_traffic_camera_database = load_traffic_cameras(get_gps_location()[0], get_gps_location()[1], traffic_camera_database, traffic_camera_loaded_radius) # Load all traffic cameras within the configured loading radius.
 
     #current_location = get_gps_location() # Get the current location.
     #nearby_traffic_cameras(current_location[0], current_location[1], loaded_traffic_camera_database, traffic_camera_alert_radius) # Get all traffic cameras within the configured radius.
-
 
 
 
@@ -1395,15 +1397,14 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
                 elif (nearest_misc_camera["dst"] < nearest_speed_camera["dst"] and nearest_misc_camera["dst"] < nearest_redlight_camera["dst"]): # Check to see if the nearest miscellaneous camera is closer than nearest of the other camera types
                     nearest_camera = nearest_redlight_camera # Set the overall nearest camera to the nearest miscellaneous camera.
                 else:
-                    print(style.yellow + "Warning: Predator was unable to locate the nearest traffic camera. This condition should never occur, and there's almost certainly a bug in Predator." + style.end)
+                    pass
 
 
                 # Display and play alerts as necessary.
 
 
-                simulated_progress = simulated_progress + 1 # TODO REMOVE
 
-                if (nearest_camera["dst"] < (float(traffic_camera_alert_radius) * 0.1) or simulated_progress > 20): # Check to see if the nearest camera is within 10% of the traffic camera alert radius.
+                if (nearest_camera["dst"] < (float(traffic_camera_alert_radius) * 0.1)): # Check to see if the nearest camera is within 10% of the traffic camera alert radius.
                     # Update the status lighting to to indicate a camera alert.
                     if (status_lighting_enabled == True): # Check to see if status lighting alerts are enabled in the Predator configuration.
                         update_status_lighting("camera") # Run the function to update the status lighting.
@@ -1412,6 +1413,8 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
                         for i in range(0, int(alert_sounds_camera3_repeat)): # Repeat the sound several times, if the configuration says to.
                             os.system("mpg321 " + alert_sounds_camera3 + " > /dev/null 2>&1 &") # Play the sound specified for this alert type in the configuration.
                             time.sleep(float(alert_sounds_camera3_delay)) # Wait before playing the sound again.
+                    if (shape_alerts == True):  # Check to see if the user has enabled shape notifications.
+                        display_shape("cross") # Display an ASCII cross in the output.
                     print(style.blue + style.bold)
                     print("=====================")
                     print("=====================")
@@ -1427,7 +1430,7 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
                     print("=====================")
                     print("=====================")
                     print(style.end + style.end)
-                elif (nearest_camera["dst"] < (float(traffic_camera_alert_radius) * 0.25) or simulated_progress > 10): # Check to see if the nearest camera is within 25% of the traffic camera alert radius.
+                elif (nearest_camera["dst"] < (float(traffic_camera_alert_radius) * 0.25)): # Check to see if the nearest camera is within 25% of the traffic camera alert radius.
                     # Update the status lighting to to indicate a camera alert.
                     if (status_lighting_enabled == True): # Check to see if status lighting alerts are enabled in the Predator configuration.
                         update_status_lighting("camera") # Run the function to update the status lighting.
@@ -1436,6 +1439,8 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
                         for i in range(0, int(alert_sounds_camera2_repeat)): # Repeat the sound several times, if the configuration says to.
                             os.system("mpg321 " + alert_sounds_camera2 + " > /dev/null 2>&1 &") # Play the sound specified for this alert type in the configuration.
                             time.sleep(float(alert_sounds_camera2_delay)) # Wait before playing the sound again.
+                    if (shape_alerts == True):  # Check to see if the user has enabled shape notifications.
+                        display_shape("cross") # Display an ASCII cross in the output.
                     print(style.blue + style.bold)
                     print("=====================")
                     print("=====================")
@@ -1458,6 +1463,8 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
                         for i in range(0, int(alert_sounds_camera1_repeat)): # Repeat the sound several times, if the configuration says to.
                             os.system("mpg321 " + alert_sounds_camera1 + " > /dev/null 2>&1 &") # Play the sound specified for this alert type in the configuration.
                             time.sleep(float(alert_sounds_camera1_delay)) # Wait before playing the sound again.
+                    if (shape_alerts == True):  # Check to see if the user has enabled shape notifications.
+                        display_shape("cross") # Display an ASCII cross in the output.
                     print(style.blue + style.bold)
                     print("=====================")
                     print("NEARBY TRAFFIC CAMERA")
@@ -1469,7 +1476,6 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
                         print("Speed: " + str(nearest_camera["spd"]))
                     print("=====================")
                     print(style.end + style.end)
-                    #TODO
 
 
 
@@ -1706,7 +1712,7 @@ elif (mode_selection == "3" and dashcam_mode_enabled == True): # The user has se
     dashcam_process = [] # Create a placeholder list to store the dashcam processes.
     iteration_counter = 0 # Set the iteration counter to 0 so that we can increment it for each recording device specified.
     for device in dashcam_device: # Run through each camera device specified in the configuration, and launch an FFMPEG recording instance for it.
-        dashcam_process.append(subprocess.Popen(["ffmpeg", "-y", "-nostdin", "-loglevel" , "error", "-f", "v4l2", "-framerate", dashcam_frame_rate, "-video_size", dashcam_resolution, "-input_format", "mjpeg", "-i",  dashcam_device[device], root + "/predator_dashcam_" + str(int(time.time())) + "_camera" + str(iteration_counter) + ".mkv"], shell=False))
+        dashcam_process.append(subprocess.Popen(["ffmpeg", "-y", "-nostdin", "-loglevel" , "error", "-f", "v4l2", "-framerate", dashcam_frame_rate, "-video_size", dashcam_resolution, "-input_format", "mjpeg", "-i",  dashcam_device[device], root + "/predator_dashcam_" + str(int(time.time())) + "_" + str(device) + ".mkv"], shell=False))
         iteration_counter = iteration_counter + 1 # Iterate the counter. This value will be used to create unique file names for each recorded video.
         print("Started recording on " + str(dashcam_device[device])) # Inform the user that recording was initiation for this camera device.
 

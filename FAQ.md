@@ -2,19 +2,19 @@
 
 This document contains a series of questions you may have concerning Predator.
 
-**What is Predator?**
+**What exactly is Predator?**
 
-    In short, Predator is a utility for detecting license plates, both in real-time, and by scanning a pre-recorded video. Predator is also capable of general object recognition, and can identify objects like vehicles, traffic lights, pedestrians, and dozens of others.
+    In short, Predator is an advanced utility designed primarily to be a vehicle-based camera system with a focus on license plate reading. Predator is also capable of general object recognition, and can identify objects like vehicles, traffic lights, pedestrians, and dozens of others. Depending on it's configuration, Predator can also interface with a GPS in order to provide real-time speed/red-light camera alerts.
 
 
 **How do I install Predator?**
 
-    For installation and setup instructions, check tte DOCUMENTATION.md document.
+    For installation and setup instructions, check the DOCUMENTATION.md document.
 
 
 **I have a problem with Predator and I need help.**
 
-    If you're encountering an issue with Predator, first ensure that you've followed all of the steps described in the `DOCUMENTATION.md` document for setting up Predator. If your issue persists, try to work out its source. The majority of Predator issues can be traced back to one of it's dependencies not working properly. Check that OpenALPR, FSWebcam, and FFMPEG are all working properly. If you still can't resolve your issue, contact V0LT support using the information found at <https://v0lttech.com/contact.php>. From there, you can find various contact methods for V0LT, including instant messaging over Matrix, and email with optional PGP encryption.
+    If you're encountering an issue with Predator, first ensure that you've followed all of the steps described in the `DOCUMENTATION.md` document for setting up Predator. If your issue persists, try to work out its source by checking individual potential points of failure. The majority of Predator issues can be traced back to one of it's dependencies not working properly. Check that OpenALPR, FSWebcam, FFMPEG, and GPSD are all working properly. If you still can't resolve your issue, contact V0LT support using the information found at <https://v0lttech.com/contact.php>. From there, you can find various contact methods for V0LT, including instant messaging over Matrix, and email with optional PGP encryption.
 
 
 **Who is Predator designed for?**

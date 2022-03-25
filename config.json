@@ -21,7 +21,7 @@
     },
     "realtime": {
         "realtime_output_level": "2",
-        "clear_between_rounds": true,
+        "clear_between_rounds": false,
         "delay_between_rounds": "0.2",
         "print_invalid_plates": false,
         "print_detected_plate_count": false,
@@ -36,6 +36,7 @@
         "real_time_image_rotation": "0",
         "fswebcam_device": "/dev/video0",
         "fswebcam_flags": "--set brightness=70%",
+        "gps_enabled": true,
         "audio_alerts": true,
         "startup_sound": {
             "path": "./assets/sounds/testnoise.mp3",
@@ -73,7 +74,7 @@
         "default_alert_database": "",
         "default_save_license_plates_preference": "",
         "default_save_images_preference": "",
-        "default_license_plate_format": "aaa0000",
+        "default_license_plate_format": "",
         "default_realtime_object_recognition": "",
         "push_notifications_enabled": false,
         "gotify_server": "",
@@ -82,7 +83,7 @@
         "status_lighting_base_url": "http://predatorwled.local/win&A=255",
         "status_lighting_values": {
             "alert": "[U]&R=255&G=0&B=0",
-            "warning": "[U]&R=255&G=255&B=0",
+            "warning": "[U]&R=255&G=128&B=0",
             "normal": "[U]&R=0&G=255&B=0",
             "camera": "[U]&R=0&G=0&B=255"
         },
@@ -92,13 +93,13 @@
             "redlight": true,
             "misc": true
         },
-        "traffic_camera_alert_radius": "10",
-        "traffic_camera_database": "/home/cvieira/Downloads/camera_database.excam",
+        "traffic_camera_alert_radius": "5",
+        "traffic_camera_database": "/home/cvieira/Software/Predator/camera_database.excam",
         "traffic_camera_loaded_radius": "500"
     },
     "dashcam": {
-        "dashcam_resolution": "720x480",
-        "dashcam_frame_rate": "10",
+        "dashcam_resolution": "1920x1080",
+        "dashcam_frame_rate": "15",
         "dashcam_device": {
             "main": "/dev/video0"
         },

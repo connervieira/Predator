@@ -15,7 +15,20 @@
 
 # This script contains several funtions and classes used in main.py
 
+
+
+
+
+
+
 import os # Required to interact with certain operating system functions
+import json # Required to process JSON data
+
+predator_root_directory = str(os.path.dirname(os.path.realpath(__file__))) # This variable determines the folder path of the root Predator directory. This should usually automatically recognize itself, but it if it doesn't, you can change it manually.
+
+config = json.load(open(predator_root_directory + "/config.json")) # Load the configuration database from config.json
+
+
 import time # Required to add delays and handle dates/times
 import subprocess # Required for starting some shell commands
 import sys
@@ -24,11 +37,18 @@ import re # Required to use Regex
 import validators # Required to validate URLs
 import datetime # Required for converting between timestamps and human readable date/time information
 from xml.dom import minidom # Required for processing GPX data
-import json # Required to pretty-print dictionaries
 import fnmatch # Required to use wildcards to check strings
 import lzma # Required to load ExCam database
 import math # Required to run more complex math calculations
 from geopy.distance import great_circle # Required to calculate distance between locations.
+from gps import * # Required to access GPS information.
+import gpsd
+
+
+
+
+
+gps_enabled = config["realtime"]["gps_enabled"] # This setting determines whether or not Predator's GPS features are enabled.
 
 
 
@@ -214,6 +234,21 @@ def display_shape(shape):
         print("           #")
         print(style.end)
 
+    elif (shape == "cross"):
+        print(style.bold)
+        print("########              ########")
+        print("  ########          ########")
+        print("    ########      ########")
+        print("      ########  ########")
+        print("        ##############")
+        print("          ##########")
+        print("        ##############")
+        print("      ########  ########")
+        print("    ########      ########")
+        print("  ########          ########")
+        print("########              ########")
+        print(style.end)
+
 
 # Define some styling information
 class style:
@@ -250,8 +285,16 @@ def countdown(timer):
 
 
 # Define the function that will be used to get the current GPS coordinates.
-def get_gps_location(): # Placeholder that should be updated at a later date. TODO
-    return 41.4919, -81.6941
+def get_gps_location(): # Placeholder that should be updated at a later date.
+    if (gps_enabled == True): # Check to see if GPS is enabled.
+        try: # Don't terminate the entire script if the GPS location fails to be aquired.
+            gpsd.connect() # Connect to the GPS daemon.
+            gps_data_packet = gpsd.get_current() # Get the current information.
+            return gps_data_packet.position()[0], gps_data_packet.position()[1] # Return the longitude and latitude.
+        except: # If the current location can't be established, then return placeholder location data.
+            return 0.0000, 0.0000 # Return a default placeholder location.
+    else: # If GPS is disabled, then this function should never be called, but return a placeholder position regardless.
+        return 0.0000, 0.0000 # Return a default placeholder location.
 
 
 
@@ -266,14 +309,17 @@ def get_distance(lat1, lon1, lat2, lon2):
 
 # Define the function that will be used to get nearby speed, red light, and traffic cameras.
 def load_traffic_cameras(current_lat, current_lon, database_file, radius):
-    with lzma.open(database_file, "rt", encoding="utf-8") as f: # Open the database file.
-        database_lines = list(map(json.loads, f)) # Load the camera database
-        loaded_database_information = [] # Load an empty placeholder database so we can write data to it later.
-        
-        for camera in database_lines: # Iterate through each camera in the database.
-            if ("lat" in camera and "lon" in camera): # Only check this camera if it has a latitude and longitude defined in the database.
-                if (get_distance(current_lat, current_lon, camera['lat'], camera['lon']) < float(radius)): # Check to see if this camera is inside the initial loading radius.
-                    loaded_database_information.append(camera)
+    if (os.path.exists(database_file) == True): # Check to make sure the database specified in the configuration actually exists.
+        with lzma.open(database_file, "rt", encoding="utf-8") as f: # Open the database file.
+            database_lines = list(map(json.loads, f)) # Load the camera database
+            loaded_database_information = [] # Load an empty placeholder database so we can write data to it later.
+            
+            for camera in database_lines: # Iterate through each camera in the database.
+                if ("lat" in camera and "lon" in camera): # Only check this camera if it has a latitude and longitude defined in the database.
+                    if (get_distance(current_lat, current_lon, camera['lat'], camera['lon']) < float(radius)): # Check to see if this camera is inside the initial loading radius.
+                        loaded_database_information.append(camera)
+    else:
+        loaded_database_information = {} # Return a blank database if the file specified doesn't exist.
 
     return loaded_database_information # Return the newly edited database information.
 

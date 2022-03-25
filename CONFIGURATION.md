@@ -143,6 +143,10 @@ Configuration values in this section are settings specific to real-time mode.
 - `save_real_time_object_recognition`
     - This setting determines whether or not Predator will save all of the objects it recognizes to disk while running in real-time mode.
     - When this is set to `false`, the objects recognized will only be printed to the console, and won't be saved to a file.
+- `gps_enabled`
+    - This configuration value is used to globally enable and disable Predator's GPS functionality.
+    - If you don't have a GPS connected, or don't want to use location aware features, set this to `false`.
+    - To enable location aware features like traffic camera alerts, this must be set to `true`.
 
 
 ### Real-time Mode Default Settings

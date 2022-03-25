@@ -35,7 +35,7 @@ If you're technically proficient, and want to try building your own device to ru
 
 ### Contact
 
-For more information about Predator Apex Support, contact admin@v0lttech.com.
+For more information about Predator Apex Support, contact V0LT using the information found at <https://v0lttech.com/contact.php>.
 
 
 ## Learn More

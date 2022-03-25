@@ -132,9 +132,9 @@ March 1st, 2022
 
 ### Management Update
 
-This update adds "Management Mode", and improves the efficiency and organization of various user interfaces. This update also new functionality and several new features.
+This update adds "Management Mode", and improves the efficiency and organization of various user interfaces. This update also adds new functionality and several new features, including support for GPS.
 
-*Release date: To be determined*
+March 26th, 2022
 
 - Adjusted the default settings to reduce the amount of configuration that needs to be done for most use cases.
 - Added support for customizable RGB status lighting.
@@ -184,4 +184,8 @@ This update adds "Management Mode", and improves the efficiency and organization
     - This makes Predator significantly more efficient by increasing the amount of plates that can be detected per processing cycle, without significantly increasing the time required to process each cycle.
 - Added the ability to alert to nearby speed cameras, red light cameras, and other traffic cameras while operating in real-time mode.
     - Several configuration values were add to support this feature, including new sound effects.
+        - New sounds: `camera1_sound`, `camera2_sound`, `camera3_sound`
+	    - New configuration values: `traffic_camera_alerts_enabled`, `camera_alert_types`, `traffic_camera_alert_radius`, `traffic_camera_database`, `traffic_camera_loaded_radius` `status_lighting_values/camera`
 - Adjusted the wording of some prompts to better mesh with the over all structure of the user interface.
+- Predator can now interface with GPS using GPSD
+    - GPS features can be toggled on and off by changing the `gps_enabled` configuration value.

@@ -21,21 +21,24 @@ This is the installation process for Predator and all of it's dependencies. This
     - Predator uses ImageMagick to manipulate still frames of video.
     - You can learn about the ImageMagick installation process at <https://imagemagick.org/script/download.php>
 5. Install the required Python packages.
-    - `pip3 install validators opencv-python-headless==4.5.3.56 cvlib tensorflow keras silence-tensorflow psutil gps geopy`
+    - `pip3 install validators opencv-python-headless==4.5.3.56 cvlib tensorflow keras silence-tensorflow psutil gps geopy gpsd-py3`
     - When tested on a Raspberry Pi 3, this step caused some issues. If you receive errors related to OpenCV when attempting to run Predator later, try uninstalling OpenCV Headless and replace it with the standard OpenCV library.
         - `pip3 uninstall opencv-python-headless; pip3 install opencv-python`
 6. Install the `mpg321` package.
     - Predator requires MPG321 in order to play audio effects for alerts.
     - You can install MPG321 using the following command on a Debian based Linux machine: `sudo apt-get install mpg321`
-7. Optionally, install software to remotely manage Predator.
+7. Install `GPSD`
+    - GPSD is required in order to handle GPS data.
+    - You can install GPSD using this command on a Debian based Linux machine: `sudo apt-get install gpsd gpsd-clients`
+8. Optionally, install software to remotely manage Predator.
     - If you're installing Predator on a Raspberry Pi, you may find it useful to install a program like [RaspAP](https://github.com/RaspAP/raspap-webgui) in order to remotely manage your Predator instance, and eliminate the need for a full keyboard and display.
     - Predator works entirely via command line, meaning any set up that enables SSH access to the host will allow for remote management of Predator.
-8. Download Predator.
+9. Download Predator.
     - Predator can be downloaded either from the V0LT website, or from it's GitHub page. The download straight from the V0LT website is recommended for sake of stability and completeness, but you're free to use GitHub as well if you're OK with using a less stable version of Predator.
     - V0LT website: <https://v0lttech.com/predator.php>
     - GitHub page: <https://github.com/connervieira/Predator>
         - `git clone https://github.com/connervieira/Predator`
-9. Extract Predator
+10. Extract Predator
     - After downloading Predator, regardless of where you get it from, extract it from the compressed archive (if necessary), and place it somewhere on your filesystem.
 
 
@@ -48,8 +51,8 @@ After installing Predator, you should do some quick configuration in order to ge
 2. Make configuration changes
     - All configuration values are explained extensively in the [CONFIGURATION.md](CONFIGURATION.md) document.
     - Make changes to any of the configuration values to better fit your usage context.
-3. Depending on the platform, Predator might not be able to locate the `config.json` file. If you encounter issues during the steps described in the "Usage" section, you may need to manually set Predator's directory in `main.py`
-    - At the top of the `main.py` and `lighting.py` scripts, you should see a variable titled `predator_root_directory`. By default, a Python function is used to find the current directory of the script.
+3. Depending on the platform, Predator might not be able to locate the `config.json` file. If you encounter issues during the steps described in the "Usage" section, you may need to manually set Predator's directory.
+    - At the top of the `main.py`, `utils.py`, and `lighting.py` scripts, you should see a variable titled `predator_root_directory`. By default, a Python function is used to find the current directory of the script.
     - If you receive errors related to missing configuration files when trying to run Predator, try setting this variable to a static file path.
     - Example:
         - `predator_root_directory = "/home/user/Predator/"`
@@ -156,9 +159,8 @@ After configuring Predator, you can try it out for the first time!
                     - Saved license plates will be saved to `real_time_plates.csv` in the root project folder, provided license plate saving is enabled.
                 - If a plate detected is in the alert database specified during the preferences stage earlier, it will show a large alert message in the console output.
         - Dash-cam mode
-            - In dash-cam mode, Predator will record video indefinitely until either disk space runs out, or `Ctrl + C` is pressed.
+            - In dash-cam mode, Predator will record video indefinitely until disk space runs out, the return key is pressed, or the Predator process is terminated.
             - Predator will not detect license plates in this mode. However, you can use video recorded in this mode with pre-recorded mode in order to scan for license plates at a later date.
             - The dash-cam video recorded will be saved to the project folder as `predator_dashcam_TIME_CHANNEL.mkv`.
                 - `TIME` is replaced by a Unix timestamp of when the file was created.
-                - `CHANNEL` is replaced by the number of the camera device used.
-                    - For example, if you have two camera devices running simultaneously, the first camera will be represented as camera 1, and the second camera will be represented as camera 2.
+                - `CHANNEL` is replaced by the name of the device used, as specified in the configuration.
