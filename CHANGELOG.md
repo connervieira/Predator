@@ -189,3 +189,4 @@ March 26th, 2022
 - Adjusted the wording of some prompts to better mesh with the over all structure of the user interface.
 - Predator can now interface with GPS using GPSD
     - GPS features can be toggled on and off by changing the `gps_enabled` configuration value.
+- Increased the default real-time plate guesses to 20 guess per plate.

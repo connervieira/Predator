@@ -36,7 +36,7 @@
         "real_time_image_rotation": "0",
         "fswebcam_device": "/dev/video0",
         "fswebcam_flags": "--set brightness=70%",
-        "gps_enabled": true,
+        "gps_enabled": false,
         "audio_alerts": true,
         "startup_sound": {
             "path": "./assets/sounds/testnoise.mp3",
@@ -87,14 +87,14 @@
             "normal": "[U]&R=0&G=255&B=0",
             "camera": "[U]&R=0&G=0&B=255"
         },
-        "traffic_camera_alerts_enabled": true,
+        "traffic_camera_alerts_enabled": false,
         "camera_alert_types": {
             "speed": true,
             "redlight": true,
             "misc": true
         },
-        "traffic_camera_alert_radius": "5",
-        "traffic_camera_database": "/home/cvieira/Software/Predator/camera_database.excam",
+        "traffic_camera_alert_radius": "1",
+        "traffic_camera_database": "",
         "traffic_camera_loaded_radius": "500"
     },
     "dashcam": {

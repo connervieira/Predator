@@ -188,11 +188,6 @@ input()
 if (traffic_camera_alerts_enabled == True): # Check to see if traffic camera alerts are enabled.
     loaded_traffic_camera_database = load_traffic_cameras(get_gps_location()[0], get_gps_location()[1], traffic_camera_database, traffic_camera_loaded_radius) # Load all traffic cameras within the configured loading radius.
 
-    #current_location = get_gps_location() # Get the current location.
-    #nearby_traffic_cameras(current_location[0], current_location[1], loaded_traffic_camera_database, traffic_camera_alert_radius) # Get all traffic cameras within the configured radius.
-
-
-
 
 
 
