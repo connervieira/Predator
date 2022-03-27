@@ -6,11 +6,14 @@
         "default_root": "",
         "silence_file_saving": false,
         "disable_object_recognition": false,
+        "gps_enabled": true,
+        "speed_display_unit": "mph",
         "modes_enabled": {
             "management": true,
             "prerecorded": true,
             "realtime": true,
-            "dashcam": true
+            "dashcam": true,
+            "information": true
         }
     },
     "prerecorded": {
@@ -20,6 +23,7 @@
         "bottom_margin": "300"
     },
     "realtime": {
+        "realtime_alpr_enabled": true,
         "realtime_output_level": "2",
         "clear_between_rounds": false,
         "delay_between_rounds": "0.2",
@@ -36,7 +40,7 @@
         "real_time_image_rotation": "0",
         "fswebcam_device": "/dev/video0",
         "fswebcam_flags": "--set brightness=70%",
-        "gps_enabled": false,
+        "speed_display_enabled": true,
         "audio_alerts": true,
         "startup_sound": {
             "path": "./assets/sounds/testnoise.mp3",
@@ -104,5 +108,19 @@
             "main": "/dev/video0"
         },
         "dashcam_background_mode_realtime": false
+    },
+    "information": {
+        "information_refresh_delay": "1.0",
+        "displays": {
+            "time": true,
+            "date": true,
+            "speed": true,
+            "location": true,
+            "altitude": true,
+            "track": true,
+            "satellites": true,
+            "nearest_camera": true
+        },
+        "max_nearest_camera_range": "50"
     }
 }

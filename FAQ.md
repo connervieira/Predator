@@ -70,3 +70,8 @@ This document contains a series of questions you may have concerning Predator.
 **How many cameras can Predator use at one time?**
 
     This is a bit of a complex question, but in short, as many as you want. More specifically, Predator will use as many cameras as your OS, USB controller, and processor allow. In practice, this means that Predator can usually run at least two USB cameras at once, even on low powered devices like the Raspberry Pi.
+
+
+**Can I run multiple instances of Predator at the same time on a single device?**
+
+    Theoretically, yes. However, this could easily cause several issues. For example, 1 camera device can only be used by a single process at a time, so running multiple instance of Predator could cause one or both instances to fail. If you want to run two instances of Predator at the same time, then you're much more likely to have success if each instance is running in a different mode. For example, running one instance of real-time mode in the background with an instance of information mode in the foreground will almost certainly work just fine.

@@ -20,7 +20,8 @@ This section of configuration values will effect Predator's general operation.
         - When set to "0", Predator will skip the 'mode' prompt, and automatically boot into management mode.
         - When set to "1", Predator will skip the 'mode' prompt, and automatically boot into pre-recorded mode.
         - When set to "2", Predator will skip the 'mode' prompt, and automatically boot into real-time mode.
-        - When set to "2", Predator will skip the 'mode' prompt, and automatically boot into dash-cam mode.
+        - When set to "3", Predator will skip the 'mode' prompt, and automatically boot into dash-cam mode.
+        - When set to "4", Predator will skip the 'mode' prompt, and automatically boot into dashboard mode.
     - It may be useful to change this setting in several different situations:
         - If you only ever use the same mode when using Predator, setting this to your preferred mode can save time.
         - When installing Predator in a vehicle, this setting can allow Predator to load without any user input.
@@ -36,6 +37,18 @@ This section of configuration values will effect Predator's general operation.
     - This setting can be used to globally disable object recognition (Tensorflow and OpenCV).
     - If you're on a platform that doesn't support OpenCV or Tensorflow, then you can set this to 'true' in order to prevent errors while using Predator.
     - Under normal usage, this should be set to `false`, since this will allow Predator to use it's full functionality.
+- `gps_enabled`
+    - This configuration value is used to globally enable and disable Predator's GPS functionality.
+    - If you don't have a GPS connected, or don't want to use location aware features, set this to `false`.
+    - To enable location aware features like traffic camera alerts, this must be set to `true`.
+- `speed_display_unit`
+    - This configuration value determines what units Predator will use to display the current speed.
+    - This value can only be set to the following strings:
+        - "mph" for miles-per-hour
+        - "kph" for kilometers-per-hour
+        - "mps" for meters-per-second
+        - "fps" for feet-per-second
+        - "knot" for knots
 - `modes_enabled`
     - This setting determines whether or not each mode is activated in Predator.
     - When the value for a particular mode is set to `false`, that mode's option will be hidden from the mode selection menu shown to the user when Predator starts, and the auto-start-mode command line arguments won't allow the user to boot Predator directly to that mode.
@@ -58,6 +71,12 @@ Configuration values in this section are settings specific to pre-recorded mode.
 
 Configuration values in this section are settings specific to real-time mode.
 
+- `realtime_alpr_enabled`
+    - This setting is a boolean that determines whether or not Predator will run license plate recognition while operating in real-time mode.
+    - Under normal circumstances, this should be left as `true`, since it will allow Predator to use it's full functionality. However, if you don't want license plate recognition, and only care about some of Predator's other functionality, then license plate recognition can be disabled to save time and improve efficiency.
+- `realtime_alpr_disabled_delay`
+    - This setting is used to add an artificial delay when Predator's real-time license plate recogition is disabled.
+    - Typically, the license plate recognition process will take at least a second or two, allowing the user to read any on-screen messages before the processing cycle continues. This setting allows the user to specify in time, in seconds, that Predator will wait when `realtime_alpr_enabled` is set to `false`.
 - `realtime_output_level`
     - This setting determines how much information Predator prints to the console while operating in real-time mode.
     - This setting has 3 different options.
@@ -146,10 +165,9 @@ Configuration values in this section are settings specific to real-time mode.
 - `save_real_time_object_recognition`
     - This setting determines whether or not Predator will save all of the objects it recognizes to disk while running in real-time mode.
     - When this is set to `false`, the objects recognized will only be printed to the console, and won't be saved to a file.
-- `gps_enabled`
-    - This configuration value is used to globally enable and disable Predator's GPS functionality.
-    - If you don't have a GPS connected, or don't want to use location aware features, set this to `false`.
-    - To enable location aware features like traffic camera alerts, this must be set to `true`.
+- `speed_display_enabled`
+    - This configuration value is a boolean that determines whether or not the driver's current speed will be printed to the console during each processing cycle in real-time mode.
+    - For this configuration value to be active, `gps_enabled` needs to be enabled as well.
 
 
 ### Real-time Mode Default Settings
@@ -271,3 +289,33 @@ Predator can notify the user when a speed or red-light camera is nearby, based o
 - `dashcam_background_mode_realtime`
     - This setting determines whether Predator will automatically enabled background dashcam recording when starting in real-time mode.
     - Note that Predator can only use each recording device for one task at a time, so if you run real-time mode with background recording enabled, you'll need to specify two different devices by changing `fswebcam_device` and `dashcam_device`.
+
+
+## Information Mode Configuration
+- `information_refresh_delay`
+    - This setting determines how long Predator will wait before refreshes while operating in information mode.
+    - Having a short pause between refreshes allows the user to read the information displayed on the screen.
+- `displays`
+    - The configuration values in this section are used to enabled and disable whether or not certain pieces of information are displayed.
+    - Below are all the values that can be turned on and off.
+        - `time`
+            - This setting determines whether the current time will be displayed while operating in information mode.
+        - `date`
+            - This setting determines whether the current date will be displayed while operating in information mode.
+        - `speed`
+            - This setting determines whether the current speed will be displayed while operating in information mode.
+        - `location`
+            - This setting determines whether the current location will be displayed while operating in information mode.
+        - `altitude`
+            - This setting determines whether the current altitude will be displayed while operating in information mode.
+        - `track`
+            - This setting determines whether the current track will be displayed while operating in information mode.
+        - `satellites`
+            - This setting determines whether the current connected satellite count will be displayed while operating in information mode.
+        - `nearest_camera`
+            - This setting determines whether the current nearest traffic camera will be displayed while operating in information mode.
+            - For this configuration value to work properly, the `traffic_camera_alerts_enabled` setting in the real-time section must also be enabled.
+            - This setting will use the same database information loaded according to the `traffic_camera_loaded_radius` setting in the real-time section.
+- `max_nearest_camera_range`
+    - This setting determines the maxmium distance that Predator will consider when displaying the nearest traffic camera.
+    - Any cameras detected outside this range will be ignored.

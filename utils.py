@@ -48,7 +48,7 @@ import gpsd
 
 
 
-gps_enabled = config["realtime"]["gps_enabled"] # This setting determines whether or not Predator's GPS features are enabled.
+gps_enabled = config["general"]["gps_enabled"] # This setting determines whether or not Predator's GPS features are enabled.
 
 
 
@@ -290,11 +290,11 @@ def get_gps_location(): # Placeholder that should be updated at a later date.
         try: # Don't terminate the entire script if the GPS location fails to be aquired.
             gpsd.connect() # Connect to the GPS daemon.
             gps_data_packet = gpsd.get_current() # Get the current information.
-            return gps_data_packet.position()[0], gps_data_packet.position()[1], gps_data_packet.speed(), gps_data_packet.altitude() # Return the longitude and latitude.
+            return gps_data_packet.position()[0], gps_data_packet.position()[1], gps_data_packet.speed(), gps_data_packet.altitude(), gps_data_packet.movement()["track"], gps_data_packet.sats # Return GPS information.
         except: # If the current location can't be established, then return placeholder location data.
-            return 0.0000, 0.0000, 0.0, 0.0 # Return a default placeholder location.
+            return 0.0000, 0.0000, 0.0, 0.0, 0.0, 0 # Return a default placeholder location.
     else: # If GPS is disabled, then this function should never be called, but return a placeholder position regardless.
-        return 0.0000, 0.0000, 0.0, 0.0 # Return a default placeholder location.
+        return 0.0000, 0.0000, 0.0, 0.0, 0.0, 0 # Return a default placeholder location.
 
 
 
@@ -343,3 +343,23 @@ def nearby_traffic_cameras(current_lat, current_lon, database_information, radiu
 
     return nearby_speed_cameras, nearby_redlight_cameras, nearby_misc_cameras
 
+
+
+
+def convert_speed(speed, unit="mph"):
+    unit = unit.lower() # Convert the unit to all lowercase in order to make it easier to work with and remove inconsistencies in configuration setups.
+
+    if (unit == "kph"): # Convert the speed to kilometers per hour.
+        speed = speed # The speed is already measured in kilometers per hour, so there is no reason to convert it.
+    elif (unit == "mph"): # Convert the speed to miles per hour.
+        speed = speed * 0.6213712
+    elif (unit == "mps"): # Convert the speed to meters per second.
+        speed = speed * 0.2777778
+    elif (unit == "knot"): # Convert the speed to meters per second.
+        speed = speed * 0.5399568
+    elif (unit == "fps"): # Convert the speed to feet per second.
+        speed = speed * 0.9113444
+    else: # If an invalid unit was supplied, then simply return a speed of zero.
+        speed = 0
+
+    return speed

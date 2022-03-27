@@ -190,3 +190,34 @@ March 26th, 2022
 - Predator can now interface with GPS using GPSD
     - GPS features can be toggled on and off by changing the `gps_enabled` configuration value.
 - Increased the default real-time plate guesses to 20 guess per plate.
+
+
+## Version 7.0
+
+### Information Update
+
+*Release date: to be determined*
+
+This update adds information mode, which allows Predator to rapidly display useful information in the console output, as well as several new features to real-time mode.
+
+- Adjusted some comments that had typos or confusing wording.
+- License plate recognition can now be entirely disabled in real-time mode using the `realtime_alpr_enabled` configuration value.
+    - A custom artificial delay can be (optionally) added when license plate recognition is disabled in order to prevent Predator from running through the real-time mode processing cycle unreasonably fast.
+- Added the ability to display the current speed during each processing cycle in real-time mode.
+    - This feature can be turned on and off in the configuration.
+    - The current speed can be displayed in kilometers per hour, miles per hour, meters per second, feet per second, or knots.
+- Moved the `gps_enabled` and `speed_display_unit` configuration values to the `general` section.
+- Added 'Information' mode, which allows Predator to show customizable information displays in the console output.
+    - This mode also adds several new configuration values.
+        - `information_refresh_delay
+        - `displays`
+            - `time`
+            - `date`
+            - `speed`
+            - `location`
+            - `altitude`
+            - `track`
+            - `satellites`
+            - `nearest_camera`
+        - `max_nearest_camera_range`
+- Added a start-up check to see if the traffic camera database file specified in the configuration actually exists.
