@@ -209,7 +209,7 @@ This update adds information mode, which allows Predator to rapidly display usef
 - Moved the `gps_enabled` and `speed_display_unit` configuration values to the `general` section.
 - Added 'Information' mode, which allows Predator to show customizable information displays in the console output.
     - This mode also adds several new configuration values.
-        - `information_refresh_delay
+        - `information_refresh_delay`
         - `displays`
             - `time`
             - `date`
