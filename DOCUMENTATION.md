@@ -22,7 +22,7 @@ This is the installation process for Predator and all of it's dependencies. This
     - You can learn about the ImageMagick installation process at <https://imagemagick.org/script/download.php>
 5. Install the required Python packages.
     - `pip3 install validators opencv-python-headless==4.5.3.56 cvlib tensorflow keras silence-tensorflow psutil gps geopy gpsd-py3`
-    - When tested on a Raspberry Pi 3, this step caused some issues. If you receive errors related to OpenCV when attempting to run Predator later, try uninstalling OpenCV Headless and replace it with the standard OpenCV library.
+    - When tested on a Raspberry Pi 3, this step occasionally caused some issues. If you receive errors related to OpenCV when attempting to run Predator later, try uninstalling OpenCV Headless and replace it with the standard OpenCV library.
         - `pip3 uninstall opencv-python-headless; pip3 install opencv-python`
 6. Optionally, install the `mpg321` package.
     - Predator requires MPG321 in order to play audio effects for alerts.
@@ -34,6 +34,7 @@ This is the installation process for Predator and all of it's dependencies. This
 8. Optionally, install software to remotely manage Predator.
     - If you're installing Predator on a Raspberry Pi, you may find it useful to install a program like [RaspAP](https://github.com/RaspAP/raspap-webgui) in order to remotely manage your Predator instance, and eliminate the need for a full keyboard and display.
     - Predator works entirely via command line, meaning any set up that enables SSH access to the host will allow for remote management of Predator.
+    - If you already have an access point installed in the same area as Predator, you can simply connect Predator to it, and use SSH on a separate device to access the instance remotely.
 9. Download Predator.
     - Predator can be downloaded either from the V0LT website, or from it's GitHub page. The download straight from the V0LT website is recommended for sake of stability and completeness, but you're free to use GitHub as well if you're OK with using a less stable version of Predator.
     - V0LT website: <https://v0lttech.com/predator.php>
