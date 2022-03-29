@@ -21,7 +21,7 @@ This section of configuration values will effect Predator's general operation.
         - When set to "1", Predator will skip the 'mode' prompt, and automatically boot into pre-recorded mode.
         - When set to "2", Predator will skip the 'mode' prompt, and automatically boot into real-time mode.
         - When set to "3", Predator will skip the 'mode' prompt, and automatically boot into dash-cam mode.
-        - When set to "4", Predator will skip the 'mode' prompt, and automatically boot into dashboard mode.
+        - When set to "4", Predator will skip the 'mode' prompt, and automatically boot into information mode.
     - It may be useful to change this setting in several different situations:
         - If you only ever use the same mode when using Predator, setting this to your preferred mode can save time.
         - When installing Predator in a vehicle, this setting can allow Predator to load without any user input.
