@@ -40,7 +40,8 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] The ability to interface with GPS data in order to provide new features and functionality.
 - [X] Add a shape alert for traffic cameras.
 - [X] Add "Information Mode" for displaying useful information through the console output.
-- [ ] Add telemetry recording in Information Mode
+- [X] Move alert databases to a configuration value instead of a start-up preference.
+- [X] Add telemetry recording in Information Mode
 - [ ] Add GPS based alerts for automated license plate readers.
 
 

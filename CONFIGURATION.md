@@ -54,6 +54,12 @@ This section of configuration values will effect Predator's general operation.
     - When the value for a particular mode is set to `false`, that mode's option will be hidden from the mode selection menu shown to the user when Predator starts, and the auto-start-mode command line arguments won't allow the user to boot Predator directly to that mode.
     - Under normal circumstances, all of these settings should be left as 'true', in order to enable full functionality of Predator, but there may be certain situations in which is useful to block certain modes from starting.
         - This setting is not intended to a be a security feature. It's completely trivial to bypass this setting by simply modifying the configuration file directly.
+- `alert_databases`
+    - This setting contains the file names all of the alert databases used by Predator.
+        - `license_plates` should be set to (if anything), a plain-text list of license plates that Predator should show a heightened alert for.
+        - `traffic_cameras` should be set to (if anything), an ExCam database of speed, red-light, and traffic cameras.
+    - Each value in this section should either be left blank, or be a file path relative to the root project folder.
+        - For example, if your alert database is in `/home/pi/Data/alerts.txt`, and your root project directory is `/home/pi/Data/`, then then the alert database value should simply be set to `alerts.txt`, not the the full file path.
 
 
 ## Pre-recorded Mode Configuration
@@ -98,6 +104,9 @@ Configuration values in this section are settings specific to real-time mode.
     - This setting is a number in the form of a string that determines how many OpenALPR guesses Predator will take into account when analyzing a plate.
     - The higher this number is, the more likely Predator is to guess a plate incorrectly. The lower this number is, the less likely Predator will be to find a valid guess at all.
     - By default this value is set to 10, which tends to be a healthy balance for the majority of tasks.
+- `alpr_location_tagging`
+    - This setting determines whether or not the current GPS location will be saved to the log file when each plate is detected.
+    - For this setting to do anything, both the "save license plates" preference, and `gps_enabled` configuration value need to be turned on.
 - `alerts_ignore_validation`
     - This setting determines whether alerts will respect or ignore the plate validation format.
     - When this setting is set to `true`, if a plate fails the validation test, but matches an alert database plate, the alert will be displayed anyway.
@@ -255,10 +264,6 @@ Predator can notify the user when a speed or red-light camera is nearby, based o
         - `misc` includes all traffic cameras that don't fall into the other two categories. 
 - `traffic_camera_alert_radius`
     - This configuration value determines the distance, in miles, at which Predator will alert the user of a speed camera.
-- `traffic_camera_database`
-    - This is a file path pointing to a database of traffic cameras.
-    - The database should be in ExCam format.
-        - For legal reasons, Predator doesn't come packaged with the database. Please review your local laws before installing a speed and red-light camera database.
 - `traffic_camera_loaded_radius`
     - This is the radius, in miles, that Predator will load traffic cameras from during the initial loading process.
     - For example, if this value is set to `100`, then Predator will only load traffic cameras in a 100 mile radius from the current location when it boots. If you travel more than 100 miles away from your original location without reloading Predator then you won't get traffic camera alerts.
@@ -319,3 +324,10 @@ Predator can notify the user when a speed or red-light camera is nearby, based o
 - `max_nearest_camera_range`
     - This setting determines the maxmium distance that Predator will consider when displaying the nearest traffic camera.
     - Any cameras detected outside this range will be ignored.
+- `record_telemetry`
+    - This setting determines whether or not Predator will log the information it displays while operating in information mode.
+    - When set to `true`, all of the the raw information displays that are available under the `displays` configuration value will be recorded, regardless of whether they are turned on.
+        - This configuration value only records raw data, like speed, altitude, and number of connected satellites. It does not record the nearest traffic camera, or similar information.
+        - If `gps_enabled` is set to `false`, then all GPS-dependent information will be left as placeholders.
+    - When enabled, a log file will be created in the root project directory named `information_recording.csv`.
+        - This file follows this format: `time,current_speed,current_latitude,current_longitude,current_altitude,current_track,current_connected_satellite_count`

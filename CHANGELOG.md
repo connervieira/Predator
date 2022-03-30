@@ -204,7 +204,7 @@ This update adds information mode, which allows Predator to rapidly display usef
 - License plate recognition can now be entirely disabled in real-time mode using the `realtime_alpr_enabled` configuration value.
     - A custom artificial delay can be (optionally) added when license plate recognition is disabled in order to prevent Predator from running through the real-time mode processing cycle unreasonably fast.
 - Added the ability to display the current speed during each processing cycle in real-time mode.
-    - This feature can be turned on and off in the configuration.
+    - This feature can be turned on and off in the configuration using the `speed_display_enabled` setting.
     - The current speed can be displayed in kilometers per hour, miles per hour, meters per second, feet per second, or knots.
 - Moved the `gps_enabled` and `speed_display_unit` configuration values to the `general` section.
 - Added 'Information' mode, which allows Predator to show customizable information displays in the console output.
@@ -220,4 +220,9 @@ This update adds information mode, which allows Predator to rapidly display usef
             - `satellites`
             - `nearest_camera`
         - `max_nearest_camera_range`
+    - Information mode can also be used to record telemetry to a log file, using the `record_telemetry` configuration value.
 - Added a start-up check to see if the traffic camera database file specified in the configuration actually exists.
+- Added the ability to save the current location to the log of plates detected in real-time.
+- Adjusted the default values for a couple settings.
+- Moved the alert databases to a centralized configuration value for sake of efficiency and organization.
+    - The start-up prompt asking the user to enter an alert database is no longer shown.

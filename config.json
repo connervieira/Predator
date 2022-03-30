@@ -14,6 +14,10 @@
             "realtime": true,
             "dashcam": true,
             "information": true
+        },
+        "alert_databases": {
+            "license_plates": "",
+            "traffic_cameras": ""
         }
     },
     "prerecorded": {
@@ -28,8 +32,9 @@
         "clear_between_rounds": false,
         "delay_between_rounds": "0.2",
         "print_invalid_plates": false,
-        "print_detected_plate_count": false,
+        "print_detected_plate_count": true,
         "realtime_guesses": "20",
+        "alpr_location_tagging": true,
         "alerts_ignore_validation": true,
         "camera_resolution": "1920x1080",
         "real_time_cropping_enabled": false,
@@ -40,7 +45,7 @@
         "real_time_image_rotation": "0",
         "fswebcam_device": "/dev/video0",
         "fswebcam_flags": "--set brightness=70%",
-        "speed_display_enabled": true,
+        "speed_display_enabled": false,
         "audio_alerts": true,
         "startup_sound": {
             "path": "./assets/sounds/testnoise.mp3",
@@ -75,7 +80,6 @@
         "webhook": "",
         "shape_alerts": false,
         "save_real_time_object_recognition": true,
-        "default_alert_database": "",
         "default_save_license_plates_preference": "",
         "default_save_images_preference": "",
         "default_license_plate_format": "",
@@ -121,6 +125,7 @@
             "satellites": true,
             "nearest_camera": true
         },
-        "max_nearest_camera_range": "50"
+        "max_nearest_camera_range": "50",
+        "record_telemetry": true
     }
 }

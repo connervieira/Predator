@@ -134,7 +134,12 @@ After configuring Predator, you can try it out for the first time!
                 - To clarify, messages indicating detected license plates will still appear, but all plates will be treated identically, and there won't be any heightened alerts.
             - Example: `ImportantPlates.txt`
         - Next, you'll be asked whether or not you want to save the license plates detected by Predator in real-time mode. When this turned on, Predator will automatically save every plate it detects in a file named `real_time_plates.csv` in the root project directory, along with a timestamp and whether or not the plate was in the alert database you specified before.
-            - This file follows this format: `PLATE,timestamp,alert_status`
+            - This file follows this format: `plate,timestamp,alert_status,latitude,longitude`
+                - `plate` is replaced by the characters in the detected plate.
+                - `timestamp` is replaced by the time the plate was detected.
+                - `alert_status` is replaced with a boolean indicating whether or not one of the plates detected in the frame were alert plates.
+                - `latitude` is replaced by the GPS latitude that the plate was detected, if enabled.
+                - `longitude` is replaced by the GPS longitude that the plate was detected, if enabled.
             - If you leave this setting blank, license plate saving will be disabled by default.
             - Example: `y`
         - Next, you'll be asked whether or not you want Predator to save every image it takes in real-time mode. For sake of storage, this should usually be turned off, but there may be times where you want Predator to act somewhat like a timelapse dashcam, and save every image it takes to the root project folder.

@@ -92,6 +92,7 @@ prerecorded_mode_enabled = config["general"]["modes_enabled"]["prerecorded"] # T
 realtime_mode_enabled = config["general"]["modes_enabled"]["realtime"] # This setting is used to prevent realtime mode from being loaded from the user menu or command line arguments of Predator.
 dashcam_mode_enabled = config["general"]["modes_enabled"]["dashcam"] # This setting is used to prevent dashcam mode from being loaded from the user menu or command line arguments of Predator.
 information_mode_enabled = config["general"]["modes_enabled"]["information"] # This setting is used to prevent information mode from being loaded from the user menu or command line arguments of Predator.
+alert_database_license_plates = config["general"]["alert_databases"]["license_plates"] # This configuration value defines the file that Predator will load the alert list for license plates from.
 
 
 
@@ -111,6 +112,7 @@ delay_between_rounds = config["realtime"]["delay_between_rounds"] # This setting
 print_invalid_plates = config["realtime"]["print_invalid_plates"] # In real-time mode, print all plates that get invalided by the formatting rules in red. When this is set to false, only valid plates are displayed.
 print_detected_plate_count = config["realtime"]["print_detected_plate_count"] # This setting determines whether or not Predator will print how many license plates it detects in each frame while operating in real-time mode.
 realtime_guesses = config["realtime"]["realtime_guesses"] # This setting determines how many guesses Predator will make per plate in real-time mode. The higher this number, the less accurate guesses will be, but the more likely it will be that a plate matching the formatting guidelines is found.
+alpr_location_tagging = config["realtime"]["alpr_location_tagging"] # This setting determines whether or not detected license plates will be tagged with the current GPS location.
 alerts_ignore_validation = config["realtime"]["alerts_ignore_validation"] # This setting determines whether alerts will respect or ignore the license plate validation formatting template.
 camera_resolution = config["realtime"]["camera_resolution"] # This is the resolution you want to use when taking images using the connected camera. Under normal circumstances, this should be the maximum resoultion supported by your camera.
 real_time_cropping_enabled = config["realtime"]["real_time_cropping_enabled"] # This value determines whether or not each frame captured in real-time mode will be cropped.
@@ -128,7 +130,6 @@ save_real_time_object_recognition = config["realtime"]["save_real_time_object_re
 speed_display_enabled = config["realtime"]["speed_display_enabled"] # This setting determines whether or not Predator will display the current GPS speed each processing cycle in real-time mode.
 
 # Default settings
-default_alert_database = config["realtime"]["default_alert_database"] # If this variable isn't empty, the "alert database" prompt will be skipped when starting in real-time mode. This variable will be used as the alert database. Add a single space to skip this prompt without specifying a database.
 default_save_license_plates_preference = config["realtime"]["default_save_license_plates_preference"] # If this variable isn't empty, the "save license plates" prompt will be skipped when starting in real-time mode. If this variable is set to "y", license plates will be saved.
 default_save_images_preference = config["realtime"]["default_save_images_preference"] # If this variable isn't empty, the "save images" prompt will be skipped when starting in real-time mode. If this variable is set to "y", all images will be saved.
 default_license_plate_format = config["realtime"]["default_license_plate_format"] # If this variable isn't empty, the "license plate format" prompt will be skipped when starting in real-time mode. This variable will be used as the license plate format.
@@ -170,7 +171,7 @@ camera_alert_types_speed = config["realtime"]["camera_alert_types"]["speed"]
 camera_alert_types_redlight = config["realtime"]["camera_alert_types"]["redlight"]
 camera_alert_types_misc = config["realtime"]["camera_alert_types"]["misc"]
 traffic_camera_alert_radius = config["realtime"]["traffic_camera_alert_radius"]
-traffic_camera_database = config["realtime"]["traffic_camera_database"]
+traffic_camera_database = config["general"]["alert_databases"]["traffic_cameras"]
 traffic_camera_loaded_radius = config["realtime"]["traffic_camera_loaded_radius"]
 
 
@@ -194,6 +195,7 @@ information_display_track = config["information"]["displays"]["track"] # This se
 information_display_satellites = config["information"]["displays"]["satellites"] # This setting determines whether the current connected satellite count will be displayed while operating in information mode.
 information_display_nearest_camera = config["information"]["displays"]["nearest_camera"] # This setting determines whether the current nearest traffic camera will be displayed while operating in information mode.
 information_max_nearest_camera_range = config["information"]["max_nearest_camera_range"] # This setting determines the maxmium distance that Predator will consider when displaying the nearest traffic camera.
+information_record_telemetry = config["information"]["record_telemetry"] # This setting determines whether or not Predator will log the information it handles while operating in information mode.
 
 # Load the traffic camera database, if enabled.
 if (traffic_camera_alerts_enabled == True): # Check to see if traffic camera alerts are enabled.
@@ -391,6 +393,7 @@ if (mode_selection == "0" and management_mode_enabled == True): # The user has s
                 copy_realtime_object_recognition_data  = False
                 copy_realtime_license_plate_recognition_data = False
                 copy_dashcam_video = False
+                copy_information_telemetry = False
 
                 while True: # Run the "copy files" selection menu on a loop forever until the user is finished selecting files.
                     clear() # Clear the console output before each loop.
@@ -444,6 +447,12 @@ if (mode_selection == "0" and management_mode_enabled == True): # The user has s
                         print("D1. [X] Dash-cam videos")
                     else:
                         print("D1. [ ] Dash-cam videos")
+                    print("")
+                    print("===== Information Mode =====")
+                    if (copy_information_telemetry == True):
+                        print("I1. [X] Telemetry Records")
+                    else:
+                        print("I1. [ ] Telemetry Records")
 
                     selection = input("Selection: ") # Prompt the user for a selection.
 
@@ -472,6 +481,8 @@ if (mode_selection == "0" and management_mode_enabled == True): # The user has s
                         copy_realtime_license_plate_recognition_data = not copy_realtime_license_plate_recognition_data
                     elif (selection.lower() == "d1"):
                         copy_dashcam_video = not copy_dashcam_video
+                    elif (selection.lower() == "i1"):
+                        copy_information_telemetry = not copy_information_telemetry
                 
 
                 # Prompt the user for the copying destination.
@@ -502,6 +513,8 @@ if (mode_selection == "0" and management_mode_enabled == True): # The user has s
                     os.system("cp " + root + "/real_time_plates* " + copy_destination)
                 if (copy_dashcam_video):
                     os.system("cp " + root + "/predator_dashcam* " + copy_destination)
+                if (copy_information_telemetry):
+                    os.system("cp " + root + "/information_recording.* " + copy_destination)
 
                 clear()
                 print("Files have finished copying.")
@@ -519,6 +532,7 @@ if (mode_selection == "0" and management_mode_enabled == True): # The user has s
                 delete_realtime_object_recognition_data  = False
                 delete_realtime_license_plate_recognition_data = False
                 delete_dashcam_video = False
+                delete_information_telemetry  = False
 
                 while True: # Run the "delete files" selection menu on a loop forever until the user is finished selecting files.
                     clear() # Clear the console output before each loop.
@@ -572,6 +586,12 @@ if (mode_selection == "0" and management_mode_enabled == True): # The user has s
                         print("D1. [X] Dash-cam videos")
                     else:
                         print("D1. [ ] Dash-cam videos")
+                    print("")
+                    print("===== Information Mode =====")
+                    if (delete_information_telemetry == True):
+                        print("I1. [X] Telemetry Records")
+                    else:
+                        print("I1. [ ] Telemetry Records")
 
                     selection = input("Selection: ") # Prompt the user for a selection.
 
@@ -599,6 +619,8 @@ if (mode_selection == "0" and management_mode_enabled == True): # The user has s
                         delete_realtime_license_plate_recognition_data = not delete_realtime_license_plate_recognition_data
                     elif (selection.lower() == "d1"):
                         delete_dashcam_video = not delete_dashcam_video
+                    elif (selection.lower() == "i1"):
+                        delete_information_telemetry = not delete_information_telemetry
 
                 if (delete_management_custom):
                     delete_custom_file_name = input("Please specify the name of the additional file you'd like to delete from the current project folder: ")
@@ -626,6 +648,8 @@ if (mode_selection == "0" and management_mode_enabled == True): # The user has s
                         os.system("rm " + root + "/real_time_plates*")
                     if (delete_dashcam_video):
                         os.system("rm " + root + "/predator_dashcam*")
+                    if (delete_information_telemetry):
+                        os.system("rm " + root + "/information_recording*")
 
                     clear()
                     print("Files have finished deleting.")
@@ -1173,6 +1197,12 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
 # Real-time mode
 
 elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has set Predator to boot into real-time mode.
+    if (alert_database_license_plates != ""): # Check to see if the user has configured a file for alerts.
+        alert_database = alert_database_license_plates
+    else:
+        alert_database = ""
+
+
 
     # Configure the user's preferences for this session.
     if (default_root != ""): # Check to see if the user has configured a default for this preference.
@@ -1180,15 +1210,6 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
         root = default_root
     else:
         root = input("Project root directory path: ")
-
-    if (default_alert_database != ""): # Check to see if the user has configured a default for this preference.
-        print(style.bold + "Using default preference for alert database." + style.end)
-        if (default_alert_database == " "): # If the default alert database is configured as a single space, then skip the prompt, but don't load an alert database.
-            alert_database = ""
-        else:
-            alert_database = default_alert_database
-    else:
-        alert_database = input("Optional: License plate alert database: ")
 
     if (default_save_license_plates_preference != ""): # Check to see if the user has configured a default for this preference.
         print(style.bold + "Using default preference for license plate saving." + style.end)
@@ -1672,9 +1693,11 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
 
 
 
+
             # If enabled, submit data about each newly detected plate to a network server.
-            if (realtime_output_level >= 3): # Only display this status message if the output level indicates to do so.
+            if (realtime_output_level >= 3 and webhook != None and webhook != ""): # Only display this status message if the output level indicates to do so.
                 print("Submitting data to webhook...")
+
             for each_new_plate_detected in new_plate_detected: # Iterate through each plate that was detected this round.
                 if (webhook != None and webhook != ""): # Check to see if the user has specified a webhook to submit detected plates to.
                     url = webhook.replace("[L]", each_new_plate_detected) # Replace "[L]" with the license plate detected.
@@ -1688,7 +1711,8 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
 
                     if (str(webhook_response) != "200"): # If the webhook didn't respond with a 200 code; Warn the user that there was an error.
                         print(style.yellow + "Warning: Unable to submit data to webhook. Response code: " + str(webhook_response.getcode()) + style.end)
-            if (realtime_output_level >= 3): # Only display this status message if the output level indicates to do so.
+
+            if (realtime_output_level >= 3 and webhook != None and webhook != ""): # Only display this status message if the output level indicates to do so.
                 print("Done.\n----------")
 
 
@@ -1696,17 +1720,20 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
 
 
             # If enabled, save the detected license plate (if any) to a file on disk.
-            if (realtime_output_level >= 3): # Only display this status message if the output level indicates to do so.
+            if (realtime_output_level >= 3 and save_license_plates_preference == True): # Only display this status message if the output level indicates to do so.
                 print("Saving license plate data to disk...")
+
             if (save_license_plates_preference == True): # Check to see if the user has the 'save detected license plates' preference enabled.
                 if (len(new_plate_detected) > 0): # Check to see if the new_plate_detected value is empty. If it is blank, that means no new plate was detected this round.
                     for each_new_plate_detected in new_plate_detected: # Iterate through each plate that was detected this round.
-                        if (active_alert == True): # Check to see if the current plate has an active alert.
-                            export_data = each_new_plate_detected + "," + str(round(time.time())) + ",true\n" # Add the individual plate to the export data, followed a timestamp, followed by a line break to prepare for the next plate to be added later.
+                        if (alpr_location_tagging == True and gps_enabled == True): # Check to see if the configuration value for geotagging license plate detections has been enabled.
+                            current_location = get_gps_location() # Get the current location.
+                            export_data = each_new_plate_detected + "," + str(round(time.time())) + "," + str(active_alert).lower() + "," + str(current_location[0]) + "," + str(current_location[1]) + "\n" # Add the individual plate to the export data.
                         else:
-                            export_data = each_new_plate_detected + "," + str(round(time.time())) + ",false\n" # Add the individual plate to the export data, followed a timestamp, followed by a line break to prepare for the next plate to be added later.
+                            export_data = each_new_plate_detected + "," + str(round(time.time())) + "," + str(active_alert).lower() + ",0.000,0.000\n" # Add the individual plate to the export data.
                         add_to_file(root + "/real_time_plates.csv", export_data, silence_file_saving) # Add the export data to the end of the file and write it to disk.
-            if (realtime_output_level >= 3): # Only display this status message if the output level indicates to do so.
+
+            if (realtime_output_level >= 3 and save_license_plates_preference == True): # Only display this status message if the output level indicates to do so.
                 print("Done.\n----------")
 
 
@@ -1763,6 +1790,18 @@ elif (mode_selection == "3" and dashcam_mode_enabled == True): # The user has se
 # Information mode
 
 elif (mode_selection == "4" and information_mode_enabled == True): # The user has set Predator to boot into information mode.
+
+    if (default_root != ""): # Check to see if the user has configured a default root directory path.
+        print(style.bold + "Using default preference for root directory." + style.end) # Notify the user that Predator is choosing the root project directory based on the default set in the configuration.
+        root = default_root # Use the default set in the configuration.
+    else:
+        root = input("Project root directory path: ") # Prompt the user to enter a path for the current project.
+
+    # Run some validation to make sure the information just entered by the user is correct.
+    if (os.path.exists(root) == False): # Check to see if the root directory entered by the user exists.
+        print(style.yellow + "Warning: The root project directory entered doesn't seem to exist. Predator will almost certainly fail." + style.end)
+        input("Press enter to continue...")
+
 
     while True: # Run forever in a loop until terminated.
         time.sleep(float(information_refresh_delay)) # Wait for a certain amount of time, as specified in the configuration.
@@ -1847,6 +1886,15 @@ elif (mode_selection == "4" and information_mode_enabled == True): # The user ha
                         print("    Speed: " + str(nearest_camera["spd"])) # Display the speed limit of the traffic camera.
 
 
+
+
+        if (information_record_telemetry == True): # Check to see if Predator is configured to record telemetry data.
+            if (gps_enabled == True): # Check to see if GPS features are enabled.
+                export_data = str(round(time.time())) + "," + str(current_speed) + "," + str(current_location[0]) + "," + str(current_location[1]) + "," + str(current_location[3]) + "," + str(current_location[4]) + "," + str(current_location[5]) + "\n" # Add all necessary information to the export data.
+            else:
+                export_data = str(round(time.time())) + "," + str("0") + "," + str("0.000") + "," + str("0.000") + "," + str("0") + "," + str("0") + "," + str("0") + "\n" # Add all necessary information to the export data, using placeholders for information that depends on GPS.
+
+            add_to_file(root + "/information_recording.csv", export_data, silence_file_saving) # Add the export data to the end of the file and write it to disk.
 
 
 
