@@ -100,6 +100,9 @@ After configuring Predator, you can try it out for the first time!
     - Select a mode by entering the number associated with it in the selection menu.
 3. Set preferences
     - Next Predator will prompt you to set your preferences for this session. The settings you are prompted for will change depending on the mode you choose. Below are the preference menus you'll see for all modes.
+    - Management mode:
+        - In management mode, you'll only be asked for a root project directory. Simply create or select a folder containing the project you'd like to manage, or specify an empty folder to work from a clean state.
+            - Example: `/home/cvieira/Downloads/MyProjectFolder`
     - Pre-recorded mode:
         - First, you'll be asked to set the root project folder. Simply create an empty folder, then place your video(s) into it. Specify the absolute path to this folder here.
             - Example: `/home/pi/Downloads/MyProjectFolder`
@@ -124,15 +127,8 @@ After configuring Predator, you can try it out for the first time!
             - If you don't see this setting prompt when running Predator in pre-recorded mode, it's likely that you didn't supply a time and date in the previous prompt. This is required to enable GPX location correlation.
             - Example: `DashcamVideoLocation.gpx`
     - Real-time mode:
-        - First, you'll be asked to set the root project folder. Simply create an empty folder, then place any files you want to use later into it. Specify the absolute path to this folder here.
+        - First, you'll be asked to set the root project folder. Simply create an empty folder, or choose an already existing project folder, then place any files you want to use later into it. Specify the absolute path to this folder here.
             - Example: `/home/pi/Downloads/MyProjectFolder`
-            - Don't include a forward slash at the end of the path. However, in the event that you do, Predator should be able to filter out to prevent errors on most systems. Regardless, it's best practice to avoid this.
-        - Next, you'll be asked for an alert database. An alert database is simply a plain text file containing a list of license plates you want Predator to display an alert for.
-            - This alert database should be a plain text file, and have one license plate per line, and no other characters.
-            - This preference also accepts URLs. If a URL is entered, Predator will download the list of plates from a plain text file hosted at the URL specified.
-            - If you leave this blank, no alerts will be displayed.
-                - To clarify, messages indicating detected license plates will still appear, but all plates will be treated identically, and there won't be any heightened alerts.
-            - Example: `ImportantPlates.txt`
         - Next, you'll be asked whether or not you want to save the license plates detected by Predator in real-time mode. When this turned on, Predator will automatically save every plate it detects in a file named `real_time_plates.csv` in the root project directory, along with a timestamp and whether or not the plate was in the alert database you specified before.
             - This file follows this format: `plate,timestamp,alert_status,latitude,longitude`
                 - `plate` is replaced by the characters in the detected plate.
@@ -154,10 +150,16 @@ After configuring Predator, you can try it out for the first time!
     - Dash-cam mode:
         - In dash-cam mode, you'll only be asked for a root project directory. Simply create an empty folder, and specify it's full absolute path here.
             - Example: `/home/cvieira/Downloads/MyProjectFolder`
-            - Don't include a forward slash at the end of the path. However, in the event that you do, Predator should be able to filter out to prevent errors on most systems. Regardless, it's best practice to avoid this.
+    - Information mode:
+        - In information mode, you'll only be asked for a root project directory. Simply create an empty folder, and specify it's full absolute path here.
+            - Example: `/home/cvieira/Downloads/MyProjectFolder`
     
 4. Run Predator
     - After finishing setting up your preferences, Predator will begin running automatically. Below you'll see information for all operation modes of Predator.
+        - Management mode
+            - Unlike the other modes, the entirety of management mode involves user menus.
+            - To navigate through each menu, simply enter the characters associated with the menu selection you'd like to make.
+                - Typically, menu items will be identified simply with numbers, but there may also be an additional letter, like in the case of the 'Copy' and 'Delete' menus.
         - Pre-recorded mode
             - You should note that while Predator is running it's analysis, you'll notice a folder named 'frames' appear in the project folder. Individual frames will begin to appear in this folder as Predator runs. Do not modify or delete these, since Predator will repeatedly access and modify these during the course of it's analysis. After analysis completes, you can safely delete these files either manually, or by using Predator's management mode.
             - After Predator finishes running, you'll be sent to the analysis menu.
@@ -181,3 +183,6 @@ After configuring Predator, you can try it out for the first time!
             - The dash-cam video recorded will be saved to the project folder as `predator_dashcam_TIME_CHANNEL.mkv`.
                 - `TIME` is replaced by a Unix timestamp of when the file was created.
                 - `CHANNEL` is replaced by the name of the device used, as specified in the configuration.
+        - Information mode
+            - In information, Predator will run in an endless loop, displaying information based on the configuration.
+            - Depending on the configuration, Predator may also record telemetry to the `information_recording.csv` file in the root project directory.
