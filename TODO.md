@@ -39,7 +39,8 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Add the ability for Predator to detect multiple license plates per frame in real-time mode.
 - [X] The ability to interface with GPS data in order to provide new features and functionality.
 - [X] Add a shape alert for traffic cameras.
-- [X] Add "information mode" for displaying useful information through the console output.
+- [X] Add "Information Mode" for displaying useful information through the console output.
+- [ ] Add telemetry recording in Information Mode
 - [ ] Add GPS based alerts for automated license plate readers.
 
 
@@ -47,6 +48,8 @@ These are the features actively planned for Predator and are likely to be added 
 
 These are features that may require more in-depth changes, and are purely hypothetical.
 
-- [ ] Add "survey mode", for reporting the locations of speed cameras, license plate reading cameras, and other potential points of interest.
-- [ ] The ability to process multiple videos sequentially in pre-recorded mode.
+- [ ] Add "Survey Mode", for reporting the locations of speed cameras, license plate reading cameras, and other potential points of interest.
+- [ ] Add "Crowdsource Mode", for reporting traffic, police, mobile speed cameras, and other hazards in real time.
+- [ ] Add the ability to detect VASCAR lines. 
+- [ ] Add the ability to process multiple videos sequentially in pre-recorded mode.
 - [ ] A GUI front-end in addition to the existing command line interface.
