@@ -192,13 +192,14 @@ March 26th, 2022
 - Increased the default real-time plate guesses to 20 guess per plate.
 
 
+
 ## Version 7.0
 
 ### Information Update
 
-*Release date: to be determined*
+March 30th, 2022
 
-This update adds information mode, which allows Predator to rapidly display useful information in the console output, as well as several new features to real-time mode.
+This update adds 'information mode', which allows Predator to rapidly display useful information in the console output, as well as several new features to real-time mode.
 
 - Adjusted some comments that had typos or confusing wording.
 - License plate recognition can now be entirely disabled in real-time mode using the `realtime_alpr_enabled` configuration value.
@@ -226,3 +227,13 @@ This update adds information mode, which allows Predator to rapidly display usef
 - Adjusted the default values for a couple settings.
 - Moved the alert databases to a centralized configuration value for sake of efficiency and organization.
     - The start-up prompt asking the user to enter an alert database is no longer shown.
+
+
+
+## Version 8.0
+
+### Survey Update
+
+*Release date: to be determined*
+
+This update prefaces plans for future updates, and adds 'survey mode', which allows the user to mark the locations of various points of interest using a connected GPS.

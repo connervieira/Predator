@@ -81,7 +81,7 @@ After configuring Predator, you can try it out for the first time!
         - To learn more about each mode, see the mode descriptions below.
         - This command-line argument will override the `auto_start_mode` configuration value.
 2. Select a mode
-    - Predator can operate in 5 possible modes.
+    - Predator can operate in 6 possible modes.
         - Management mode (Mode 0)
             - This mode isn't a main operating mode for Predator, and simply exists for doing management tasks.
             - In situations where Predator is hard-installed, like in a vehicle or security system, this mode makes it easy to clear folders, copy files, and maintain Predator without having to remove the central processor.
@@ -97,6 +97,9 @@ After configuring Predator, you can try it out for the first time!
         - Information mode (Mode 4)
             - In this mode, Predator will act like an information dashboard, and will show customizable information displays, including the current time, GPS location, altitude, nearest speed cameras, and more.
             - In this mode, Predator doesn't require a camera to be connected.
+        - Survey mode (Mode 5)
+            - In this mode, Predator allows the user to create, view, and edit databases of points of interest.
+            - In this mode, Predator doesn't required a camera to be connected, but a GPS is required.
     - Select a mode by entering the number associated with it in the selection menu.
 3. Set preferences
     - Next Predator will prompt you to set your preferences for this session. The settings you are prompted for will change depending on the mode you choose. Below are the preference menus you'll see for all modes.

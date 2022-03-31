@@ -92,6 +92,7 @@ prerecorded_mode_enabled = config["general"]["modes_enabled"]["prerecorded"] # T
 realtime_mode_enabled = config["general"]["modes_enabled"]["realtime"] # This setting is used to prevent realtime mode from being loaded from the user menu or command line arguments of Predator.
 dashcam_mode_enabled = config["general"]["modes_enabled"]["dashcam"] # This setting is used to prevent dashcam mode from being loaded from the user menu or command line arguments of Predator.
 information_mode_enabled = config["general"]["modes_enabled"]["information"] # This setting is used to prevent information mode from being loaded from the user menu or command line arguments of Predator.
+survey_mode_enabled = config["general"]["modes_enabled"]["survey"] # This setting is used to prevent survey mode from being loaded from the user menu or command line arguments of Predator.
 alert_database_license_plates = config["general"]["alert_databases"]["license_plates"] # This configuration value defines the file that Predator will load the alert list for license plates from.
 
 
@@ -297,17 +298,19 @@ if (prerecorded_mode_enabled == True): # Only show the Pre-recorded mode option 
     print("1. Pre-recorded")
 if (realtime_mode_enabled == True): # Only show the Real-time mode option if it's enabled in the Predator configuration.
     print("2. Real-time")
-if (dashcam_mode_enabled == True): # Only show Dash-cam mode option if it's enabled in the Predator configuration.
+if (dashcam_mode_enabled == True): # Only show the Dash-cam mode option if it's enabled in the Predator configuration.
     print("3. Dash-cam")
-if (information_mode_enabled == True): # Only show Dash-cam mode option if it's enabled in the Predator configuration.
+if (information_mode_enabled == True): # Only show the Information mode option if it's enabled in the Predator configuration.
     print("4. Information")
+if (survey_mode_enabled == True): # Only show the Survey mode option if it's enabled in the Predator configuration.
+    print("5. Survey")
 
 # Check to see if the auto_start_mode configuration value is an expected value. If it isn't execution can continue, but the user will need to manually select what mode Predator should start in.
-if (auto_start_mode != "" and auto_start_mode != "0" and auto_start_mode != "1" and auto_start_mode != "2" and auto_start_mode != "3" and auto_start_mode != "4"):
-    print(style.yellow + "Warning: The 'auto_start_mode' configuration value isn't properly set. This value should be blank, '0', '1', '2', '3', or '4'. It's possible there's been a typo." + style.end)
+if (auto_start_mode != "" and auto_start_mode != "0" and auto_start_mode != "1" and auto_start_mode != "2" and auto_start_mode != "3" and auto_start_mode != "4" and auto_start_mode != "5"):
+    print(style.yellow + "Warning: The 'auto_start_mode' configuration value isn't properly set. This value should be blank, '0', '1', '2', '3', '4', or '5'. It's possible there's been a typo." + style.end)
 
 if (len(sys.argv) > 1):
-    if (sys.argv[1] == "0" or sys.argv[1] == "1" or sys.argv[1] == "2" or sys.argv[1] == "3" or sys.argv[1] == "4"): # Check to see if a mode override was specified in the Predator command arguments.
+    if (sys.argv[1] == "0" or sys.argv[1] == "1" or sys.argv[1] == "2" or sys.argv[1] == "3" or sys.argv[1] == "4" or sys.argv[1] == "5"): # Check to see if a mode override was specified in the Predator command arguments.
         auto_start_mode = sys.argv[1] # Set the automatic start mode to the mode specified by the command line argument.
 
 if (auto_start_mode == "0" and management_mode_enabled == True): # Based on the configuration, Predator will automatically boot into management mode.
@@ -325,6 +328,9 @@ elif (auto_start_mode == "3" and dashcam_mode_enabled == True): # Based on the c
 elif (auto_start_mode == "4" and information_mode_enabled == True): # Based on the configuration, Predator will automatically boot into information mode.
     print(style.bold + "Automatically starting into information mode." + style.end)
     mode_selection = "4"
+elif (auto_start_mode == "5" and survey_mode_enabled == True): # Based on the configuration, Predator will automatically boot into survey mode.
+    print(style.bold + "Automatically starting into survey mode." + style.end)
+    mode_selection = "5"
 else: # No 'auto start mode' has been configured, so ask the user to select manually.
     mode_selection = input("Selection: ")
 
@@ -1895,6 +1901,145 @@ elif (mode_selection == "4" and information_mode_enabled == True): # The user ha
                 export_data = str(round(time.time())) + "," + str("0") + "," + str("0.000") + "," + str("0.000") + "," + str("0") + "," + str("0") + "," + str("0") + "\n" # Add all necessary information to the export data, using placeholders for information that depends on GPS.
 
             add_to_file(root + "/information_recording.csv", export_data, silence_file_saving) # Add the export data to the end of the file and write it to disk.
+
+
+
+
+
+
+
+
+
+
+# Survey mode
+
+elif (mode_selection == "5" and information_mode_enabled == True): # The user has set Predator to boot into survey mode.
+
+    if (default_root != ""): # Check to see if the user has configured a default root directory path.
+        print(style.bold + "Using default preference for root directory." + style.end) # Notify the user that Predator is choosing the root project directory based on the default set in the configuration.
+        root = default_root # Use the default set in the configuration.
+    else:
+        root = input("Project root directory path: ") # Prompt the user to enter a path for the current project.
+
+    # Run some validation to make sure the information just entered by the user is correct.
+    if (os.path.exists(root) == False): # Check to see if the root directory entered by the user exists.
+        print(style.yellow + "Warning: The root project directory entered doesn't seem to exist. Predator will almost certainly fail." + style.end)
+        input("Press enter to continue...")
+
+
+
+    while True:
+        clear() # Clear the console output at the beginning of each loop.
+
+        # Prompt the user to select an operation.
+        print("Please select an option.")
+        print("0. Quit")
+        print("1. Create database")
+        print("2. Edit database")
+        print("3. View database")
+        print("4. Survey database")
+        selection = input("Selection: ")
+
+
+        if (selection == "0"): # The user has selected the "quit" option.
+            print("Quitting...") # Inform the user that Predator is quitting before breaking the loop.
+            break # Break the loop to terminate Predator.
+
+        elif (selection == "1"): # The user has selected the "create database" option.
+            database_name, database_description, database_author, database_file = "", "", "", "" # Set all variables related to the new database to a blank string as a placeholder.
+            while (database_name == ""): # Ask the user for a name for the database forever until they enter something.
+                database_name = input("    Database name: ") # Prompt the user to enter a name for the new database.
+            database_description = input("    Database description: ") # Prompt the user to enter a description for the new database.
+            database_author = input("    Database author: ") # Prompt the user to enter an author for the new database.
+            while (database_file == "" or ".json" not in database_file): # Ask the user for a file name for the database file forever until they enter a valid file name.
+                database_file = input("    Database file: ") # Prompt the user to enter a file name for the new database.
+
+            database_data = { # Format the database data as a Python dictionary.
+                "name": database_name,
+                "description": database_description,
+                "author": database_author,
+                "elements": {},
+                "entries": {}
+            }
+
+
+            print("Enter each data element you'd like each entry in this database to have, in addition to the GPS coordinates included by default. Leave a blank and press enter to finish adding elements.")
+            element_addition_counter = 0 # This is a placeholder variable that will be incremented by one for each element added in the next step.
+            elements = {} # Create a placeholder dictionary that will be used to hold all of the entry elements specified by the user.
+            while True: # Run forever untilt he user is finished entering entry elements.
+                element_addition_counter = element_addition_counter + 1 # Increment the element addition counter by 1.
+                element_name, element_format = "", "" # Set both variables to a blank placeholder string.
+                print("    Element " + str(element_addition_counter) + ":") # Display the current element count so the user can keep track of how many they've added.
+                element_name = input("        Name: ").lower() # Prompt the user for a name for the current element
+                if (element_name != ""): # Only prompt the user to enter an element format if the element name wasn't left blank.
+                    while (element_format != "str" and element_format != "int" and element_format != "float" and element_format != "bool"): # Repeatedly prompt the user to enter an element type until they enter a valid one.
+                        element_format = input("        Format (str/int/float/bool): ").lower() # Prompt the user to enter an element format (variable type).
+
+                if (element_name == ""): # If the element name prompt was left blank, then break the loop, and finish adding elements.
+                    break
+                else: # If the element was not left blank, then add this element to the list of elements for this database.
+                    database_data["elements"][str(element_name)] = str(element_format) # Add an element to the list of entry elements for this database based on the user's inputs.
+
+
+            save_to_file(str(root) + "/" + str(database_file), str(json.dumps(database_data)), silence_file_saving) # Save the database to disk as JSON data.
+            clear() # Clear the console output.
+            print("Database created!") # Inform the user that the database was created.
+            input("Press enter to continue...") # Wait for the user to press enter before continuing.
+
+
+        if (selection == "2"): # The user has selected the "edit database" option. TODO
+            database_file = "" # Set the current database file name to a blank placeholder string.
+            while (os.path.exists(root + "/" + database_file) == False or database_file == ""): # Run forever until the user enters a valid database file name.
+                database_file = input("Database file name: ") # Prompt the user to enter the name of the database file they want to view.
+                if (os.path.exists(root + "/" + database_file) == False): # Check to see if the database file entered by the user exists.
+                    print(style.yellow + "Warning: The database file name entered doesn't seem to exist in the root project folder. Please enter a valid file name." + style.end) # Inform the user that the file name they entered doesn't exist in the root project directory.
+
+            database_data = json.load(open(root + "/" + database_file)) # Load the database information from the file specified by the user.
+
+            
+
+        if (selection == "3"): # The user has selected the "view database" option.
+            database_file = "" # Set the current selected database file name to a blank placeholder string.
+            while (os.path.exists(root + "/" + database_file) == False or database_file == ""): # Run forever until the user enters a valid database file name.
+                database_file = input("Database file name: ") # Prompt the user to enter the name of the database file they want to view.
+                if (os.path.exists(root + "/" + database_file) == False): # Check to see if the database file entered by the user exists.
+                    print(style.yellow + "Warning: The database file name entered doesn't seem to exist in the root project folder. Please enter a valid file name." + style.end) # Inform the user that the file name they entered doesn't exist in the root project directory.
+
+            database_data = json.load(open(root + "/" + database_file)) # Load the database information from the file specified by the user.
+
+            clear() # Clear the console output.
+            print("Database file: " + root + "/" + database_file) # Display the current database's file path.
+            print("Database name: " + database_data["name"]) # Display the current database's name.
+            print("Database description: " + database_data["description"]) # Display the current database's description.
+            print("Database author: " + database_data["author"]) # Display the current database's author.
+            print("Database elements: ")
+            print(json.dumps(database_data["elements"], indent = 4)) # Display all of the entry elements for the current database.
+            selection = input("Display all database entries (y/n): ").lower() # Prompt the user to decide whether or not to show all database entries.
+
+            if (selection[0] == "y"): # If the user selected to show all database entries, then clear the screen and print them to the console.
+                clear()
+                print("Database entries: ")
+                print(json.dumps(database_data["entries"], indent = 4)) # Display all of the entries in the current database.
+                input("Press enter to continue...") # Wait for the user to press enter before continuing.
+            elif (selection[0] == "n"): # If the user opted not to show all database entries, then simply skip and continue.
+                print("Skipping...")
+            else: # If the user entered an invalid selection, then show a notice that an invalid selection was made, then skip.
+                print(style.yellow + "Warning: Invalid option." + style.end)
+                print("Skipping...")
+                input("Press enter to continue...") # Wait for the user to press enter before continuing.
+
+            
+        if (selection == "4"): # The user has selected the "survey database" option. TODO
+            while True: # Run forever in a loop until terminated.
+                pass
+        else: # The user has selected an invalid option in the survey mode main menu.
+            print(style.yellow + "Warning: Invalid selection" + style.end)
+
+
+
+
+
+
 
 
 

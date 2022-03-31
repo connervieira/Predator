@@ -13,7 +13,8 @@
             "prerecorded": true,
             "realtime": true,
             "dashcam": true,
-            "information": true
+            "information": true,
+            "survey": true
         },
         "alert_databases": {
             "license_plates": "",
