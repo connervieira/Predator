@@ -11,28 +11,28 @@ This is the installation process for Predator and all of it's dependencies. This
     - `pip3 install validators opencv-python-headless==4.5.3.56 cvlib tensorflow keras silence-tensorflow psutil gps geopy gpsd-py3`
     - When tested on a Raspberry Pi 3, this step occasionally caused some issues. If you receive errors related to OpenCV when attempting to run Predator later, try uninstalling OpenCV Headless and replace it with the standard OpenCV library.
         - `pip3 uninstall opencv-python-headless; pip3 install opencv-python`
-2. Optionally, install OpenALPR (Recommended)
+2. Optionally, install OpenALPR (Highly Recommended)
     - Since Predator depends on OpenALPR as the core of its license plate recognition, you'll need to install it for it to work properly.
     - If you don't install OpenALPR, Predator will encounter errors while operating in modes that require license plate reading.
     - You can learn about the OpenALPR installation process at <https://github.com/openalpr/openalpr>
     - After installing, you should be able to run OpenALPR using the `alpr` command. If not, Predator won't be able to run OpenALPR, and will fail to analyze license plates.
-3. Optionally, install FFMPEG (Recommended)
+3. Optionally, install FFMPEG (Highly Recommended)
     - Predator uses FFMPEG to process videos.
     - If you don't install FFMPEG, Predator will encounter errors while operating in modes that require video processing.
     - You can install FFMPEG using the following command on a Debian based Linux machine: `sudo apt-get install ffmpeg`
-4. Optionally, install FSWebcam (Recommended)
+4. Optionally, install FSWebcam (Highly Recommended)
     - Predator uses FSWebcam to access connected cameras.
     - If you don't install FSWebcam, Predator will encounter errors while operating in modes that require accessing USB cameras.
     - You can install FSWebcam using the following command on a Debian based Linux machine: `sudo apt-get install fswebcam`
-5. Optionally, install ImageMagick (Recommended)
+5. Optionally, install ImageMagick (Highly Recommended)
     - Predator uses ImageMagick to manipulate still frames of video.
     - If you don't install ImageMagick, Predator will encounter errors while operating in modes that require image processing.
     - You can learn about the ImageMagick installation process at <https://imagemagick.org/script/download.php>
-6. Optionally, install MPG321
+6. Optionally, install MPG321 (Recommended)
     - Predator requires MPG321 in order to play audio effects for alerts.
     - If you don't install MPG321, Predator will encounter errors when audio alerts are enabled in the configuration.
     - You can install MPG321 using the following command on a Debian based Linux machine: `sudo apt-get install mpg321`
-7. Optionally, install GPSD
+7. Optionally, install GPSD (Recommended)
     - GPSD is required for Predator to receive GPS data.
     - If you don't install GPSD, Predator will encounter errors when GPS features are enabled in the configuration.
     - You can install GPSD using this command on a Debian based Linux machine: `sudo apt-get install gpsd gpsd-clients`
