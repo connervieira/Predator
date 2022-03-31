@@ -1987,7 +1987,7 @@ elif (mode_selection == "5" and information_mode_enabled == True): # The user ha
             input("Press enter to continue...") # Wait for the user to press enter before continuing.
 
 
-        if (selection == "2"): # The user has selected the "edit database" option. TODO
+        if (selection == "2"): # The user has selected the "edit database" option.
             database_file = "" # Set the current database file name to a blank placeholder string.
             while (os.path.exists(root + "/" + database_file) == False or database_file == ""): # Run forever until the user enters a valid database file name.
                 database_file = input("Database file name: ") # Prompt the user to enter the name of the database file they want to view.
@@ -1995,6 +1995,54 @@ elif (mode_selection == "5" and information_mode_enabled == True): # The user ha
                     print(style.yellow + "Warning: The database file name entered doesn't seem to exist in the root project folder. Please enter a valid file name." + style.end) # Inform the user that the file name they entered doesn't exist in the root project directory.
 
             database_data = json.load(open(root + "/" + database_file)) # Load the database information from the file specified by the user.
+            print("Leave an entry blank to leave the value unchanged.")
+
+            print("Database name:")
+            print("    Current: " + database_data["name"]) # Display the database's current name.
+            new_name = str(input("New: ")) # Prompt the user to enter a new name.
+            if (new_name != ""): # Only change the database name if the user didn't leave the prompt blank.
+                database_data["name"] = new_name # Set the database's name to the new name specified by the user.
+                print("    Name changed") # Notify the user that the name was changed.
+            else: # If the 'new name' prompt was left blank, then don't change the name.
+                print("    Name unchanged") # Notify the user that the name was left unchanged.
+
+            print("Database description:")
+            print("    Current: " + database_data["description"]) # Display the database's current description.
+            new_description = str(input("New: ")) # Prompt the user to enter a new description.
+            if (new_description != ""): # Only change the database description if the user didn't leave the prompt blank.
+                database_data["description"] = new_description # Set the database's description to the new description specified by the user.
+                print("    Description changed") # Notify the user that the description was changed.
+            else: # If the 'new description' prompt was left blank, then don't change the description.
+                print("    Description unchanged") # Notify the user that the description was left unchanged.
+
+            print("Database author:")
+            print("    Current: " + database_data["author"]) # Display the database's current author.
+            new_author = str(input("New: ")) # Prompt the user to enter a new author.
+            if (new_author != ""): # Only change the database author if the user didn't leave the prompt blank.
+                database_data["author"] = new_author # Set the database's author to the new author specified by the user.
+                print("    Author changed") # Notify the user that the author was changed.
+            else: # If the 'new author' prompt was left blank, then don't change the author.
+                print("    Author unchanged") # Notify the user that the author was left unchanged.
+
+
+            # Show the newly updated database information.
+            print("New name: " + str(database_data["name"]))
+            print("New description: " + str(database_data["description"]))
+            print("New author: " + str(database_data["author"]))
+
+            overwrite_confirmation = input("Write changes to disk (y/n): ").lower() # Ask the user to confirm the changes before overwriting the database.
+
+            if (overwrite_confirmation[0] == "y"): # Only overwrite the database after the user confirms doing so.
+                save_to_file(str(root) + "/" + str(database_file), str(json.dumps(database_data)), silence_file_saving) # Save the database to disk as JSON data.
+                print("Saved changes.") # Inform the user that the changes were saved.
+                input("Press enter to continue...") # Wait for the user to press enter before continuing.
+            elif (overwrite_confirmation[0] == "n"): # If the user didn't confirm the changes, then simply discard them and continue without saving the changes to disk.
+                print("Discarded changes.") # Inform the user that the changes were discarded.
+                input("Press enter to continue...") # Wait for the user to press enter before continuing.
+            else: # If the user entered an invalid selection, then show a notice that an invalid selection was made, then skip.
+                print(style.yellow + "Warning: Invalid option." + style.end) # Show a warning that an invalid option was selected.
+                print("Discarded changes.") # Inform the user that the changes were discarded.
+                input("Press enter to continue...") # Wait for the user to press enter before continuing.
 
             
 
