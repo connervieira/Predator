@@ -11,28 +11,28 @@ This is the installation process for Predator and all of it's dependencies. This
     - `pip3 install validators opencv-python-headless==4.5.3.56 cvlib tensorflow keras silence-tensorflow psutil gps geopy gpsd-py3`
     - When tested on a Raspberry Pi 3, this step occasionally caused some issues. If you receive errors related to OpenCV when attempting to run Predator later, try uninstalling OpenCV Headless and replace it with the standard OpenCV library.
         - `pip3 uninstall opencv-python-headless; pip3 install opencv-python`
-2. Optionally, install OpenALPR (Recommended)
+2. Optionally, install OpenALPR (Highly Recommended)
     - Since Predator depends on OpenALPR as the core of its license plate recognition, you'll need to install it for it to work properly.
     - If you don't install OpenALPR, Predator will encounter errors while operating in modes that require license plate reading.
     - You can learn about the OpenALPR installation process at <https://github.com/openalpr/openalpr>
     - After installing, you should be able to run OpenALPR using the `alpr` command. If not, Predator won't be able to run OpenALPR, and will fail to analyze license plates.
-3. Optionally, install FFMPEG (Recommended)
+3. Optionally, install FFMPEG (Highly Recommended)
     - Predator uses FFMPEG to process videos.
     - If you don't install FFMPEG, Predator will encounter errors while operating in modes that require video processing.
     - You can install FFMPEG using the following command on a Debian based Linux machine: `sudo apt-get install ffmpeg`
-4. Optionally, install FSWebcam (Recommended)
+4. Optionally, install FSWebcam (Highly Recommended)
     - Predator uses FSWebcam to access connected cameras.
     - If you don't install FSWebcam, Predator will encounter errors while operating in modes that require accessing USB cameras.
     - You can install FSWebcam using the following command on a Debian based Linux machine: `sudo apt-get install fswebcam`
-5. Optionally, install ImageMagick (Recommended)
+5. Optionally, install ImageMagick (Highly Recommended)
     - Predator uses ImageMagick to manipulate still frames of video.
     - If you don't install ImageMagick, Predator will encounter errors while operating in modes that require image processing.
     - You can learn about the ImageMagick installation process at <https://imagemagick.org/script/download.php>
-6. Optionally, install MPG321
+6. Optionally, install MPG321 (Recommended)
     - Predator requires MPG321 in order to play audio effects for alerts.
     - If you don't install MPG321, Predator will encounter errors when audio alerts are enabled in the configuration.
     - You can install MPG321 using the following command on a Debian based Linux machine: `sudo apt-get install mpg321`
-7. Optionally, install GPSD
+7. Optionally, install GPSD (Recommended)
     - GPSD is required for Predator to receive GPS data.
     - If you don't install GPSD, Predator will encounter errors when GPS features are enabled in the configuration.
     - You can install GPSD using this command on a Debian based Linux machine: `sudo apt-get install gpsd gpsd-clients`
@@ -98,7 +98,11 @@ After configuring Predator, you can try it out for the first time!
             - In this mode, Predator will act like an information dashboard, and will show customizable information displays, including the current time, GPS location, altitude, nearest speed cameras, and more.
             - In this mode, Predator doesn't require a camera to be connected.
         - Survey mode (Mode 5)
-            - In this mode, Predator allows the user to create, view, and edit databases of points of interest.
+            - In this mode, Predator allows the user to create, view, edit, and survey databases of points of interest.
+                - The 'create' function allows the user to create a fresh database with a name, description, author, and entry elements.
+                - The 'view' function allows the user to view the metadata and entries in a particular database.
+                - The 'edit' function allows the user to change the name, description, and author of a database.
+                - The 'survey' function allows the user to add entries to the database by filling out the entry elements specified when the database was created.
             - In this mode, Predator doesn't required a camera to be connected, but a GPS is required.
     - Select a mode by entering the number associated with it in the selection menu.
 3. Set preferences
@@ -154,8 +158,12 @@ After configuring Predator, you can try it out for the first time!
         - In dash-cam mode, you'll only be asked for a root project directory. Simply create an empty folder, and specify it's full absolute path here.
             - Example: `/home/cvieira/Downloads/MyProjectFolder`
     - Information mode:
-        - In information mode, you'll only be asked for a root project directory. Simply create an empty folder, and specify it's full absolute path here.
+        - In information mode, you'll only be asked for a root project directory. Simply create an empty folder or select an already created one, and specify it's full absolute path here.
             - Example: `/home/cvieira/Downloads/MyProjectFolder`
+    - Survey mode:
+        - In survey mode, you'll be asked for a root project directory. Simply create or select a folder containing the project you'd like to manage, or specify an empty folder to work from a clean state.
+            - Example: `/home/cvieira/Downloads/MyProjectFolder`
+        - Depending on the function you select in survey mode, you may also be asked to enter a database file. For this, simply enter the file name of a database file in the root project directory you specified previously.
     
 4. Run Predator
     - After finishing setting up your preferences, Predator will begin running automatically. Below you'll see information for all operation modes of Predator.
@@ -187,5 +195,11 @@ After configuring Predator, you can try it out for the first time!
                 - `TIME` is replaced by a Unix timestamp of when the file was created.
                 - `CHANNEL` is replaced by the name of the device used, as specified in the configuration.
         - Information mode
-            - In information, Predator will run in an endless loop, displaying information based on the configuration.
+            - In information mode, Predator will run in an endless loop, displaying information based on the configuration.
             - Depending on the configuration, Predator may also record telemetry to the `information_recording.csv` file in the root project directory.
+        - Survey mode
+            - In survey mode, Predator will display a menu prompting the user to select to create, view, edit, or survey a database.
+                - The 'create' function allows the user to create a fresh database.
+                - The 'view' function allows the user to view the metadata and entries in a database.
+                - The 'edit' function allows the user to edit the metadata associated with a database.
+                - The 'survey' function allows the user to add entries to the database by filling out the entry elements specified when the database was created.

@@ -237,3 +237,6 @@ This update adds 'information mode', which allows Predator to rapidly display us
 *Release date: to be determined*
 
 This update prefaces plans for future updates, and adds 'survey mode', which allows the user to mark the locations of various points of interest using a connected GPS.
+
+- Added 'survey mode', which allows the user to create, view, edit, and survey location databases.
+- Pre-recorded mode is now capable of processing multiple videos sequentially.
