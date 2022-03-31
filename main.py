@@ -2077,9 +2077,16 @@ elif (mode_selection == "5" and information_mode_enabled == True): # The user ha
                 input("Press enter to continue...") # Wait for the user to press enter before continuing.
 
             
-        if (selection == "4"): # The user has selected the "survey database" option. TODO
+        if (selection == "4"): # The user has selected the "survey database" option.
+            database_file = "" # Set the current selected database file name to a blank placeholder string.
+            while (os.path.exists(root + "/" + database_file) == False or database_file == ""): # Run forever until the user enters a valid database file name.
+                database_file = input("Database file name: ") # Prompt the user to enter the name of the database file they want to view.
+                if (os.path.exists(root + "/" + database_file) == False): # Check to see if the database file entered by the user exists.
+                    print(style.yellow + "Warning: The database file name entered doesn't seem to exist in the root project folder. Please enter a valid file name." + style.end) # Inform the user that the file name they entered doesn't exist in the root project directory.
+
+            database_data = json.load(open(root + "/" + database_file)) # Load the database information from the file specified by the user.
             while True: # Run forever in a loop until terminated.
-                pass
+                pass # TODO
         else: # The user has selected an invalid option in the survey mode main menu.
             print(style.yellow + "Warning: Invalid selection" + style.end)
 
