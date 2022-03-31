@@ -9,18 +9,16 @@ A vision system primarily designed for license plate reading and general object 
 
 ## Disclaimer
 
+While Predator is designed to be stable and reliable, you should not depend on it for safety or security critical tasks. See the SECURITY.md document for more information.
+
+
+## Description
+
 Predator is an advanced multipurpose platform focused on license plate reading and object recognition. Predator can analyze pre-recorded video from dashcams, security cameras, or other devices, as well as real-time video streams from live vehicle-mounted cameras and static webcams. In addition to video analysis, Predator is also capable of acting as a standard dash-cam or security camera, eliminating the need to install multiple devices for a single usage situation. When installed in a vehicle Predator can seamlessly detect objects and license plates as you drive, sending you alerts automatically based on customizable criteria. When installed as a stationary security camera, Predator can run in the background, sending information to webhooks, or using audio alerts to indicate important events.
 
 Predator's license plate recognition is heavily based on OpenALPR, which is arguably the gold standard for license plate recognition in the open source software community. While OpenALPR provides a rock solid foundation, Predator adds dozens of powerful features that drastically amplify it's abilities. Through extensive customizability, Predator gives you the power to dial in the performance and accuracy of your camera system without ever needing an internet connection or central database. Regardless of what you're looking to accomplish, Predator gives you the means to get there.
 
 Predator goes above just a computer vision platform. Making use of other data sources, like GPS devices, Predator can seamlessly provide alerts for potential points of interest, like speed cameras and red-light cameras. Once again, due to the sheer number of customizability options, all of Predator's alerting and monitoring functionality can be easily configured, disabled, or activated based on what you're looking to accomplish.
-
-
-## Description
-
-Predator is a powerful camera and video processing tool designed to detect license plates in both real-time and in pre-recorded videos. Predator uses OpenALPR as it's back-end, and adds dozens of powerful features ontop of OpenALPR's already strong performance. Predator is designed to process large amounts of video efficiently on both high end hardware and affordable, low-power devices, which makes it extremely versatile. It's designed to be highly customizable, allowing it to fit into any use case, ranging from a static video processing workstation, to a fully offline, mobile real-time detection system.
-
-However, Predator goes beyond just license plate recognition. Using Tensorflow and OpenCV, Predator can recognize common objects, like pedestrians, vehicles, traffic lights, and other common items. Predator also comes with the ability to function as a traditional dashcam, and record video without running any analysis. No matter what you're looking to accomplish with a camera system, Predator gives you the power and customizability to do it.
 
 
 ## General Features
