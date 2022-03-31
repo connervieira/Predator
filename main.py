@@ -1189,8 +1189,9 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
 
 
         elif (selection == "4"): # If the user selects option 4 on the main menu, then show the statstics for this session.
-            print("    Frames analyzed: " + str(len(raw_lpr_scan)))
-            print("    Plates found: " + str(len(plates_detected)))
+            print("    Frames analyzed: " + str(len(raw_lpr_scan))) # Show how many frames of video were analyzed.
+            print("    Plates found: " + str(len(plates_detected))) # Show how many unique plates were detected.
+            print("    Videos analyzed: " + str(len(videos))) # Show how many videos were analyzed.
             input("\nPress enter to continue...") # Wait for the user to press enter before repeating the menu loop.
 
 

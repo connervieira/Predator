@@ -42,10 +42,8 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Add "Information Mode" for displaying useful information through the console output.
 - [X] Move alert databases to a configuration value instead of a start-up preference.
 - [X] Add telemetry recording in Information Mode
-- [X] Add "Survey Mode", for reporting the locations of speed cameras, license plate reading cameras, and other potential points of interest.
 - [X] Add the ability to process multiple videos sequentially in pre-recorded mode.
 - [X] Add "Survey Mode", for reporting the locations of speed cameras, license plate reading cameras, and other potential points of interest.
-- [ ] Test pre-recorded mode's ability to process sequential videos.
 - [ ] Add GPS based alerts for automated license plate readers.
 
 

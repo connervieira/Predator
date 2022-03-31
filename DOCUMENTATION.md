@@ -113,8 +113,9 @@ After configuring Predator, you can try it out for the first time!
     - Pre-recorded mode:
         - First, you'll be asked to set the root project folder. Simply create an empty folder, then place your video(s) into it. Specify the absolute path to this folder here.
             - Example: `/home/pi/Downloads/MyProjectFolder`
-        - Next, you'll be asked to enter the file name of the video you want to analyze. This video should be placed in the root project directory you just specified.
-            - Example: `MyVideo.mp4`
+        - Next, you'll be asked to enter the file name(s) of the video(s) you want to analyze. Video(s) should be placed in the root project directory you just specified. If you have multiple video files, separate their names with a comma and space.
+            - Example 1: `MyVideo.mp4`
+            - Example 2: `MyFirstVideo.mp4, MySecondVideo.mp4`
         - Next, you'll be asked how many seconds you want to wait between frames for analysis. Since it would be inefficient to process every single frame of video, this value is used to only take frames every N seconds. You can think of this value as "only process a frame every N seconds of video"
             - Example: `2` will take a frame to process every 2 seconds of video. This would break up a 10 second video into 5 frames.
             - If you leave this setting blank, Predator will default to 1 frame per second.
