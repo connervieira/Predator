@@ -859,9 +859,11 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
         print(style.yellow + "Warning: The root project directory entered doesn't seem to exist. Predator will almost certainly fail." + style.end)
         input("Press enter to continue...")
 
-    if (os.path.exists(root + "/" + video) == False): # Check to see if the video file name supplied by the user actually exists in the root project folder.
-        print(style.yellow + "Warning: The video file name entered doesn't seem to exist. Predator will almost certainly fail." + style.end)
-        input("Press enter to continue...")
+    videos = video.split(", ") # Split the video input into a list, based on the position of commas.
+    for video in videos: # Iterate through each video specified by the user.
+        if (os.path.exists(root + "/" + video) == False): # Check to see if each video file name supplied by the user actually exists in the root project folder.
+            print(style.yellow + "Warning: The video file " + str(video) + " entered doesn't seem to exist in the root project directory. Predator will almost certainly fail." + style.end) # Inform the user that this video file couldn't be found.
+            input("Press enter to continue...") # Wait for the user to press enter before continuing.
 
     if (gpx_file != "" and os.path.exists(root + "/" + gpx_file) == False): # Check to see if the GPX file name supplied by the user actually exists in the root project folder.
         print(style.yellow + "Warning: The GPX file name entered doesn't seem to exist. Predator will almost certainly encounter issues." + style.end)
@@ -873,13 +875,17 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
 
 
 
+    clear() # Clear the console output
 
-
-    # Split the supplied video into individual frames based on the user's input
-    frame_split_command = "mkdir " + root + "/frames; ffmpeg -i " + root + "/" + video + " -r " + str(1/framerate) + " " + root + "/frames/output%04d.png -loglevel quiet"
-    clear()
+    
+    # Split the supplied video(s) into individual frames based on the user's input.
+    video_counter = 0 # Create a placeholder counter that will be incremented by 1 for each video. This will be appended to the file names of the video frames to keep frames from different videos separate.
     print("Splitting video into discrete images...")
-    os.system(frame_split_command)
+    for video in videos: # Iterate through each video specified by the user.
+        video_counter = video_counter + 1 # Increment the video counter by 1.
+        frame_split_command = "mkdir " + root + "/frames; ffmpeg -i " + root + "/" + video + " -r " + str(1/framerate) + " " + root + "/frames/video" + str(video_counter) + "output%04d.png -loglevel quiet" # Set up the FFMPEG command that will be used to split each video into individual frames.
+        os.system(frame_split_command) # Execute the FFMPEG command to split the video into individual frames.
+     
     print("Done.\n")
 
 
