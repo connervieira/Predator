@@ -98,7 +98,11 @@ After configuring Predator, you can try it out for the first time!
             - In this mode, Predator will act like an information dashboard, and will show customizable information displays, including the current time, GPS location, altitude, nearest speed cameras, and more.
             - In this mode, Predator doesn't require a camera to be connected.
         - Survey mode (Mode 5)
-            - In this mode, Predator allows the user to create, view, and edit databases of points of interest.
+            - In this mode, Predator allows the user to create, view, edit, and survey databases of points of interest.
+                - The 'create' function allows the user to create a fresh database with a name, description, author, and entry elements.
+                - The 'view' function allows the user to view the metadata and entries in a particular database.
+                - The 'edit' function allows the user to change the name, description, and author of a database.
+                - The 'survey' function allows the user to add entries to the database by filling out the entry elements specified when the database was created.
             - In this mode, Predator doesn't required a camera to be connected, but a GPS is required.
     - Select a mode by entering the number associated with it in the selection menu.
 3. Set preferences
@@ -154,8 +158,12 @@ After configuring Predator, you can try it out for the first time!
         - In dash-cam mode, you'll only be asked for a root project directory. Simply create an empty folder, and specify it's full absolute path here.
             - Example: `/home/cvieira/Downloads/MyProjectFolder`
     - Information mode:
-        - In information mode, you'll only be asked for a root project directory. Simply create an empty folder, and specify it's full absolute path here.
+        - In information mode, you'll only be asked for a root project directory. Simply create an empty folder or select an already created one, and specify it's full absolute path here.
             - Example: `/home/cvieira/Downloads/MyProjectFolder`
+    - Survey mode:
+        - In survey mode, you'll be asked for a root project directory. Simply create or select a folder containing the project you'd like to manage, or specify an empty folder to work from a clean state.
+            - Example: `/home/cvieira/Downloads/MyProjectFolder`
+        - Depending on the function you select in survey mode, you may also be asked to enter a database file. For this, simply enter the file name of a database file in the root project directory you specified previously.
     
 4. Run Predator
     - After finishing setting up your preferences, Predator will begin running automatically. Below you'll see information for all operation modes of Predator.
@@ -187,5 +195,11 @@ After configuring Predator, you can try it out for the first time!
                 - `TIME` is replaced by a Unix timestamp of when the file was created.
                 - `CHANNEL` is replaced by the name of the device used, as specified in the configuration.
         - Information mode
-            - In information, Predator will run in an endless loop, displaying information based on the configuration.
+            - In information mode, Predator will run in an endless loop, displaying information based on the configuration.
             - Depending on the configuration, Predator may also record telemetry to the `information_recording.csv` file in the root project directory.
+        - Survey mode
+            - In survey mode, Predator will display a menu prompting the user to select to create, view, edit, or survey a database.
+                - The 'create' function allows the user to create a fresh database.
+                - The 'view' function allows the user to view the metadata and entries in a database.
+                - The 'edit' function allows the user to edit the metadata associated with a database.
+                - The 'survey' function allows the user to add entries to the database by filling out the entry elements specified when the database was created.
