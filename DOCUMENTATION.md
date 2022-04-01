@@ -103,7 +103,7 @@ After configuring Predator, you can try it out for the first time!
                 - The 'view' function allows the user to view the metadata and entries in a particular database.
                 - The 'edit' function allows the user to change the name, description, and author of a database.
                 - The 'survey' function allows the user to add entries to the database by filling out the entry elements specified when the database was created.
-            - In this mode, Predator doesn't required a camera to be connected, but a GPS is required.
+            - In this mode, Predator doesn't required a camera to be connected, but a GPS is highly recommended. If GPS is disabled, then Predator will prompt the user for the current location coordinates every time an entry is added to a database.
     - Select a mode by entering the number associated with it in the selection menu.
 3. Set preferences
     - Next Predator will prompt you to set your preferences for this session. The settings you are prompted for will change depending on the mode you choose. Below are the preference menus you'll see for all modes.
@@ -165,6 +165,7 @@ After configuring Predator, you can try it out for the first time!
         - In survey mode, you'll be asked for a root project directory. Simply create or select a folder containing the project you'd like to manage, or specify an empty folder to work from a clean state.
             - Example: `/home/cvieira/Downloads/MyProjectFolder`
         - Depending on the function you select in survey mode, you may also be asked to enter a database file. For this, simply enter the file name of a database file in the root project directory you specified previously.
+            - Example: `database.json`
     
 4. Run Predator
     - After finishing setting up your preferences, Predator will begin running automatically. Below you'll see information for all operation modes of Predator.
