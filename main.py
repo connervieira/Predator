@@ -1965,8 +1965,10 @@ elif (mode_selection == "5" and information_mode_enabled == True): # The user ha
                 "name": database_name,
                 "description": database_description,
                 "author": database_author,
+                "created": str(round(time.time())),
+                "modified": "",
                 "elements": {},
-                "entries": {}
+                "entries": []
             }
 
 
@@ -1987,8 +1989,9 @@ elif (mode_selection == "5" and information_mode_enabled == True): # The user ha
                 else: # If the element was not left blank, then add this element to the list of elements for this database.
                     database_data["elements"][str(element_name)] = str(element_format) # Add an element to the list of entry elements for this database based on the user's inputs.
 
+            database_data["modified"] = str(round(time.time())) # Update the "last modified" time in the database.
 
-            save_to_file(str(root) + "/" + str(database_file), str(json.dumps(database_data)), silence_file_saving) # Save the database to disk as JSON data.
+            save_to_file(str(root) + "/" + str(database_file), str(json.dumps(database_data, indent = 4)), silence_file_saving) # Save the database to disk as JSON data.
             clear() # Clear the console output.
             print("Database created!") # Inform the user that the database was created.
             input("Press enter to continue...") # Wait for the user to press enter before continuing.
@@ -2037,10 +2040,12 @@ elif (mode_selection == "5" and information_mode_enabled == True): # The user ha
             print("New description: " + str(database_data["description"]))
             print("New author: " + str(database_data["author"]))
 
+            database_data["modified"] = str(round(time.time())) # Update the "last modified" time on the database.
+
             overwrite_confirmation = input("Write changes to disk (y/n): ").lower() # Ask the user to confirm the changes before overwriting the database.
 
             if (overwrite_confirmation[0] == "y"): # Only overwrite the database after the user confirms doing so.
-                save_to_file(str(root) + "/" + str(database_file), str(json.dumps(database_data)), silence_file_saving) # Save the database to disk as JSON data.
+                save_to_file(str(root) + "/" + str(database_file), str(json.dumps(database_data, indent = 4)), silence_file_saving) # Save the database to disk as JSON data.
                 print("Saved changes.") # Inform the user that the changes were saved.
                 input("Press enter to continue...") # Wait for the user to press enter before continuing.
             elif (overwrite_confirmation[0] == "n"): # If the user didn't confirm the changes, then simply discard them and continue without saving the changes to disk.
@@ -2067,6 +2072,8 @@ elif (mode_selection == "5" and information_mode_enabled == True): # The user ha
             print("Database name: " + database_data["name"]) # Display the current database's name.
             print("Database description: " + database_data["description"]) # Display the current database's description.
             print("Database author: " + database_data["author"]) # Display the current database's author.
+            print("Database created: " + database_data["created"]) # Display the current database's creation date.
+            print("Database modified: " + database_data["modified"]) # Display the current database's last-modified date.
             print("Database elements: ")
             print(json.dumps(database_data["elements"], indent = 4)) # Display all of the entry elements for the current database.
             selection = input("Display all database entries (y/n): ").lower() # Prompt the user to decide whether or not to show all database entries.
@@ -2093,7 +2100,50 @@ elif (mode_selection == "5" and information_mode_enabled == True): # The user ha
 
             database_data = json.load(open(root + "/" + database_file)) # Load the database information from the file specified by the user.
             while True: # Run forever in a loop until terminated.
-                pass # TODO
+                clear() # Clear the console output.
+                print("Please select an option")
+                print("0. Quit")
+                print("1. Add Entry To " + str(database_data["name"]))
+                selection = input("Selection: ") # Prompt the user to make a selection.
+
+                if (selection == "0"): # The user has selected the "quit" option from the survey menu in survey mode.
+                    break # Break the loop to return to the main survey mode menu.
+                elif (selection == "1"): # The user has selected to add an enty to the database.
+
+                    if (gps_enabled == True): # Check to see if GPS features are enabled in the configuration.
+                        current_location = get_gps_location() # Get the current GPS location before prompting the user to fill out each element for this entry.
+
+                    entry_data = {} # Create a placeholder dictionary for all of the elements for the new entry.
+
+                    if (gps_enabled == True): # Check to see if GPS features are enabled.
+                        entry_data["latitude"] = str(current_location[0]) # Record the current GPS latitude.
+                        entry_data["longitude"] = str(current_location[1]) # Record the current GPS longitude.
+                    else: # If GPS features are disabled, then manually prompt the user for the current position.
+                        entry_data["latitude"] = float(input("latitude (float): ")) # Prompt the user to enter a value for the current latitude.
+                        entry_data["longitude"] = float(input("longitude (float): ")) # Prompt the user to enter a value for the current longitude.
+
+                    element_iteration_counter = 0 # Set the element iteration counter to 0 so it can be incremented by 1 each time an element is iterated through./
+                    for element in database_data["elements"]: # Iterate through each entry element specified in the database.
+                        element_input = input(str(element) + " (" + database_data["elements"][element] + "): ") # Prompt the user to enter a value for this entry element.
+                        if (database_data["elements"][element] == "str"): # If this element is supposed to be a string, then convert the user's input to a string.
+                            entry_data[element] = str(element_input) # Save the user's input to the data for this entry.
+                        elif (database_data["elements"][element] == "int"): # If this element is supposed to be an integer, then convert the user's input to an integer.
+                            entry_data[element] = int(element_input) # Save the user's input to the data for this entry.
+                        elif (database_data["elements"][element] == "float"): # If this element is supposed to be a floating point number, then convert the user's input to a float.
+                            entry_data[element] = float(element_input) # Save the user's input to the data for this entry.
+                        elif (database_data["elements"][element] == "bool"): # If this element is supposed to be a boolean value, then convert the user's input to a bool.
+                            if (element_input[0].lower() == "t" or element_input[0].lower() == "y"): # The user has entered an input indicating "true".
+                                entry_data[element] = True # Save the user's input to the data for this entry.
+                            elif (element_input[0].lower() == "f" or element_input[0].lower() == "n"): # The user has entered an input indicating "false".
+                                entry_data[element] = False # Save the user's input to the data for this entry.
+
+
+                    database_data["entries"].append(entry_data) # Add the data for this entry to the main database.
+
+                save_to_file(str(root) + "/" + str(database_file), str(json.dumps(database_data, indent = 4)), silence_file_saving) # Save the database entry additions to disk as JSON data.
+
+
+
         else: # The user has selected an invalid option in the survey mode main menu.
             print(style.yellow + "Warning: Invalid selection" + style.end)
 
