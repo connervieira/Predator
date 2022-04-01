@@ -45,6 +45,7 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Add the ability to process multiple videos sequentially in pre-recorded mode.
 - [X] Add "Survey Mode", for reporting the locations of speed cameras, license plate reading cameras, and other potential points of interest.
 - [ ] Add GPS based alerts for automated license plate readers.
+- [ ] Add OBD-II integration.
 
 
 # Hypothetical
