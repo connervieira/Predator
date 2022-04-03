@@ -80,7 +80,7 @@
             "delay": "0.3"
         },
         "alpr_sound": {
-            "path": "./assets/sounds/camera3.mp3",
+            "path": "./assets/sounds/alpr.mp3",
             "repeat": "1",
             "delay": "0.3"
         },
