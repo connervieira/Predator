@@ -240,3 +240,5 @@ This update prefaces plans for future updates, and adds 'survey mode', which all
 
 - Added 'survey mode', which allows the user to create, view, edit, and survey location databases.
 - Pre-recorded mode is now capable of processing multiple videos sequentially.
+- Added support ALPR alerts in Information mode as a survey mode demonstration.
+- Reorganized some configuration values to make custom databases more intuitive.

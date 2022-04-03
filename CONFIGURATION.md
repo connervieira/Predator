@@ -58,7 +58,8 @@ This section of configuration values will effect Predator's general operation.
 - `alert_databases`
     - This setting contains the file names all of the alert databases used by Predator.
         - `license_plates` should be set to (if anything), a plain-text list of license plates that Predator should show a heightened alert for.
-        - `traffic_cameras` should be set to (if anything), an ExCam database of speed, red-light, and traffic cameras.
+        - `traffic_cameras` should be set to (if anything), an ExCam database of speed, red-light, and traffic cameras. Leaving this blank will disable traffic camera alerts.
+        - `alpr_cameras` should be set to (if anything), a Predator JSON database of ALPR cameras. Leaving this blank will disable ALPR camera alerts.
     - Each value in this section should either be left blank, or be a file path relative to the root project folder.
         - For example, if your alert database is in `/home/pi/Data/alerts.txt`, and your root project directory is `/home/pi/Data/`, then then the alert database value should simply be set to `alerts.txt`, not the the full file path.
 
@@ -150,6 +151,7 @@ Configuration values in this section are settings specific to real-time mode.
         - `camera1_sound` is the sound played to alert the user of a traffic camera (speed/red-light camera) detected at a far distance.
         - `camera2_sound` is the sound played to alert the user of a traffic camera (speed/red-light camera) detected at a moderate distance.
         - `camera3_sound` is the sound played to alert the user of a traffic camera (speed/red-light camera) detected at a critically near distance.
+        - `alpr_sound` is played to alert the user of an ALPR camera detected within the configured distance in information mode.
     - The `path` value should be set to the file path of the audio file you want to play.
     - The `repeat` value should be set to how many times you want the sound effect to be repeated.
         - Under normal circumstances, this value should just be "1", but there might be some cases in which you want to play a particular sound repeatedly.
@@ -263,8 +265,6 @@ Predator can notify the user when a speed or red-light camera is nearby, based o
         - `speed` includes both radar and average speed enforcement cameras.
         - `redlight` includes traffic light enforcement cameras.
         - `misc` includes all traffic cameras that don't fall into the other two categories. 
-- `traffic_camera_alert_radius`
-    - This configuration value determines the distance, in miles, at which Predator will alert the user of a speed camera.
 - `traffic_camera_loaded_radius`
     - This is the radius, in miles, that Predator will load traffic cameras from during the initial loading process.
     - For example, if this value is set to `100`, then Predator will only load traffic cameras in a 100 mile radius from the current location when it boots. If you travel more than 100 miles away from your original location without reloading Predator then you won't get traffic camera alerts.
@@ -318,10 +318,6 @@ Predator can notify the user when a speed or red-light camera is nearby, based o
             - This setting determines whether the current track will be displayed while operating in information mode.
         - `satellites`
             - This setting determines whether the current connected satellite count will be displayed while operating in information mode.
-        - `nearest_camera`
-            - This setting determines whether the current nearest traffic camera will be displayed while operating in information mode.
-            - For this configuration value to work properly, the `traffic_camera_alerts_enabled` setting in the real-time section must also be enabled.
-            - This setting will use the same database information loaded according to the `traffic_camera_loaded_radius` setting in the real-time section.
 - `max_nearest_camera_range`
     - This setting determines the maxmium distance that Predator will consider when displaying the nearest traffic camera.
     - Any cameras detected outside this range will be ignored.
@@ -332,3 +328,8 @@ Predator can notify the user when a speed or red-light camera is nearby, based o
         - If `gps_enabled` is set to `false`, then all GPS-dependent information will be left as placeholders.
     - When enabled, a log file will be created in the root project directory named `information_recording.csv`.
         - This file follows this format: `time,current_speed,current_latitude,current_longitude,current_altitude,current_track,current_connected_satellite_count`
+- `custom_alerts`
+    - This setting is a dictonary of alert databases and their alert ranges, in miles.
+    - The databases in this section reference the databases specified by the `alert_databases` configuration value in the general configuration section.
+        - In a future update, the user will be able to add custom alert databases by adding the databases to `alert_databases`, then referencing them in this configuration value with an alert distance.
+    - Example: `"traffic_cameras": 0.5` will show alerts for the `traffic_cameras` database within 0.5 miles of a point-of-interest.

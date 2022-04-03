@@ -4,9 +4,9 @@
         "custom_startup_message": "",
         "auto_start_mode": "",
         "default_root": "",
-        "silence_file_saving": false,
+        "silence_file_saving": true,
         "disable_object_recognition": false,
-        "gps_enabled": false,
+        "gps_enabled": true,
         "speed_display_unit": "mph",
         "modes_enabled": {
             "management": true,
@@ -18,7 +18,8 @@
         },
         "alert_databases": {
             "license_plates": "",
-            "traffic_cameras": ""
+            "traffic_cameras": "",
+            "alpr_cameras": "/home/cvieira/Software/Programming/Python/Predator/assets/databases/alpr.json"
         }
     },
     "prerecorded": {
@@ -78,6 +79,11 @@
             "repeat": "1",
             "delay": "0.3"
         },
+        "alpr_sound": {
+            "path": "./assets/sounds/camera3.mp3",
+            "repeat": "1",
+            "delay": "0.3"
+        },
         "webhook": "",
         "shape_alerts": false,
         "save_real_time_object_recognition": true,
@@ -102,9 +108,7 @@
             "redlight": true,
             "misc": true
         },
-        "traffic_camera_alert_radius": "1",
-        "traffic_camera_database": "",
-        "traffic_camera_loaded_radius": "500"
+        "traffic_camera_loaded_radius": 500
     },
     "dashcam": {
         "dashcam_resolution": "1920x1080",
@@ -115,7 +119,7 @@
         "dashcam_background_mode_realtime": false
     },
     "information": {
-        "information_refresh_delay": "1.0",
+        "information_refresh_delay": 1.0,
         "displays": {
             "time": true,
             "date": true,
@@ -123,10 +127,12 @@
             "location": true,
             "altitude": true,
             "track": true,
-            "satellites": true,
-            "nearest_camera": true
+            "satellites": true
         },
-        "max_nearest_camera_range": "50",
-        "record_telemetry": true
+        "record_telemetry": true,
+        "custom_alerts": {
+            "traffic_cameras": 0.5,
+            "alpr_cameras": 1 
+        }
     }
 }

@@ -56,6 +56,7 @@ get_gps_location = utils.get_gps_location # Load the function to get the current
 get_distance = utils.get_distance # Load the function to get the distance between to global positions.
 load_traffic_cameras = utils.load_traffic_cameras # Load the function used to load the database of speed and red-light cameras.
 nearby_traffic_cameras = utils.nearby_traffic_cameras # Load the function used to check for nearby traffic cameras.
+nearby_database_poi = utils.nearby_database_poi # Load the function used to check for general nearby points of interest.
 convert_speed = utils.convert_speed # Load the function used to convert speeds from KPH to other units.
 
 if (config["general"]["disable_object_recognition"] == False): # Check to see whether or not object recognition (Tensorflow/OpenCV) has been globally disabled.
@@ -94,6 +95,8 @@ dashcam_mode_enabled = config["general"]["modes_enabled"]["dashcam"] # This sett
 information_mode_enabled = config["general"]["modes_enabled"]["information"] # This setting is used to prevent information mode from being loaded from the user menu or command line arguments of Predator.
 survey_mode_enabled = config["general"]["modes_enabled"]["survey"] # This setting is used to prevent survey mode from being loaded from the user menu or command line arguments of Predator.
 alert_database_license_plates = config["general"]["alert_databases"]["license_plates"] # This configuration value defines the file that Predator will load the alert list for license plates from.
+traffic_camera_database = config["general"]["alert_databases"]["traffic_cameras"]
+alpr_camera_database = config["general"]["alert_databases"]["alpr_cameras"]
 
 
 
@@ -172,7 +175,6 @@ camera_alert_types_speed = config["realtime"]["camera_alert_types"]["speed"]
 camera_alert_types_redlight = config["realtime"]["camera_alert_types"]["redlight"]
 camera_alert_types_misc = config["realtime"]["camera_alert_types"]["misc"]
 traffic_camera_alert_radius = config["realtime"]["traffic_camera_alert_radius"]
-traffic_camera_database = config["general"]["alert_databases"]["traffic_cameras"]
 traffic_camera_loaded_radius = config["realtime"]["traffic_camera_loaded_radius"]
 
 
@@ -194,9 +196,9 @@ information_display_location = config["information"]["displays"]["location"] # T
 information_display_altitude = config["information"]["displays"]["altitude"] # This setting determines whether the current altitude will be displayed while operating in information mode.
 information_display_track = config["information"]["displays"]["track"] # This setting determines whether the current track will be displayed while operating in information mode.
 information_display_satellites = config["information"]["displays"]["satellites"] # This setting determines whether the current connected satellite count will be displayed while operating in information mode.
-information_display_nearest_camera = config["information"]["displays"]["nearest_camera"] # This setting determines whether the current nearest traffic camera will be displayed while operating in information mode.
-information_max_nearest_camera_range = config["information"]["max_nearest_camera_range"] # This setting determines the maxmium distance that Predator will consider when displaying the nearest traffic camera.
 information_record_telemetry = config["information"]["record_telemetry"] # This setting determines whether or not Predator will log the information it handles while operating in information mode.
+information_max_nearest_alpr_range = config["information"]["custom_alerts"]["alpr_cameras"] # This setting determines the maxmium distance that Predator will consider when displaying the nearest ALPR camera.
+information_max_nearest_camera_range = config["information"]["custom_alerts"]["traffic_cameras"] # This setting determines the maxmium distance that Predator will consider when displaying the nearest traffic camera.
 
 # Load the traffic camera database, if enabled.
 if (traffic_camera_alerts_enabled == True): # Check to see if traffic camera alerts are enabled.
@@ -204,6 +206,10 @@ if (traffic_camera_alerts_enabled == True): # Check to see if traffic camera ale
         loaded_traffic_camera_database = load_traffic_cameras(get_gps_location()[0], get_gps_location()[1], traffic_camera_database, traffic_camera_loaded_radius) # Load all traffic cameras within the configured loading radius.
     else:
         print(style.yellow + "Warning: The 'traffic_camera_alerts_enabled' setting is turned on, but the 'traffic_camera_database' defined in the configuration section doesn't point to a valid file. Expect traffic camera alerts to be broken." + style.end)
+
+# Load the ALPR camera database, if enabled.
+if (alpr_camera_database != "" and os.path.exists(alpr_camera_database)):
+    loaded_alpr_camera_database = json.load(open(alpr_camera_database))
 
 
 
@@ -1848,12 +1854,11 @@ elif (mode_selection == "4" and information_mode_enabled == True): # The user ha
             print("Satellites: " + str(current_location[5])) # Print the current altitude satellite count to the console.
 
 
-        if (information_display_nearest_camera == True and gps_enabled == True and traffic_camera_alerts_enabled == True): # Check to see if the speed camera display is enabled in the configuration.
+
+        # Traffic camera alert processing
+        if (gps_enabled == True and traffic_camera_alerts_enabled == True): # Check to see if the speed camera display is enabled in the configuration.
             # Create placeholders for each camera type so we can add the closet camera for each category in the next step .
-            nearest_speed_camera = {"dst": 10000000.0}
-            nearest_redlight_camera = {"dst": 10000000.0}
-            nearest_misc_camera = {"dst": 10000000.0}
-            nearest_camera = {"dst": 10000000.0}
+            nearest_speed_camera, nearest_redlight_camera. nearest_misc_camera, nearest_camera = {"dst": 10000000.0}
 
             nearby_speed_cameras, nearby_redlight_cameras, nearby_misc_cameras = nearby_traffic_cameras(current_location[0], current_location[1], loaded_traffic_camera_database, traffic_camera_alert_radius) # Get all traffic cameras within the configured radius.
 
@@ -1880,7 +1885,6 @@ elif (mode_selection == "4" and information_mode_enabled == True): # The user ha
                 else:
                     pass
 
-
                 # Display the nearest traffic camera, if applicable.
                 if (nearest_camera["dst"] < float(max_nearest_camera_range)): # Only display the nearest camera if it's within the maximum range specified in the configuration.
                     print("Nearby Camera:")
@@ -1901,6 +1905,22 @@ elif (mode_selection == "4" and information_mode_enabled == True): # The user ha
 
 
 
+        # ALPR camera alert processing
+        if (os.path.exists(alpr_camera_database) == True and alpr_camera_database != "" and gps_enabled == True): # Check to see if a valid ALPR database has been configured.
+            nearby_alpr_cameras = nearby_database_poi(current_location[0], current_location[1], loaded_alpr_camera_database, information_max_nearest_alpr_range) # Get nearby entries from this POI database.
+            nearest_camera = {"distance": 1000000000.0}
+            if (len(nearby_alpr_cameras) > 0): # Only iterate through the nearby cameras if there are any nearby cameras to begin with.
+                for entry in nearby_alpr_cameras["entries"]: # Iterate through all nearby ALPR cameras.
+                    if (entry["distance"] < nearest_camera["distance"]): # Check to see if the distance to this camera is lower than the current closest camera.
+                        nearest_camera = entry # Make the current camera the new closest camera.
+
+                print("Nearest " + loaded_alpr_camera_database["name"] + ":")
+                print("    Distance: " + str(nearest_camera["distance"]) + " miles")
+                print("    Street: " + str(nearest_camera["road"]))
+
+
+
+        # Telemetry recording
         if (information_record_telemetry == True): # Check to see if Predator is configured to record telemetry data.
             if (gps_enabled == True): # Check to see if GPS features are enabled.
                 export_data = str(round(time.time())) + "," + str(current_speed) + "," + str(current_location[0]) + "," + str(current_location[1]) + "," + str(current_location[3]) + "," + str(current_location[4]) + "," + str(current_location[5]) + "\n" # Add all necessary information to the export data.

@@ -1,0 +1,249 @@
+{
+    "name": "ALPR",
+    "description": "This database contains the locations of various fixed automated license plate recognition cameras, specifically in north-east Ohio. This database is far from comprehensive, and is a work in progress.",
+    "author": "V0LT",
+    "created": "1648767201",
+    "modified": "1648773275",
+    "elements": {
+        "brand": "str",
+        "name": "str",
+        "road": "str",
+        "description": "str",
+        "direction": "int",
+        "owner": "str",
+        "type": "str"
+    },
+    "entries": [
+        {
+            "latitude": 41.49054,
+            "longitude": -81.3825,
+            "brand": "Flock Safety",
+            "name": "Sparrow",
+            "road": "County Line Road",
+            "description": "A black, solar powered unit placed on a pole on the side of the road, reading the license plates on the back of vehicles just after passing through the intersecton.",
+            "direction": 180,
+            "owner": "",
+            "type": "standalone"
+        },
+        {
+            "latitude": 41.5007,
+            "longitude": -81.40423,
+            "brand": "Flock Safety",
+            "name": "Falcon",
+            "road": "Chagrin River Road",
+            "description": "A black, solar powered unit placed on a black pole on the side of the road, scanning the license plates on the backs of cars headed south, entering Hunting Valley.",
+            "direction": 180,
+            "owner": "",
+            "type": "standalone"
+        },
+        {
+            "latitude": 41.52007,
+            "longitude": -81.43845,
+            "brand": "",
+            "name": "",
+            "road": "Mayfield Road",
+            "description": "Mounted on a traffic light cross bar, facing the backs of cars headed east on Mayfield Road, just after passing SOM Center Road.",
+            "direction": 90,
+            "owner": "",
+            "type": "trafficlight_crossbar"
+        },
+        {
+            "latitude": 41.52019,
+            "longitude": -81.43889,
+            "brand": "",
+            "name": "",
+            "road": "Mayfield Road",
+            "description": "Mounted on a traffic light cross bar, facing the backs of cars headed west on Mayfield Road, just after passing SOM Center Road.",
+            "direction": 270,
+            "owner": "",
+            "type": "trafficlight_crossbar"
+        },
+        {
+            "latitude": 41.66267,
+            "longitude": -81.26366,
+            "brand": "",
+            "name": "",
+            "road": "I-90 East",
+            "description": "Located on a tall silver pole on the left side of the road, facing the backs of vehicles just as they hit the start of a bridge.",
+            "direction": 75,
+            "owner": "",
+            "type": "standalone"
+        },
+        {
+            "latitude": 41.69172,
+            "longitude": -81.20322,
+            "brand": "",
+            "name": "",
+            "road": "I-90 East",
+            "description": "Located on a tall silver pole on the right side of the road, facing the backs of cars on I-90 East.",
+            "direction": 45,
+            "owner": "",
+            "type": "standalone"
+        },
+        {
+            "latitude": 41.69194,
+            "longitude": -81.20382,
+            "brand": "",
+            "name": "",
+            "road": "I-90 West",
+            "description": "Located on a tall silver pole on the right side of the road, facing the backs of cars on I-90 West.",
+            "direction": 225,
+            "owner": "",
+            "type": "standalone"
+        },
+        {
+            "latitude": 41.71889,
+            "longitude": -81.14378,
+            "brand": "",
+            "name": "",
+            "road": "I-90 East",
+            "description": "Located on a tall silver pole on the left side of the road, facing the backs of cars on I-90 East, just as they begin to cross a bridge.",
+            "direction": 70,
+            "owner": "",
+            "type": "standalone"
+        },
+        {
+            "latitude": 41.71906,
+            "longitude": -81.14373,
+            "brand": "",
+            "name": "",
+            "road": "I-90 West",
+            "description": "Located on a tall silver pole on the left side of the road, facing the backs of cars on I-90 West, just after they finish crossing a bridge.",
+            "direction": 250,
+            "owner": "",
+            "type": "standalone"
+        },
+        {
+            "latitude": 41.66674,
+            "longitude": -81.33987,
+            "brand": "",
+            "name": "",
+            "road": "Center Street",
+            "description": "Mounted on a traffic light cross bar, facing the backs of cars travelling north on Center Street, just after passing Mentor Avenue.",
+            "direction": 0,
+            "owner": "",
+            "type": "trafficlight_crossbar"
+        },
+        {
+            "latitude": 41.66621,
+            "longitude": -81.34004,
+            "brand": "",
+            "name": "",
+            "road": "Center Street",
+            "description": "Mounted on a traffic light cross bar, facing the backs of cars travelling south on Center Street, just after passing Mentor Avenue.",
+            "direction": 180,
+            "owner": "",
+            "type": "trafficlight_crossbar"
+        },
+        {
+            "latitude": 41.41699,
+            "longitude": -81.6061,
+            "brand": "",
+            "name": "",
+            "road": "Turney Road",
+            "description": "Mounted on a traffic light cross bar, facing the backs of cars headed south-east on Turney Road, just after passing Granger Road.",
+            "direction": 150,
+            "owner": "",
+            "type": "trafficlight_crossbar"
+        },
+        {
+            "latitude": 41.41716,
+            "longitude": -81.60605,
+            "brand": "",
+            "name": "",
+            "road": "Turney Road",
+            "description": "Mounted on a traffic light cross bar, facing the backs of cars headed north-west on Turney Road, just after passing Granger Road.",
+            "direction": 330,
+            "owner": "",
+            "type": "trafficlight_crossbar"
+        },
+        {
+            "latitude": 41.46242,
+            "longitude": -81.48063,
+            "brand": "",
+            "name": "",
+            "road": "Chargrin Boulevard",
+            "description": "Mounted on a traffic light cross bar, facing the backs of cars travelling west on Chargrin Boulevard as they pass Brainard Road.",
+            "direction": 270,
+            "owner": "",
+            "type": "trafficlight_crossbar"
+        },
+        {
+            "latitude": 41.46235,
+            "longitude": -81.48085,
+            "brand": "",
+            "name": "",
+            "road": "Chagrin Boulevard",
+            "description": "Mounted on a traffic light cross bar, facing the backs of cars travelling east on Chagrin Boulevard as they pass Brainard Road.",
+            "direction": 90,
+            "owner": "",
+            "type": "trafficlight_crossbar"
+        },
+        {
+            "latitude": 41.41299,
+            "longitude": -81.7344,
+            "brand": "",
+            "name": "",
+            "road": "Ridge Road",
+            "description": "Mounted on a traffic light cross bar, facing the backs of cars travelling north on Ridge Road as they cross Pearl Road.",
+            "direction": 0,
+            "owner": "",
+            "type": "trafficlight_crossbar"
+        },
+        {
+            "latitude": 41.41331,
+            "longitude": -81.73454,
+            "brand": "",
+            "name": "",
+            "road": "Ridge Road",
+            "description": "Mounted on a traffic light cross bar, facing the backs of cars travelling south on Ridge Road as they cross Pearl Road.",
+            "direction": 180,
+            "owner": "",
+            "type": "trafficlight_crossbar"
+        },
+        {
+            "latitude": 41.38875,
+            "longitude": -81.76381,
+            "brand": "",
+            "name": "",
+            "road": "Pearl Road",
+            "description": "Mounted on a traffic light cross bar facing the backs of cars headed north-east on Pearl road, just after they pass York Road and Stumph Road.",
+            "direction": 30,
+            "owner": "",
+            "type": "trafficlight_crossbar"
+        },
+        {
+            "latitude": 41.38881,
+            "longitude": -81.76409,
+            "brand": "",
+            "name": "",
+            "road": "Stumph Road",
+            "description": "Mounted on a traffic light cross bar, facing the backs of cars travelling north-west on Stump Road, just after crossing Pearl Road.",
+            "direction": 325,
+            "owner": "",
+            "type": "trafficlight_crossbar"
+        },
+        {
+            "latitude": 41.38861,
+            "longitude": -81.7642,
+            "brand": "",
+            "name": "",
+            "road": "Pearl Road",
+            "description": "Mounted on a traffic light cross bar, facing the backs of cars headed south-west on Pearl Road, just after passing Stumph Road and York Road.",
+            "direction": 230,
+            "owner": "",
+            "type": "trafficlight_crossbar"
+        },
+        {
+            "latitude": 41.38854,
+            "longitude": -81.76391,
+            "brand": "",
+            "name": "",
+            "road": "York Road",
+            "description": "Mounted on a traffic light cross bar, facing the backs of cars travelling south-east on York Road, just after passing Pearl Road.",
+            "direction": 130,
+            "owner": "",
+            "type": "trafficlight_crossbar"
+        }
+    ]
+}

@@ -205,3 +205,7 @@ After configuring Predator, you can try it out for the first time!
                 - The 'view' function allows the user to view the metadata and entries in a database.
                 - The 'edit' function allows the user to edit the metadata associated with a database.
                 - The 'survey' function allows the user to add entries to the database by filling out the entry elements specified when the database was created.
+            - Create, surveying, and using databases can be a somewhat complex task, and you should take care to set everything up appropriately.
+                - "Entry elements" are the elements that each entry in a database has. For example, if you have a database for gas stations, you might have elements for "address" (string), "gasoline" (boolean), and "diesel" (boolean). These elements will be shown to the user as prompts in survey mode.
+                    - The following entry elements names can't be used, since they would break Predator's database processing ability.
+                        - `longitude`, `latitude`, `distance`
