@@ -254,7 +254,7 @@ In order to better integrate with an existing system, Predator can communicate w
 
 ### Real-time Mode Traffic Camera Alert Settings
 
-Predator can notify the user when a speed or red-light camera is nearby, based on GPS data an an ExCam database.
+While operating in Real-time mode, Predator can notify the user when a speed or red-light camera is nearby, based on GPS data and an ExCam database. However, traffic camera alerts are primarily designed to be used in Information Mode. Many of the configuration values for traffic camera alerts in the Information Mode section will also influence the operating of Real-time Mode
 
 - `traffic_camera_alerts_enabled`
     - This configuration value determines whether or not traffic camera alerts are enabled.
@@ -297,7 +297,9 @@ Predator can notify the user when a speed or red-light camera is nearby, based o
     - Note that Predator can only use each recording device for one task at a time, so if you run real-time mode with background recording enabled, you'll need to specify two different devices by changing `fswebcam_device` and `dashcam_device`.
 
 
+
 ## Information Mode Configuration
+
 - `information_refresh_delay`
     - This setting determines how long Predator will wait before refreshes while operating in information mode.
     - Having a short pause between refreshes allows the user to read the information displayed on the screen.
@@ -330,6 +332,7 @@ Predator can notify the user when a speed or red-light camera is nearby, based o
         - This file follows this format: `time,current_speed,current_latitude,current_longitude,current_altitude,current_track,current_connected_satellite_count`
 - `custom_alerts`
     - This setting is a dictonary of alert databases and their alert ranges, in miles.
-    - The databases in this section reference the databases specified by the `alert_databases` configuration value in the general configuration section.
+        - The `traffic_cameras` alert database is used for speed and red-light camera alerts. Use this value to specify the distance (in miles) at which Predator should consider a speed camera to be within alert distance.
+            - Example: `"traffic_cameras": 0.5` will show alerts for the `traffic_cameras` database within 0.5 miles of a point-of-interest.
+    - The databases in this section correspond the databases specified by the `alert_databases` configuration value in the general configuration section.
         - In a future update, the user will be able to add custom alert databases by adding the databases to `alert_databases`, then referencing them in this configuration value with an alert distance.
-    - Example: `"traffic_cameras": 0.5` will show alerts for the `traffic_cameras` database within 0.5 miles of a point-of-interest.
