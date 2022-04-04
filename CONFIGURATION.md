@@ -323,6 +323,7 @@ While operating in Real-time mode, Predator can notify the user when a speed or 
 - `max_nearest_camera_range`
     - This setting determines the maxmium distance that Predator will consider when displaying the nearest traffic camera.
     - Any cameras detected outside this range will be ignored.
+    - For sake of clarification, this is not the same as the alert range. This value only determines how close to a camera Predator has to be before it displays it as the "nearest camera". The alert distance, as specified in `custom_alerts`, is the distance at which Predator will display a prominent alert for a nearby camera.
 - `record_telemetry`
     - This setting determines whether or not Predator will log the information it displays while operating in information mode.
     - When set to `true`, all of the the raw information displays that are available under the `displays` configuration value will be recorded, regardless of whether they are turned on.
