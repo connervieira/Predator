@@ -96,6 +96,37 @@ While Predator's powerful real-time video analysis can provide useful informatio
 Predator's extreme customizability can be a bit overwhelming to new users. For this reason, Predator is extensively documented, and comes bundled with step-by-step guides on how to download it, install it, configure it, and run it.
 
 
+
+## Modes
+
+Predator is an extremely versatile platform, and supports several different modes to better support all situations and use cases.
+
+### Management Mode (0)
+
+Management mode isn't exactly a primary mode of Predator, but it allows the user to configure, maintain, and manage Predator from within the program.
+
+### Pre-recorded Mode (1)
+
+Pre-recorded mode allows Predator to analyze pre-recorded video, and detect license plates and objects.
+
+### Real-time Mode (2)
+
+Real-time mode allows Predator to detect license plates and objects in real-time video streams.
+
+### Dash-cam Mode (3)
+
+Dash-cam mode allows Predator to record video without running any analysis or computer-vision processing.
+
+### Information Mode (4)
+
+Information mode allows Predator to display and record telemetry data from various sources.
+
+### Survey Mode (5)
+
+Survey mode allows the user to create, view, edit, and modify custom databases containing the locations of certain points of interest.
+
+
+
 ## Screenshots
 
 ### Real-time Mode Alert
