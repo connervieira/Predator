@@ -189,7 +189,8 @@ After configuring Predator, you can try it out for the first time!
                 - Depending on the preferences for the session, Predator might also save images taken and the license plates detected.
                     - Images taken will be saved as `realtime_imageN.jpg` in the root project folder. If saving images is turned on, 'N' with the sequential image number. Otherwise, the N will be removed.
                     - Saved license plates will be saved to `real_time_plates.csv` in the root project folder, provided license plate saving is enabled.
-                - If a plate detected is in the alert database specified during the preferences stage earlier, it will show a large alert message in the console output.
+                - If a plate detected is in the alert database specified during the preferences stage earlier, it will show a prominent alert message in the console output.
+            - Predator is also capable of displaying speed camera and red-light camera alerts in Real-time mode. However, traffic camera alerts are primarily designed around Information mode.
         - Dash-cam mode
             - In dash-cam mode, Predator will record video indefinitely until disk space runs out, the return key is pressed, or the Predator process is terminated.
             - Predator will not detect license plates in this mode. However, you can use video recorded in this mode with pre-recorded mode in order to scan for license plates at a later date.
@@ -198,6 +199,7 @@ After configuring Predator, you can try it out for the first time!
                 - `CHANNEL` is replaced by the name of the device used, as specified in the configuration.
         - Information mode
             - In information mode, Predator will run in an endless loop, displaying information based on the configuration.
+                - Information mode is capable of displaying general information like the current time, GPS location, speed, etc as well as more specific information, like the distance to the nearest traffic monitoring camera.
             - Depending on the configuration, Predator may also record telemetry to the `information_recording.csv` file in the root project directory.
         - Survey mode
             - In survey mode, Predator will display a menu prompting the user to select to create, view, edit, or survey a database.
@@ -207,5 +209,5 @@ After configuring Predator, you can try it out for the first time!
                 - The 'survey' function allows the user to add entries to the database by filling out the entry elements specified when the database was created.
             - Create, surveying, and using databases can be a somewhat complex task, and you should take care to set everything up appropriately.
                 - "Entry elements" are the elements that each entry in a database has. For example, if you have a database for gas stations, you might have elements for "address" (string), "gasoline" (boolean), and "diesel" (boolean). These elements will be shown to the user as prompts in survey mode.
-                    - The following entry elements names can't be used, since they would break Predator's database processing ability.
+                    - The following entry elements names can't be used, since they would interfere Predator's database processing abilities.
                         - `longitude`, `latitude`, `distance`
