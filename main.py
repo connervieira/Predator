@@ -2160,6 +2160,7 @@ elif (mode_selection == "5" and information_mode_enabled == True): # The user ha
 
                     database_data["entries"].append(entry_data) # Add the data for this entry to the main database.
 
+                database_data["modified"] = str(round(time.time())) # Update the "last modified" time in the database.
                 save_to_file(str(root) + "/" + str(database_file), str(json.dumps(database_data, indent = 4)), silence_file_saving) # Save the database entry additions to disk as JSON data.
 
 
