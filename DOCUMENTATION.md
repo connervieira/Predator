@@ -166,7 +166,6 @@ After configuring Predator, you can try it out for the first time!
             - Example: `/home/cvieira/Downloads/MyProjectFolder`
         - Depending on the function you select in survey mode, you may also be asked to enter a database file. For this, simply enter the file name of a database file in the root project directory you specified previously.
             - Example: `database.json`
-    
 4. Run Predator
     - After finishing setting up your preferences, Predator will begin running automatically. Below you'll see information for all operation modes of Predator.
         - Management mode
