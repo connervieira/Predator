@@ -197,6 +197,7 @@ information_display_track = config["information"]["displays"]["track"] # This se
 information_display_satellites = config["information"]["displays"]["satellites"] # This setting determines whether the current connected satellite count will be displayed while operating in information mode.
 information_record_telemetry = config["information"]["record_telemetry"] # This setting determines whether or not Predator will log the information it handles while operating in information mode.
 information_max_nearest_alpr_range = config["information"]["alerts"]["alpr_cameras"] # This setting determines the maxmium distance that Predator will consider when displaying the nearest ALPR camera.
+information_max_nearest_camera_range = config["information"]["alerts"]["traffic_cameras"] # This setting determines the maxmium distance that Predator will consider when displaying the nearest traffic camera.
 traffic_camera_alert_radius = config["information"]["alerts"]["traffic_cameras"]
 
 # Load the traffic camera database, if enabled.
@@ -2159,6 +2160,7 @@ elif (mode_selection == "5" and information_mode_enabled == True): # The user ha
 
                     database_data["entries"].append(entry_data) # Add the data for this entry to the main database.
 
+                database_data["modified"] = str(round(time.time())) # Update the "last modified" time in the database.
                 save_to_file(str(root) + "/" + str(database_file), str(json.dumps(database_data, indent = 4)), silence_file_saving) # Save the database entry additions to disk as JSON data.
 
 
