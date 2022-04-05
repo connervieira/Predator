@@ -141,7 +141,7 @@
             "brand": "",
             "name": "",
             "road": "Center Street",
-            "description": "Mounted on a traffic light cross bar, facing the backs of cars travelling north on Center Street, just after passing Mentor Avenue.",
+            "description": "Mounted on a traffic light cross bar, facing the backs of cars traveling north on Center Street, just after passing Mentor Avenue.",
             "direction": 0,
             "owner": "",
             "type": "trafficlight_crossbar"
@@ -152,7 +152,7 @@
             "brand": "",
             "name": "",
             "road": "Center Street",
-            "description": "Mounted on a traffic light cross bar, facing the backs of cars travelling south on Center Street, just after passing Mentor Avenue.",
+            "description": "Mounted on a traffic light cross bar, facing the backs of cars traveling south on Center Street, just after passing Mentor Avenue.",
             "direction": 180,
             "owner": "",
             "type": "trafficlight_crossbar"
@@ -185,7 +185,7 @@
             "brand": "",
             "name": "",
             "road": "Chargrin Boulevard",
-            "description": "Mounted on a traffic light cross bar, facing the backs of cars travelling west on Chargrin Boulevard as they pass Brainard Road.",
+            "description": "Mounted on a traffic light cross bar, facing the backs of cars traveling west on Chargrin Boulevard as they pass Brainard Road.",
             "direction": 270,
             "owner": "",
             "type": "trafficlight_crossbar"
@@ -196,7 +196,7 @@
             "brand": "",
             "name": "",
             "road": "Chagrin Boulevard",
-            "description": "Mounted on a traffic light cross bar, facing the backs of cars travelling east on Chagrin Boulevard as they pass Brainard Road.",
+            "description": "Mounted on a traffic light cross bar, facing the backs of cars traveling east on Chagrin Boulevard as they pass Brainard Road.",
             "direction": 90,
             "owner": "",
             "type": "trafficlight_crossbar"
@@ -207,7 +207,7 @@
             "brand": "",
             "name": "",
             "road": "Ridge Road",
-            "description": "Mounted on a traffic light cross bar, facing the backs of cars travelling north on Ridge Road as they cross Pearl Road.",
+            "description": "Mounted on a traffic light cross bar, facing the backs of cars traveling north on Ridge Road as they cross Pearl Road.",
             "direction": 0,
             "owner": "",
             "type": "trafficlight_crossbar"
@@ -218,7 +218,7 @@
             "brand": "",
             "name": "",
             "road": "Ridge Road",
-            "description": "Mounted on a traffic light cross bar, facing the backs of cars travelling south on Ridge Road as they cross Pearl Road.",
+            "description": "Mounted on a traffic light cross bar, facing the backs of cars traveling south on Ridge Road as they cross Pearl Road.",
             "direction": 180,
             "owner": "",
             "type": "trafficlight_crossbar"
@@ -240,7 +240,7 @@
             "brand": "",
             "name": "",
             "road": "Stumph Road",
-            "description": "Mounted on a traffic light cross bar, facing the backs of cars travelling north-west on Stump Road, just after crossing Pearl Road.",
+            "description": "Mounted on a traffic light cross bar, facing the backs of cars traveling north-west on Stump Road, just after crossing Pearl Road.",
             "direction": 325,
             "owner": "",
             "type": "trafficlight_crossbar"
@@ -262,7 +262,7 @@
             "brand": "",
             "name": "",
             "road": "York Road",
-            "description": "Mounted on a traffic light cross bar, facing the backs of cars travelling south-east on York Road, just after passing Pearl Road.",
+            "description": "Mounted on a traffic light cross bar, facing the backs of cars traveling south-east on York Road, just after passing Pearl Road.",
             "direction": 130,
             "owner": "",
             "type": "trafficlight_crossbar"
