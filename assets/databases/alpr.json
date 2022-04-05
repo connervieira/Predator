@@ -3,7 +3,7 @@
     "description": "This database contains the locations of various fixed automated license plate recognition cameras, specifically in north-east Ohio. This database is far from comprehensive, and is a work in progress.",
     "author": "V0LT",
     "created": "1648767201",
-    "modified": "1648773275",
+    "modified": "1649192055",
     "elements": {
         "brand": "str",
         "name": "str",
@@ -18,10 +18,32 @@
             "latitude": 41.49054,
             "longitude": -81.3825,
             "brand": "Flock Safety",
-            "name": "Sparrow",
+            "name": "Falcon",
             "road": "County Line Road",
-            "description": "A black, solar powered unit placed on a pole on the side of the road, reading the license plates on the back of vehicles just after passing through the intersecton.",
+            "description": "A black, solar powered unit placed on a pole on the west side of the road, reading the license plates on the back of vehicles traveling south on County Line Road just after passing Fairmount Road.",
             "direction": 180,
+            "owner": "",
+            "type": "standalone"
+        },
+        {
+            "latitude": 41.49077,
+            "longitude": -81.38246,
+            "brand": "Flock Safety",
+            "name": "Falcon",
+            "road": "County Line Road",
+            "description": "A black, solar powered unit placed on a pole on the east side of the road, reading the license plates on the back of vehicles traveling north on County Line Road just after passing Fairmount Road.",
+            "direction": 0,
+            "owner": "",
+            "type": "standalone"
+        },
+        {
+            "latitude": 41.49058,
+            "longitude": -81.38271,
+            "brand": "Flock Safety",
+            "name": "Falcon",
+            "road": "Fairmount Boulevard",
+            "description": "A black, solar powered unit placed on a pole on the south side of the road, reading the license plates on the back of vehicles traveling west on Fairmount Boulevard just after passing County Line Road.",
+            "direction": 270,
             "owner": "",
             "type": "standalone"
         },
@@ -244,6 +266,28 @@
             "direction": 130,
             "owner": "",
             "type": "trafficlight_crossbar"
+        },
+        {
+            "latitude": 41.49959,
+            "longitude": -81.39093,
+            "brand": "Flock Safety",
+            "name": "Falcon",
+            "road": "County Line Road",
+            "description": "Mounted on a tall black pole on the west side of the road, facing the backs of cars traveling south on Country Line Road.",
+            "direction": 180,
+            "owner": "",
+            "type": "standalone"
+        },
+        {
+            "latitude": 41.49928,
+            "longitude": -81.40454,
+            "brand": "Flock Safety",
+            "name": "Falcon",
+            "road": "Cedar Road",
+            "description": "Mounted on a tall black pole on the east side of the of a fork in Cedar Road, facing the backs of cars traveling west from Chagrin River Road to Cedar Road.",
+            "direction": 270,
+            "owner": "",
+            "type": "standalone"
         }
     ]
 }
