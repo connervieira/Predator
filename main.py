@@ -174,7 +174,6 @@ traffic_camera_alerts_enabled = config["realtime"]["traffic_camera_alerts_enable
 camera_alert_types_speed = config["realtime"]["camera_alert_types"]["speed"]
 camera_alert_types_redlight = config["realtime"]["camera_alert_types"]["redlight"]
 camera_alert_types_misc = config["realtime"]["camera_alert_types"]["misc"]
-traffic_camera_alert_radius = config["realtime"]["traffic_camera_alert_radius"]
 traffic_camera_loaded_radius = config["realtime"]["traffic_camera_loaded_radius"]
 
 
@@ -199,6 +198,7 @@ information_display_satellites = config["information"]["displays"]["satellites"]
 information_record_telemetry = config["information"]["record_telemetry"] # This setting determines whether or not Predator will log the information it handles while operating in information mode.
 information_max_nearest_alpr_range = config["information"]["custom_alerts"]["alpr_cameras"] # This setting determines the maxmium distance that Predator will consider when displaying the nearest ALPR camera.
 information_max_nearest_camera_range = config["information"]["custom_alerts"]["traffic_cameras"] # This setting determines the maxmium distance that Predator will consider when displaying the nearest traffic camera.
+traffic_camera_alert_radius = config["information"]["custom_alerts"]["traffic_cameras"]
 
 # Load the traffic camera database, if enabled.
 if (traffic_camera_alerts_enabled == True): # Check to see if traffic camera alerts are enabled.
