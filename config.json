@@ -17,7 +17,7 @@
             "survey": true
         },
         "alert_databases": {
-            "license_plates": "",
+            "license_plates": "http://v0lttech.com/files/documents/predator/amber.txt",
             "traffic_cameras": "",
             "alpr_cameras": "/home/cvieira/Software/Programming/Python/Predator/assets/databases/alpr.json"
         }
