@@ -174,7 +174,6 @@ traffic_camera_alerts_enabled = config["realtime"]["traffic_camera_alerts_enable
 camera_alert_types_speed = config["realtime"]["camera_alert_types"]["speed"]
 camera_alert_types_redlight = config["realtime"]["camera_alert_types"]["redlight"]
 camera_alert_types_misc = config["realtime"]["camera_alert_types"]["misc"]
-traffic_camera_alert_radius = config["realtime"]["traffic_camera_alert_radius"]
 traffic_camera_loaded_radius = config["realtime"]["traffic_camera_loaded_radius"]
 
 
@@ -197,8 +196,8 @@ information_display_altitude = config["information"]["displays"]["altitude"] # T
 information_display_track = config["information"]["displays"]["track"] # This setting determines whether the current track will be displayed while operating in information mode.
 information_display_satellites = config["information"]["displays"]["satellites"] # This setting determines whether the current connected satellite count will be displayed while operating in information mode.
 information_record_telemetry = config["information"]["record_telemetry"] # This setting determines whether or not Predator will log the information it handles while operating in information mode.
-information_max_nearest_alpr_range = config["information"]["custom_alerts"]["alpr_cameras"] # This setting determines the maxmium distance that Predator will consider when displaying the nearest ALPR camera.
-information_max_nearest_camera_range = config["information"]["custom_alerts"]["traffic_cameras"] # This setting determines the maxmium distance that Predator will consider when displaying the nearest traffic camera.
+information_max_nearest_alpr_range = config["information"]["alerts"]["alpr_cameras"] # This setting determines the maxmium distance that Predator will consider when displaying the nearest ALPR camera.
+traffic_camera_alert_radius = config["information"]["alerts"]["traffic_cameras"]
 
 # Load the traffic camera database, if enabled.
 if (traffic_camera_alerts_enabled == True): # Check to see if traffic camera alerts are enabled.
@@ -1886,7 +1885,7 @@ elif (mode_selection == "4" and information_mode_enabled == True): # The user ha
                     pass
 
                 # Display the nearest traffic camera, if applicable.
-                if (nearest_camera["dst"] < float(max_nearest_camera_range)): # Only display the nearest camera if it's within the maximum range specified in the configuration.
+                if (nearest_camera["dst"] < float(traffic_camera_alert_radius)): # Only display the nearest camera if it's within the maximum range specified in the configuration.
                     print("Nearby Camera:")
                     if (nearest_camera == nearest_speed_camera): # Check to see if the overall nearest camera is the nearest speed camera.
                         print("    Type: Speed Camera")

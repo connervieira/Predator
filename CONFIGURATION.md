@@ -269,6 +269,7 @@ Predator can notify the user when a speed or red-light camera is nearby, based o
     - This is the radius, in miles, that Predator will load traffic cameras from during the initial loading process.
     - For example, if this value is set to `100`, then Predator will only load traffic cameras in a 100 mile radius from the current location when it boots. If you travel more than 100 miles away from your original location without reloading Predator then you won't get traffic camera alerts.
     - If you're running Predator on a high performance processor, you can comfortable set this to a very high number, which could be useful on long road trips where you might not restart Predator for hundreds of miles at a time. However, if you're running Predator on a low powered device, like a Raspberry Pi, you should reduce this radius to make Predator faster at checking traffic camera proximity when running in real-time mode.
+    - This setting does not determine the distance at which alerts will be displayed. To configure the alert distance for traffic cameras, see the `alerts` configuration value in the Information Mode section below.
 
 
 
@@ -297,7 +298,9 @@ Predator can notify the user when a speed or red-light camera is nearby, based o
     - Note that Predator can only use each recording device for one task at a time, so if you run real-time mode with background recording enabled, you'll need to specify two different devices by changing `fswebcam_device` and `dashcam_device`.
 
 
+
 ## Information Mode Configuration
+
 - `information_refresh_delay`
     - This setting determines how long Predator will wait before refreshes while operating in information mode.
     - Having a short pause between refreshes allows the user to read the information displayed on the screen.
@@ -328,7 +331,7 @@ Predator can notify the user when a speed or red-light camera is nearby, based o
         - If `gps_enabled` is set to `false`, then all GPS-dependent information will be left as placeholders.
     - When enabled, a log file will be created in the root project directory named `information_recording.csv`.
         - This file follows this format: `time,current_speed,current_latitude,current_longitude,current_altitude,current_track,current_connected_satellite_count`
-- `custom_alerts`
+- `alerts`
     - This setting is a dictonary of alert databases and their alert ranges, in miles.
     - The databases in this section reference the databases specified by the `alert_databases` configuration value in the general configuration section.
         - In a future update, the user will be able to add custom alert databases by adding the databases to `alert_databases`, then referencing them in this configuration value with an alert distance.

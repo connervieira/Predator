@@ -130,7 +130,7 @@
             "satellites": true
         },
         "record_telemetry": true,
-        "custom_alerts": {
+        "alert": {
             "traffic_cameras": 0.5,
             "alpr_cameras": 1 
         }

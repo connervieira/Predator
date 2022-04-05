@@ -45,14 +45,14 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Add the ability to process multiple videos sequentially in pre-recorded mode.
 - [X] Add "Survey Mode", for reporting the locations of speed cameras, license plate reading cameras, and other potential points of interest.
 - [X] Add GPS based notificaitons for automated license plate readers.
-- [ ] Redo CONFIGURATION.md to better represent the newly changed configuration values.
-- [ ] Add OBD-II integration.
+- [X] Redo CONFIGURATION.md to better represent the newly changed configuration values.
 
 
 # Hypothetical
 
 These are features that may require more in-depth changes, and are purely hypothetical.
 
+- [ ] Add OBD-II integration.
 - [ ] Add "Crowdsource Mode", for reporting traffic, police, mobile speed cameras, and other hazards in real time.
 - [ ] Add the ability to detect VASCAR lines. 
 - [ ] A GUI front-end in addition to the existing command line interface.
