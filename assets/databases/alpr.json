@@ -288,6 +288,39 @@
             "direction": 270,
             "owner": "",
             "type": "standalone"
+        },
+        {
+            "latitude": 41.50862,
+            "longitude": -81.43729,
+            "brand": "Flock Safety",
+            "name": "Falcon",
+            "road": "SOM Center Road",
+            "description": "Mounted on a tall black pole on the west side of the road, facing the backs of cars traveling north on the round-about between Gates Mills Boulevard and SOM Center Road.",
+            "direction": 30,
+            "owner": "",
+            "type": "standalone"
+        },
+        {
+            "latitude": 41.49193,
+            "longitude": -81.43828,
+            "brand": "Flock Safety",
+            "name": "Falcon",
+            "road": "SOM Center Road",
+            "description": "Mounted on a tall black pole on the east side of the road, facing the backs of cars traveling north on SOM Center Road just after passing Fairmount Boulevard.",
+            "direction": 0,
+            "owner": "",
+            "type": "standalone"
+        },
+        {
+            "latitude": 41.49176,
+            "longitude": -81.43808,
+            "brand": "Flock Safety",
+            "name": "Falcon",
+            "road": "Fairmount Boulevard",
+            "description": "Mounted on a tall black pole on the south side of the road, facing the backs of cars traveling east on Fairmount Boulevard just after passing SOM Center Road.",
+            "direction": 90,
+            "owner": "",
+            "type": "standalone"
         }
     ]
 }
