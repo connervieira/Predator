@@ -77,9 +77,14 @@ After configuring Predator, you can try it out for the first time!
     - After Predator starts, you should see a large banner displaying the Predator name.
     - To force Predator to start into a particular mode, add the mode number to the end of the command.
         - Example: `python3 main.py 3`
-            - This command will force Predator to start into mode #3, which is dash-cam mode.
+            - This command will force Predator to start into mode #3, which is Dash-cam Mode.
         - To learn more about each mode, see the mode descriptions below.
         - This command-line argument will override the `auto_start_mode` configuration value.
+    - To force Predator to use a particular root project directory, add the directory path as the second command line argument.
+        - A mode number must be entered as the first command line argument to specify a root project directory.
+        - This command-line argument will override the `default_root` configuration value.
+        - Example: `python3 main.py 4 /home/pi/Predator/`
+            - This command will force Predator to start into Information Mode, using the /home/pi/Predator directory as the root project folder.
 2. Select a mode
     - Predator can operate in 6 possible modes.
         - Management mode (Mode 0)

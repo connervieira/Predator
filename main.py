@@ -198,7 +198,6 @@ information_display_track = config["information"]["displays"]["track"] # This se
 information_display_satellites = config["information"]["displays"]["satellites"] # This setting determines whether the current connected satellite count will be displayed while operating in information mode.
 information_record_telemetry = config["information"]["record_telemetry"] # This setting determines whether or not Predator will log the information it handles while operating in information mode.
 information_max_nearest_alpr_range = config["information"]["alerts"]["alpr_cameras"] # This setting determines the maxmium distance that Predator will consider when displaying the nearest ALPR camera.
-information_max_nearest_camera_range = config["information"]["alerts"]["traffic_cameras"] # This setting determines the maxmium distance that Predator will consider when displaying the nearest traffic camera.
 traffic_camera_alert_radius = config["information"]["alerts"]["traffic_cameras"]
 
 # Load the traffic camera database, if enabled.
@@ -316,9 +315,13 @@ if (survey_mode_enabled == True): # Only show the Survey mode option if it's ena
 if (auto_start_mode != "" and auto_start_mode != "0" and auto_start_mode != "1" and auto_start_mode != "2" and auto_start_mode != "3" and auto_start_mode != "4" and auto_start_mode != "5"):
     print(style.yellow + "Warning: The 'auto_start_mode' configuration value isn't properly set. This value should be blank, '0', '1', '2', '3', '4', or '5'. It's possible there's been a typo." + style.end)
 
-if (len(sys.argv) > 1):
+if (len(sys.argv) > 1): # Check to see if there is at least 1 command line argument.
     if (sys.argv[1] == "0" or sys.argv[1] == "1" or sys.argv[1] == "2" or sys.argv[1] == "3" or sys.argv[1] == "4" or sys.argv[1] == "5"): # Check to see if a mode override was specified in the Predator command arguments.
         auto_start_mode = sys.argv[1] # Set the automatic start mode to the mode specified by the command line argument.
+
+if (len(sys.argv) > 2): # Check to see if there are at least 2 command line arguments.
+    default_root = str(sys.argv[2]) # Set the default root directory to the path specified by the command line argument.
+
 
 if (auto_start_mode == "0" and management_mode_enabled == True): # Based on the configuration, Predator will automatically boot into management mode.
     print(style.bold + "Automatically starting into management mode." + style.end)
@@ -1231,6 +1234,15 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
     else:
         root = input("Project root directory path: ")
 
+    if (default_license_plate_format != ""): # Check to see if the user has configured a default for this preference.
+        print(style.bold + "Using default preference for license plate formatting." + style.end)
+        if (default_license_plate_format == " "): # If the default license plate format is configured as a single space, then skip the prompt, but don't load a license format guideline.
+            license_plate_format = ""
+        else:
+            license_plate_format = default_license_plate_format
+    else:
+        license_plate_format = input("Optional: License plate validation format: ")
+
     if (default_save_license_plates_preference != ""): # Check to see if the user has configured a default for this preference.
         print(style.bold + "Using default preference for license plate saving." + style.end)
         save_license_plates_preference = default_save_license_plates_preference
@@ -1243,15 +1255,6 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
     else:
         save_images_preference = input("Optional: Enable image saving: (y/n): ")
 
-
-    if (default_license_plate_format != ""): # Check to see if the user has configured a default for this preference.
-        print(style.bold + "Using default preference for license plate formatting." + style.end)
-        if (default_license_plate_format == " "): # If the default license plate format is configured as a single space, then skip the prompt, but don't load a license format guideline.
-            license_plate_format = ""
-        else:
-            license_plate_format = default_license_plate_format
-    else:
-        license_plate_format = input("Optional: License plate validation format: ")
 
     if (disable_object_recognition == True): # Check to see whether or not object recognition has been globally disabled in the Predator configuration.
         print(style.yellow + "Warning: Skipping object recognition prompt, since object recognition has been globally disabled in the Predator configuration. Adjust the `disable_object_recognition` configuration value to change this." + style.end)
@@ -1436,16 +1439,29 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
 
 
 
-        # Process traffic camera alerts.
-        if (traffic_camera_alerts_enabled == True): # Check to see if traffic camera alerts are enabled.
-            current_location = get_gps_location() # Get the current location.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        # Traffic camera alert processing
+        if (gps_enabled == True and traffic_camera_alerts_enabled == True): # Check to see if the speed camera display is enabled in the configuration.
+            current_location = get_gps_location() # Get the current GPS location information.
 
 
             # Create placeholders for each camera type so we can add the closet camera for each category in the next step .
-            nearest_speed_camera = {"dst": 10000000.0}
-            nearest_redlight_camera = {"dst": 10000000.0}
-            nearest_misc_camera = {"dst": 10000000.0}
-            nearest_camera = {"dst": 10000000.0}
+            nearest_speed_camera, nearest_redlight_camera, nearest_misc_camera, nearest_camera = {"dst": 10000000.0}, {"dst": 10000000.0}, {"dst": 10000000.0}, {"dst": 10000000.0}
 
             nearby_speed_cameras, nearby_redlight_cameras, nearby_misc_cameras = nearby_traffic_cameras(current_location[0], current_location[1], loaded_traffic_camera_database, traffic_camera_alert_radius) # Get all traffic cameras within the configured radius.
 
@@ -1472,80 +1488,46 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
                 else:
                     pass
 
-
-                # Display and play traffic camera alerts as necessary.
-                if (nearest_camera["dst"] < (float(traffic_camera_alert_radius) * 0.1)): # Check to see if the nearest camera is within 10% of the traffic camera alert radius.
-                    # Update the status lighting to to indicate a camera alert.
+                # Display the nearest traffic camera, if applicable.
+                if (nearest_camera["dst"] < float(traffic_camera_alert_radius)): # Only display the nearest camera if it's within the maximum range specified in the configuration.
                     if (status_lighting_enabled == True): # Check to see if status lighting alerts are enabled in the Predator configuration.
                         update_status_lighting("camera") # Run the function to update the status lighting.
 
-                    if (audio_alerts == True and int(alert_sounds_camera3_repeat) > 0): # Check to see if the user has audio alerts enabled.
-                        for i in range(0, int(alert_sounds_camera3_repeat)): # Repeat the sound several times, if the configuration says to.
-                            os.system("mpg321 " + alert_sounds_camera3 + " > /dev/null 2>&1 &") # Play the sound specified for this alert type in the configuration.
-                            time.sleep(float(alert_sounds_camera3_delay)) # Wait before playing the sound again.
-                    if (shape_alerts == True):  # Check to see if the user has enabled shape notifications.
+                    if (shape_alerts == True): # Check to see if the user has enabled shape notifications.
                         display_shape("cross") # Display an ASCII cross in the output.
-                    print(style.blue + style.bold)
-                    print("=====================")
-                    print("=====================")
-                    print("=====================")
-                    print("NEARBY TRAFFIC CAMERA")
-                    print("Proximity Level: 3")
-                    print("Distance: " + str(round((nearest_camera["dst"]*100)/100)) + " miles")
-                    if (nearest_camera["str"] != None):
-                        print("Street: " + str(nearest_camera["str"]))
-                    if (nearest_camera["spd"] != None):
-                        print("Speed: " + str(nearest_camera["spd"]))
-                    print("=====================")
-                    print("=====================")
-                    print("=====================")
-                    print(style.end + style.end)
-                elif (nearest_camera["dst"] < (float(traffic_camera_alert_radius) * 0.25)): # Check to see if the nearest camera is within 25% of the traffic camera alert radius.
-                    # Update the status lighting to to indicate a camera alert.
-                    if (status_lighting_enabled == True): # Check to see if status lighting alerts are enabled in the Predator configuration.
-                        update_status_lighting("camera") # Run the function to update the status lighting.
 
-                    if (audio_alerts == True and int(alert_sounds_camera2_repeat) > 0): # Check to see if the user has audio alerts enabled.
-                        for i in range(0, int(alert_sounds_camera2_repeat)): # Repeat the sound several times, if the configuration says to.
-                            os.system("mpg321 " + alert_sounds_camera2 + " > /dev/null 2>&1 &") # Play the sound specified for this alert type in the configuration.
-                            time.sleep(float(alert_sounds_camera2_delay)) # Wait before playing the sound again.
-                    if (shape_alerts == True):  # Check to see if the user has enabled shape notifications.
-                        display_shape("cross") # Display an ASCII cross in the output.
-                    print(style.blue + style.bold)
-                    print("=====================")
-                    print("=====================")
-                    print("NEARBY TRAFFIC CAMERA")
-                    print("Proximity Level: 2")
-                    print("Distance: " + str(round((nearest_camera["dst"]*100)/100)) + " miles")
-                    if (nearest_camera["str"] != None):
-                        print("Street: " + str(nearest_camera["str"]))
-                    if (nearest_camera["spd"] != None):
-                        print("Speed: " + str(nearest_camera["spd"]))
-                    print("=====================")
-                    print("=====================")
-                    print(style.end + style.end)
-                elif (nearest_camera["dst"] < (float(traffic_camera_alert_radius))): # Check to see if the nearest camera is within the traffic camera alert radius.
-                    # Update the status lighting to to indicate a camera alert.
-                    if (status_lighting_enabled == True): # Check to see if status lighting alerts are enabled in the Predator configuration.
-                        update_status_lighting("camera") # Run the function to update the status lighting.
+                    print("Nearest Enforcement Camera:")
+                    if (nearest_camera == nearest_speed_camera): # Check to see if the overall nearest camera is the nearest speed camera.
+                        print("    Type: Speed Camera")
+                    elif (nearest_camera == nearest_redlight_camera): # Check to see if the overall nearest camera is the nearest red light camera.
+                        print("    Type: Red Light Camera")
+                    elif (nearest_camera == nearest_misc_camera): # Check to see if the overall nearest camera is the nearest general traffic camera.
+                        print("    Type: General Traffic Camera")
+                    else:
+                        print("    Type: Unknown")
+                    print("    Distance: " + str(round(nearest_camera["dst"]*1000)/1000) + " miles") # Display the current distance to the traffic camera.
+                    if (nearest_camera["str"] != None): # Check to see if street data exists for this camera.
+                        print("    Street: " + str(nearest_camera["str"])) # Display the street that the traffic camera is on.
+                    if (nearest_camera["spd"] != None): # Check to see if speed limit data exists for this camera.
+                        print("    Speed: " + str(nearest_camera["spd"])) # Display the speed limit of the traffic camera.
 
-                    if (audio_alerts == True and int(alert_sounds_camera1_repeat) > 0): # Check to see if the user has audio alerts enabled.
-                        for i in range(0, int(alert_sounds_camera1_repeat)): # Repeat the sound several times, if the configuration says to.
-                            os.system("mpg321 " + alert_sounds_camera1 + " > /dev/null 2>&1 &") # Play the sound specified for this alert type in the configuration.
-                            time.sleep(float(alert_sounds_camera1_delay)) # Wait before playing the sound again.
-                    if (shape_alerts == True):  # Check to see if the user has enabled shape notifications.
-                        display_shape("cross") # Display an ASCII cross in the output.
-                    print(style.blue + style.bold)
-                    print("=====================")
-                    print("NEARBY TRAFFIC CAMERA")
-                    print("Proximity Level: 1")
-                    print("Distance: " + str(round((nearest_camera["dst"]*100)/100)) + " miles")
-                    if (nearest_camera["str"] != None):
-                        print("Street: " + str(nearest_camera["str"]))
-                    if (nearest_camera["spd"] != None):
-                        print("Speed: " + str(nearest_camera["spd"]))
-                    print("=====================")
-                    print(style.end + style.end)
+                    # Play audio alerts, as necessary.
+                    if (nearest_camera["dst"] < (float(traffic_camera_alert_radius) * 0.1)): # Check to see if the nearest camera is within 10% of the traffic camera alert radius.
+                        if (audio_alerts == True and int(alert_sounds_camera3_repeat) > 0): # Check to see if the user has audio alerts enabled.
+                            for i in range(0, int(alert_sounds_camera3_repeat)): # Repeat the sound several times, if the configuration says to.
+                                os.system("mpg321 " + alert_sounds_camera3 + " > /dev/null 2>&1 &") # Play the sound specified for this alert type in the configuration.
+                                time.sleep(float(alert_sounds_camera3_delay)) # Wait before playing the sound again.
+                    elif (nearest_camera["dst"] < (float(traffic_camera_alert_radius) * 0.25)): # Check to see if the nearest camera is within 25% of the traffic camera alert radius.
+                        if (audio_alerts == True and int(alert_sounds_camera2_repeat) > 0): # Check to see if the user has audio alerts enabled.
+                            for i in range(0, int(alert_sounds_camera2_repeat)): # Repeat the sound several times, if the configuration says to.
+                                os.system("mpg321 " + alert_sounds_camera2 + " > /dev/null 2>&1 &") # Play the sound specified for this alert type in the configuration.
+                                time.sleep(float(alert_sounds_camera2_delay)) # Wait before playing the sound again.
+                    elif (nearest_camera["dst"] < (float(traffic_camera_alert_radius))): # Check to see if the nearest camera is within the traffic camera alert radius.
+                        if (audio_alerts == True and int(alert_sounds_camera1_repeat) > 0): # Check to see if the user has audio alerts enabled.
+                            for i in range(0, int(alert_sounds_camera1_repeat)): # Repeat the sound several times, if the configuration says to.
+                                os.system("mpg321 " + alert_sounds_camera1 + " > /dev/null 2>&1 &") # Play the sound specified for this alert type in the configuration.
+                                time.sleep(float(alert_sounds_camera1_delay)) # Wait before playing the sound again.
+
 
 
 
@@ -1619,7 +1601,7 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
                         if (push_notifications_enabled == True): # Check to see if the user has Gotify notifications enabled.
                             os.system("curl -X POST '" + gotify_server + "/message?token=" + gotify_application_token + "' -F 'title=Predator' -F 'message=A license plate has been detected: " + detected_plate + "' > /dev/null 2>&1 &") # Send a push notification via Gotify.
 
-                        if (shape_alerts == True):  # Check to see if the user has enabled shape notifications.
+                        if (shape_alerts == True): # Check to see if the user has enabled shape notifications.
                             display_shape("square") # Display an ASCII square in the output.
 
                         if (status_lighting_enabled == True): # Check to see if status lighting alerts are enabled in the Predator configuration.
@@ -1631,7 +1613,7 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
                         if (realtime_output_level >= 2): # Only display this status message if the output level indicates to do so.
                             print("A plate was found, but none of the guesses matched the supplied plate format.\n----------")
 
-                        if (shape_alerts == True):  # Check to see if the user has enabled shape notifications.
+                        if (shape_alerts == True): # Check to see if the user has enabled shape notifications.
                             display_shape("circle") # Display an ASCII circle in the output.
 
 
@@ -1666,7 +1648,7 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
                                         print("===================")
                                         print(style.end + style.end)
 
-                                    if (shape_alerts == True):  # Check to see if the user has enabled shape notifications.
+                                    if (shape_alerts == True): # Check to see if the user has enabled shape notifications.
                                         display_shape("triangle") # Display an ASCII triangle in the output.
 
                                     if (audio_alerts == True and int(alert_sounds_alert_repeat) > 0): # Check to see if the user has audio alerts enabled.
@@ -1695,7 +1677,7 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
                                 print("===================")
                                 print(style.end + style.end)
 
-                            if (shape_alerts == True):  # Check to see if the user has enabled shape notifications.
+                            if (shape_alerts == True): # Check to see if the user has enabled shape notifications.
                                 display_shape("triangle") # Display an ASCII triangle in the output.
 
                             if (audio_alerts == True and int(alert_sounds_alert_repeat) > 0): # Check to see if the user has audio alerts enabled.
@@ -1826,6 +1808,8 @@ elif (mode_selection == "4" and information_mode_enabled == True): # The user ha
     while True: # Run forever in a loop until terminated.
         time.sleep(float(information_refresh_delay)) # Wait for a certain amount of time, as specified in the configuration.
         clear() # Clear the console output at the beginning of every cycle.
+        if (status_lighting_enabled == True): # Check to see if status lighting alerts are enabled in the Predator configuration.
+            update_status_lighting("normal") # Run the function to reset the status lighting to indicate normal operation.
 
         if (gps_enabled == True): # If GPS is enabled, then get the current location at the beginning of the cycle.
             current_location = get_gps_location() # Get the current location.
@@ -1859,7 +1843,7 @@ elif (mode_selection == "4" and information_mode_enabled == True): # The user ha
         # Traffic camera alert processing
         if (gps_enabled == True and traffic_camera_alerts_enabled == True): # Check to see if the speed camera display is enabled in the configuration.
             # Create placeholders for each camera type so we can add the closet camera for each category in the next step .
-            nearest_speed_camera, nearest_redlight_camera. nearest_misc_camera, nearest_camera = {"dst": 10000000.0}
+            nearest_speed_camera, nearest_redlight_camera, nearest_misc_camera, nearest_camera = {"dst": 10000000.0}, {"dst": 10000000.0}, {"dst": 10000000.0}, {"dst": 10000000.0}
 
             nearby_speed_cameras, nearby_redlight_cameras, nearby_misc_cameras = nearby_traffic_cameras(current_location[0], current_location[1], loaded_traffic_camera_database, traffic_camera_alert_radius) # Get all traffic cameras within the configured radius.
 
@@ -1888,7 +1872,13 @@ elif (mode_selection == "4" and information_mode_enabled == True): # The user ha
 
                 # Display the nearest traffic camera, if applicable.
                 if (nearest_camera["dst"] < float(traffic_camera_alert_radius)): # Only display the nearest camera if it's within the maximum range specified in the configuration.
-                    print("Nearby Camera:")
+                    if (status_lighting_enabled == True): # Check to see if status lighting alerts are enabled in the Predator configuration.
+                        update_status_lighting("camera") # Run the function to update the status lighting.
+
+                    if (shape_alerts == True): # Check to see if the user has enabled shape notifications.
+                        display_shape("cross") # Display an ASCII cross in the output.
+
+                    print("Nearest Enforcement Camera:")
                     if (nearest_camera == nearest_speed_camera): # Check to see if the overall nearest camera is the nearest speed camera.
                         print("    Type: Speed Camera")
                     elif (nearest_camera == nearest_redlight_camera): # Check to see if the overall nearest camera is the nearest red light camera.
@@ -1897,11 +1887,28 @@ elif (mode_selection == "4" and information_mode_enabled == True): # The user ha
                         print("    Type: General Traffic Camera")
                     else:
                         print("    Type: Unknown")
-                    print("    Distance: " + str(round((nearest_camera["dst"]*100)/100)) + " miles") # Display the current distance to the traffic camera.
+                    print("    Distance: " + str(round(nearest_camera["dst"]*1000)/1000) + " miles") # Display the current distance to the traffic camera.
                     if (nearest_camera["str"] != None): # Check to see if street data exists for this camera.
                         print("    Street: " + str(nearest_camera["str"])) # Display the street that the traffic camera is on.
                     if (nearest_camera["spd"] != None): # Check to see if speed limit data exists for this camera.
                         print("    Speed: " + str(nearest_camera["spd"])) # Display the speed limit of the traffic camera.
+
+                    # Play audio alerts, as necessary.
+                    if (nearest_camera["dst"] < (float(traffic_camera_alert_radius) * 0.1)): # Check to see if the nearest camera is within 10% of the traffic camera alert radius.
+                        if (audio_alerts == True and int(alert_sounds_camera3_repeat) > 0): # Check to see if the user has audio alerts enabled.
+                            for i in range(0, int(alert_sounds_camera3_repeat)): # Repeat the sound several times, if the configuration says to.
+                                os.system("mpg321 " + alert_sounds_camera3 + " > /dev/null 2>&1 &") # Play the sound specified for this alert type in the configuration.
+                                time.sleep(float(alert_sounds_camera3_delay)) # Wait before playing the sound again.
+                    elif (nearest_camera["dst"] < (float(traffic_camera_alert_radius) * 0.25)): # Check to see if the nearest camera is within 25% of the traffic camera alert radius.
+                        if (audio_alerts == True and int(alert_sounds_camera2_repeat) > 0): # Check to see if the user has audio alerts enabled.
+                            for i in range(0, int(alert_sounds_camera2_repeat)): # Repeat the sound several times, if the configuration says to.
+                                os.system("mpg321 " + alert_sounds_camera2 + " > /dev/null 2>&1 &") # Play the sound specified for this alert type in the configuration.
+                                time.sleep(float(alert_sounds_camera2_delay)) # Wait before playing the sound again.
+                    elif (nearest_camera["dst"] < (float(traffic_camera_alert_radius))): # Check to see if the nearest camera is within the traffic camera alert radius.
+                        if (audio_alerts == True and int(alert_sounds_camera1_repeat) > 0): # Check to see if the user has audio alerts enabled.
+                            for i in range(0, int(alert_sounds_camera1_repeat)): # Repeat the sound several times, if the configuration says to.
+                                os.system("mpg321 " + alert_sounds_camera1 + " > /dev/null 2>&1 &") # Play the sound specified for this alert type in the configuration.
+                                time.sleep(float(alert_sounds_camera1_delay)) # Wait before playing the sound again.
 
 
 
@@ -1911,12 +1918,12 @@ elif (mode_selection == "4" and information_mode_enabled == True): # The user ha
             nearby_alpr_cameras = nearby_database_poi(current_location[0], current_location[1], loaded_alpr_camera_database, information_max_nearest_alpr_range) # Get nearby entries from this POI database.
             nearest_camera = {"distance": 1000000000.0}
             if (len(nearby_alpr_cameras) > 0): # Only iterate through the nearby cameras if there are any nearby cameras to begin with.
-                for entry in nearby_alpr_cameras["entries"]: # Iterate through all nearby ALPR cameras.
+                for entry in nearby_alpr_cameras: # Iterate through all nearby ALPR cameras.
                     if (entry["distance"] < nearest_camera["distance"]): # Check to see if the distance to this camera is lower than the current closest camera.
                         nearest_camera = entry # Make the current camera the new closest camera.
 
                 print("Nearest " + loaded_alpr_camera_database["name"] + ":")
-                print("    Distance: " + str(nearest_camera["distance"]) + " miles")
+                print("    Distance: " + str(round(nearest_camera["distance"]*1000)/1000) + " miles")
                 print("    Street: " + str(nearest_camera["road"]))
 
 

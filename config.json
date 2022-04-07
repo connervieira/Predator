@@ -6,7 +6,7 @@
         "default_root": "",
         "silence_file_saving": true,
         "disable_object_recognition": false,
-        "gps_enabled": false,
+        "gps_enabled": true,
         "speed_display_unit": "mph",
         "modes_enabled": {
             "management": true,
@@ -17,11 +17,11 @@
             "survey": true
         },
         "alert_databases": {
-            "license_plates": "alerts.json",
+            "license_plates": "alerts.txt",
             "traffic_cameras": "",
-            "alpr_cameras": "/home/cvieira/Software/Programming/Python/Predator/assets/databases/alpr.json"
+            "alpr_cameras": ""
         },
-        "traffic_camera_alerts_enabled": false,
+        "traffic_camera_alerts_enabled": true,
         "camera_alert_types": {
             "speed": true,
             "redlight": true,
@@ -99,7 +99,7 @@
         "default_license_plate_format": "",
         "default_realtime_object_recognition": "",
         "push_notifications_enabled": false,
-        "gotify_server": "",
+        "gotify_server": "http://10.3.141.1:1522",
         "gotify_application_token": "",
         "status_lighting_enabled": true,
         "status_lighting_base_url": "http://predatorwled.local/win&A=255",
@@ -131,7 +131,7 @@
         },
         "record_telemetry": true,
         "alerts": {
-            "traffic_cameras": 0.5,
+            "traffic_cameras": 1,
             "alpr_cameras": 1 
         }
     }

@@ -46,8 +46,8 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Add "Survey Mode", for reporting the locations of speed cameras, license plate reading cameras, and other potential points of interest.
 - [X] Add GPS based notificaitons for automated license plate readers.
 - [X] Redo CONFIGURATION.md to better represent the newly changed configuration values.
-- [ ] Transition Real-time Mode alert databases from plain text lists to JSON databases.
 - [ ] Test ALPR alerts.
+- [ ] Transition Real-time Mode alert databases from plain text lists to JSON databases.
 
 
 # Hypothetical

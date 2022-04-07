@@ -292,7 +292,7 @@ def get_gps_location(): # Placeholder that should be updated at a later date.
             gps_data_packet = gpsd.get_current() # Get the current information.
             return gps_data_packet.position()[0], gps_data_packet.position()[1], gps_data_packet.speed(), gps_data_packet.altitude(), gps_data_packet.movement()["track"], gps_data_packet.sats # Return GPS information.
         except: # If the current location can't be established, then return placeholder location data.
-            return 41.52396, -81.42150, 0.0, 0.0, 0.0, 0 # Return a default placeholder location.
+            return 0.0000, 0.0000, 0.0, 0.0, 0.0, 0 # Return a default placeholder location.
     else: # If GPS is disabled, then this function should never be called, but return a placeholder position regardless.
         return 0.0000, 0.0000, 0.0, 0.0, 0.0, 0 # Return a default placeholder location.
 
@@ -348,11 +348,13 @@ def nearby_traffic_cameras(current_lat, current_lon, database_information, radiu
 
 
 def nearby_database_poi(current_lat, current_lon, database_information, radius=1.0):
+    nearby_database_information = [] # Create a placeholder list to add the narby POIs to in the next steps.
     for entry in database_information["entries"]: # Iterate through each entry in the loaded database information.
-        current_distance = get_distance(current_lat, current_lon, entry['latitude'], entry['longitude'])
+        current_distance = get_distance(current_lat, current_lon, entry['latitude'], entry['longitude']) # Get the current distance to the POI in question.
+        entry["distance"] = current_distance # Append the current POI's distance to it's database information.
         if (current_distance < float(radius)): # Check to see if the current POI is within range of the user.
-            entry["distance"] = current_distance # Append the current POI's distance to it's database information.
-    return database_information # Return the new database with the newly added distance information.
+            nearby_database_information.append(entry) # Add this entry to the list of POIs within range.
+    return nearby_database_information # Return the new database with the newly added distance information.
 
 
 

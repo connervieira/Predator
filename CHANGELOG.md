@@ -244,3 +244,7 @@ This update prefaces plans for future updates, and adds 'survey mode', which all
     - The ALPR database was created using Predator's new Survey Mode, and acts as an example of how to set up a Predator database.
 - Reorganized some configuration values to make custom databases more intuitive.
     - Moved all traffic camera related configuration values to either the 'General' section or the 'Information Mode' section.
+- The second command line argumented appended to Predator can now be used to specify the project root directory.
+- Simplified enforcement camera alerts in Real-time Mode to make them appear more like enforcement camera alerts in Information Mode.
+- Enforcement camera alerts in real-time mode now support shape alerts, audio alerts, and status lighting alerts.
+- Moved the 'license plate validation format' prompt to the second prompt in Real-time Mode.
