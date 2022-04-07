@@ -21,7 +21,7 @@
             "traffic_cameras": "",
             "alpr_cameras": ""
         },
-        "traffic_camera_alerts_enabled": true,
+        "traffic_camera_alerts_enabled": false,
         "camera_alert_types": {
             "speed": true,
             "redlight": true,

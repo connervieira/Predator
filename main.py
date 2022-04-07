@@ -1708,12 +1708,12 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
                     url = url.replace("[A]", str(active_alert)) # Replace "[A]" with the current alert status.
 
                     try: # Try sending a request to the webook.
-                        webhook_response = urllib.request.urlopen(url).getcode() # Save the raw data from the request to a variable.
+                        response = requests.get(url)
                     except Exception as e:
-                        webhook_response = e
+                        response = e
 
                     if (str(webhook_response) != "200"): # If the webhook didn't respond with a 200 code; Warn the user that there was an error.
-                        print(style.yellow + "Warning: Unable to submit data to webhook. Response code: " + str(webhook_response.getcode()) + style.end)
+                        print(style.yellow + "Warning: Unable to submit data to webhook." + style.end)
 
             if (realtime_output_level >= 3 and webhook != None and webhook != ""): # Only display this status message if the output level indicates to do so.
                 print("Done.\n----------")
