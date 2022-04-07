@@ -62,6 +62,21 @@ This section of configuration values will effect Predator's general operation.
         - `alpr_cameras` should be set to (if anything), a Predator JSON database of ALPR cameras. Leaving this blank will disable ALPR camera alerts.
     - Each value in this section should either be left blank, or be a file path relative to the root project folder.
         - For example, if your alert database is in `/home/pi/Data/alerts.txt`, and your root project directory is `/home/pi/Data/`, then then the alert database value should simply be set to `alerts.txt`, not the the full file path.
+- `traffic_camera_alerts_enabled`
+    - This configuration value determines whether or not traffic camera alerts are enabled.
+    - When this is set to `true`, Predator will use information from the following traffic camera alert settings in order to notify the user of nearby traffic cameras.
+- `camera_alert_types`
+    - This configuration value determines which camera types Predator will consider when displaying alerts to the user. All of the values under this setting should be set to a boolean value indicating whether or not alerts should be shown for each respective camera type.
+    - There are currently 3 types of cameras.
+        - `speed` includes both radar and average speed enforcement cameras.
+        - `redlight` includes traffic light enforcement cameras.
+        - `misc` includes all traffic cameras that don't fall into the other two categories. 
+- `traffic_camera_loaded_radius`
+    - This is the radius, in miles, that Predator will load traffic cameras from during the initial loading process.
+    - For example, if this value is set to `100`, then Predator will only load traffic cameras in a 100 mile radius from the current location when it boots. If you travel more than 100 miles away from your original location without reloading Predator then you won't get traffic camera alerts.
+    - If you're running Predator on a high performance processor, you can comfortable set this to a very high number, which could be useful on long road trips where you might not restart Predator for hundreds of miles at a time. However, if you're running Predator on a low powered device, like a Raspberry Pi, you should reduce this radius to make Predator faster at checking traffic camera proximity when running in real-time mode.
+    - This setting does not determine the distance at which alerts will be displayed. To configure the alert distance for traffic cameras, see the `alerts` configuration value in the Information Mode section below.
+
 
 
 ## Pre-recorded Mode Configuration
@@ -252,24 +267,6 @@ In order to better integrate with an existing system, Predator can communicate w
         - The "normal" status is used when Predator is running, and hasn't detected any license plates in the past processing cycle.
 
 
-### Real-time Mode Traffic Camera Alert Settings
-
-While operating in Real-time mode, Predator can notify the user when a speed or red-light camera is nearby, based on GPS data and an ExCam database. However, traffic camera alerts are primarily designed to be used in Information Mode. Many of the configuration values for traffic camera alerts in the Information Mode section will also influence the operating of Real-time Mode
-
-- `traffic_camera_alerts_enabled`
-    - This configuration value determines whether or not traffic camera alerts are enabled.
-    - When this is set to `true`, Predator will use information from the following traffic camera alert settings in order to notify the user of nearby traffic cameras.
-- `camera_alert_types`
-    - This configuration value determines which camera types Predator will consider when displaying alerts to the user. All of the values under this setting should be set to a boolean value indicating whether or not alerts should be shown for each respective camera type.
-    - There are currently 3 types of cameras.
-        - `speed` includes both radar and average speed enforcement cameras.
-        - `redlight` includes traffic light enforcement cameras.
-        - `misc` includes all traffic cameras that don't fall into the other two categories. 
-- `traffic_camera_loaded_radius`
-    - This is the radius, in miles, that Predator will load traffic cameras from during the initial loading process.
-    - For example, if this value is set to `100`, then Predator will only load traffic cameras in a 100 mile radius from the current location when it boots. If you travel more than 100 miles away from your original location without reloading Predator then you won't get traffic camera alerts.
-    - If you're running Predator on a high performance processor, you can comfortable set this to a very high number, which could be useful on long road trips where you might not restart Predator for hundreds of miles at a time. However, if you're running Predator on a low powered device, like a Raspberry Pi, you should reduce this radius to make Predator faster at checking traffic camera proximity when running in real-time mode.
-    - This setting does not determine the distance at which alerts will be displayed. To configure the alert distance for traffic cameras, see the `alerts` configuration value in the Information Mode section below.
 
 
 

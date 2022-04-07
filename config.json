@@ -17,10 +17,17 @@
             "survey": true
         },
         "alert_databases": {
-            "license_plates": "http://v0lttech.com/files/documents/predator/amber.txt",
+            "license_plates": "alerts.json",
             "traffic_cameras": "",
             "alpr_cameras": "/home/cvieira/Software/Programming/Python/Predator/assets/databases/alpr.json"
-        }
+        },
+        "traffic_camera_alerts_enabled": false,
+        "camera_alert_types": {
+            "speed": true,
+            "redlight": true,
+            "misc": true
+        },
+        "traffic_camera_loaded_radius": 500
     },
     "prerecorded": {
         "left_margin": "700",
@@ -101,14 +108,7 @@
             "warning": "[U]&R=255&G=128&B=0",
             "normal": "[U]&R=0&G=255&B=0",
             "camera": "[U]&R=0&G=0&B=255"
-        },
-        "traffic_camera_alerts_enabled": false,
-        "camera_alert_types": {
-            "speed": true,
-            "redlight": true,
-            "misc": true
-        },
-        "traffic_camera_loaded_radius": 500
+        }
     },
     "dashcam": {
         "dashcam_resolution": "1920x1080",

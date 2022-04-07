@@ -98,6 +98,13 @@ alert_database_license_plates = config["general"]["alert_databases"]["license_pl
 traffic_camera_database = config["general"]["alert_databases"]["traffic_cameras"]
 alpr_camera_database = config["general"]["alert_databases"]["alpr_cameras"]
 
+# Traffic camera alert settings
+traffic_camera_alerts_enabled = config["general"]["traffic_camera_alerts_enabled"]
+camera_alert_types_speed = config["general"]["camera_alert_types"]["speed"]
+camera_alert_types_redlight = config["general"]["camera_alert_types"]["redlight"]
+camera_alert_types_misc = config["general"]["camera_alert_types"]["misc"]
+traffic_camera_loaded_radius = config["general"]["traffic_camera_loaded_radius"]
+
 
 
 # ----- Pre-recorded mode configuration -----
@@ -169,12 +176,6 @@ alert_sounds_camera3 = config["realtime"]["camera3_sound"]["path"]
 alert_sounds_camera3_repeat = config["realtime"]["camera3_sound"]["repeat"]
 alert_sounds_camera3_delay = config["realtime"]["camera3_sound"]["delay"]
 
-# Traffic camera alert settings
-traffic_camera_alerts_enabled = config["realtime"]["traffic_camera_alerts_enabled"]
-camera_alert_types_speed = config["realtime"]["camera_alert_types"]["speed"]
-camera_alert_types_redlight = config["realtime"]["camera_alert_types"]["redlight"]
-camera_alert_types_misc = config["realtime"]["camera_alert_types"]["misc"]
-traffic_camera_loaded_radius = config["realtime"]["traffic_camera_loaded_radius"]
 
 
 
@@ -1306,7 +1307,10 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
             if (os.path.exists(root + "/" + alert_database)): # Check to see if the database specified by the user actually exists.
                 f = open(root + "/" + alert_database, "r") # Open the user-specified datbase file.
                 file_contents = f.read() # Read the file.
-                alert_database_list = file_contents.split() # Read each line of the file as a seperate entry in the alert database list.
+                if (file_contents[0] == "{"): # Check to see if the first character in the file indicates that this alert database is a JSON database.
+                    alert_database_list = json.dumps(file_contents) # Load the alert database as JSON data.
+                else: # The alert database appears to be a plain text list.
+                    alert_database_list = file_contents.split() # Read each line of the file as a seperate entry in the alert database list.
                 f.close() # Close the file.
             else: # If the alert database specified by the user does not exist, alert the user of the error.
                 print(style.yellow + "Warning: The alert database specified at " + root + "/" + alert_database + " does not exist. Alerts have been disabled." + style.end)
@@ -1469,10 +1473,7 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
                     pass
 
 
-                # Display and play alerts as necessary.
-
-
-
+                # Display and play traffic camera alerts as necessary.
                 if (nearest_camera["dst"] < (float(traffic_camera_alert_radius) * 0.1)): # Check to see if the nearest camera is within 10% of the traffic camera alert radius.
                     # Update the status lighting to to indicate a camera alert.
                     if (status_lighting_enabled == True): # Check to see if status lighting alerts are enabled in the Predator configuration.

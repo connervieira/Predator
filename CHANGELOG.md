@@ -204,11 +204,11 @@ This update adds 'information mode', which allows Predator to rapidly display us
 - Adjusted some comments that had typos or confusing wording.
 - License plate recognition can now be entirely disabled in real-time mode using the `realtime_alpr_enabled` configuration value.
     - A custom artificial delay can be (optionally) added when license plate recognition is disabled in order to prevent Predator from running through the real-time mode processing cycle unreasonably fast.
-- Added the ability to display the current speed during each processing cycle in real-time mode.
+- Added the ability to display the current speed during each processing cycle in Real-time Mode.
     - This feature can be turned on and off in the configuration using the `speed_display_enabled` setting.
     - The current speed can be displayed in kilometers per hour, miles per hour, meters per second, feet per second, or knots.
 - Moved the `gps_enabled` and `speed_display_unit` configuration values to the `general` section.
-- Added 'Information' mode, which allows Predator to show customizable information displays in the console output.
+- Added 'Information Mode', which allows Predator to show customizable information displays in the console output.
     - This mode also adds several new configuration values.
         - `information_refresh_delay`
         - `displays`
@@ -221,7 +221,7 @@ This update adds 'information mode', which allows Predator to rapidly display us
             - `satellites`
             - `nearest_camera`
         - `max_nearest_camera_range`
-    - Information mode can also be used to record telemetry to a log file, using the `record_telemetry` configuration value.
+    - Information Mode can also be used to record telemetry to a log file, using the `record_telemetry` configuration value.
 - Added a start-up check to see if the traffic camera database file specified in the configuration actually exists.
 - Added the ability to save the current location to the log of plates detected in real-time.
 - Adjusted the default values for a couple settings.
@@ -240,5 +240,7 @@ This update prefaces plans for future updates, and adds 'survey mode', which all
 
 - Added 'survey mode', which allows the user to create, view, edit, and survey location databases.
 - Pre-recorded mode is now capable of processing multiple videos sequentially.
-- Added support ALPR alerts in Information mode as a survey mode demonstration.
+- Added support ALPR alerts in Information mode.
+    - The ALPR database was created using Predator's new Survey Mode, and acts as an example of how to set up a Predator database.
 - Reorganized some configuration values to make custom databases more intuitive.
+    - Moved all traffic camera related configuration values to either the 'General' section or the 'Information Mode' section.

@@ -3,7 +3,7 @@
     "description": "This database contains the locations of various fixed automated license plate recognition cameras, specifically in north-east Ohio. This database is far from comprehensive, and is a work in progress.",
     "author": "V0LT",
     "created": "1648767201",
-    "modified": "1649192055",
+    "modified": "1649281309",
     "elements": {
         "brand": "str",
         "name": "str",
@@ -319,6 +319,28 @@
             "road": "Fairmount Boulevard",
             "description": "Mounted on a tall black pole on the south side of the road, facing the backs of cars traveling east on Fairmount Boulevard just after passing SOM Center Road.",
             "direction": 90,
+            "owner": "",
+            "type": "standalone"
+        },
+        {
+            "latitude": 41.58219,
+            "longitude": -81.43929,
+            "brand": "Flock Safety",
+            "name": "Falcon",
+            "road": "SOM Center Road",
+            "description": "A solar powered unit placed on a tall black pole on the east side of the road, reading the license plates on the backs of cars traveling north on SOM Center Road.",
+            "direction": 0,
+            "owner": "",
+            "type": "standalone"
+        },
+        {
+            "latitude": 41.52156,
+            "longitude": -81.42465,
+            "brand": "Flock Safety",
+            "name": "Falcon",
+            "road": "West Hill Drive",
+            "description": "On the south side of the road, facing the backs of cars traveling east on West Hill Drive.",
+            "direction": 40,
             "owner": "",
             "type": "standalone"
         }
