@@ -57,7 +57,7 @@ get_distance = utils.get_distance # Load the function to get the distance betwee
 load_traffic_cameras = utils.load_traffic_cameras # Load the function used to load the database of speed and red-light cameras.
 nearby_traffic_cameras = utils.nearby_traffic_cameras # Load the function used to check for nearby traffic cameras.
 nearby_database_poi = utils.nearby_database_poi # Load the function used to check for general nearby points of interest.
-convert_speed = utils.convert_speed # Load the function used to convert speeds from KPH to other units.
+convert_speed = utils.convert_speed # Load the function used to convert speeds from meters per second to other units.
 
 if (config["general"]["disable_object_recognition"] == False): # Check to see whether or not object recognition (Tensorflow/OpenCV) has been globally disabled.
     try: # "Try" to import Tensorflow and OpenCV; Don't quit the entire program if an error is encountered.

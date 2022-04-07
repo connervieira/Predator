@@ -366,15 +366,15 @@ def convert_speed(speed, unit="mph"):
     unit = unit.lower() # Convert the unit to all lowercase in order to make it easier to work with and remove inconsistencies in configuration setups.
 
     if (unit == "kph"): # Convert the speed to kilometers per hour.
-        speed = speed # The speed is already measured in kilometers per hour, so there is no reason to convert it.
+        speed = speed * 3.6 # The speed is already measured in kilometers per hour, so there is no reason to convert it.
     elif (unit == "mph"): # Convert the speed to miles per hour.
-        speed = speed * 0.6213712
+        speed = speed * 2.236936
     elif (unit == "mps"): # Convert the speed to meters per second.
-        speed = speed * 0.2777778
+        speed = speed # The speed is already measured in meters per second, so there is no reason to convert it.
     elif (unit == "knot"): # Convert the speed to meters per second.
-        speed = speed * 0.5399568
+        speed = speed * 1.943844
     elif (unit == "fps"): # Convert the speed to feet per second.
-        speed = speed * 0.9113444
+        speed = speed * 3.28084
     else: # If an invalid unit was supplied, then simply return a speed of zero.
         speed = 0
 
