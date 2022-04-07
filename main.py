@@ -206,6 +206,7 @@ if (traffic_camera_alerts_enabled == True): # Check to see if traffic camera ale
         loaded_traffic_camera_database = load_traffic_cameras(get_gps_location()[0], get_gps_location()[1], traffic_camera_database, traffic_camera_loaded_radius) # Load all traffic cameras within the configured loading radius.
     else:
         print(style.yellow + "Warning: The 'traffic_camera_alerts_enabled' setting is turned on, but the 'traffic_camera_database' defined in the configuration section doesn't point to a valid file. Expect traffic camera alerts to be broken." + style.end)
+        input("Press enter to continue...")
 
 # Load the ALPR camera database, if enabled.
 if (alpr_camera_database != "" and os.path.exists(alpr_camera_database)):
