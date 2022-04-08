@@ -6,7 +6,7 @@
         "default_root": "",
         "silence_file_saving": true,
         "disable_object_recognition": false,
-        "gps_enabled": true,
+        "gps_enabled": false,
         "speed_display_unit": "mph",
         "modes_enabled": {
             "management": true,
