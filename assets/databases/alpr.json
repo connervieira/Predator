@@ -3,7 +3,7 @@
     "description": "This database contains the locations of various fixed automated license plate recognition cameras, specifically in north-east Ohio. This database is far from comprehensive, and is a work in progress.",
     "author": "V0LT",
     "created": "1648767201",
-    "modified": "1649376432",
+    "modified": "1649458037",
     "elements": {
         "brand": "str",
         "name": "str",
@@ -587,7 +587,7 @@
             "type": "trafficlight_crossbar"
         },
         {
-            "latitude": 41.50150,
+            "latitude": 41.5015,
             "longitude": -81.49771,
             "brand": "",
             "name": "",
@@ -618,6 +618,138 @@
             "direction": 90,
             "owner": "",
             "type": "trafficlight_crossbar"
+        },
+        {
+            "latitude": 41.50878,
+            "longitude": -81.60562,
+            "brand": "",
+            "name": "",
+            "road": "Euclid Avenue",
+            "description": "Mounted on a traffic light cross bars, facing the backs of cars traveling south west on Euclid Avenue just after passing Ford Drive.",
+            "direction": 220,
+            "owner": "",
+            "type": "trafficlight_crossbar"
+        },
+        {
+            "latitude": 41.50896,
+            "longitude": -81.60518,
+            "brand": "",
+            "name": "",
+            "road": "Euclid Avenue",
+            "description": "Mounted on a traffic light cross bar, facing the backs of cars traveling north east on Euclid Avenue just after passing Mayfield Road.",
+            "direction": 50,
+            "owner": "",
+            "type": "trafficlight_crossbar"
+        },
+        {
+            "latitude": 41.41331,
+            "longitude": -81.73455,
+            "brand": "",
+            "name": "",
+            "road": "Ridge Road",
+            "description": "Mounted on a traffic light cross bar, facing the backs of cars traveling south on Ridge Road just before passing Pearl Road.",
+            "direction": 180,
+            "owner": "",
+            "type": "trafficlight_crossbar"
+        },
+        {
+            "latitude": 41.41299,
+            "longitude": -81.73441,
+            "brand": "",
+            "name": "",
+            "road": "Ridge Road",
+            "description": "Mounted on a traffic light cross bar, facing the backs of cars traveling north on Ridge Road, just before passing Pearl Road.",
+            "direction": 0,
+            "owner": "",
+            "type": "trafficlight_crossbar"
+        },
+        {
+            "latitude": 41.40501,
+            "longitude": -81.73454,
+            "brand": "",
+            "name": "",
+            "road": "Ridge Road",
+            "description": "Mounted on a traffic light cross bar, facing the front of cars traveling north on Ridge Road, as they cross Snow Road.",
+            "direction": 180,
+            "owner": "",
+            "type": "trafficlight_crossbar_monitor"
+        },
+        {
+            "latitude": 41.40477,
+            "longitude": -81.73459,
+            "brand": "",
+            "name": "",
+            "road": "Ridge road",
+            "description": "Mounted on a traffic light cross bar, facing the front of cars traveling south on Ridge Road as they cross Snow Road.",
+            "direction": 0,
+            "owner": "",
+            "type": "trafficlight_crossbar_monitor"
+        },
+        {
+            "latitude": 41.4049,
+            "longitude": -81.73475,
+            "brand": "",
+            "name": "",
+            "road": "Snow Road",
+            "description": "Mounted on a traffic light cross bar, facing the front of cars traveling west on Snow Road as they pass Ridge Road.",
+            "direction": 90,
+            "owner": "",
+            "type": "trafficlight_crossbar_monitor"
+        },
+        {
+            "latitude": 41.40488,
+            "longitude": -81.7344,
+            "brand": "",
+            "name": "",
+            "road": "Snow Road",
+            "description": "Mounted on a traffic light cross bar, facing the front of cars traveling east on Snow Road as they pass Ridge Road.",
+            "direction": 270,
+            "owner": "",
+            "type": "trafficlight_crossbar_monitor"
+        },
+        {
+            "latitude": 41.52074,
+            "longitude": -81.53673,
+            "brand": "",
+            "name": "",
+            "road": "Mayfield Road",
+            "description": "Mounted on a traffic light cross bar facing the front of cars traveling west on Mayfield Road as they pass Warrensville Center Road.",
+            "direction": 90,
+            "owner": "",
+            "type": "trafficsignal_crossbar_monitor"
+        },
+        {
+            "latitude": 41.52067,
+            "longitude": -81.53631,
+            "brand": "",
+            "name": "",
+            "road": "Mayfield Road",
+            "description": "Mounted on a traffic light cross bar, facing the front of cars traveling east on Mayfield Road as they pass Warrensville Center Road.",
+            "direction": 270,
+            "owner": "",
+            "type": "trafficlight_crossbar_monitor"
+        },
+        {
+            "latitude": 1.0,
+            "longitude": 41.52082,
+            "brand": "-81.53647",
+            "name": "",
+            "road": "Warrensville Center Road",
+            "description": "Mounted on a traffic light cross bar, facing the front of cars traveling north on Warrensville Center Road as they pass Mayfield Road.",
+            "direction": 180,
+            "owner": "",
+            "type": "trafficlight_crossbar_monitor"
+        },
+        {
+            "latitude": 41.52058,
+            "longitude": -81.53654,
+            "brand": "",
+            "name": "",
+            "road": "Warrensville Center Road",
+            "description": "Mounted on a traffic light cross bar, facing the front of cars traveling south on Warrensville Center Road as they pass Mayfield Road.",
+            "direction": 0,
+            "owner": "",
+            "type": "trafficlight_crossbar_monitor"
         }
     ]
 }
