@@ -394,7 +394,7 @@
             "brand": "Flock Safety",
             "name": "Falcon",
             "road": "SOM Center Road",
-            "description": "A black solar powered camera on a standalone pole located on the east side of the road, facing the backs of cars traveling north on SOM Center Road.",
+            "description": "A black solar powered camera on a standalone pole located on the east side of the road, facing the front of cars traveling north on SOM Center Road.",
             "direction": 0,
             "owner": "",
             "type": "standalone"
@@ -572,6 +572,50 @@
             "road": "Mayfield Road",
             "description": "Mounted on a traffic light cross bar, facing the backs of cars traveling west on Mayfield Road just after passing South Belvoir Boulevard.",
             "direction": 270,
+            "owner": "",
+            "type": "trafficlight_crossbar"
+        },
+        {
+            "latitude": 41.50113,
+            "longitude": -81.49786,
+            "brand": "",
+            "name": "",
+            "road": "Richmond Road",
+            "description": "Mounted on a traffic light cross bar, facing the backs of cars traveling south on Richmond Road just after passing Cedar Road.",
+            "direction": 180,
+            "owner": "",
+            "type": "trafficlight_crossbar"
+        },
+        {
+            "latitude": 41.50150,
+            "longitude": -81.49771,
+            "brand": "",
+            "name": "",
+            "road": "Richmond Road",
+            "description": "Mounted on a traffic light cross bar, facing the backs of cars traveling north on Richmond Road just after passing Cedar Road.",
+            "direction": 0,
+            "owner": "",
+            "type": "trafficlight_crossbar"
+        },
+        {
+            "latitude": 41.50133,
+            "longitude": -81.49806,
+            "brand": "",
+            "name": "",
+            "road": "Cedar Road",
+            "description": "Mounted on a traffic light cross bar, facing the backs of cars traveling west on Cedar Road just after passing Richmond Road.",
+            "direction": 270,
+            "owner": "",
+            "type": "trafficlight_crossbar"
+        },
+        {
+            "latitude": 41.50123,
+            "longitude": -81.49756,
+            "brand": "",
+            "name": "",
+            "road": "Cedar Road",
+            "description": "Mounted on a traffic light cross bar, facing the backs of cars traveling east on Cedar Road just after passing Richmond Road.",
+            "direction": 90,
             "owner": "",
             "type": "trafficlight_crossbar"
         }
