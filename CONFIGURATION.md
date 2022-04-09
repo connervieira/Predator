@@ -58,13 +58,18 @@ This section of configuration values will effect Predator's general operation.
 - `alert_databases`
     - This setting contains the file names all of the alert databases used by Predator.
         - `license_plates` should be set to (if anything), a plain-text list of license plates that Predator should show a heightened alert for.
+            - This file should be relative to the root project directory.
         - `traffic_cameras` should be set to (if anything), an ExCam database of speed, red-light, and traffic cameras. Leaving this blank will disable traffic camera alerts.
+            - This file should be an absolute file path.
         - `alpr_cameras` should be set to (if anything), a Predator JSON database of ALPR cameras. Leaving this blank will disable ALPR camera alerts.
+            - This file should be an absolute file path.
     - Each value in this section should either be left blank, or be a file path relative to the root project folder.
         - For example, if your alert database is in `/home/pi/Data/alerts.txt`, and your root project directory is `/home/pi/Data/`, then then the alert database value should simply be set to `alerts.txt`, not the the full file path.
 - `traffic_camera_alerts_enabled`
-    - This configuration value determines whether or not traffic camera alerts are enabled.
-    - When this is set to `true`, Predator will use information from the following traffic camera alert settings in order to notify the user of nearby traffic cameras.
+    - This configuration value determines whether or not traffic enforcement camera alerts are enabled.
+        - This includes red-light cameras, speed cameras, and other enforcement cameras.
+        - This does not include automated license plate readers, which are supplied by a different database.
+    - When this is set to `true`, Predator will use information from the following traffic camera alert settings in order to notify the user of nearby traffic enforcement cameras.
 - `camera_alert_types`
     - This configuration value determines which camera types Predator will consider when displaying alerts to the user. All of the values under this setting should be set to a boolean value indicating whether or not alerts should be shown for each respective camera type.
     - There are currently 3 types of cameras.

@@ -1310,18 +1310,21 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
 
 
     # Load the alert database
+    alpr_alert_database_format = "none"
     if (alert_database != None and alert_database != ""): # Check to see if the user has supplied a database to scan for alerts.
         if (validators.url(alert_database)): # Check to see if the user supplied a URL as their alert database.
             # If so, download the data at the URL as the databse.
-            alert_database_list = download_plate_database(alert_database)
+            alert_database_list, alpr_alert_database_format = download_plate_database(alert_database)
         else: # The input the user supplied doesn't appear to be a URL.
             if (os.path.exists(root + "/" + alert_database)): # Check to see if the database specified by the user actually exists.
                 f = open(root + "/" + alert_database, "r") # Open the user-specified datbase file.
                 file_contents = f.read() # Read the file.
                 if (file_contents[0] == "{"): # Check to see if the first character in the file indicates that this alert database is a JSON database.
-                    alert_database_list = json.dumps(file_contents) # Load the alert database as JSON data.
+                    alert_database_list = json.loads(file_contents) # Load the alert database as JSON data.
+                    alpr_alert_database_format = "json"
                 else: # The alert database appears to be a plain text list.
                     alert_database_list = file_contents.split() # Read each line of the file as a seperate entry in the alert database list.
+                    alpr_alert_database_format = "text"
                 f.close() # Close the file.
             else: # If the alert database specified by the user does not exist, alert the user of the error.
                 print(style.yellow + "Warning: The alert database specified at " + root + "/" + alert_database + " does not exist. Alerts have been disabled." + style.end)
@@ -1348,7 +1351,6 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
             current_location = get_gps_location() # Get the current location.
             current_speed = convert_speed(float(current_location[2]), speed_display_unit) # Convert the speed data from the GPS into the units specified by the configuration.
             print("Current speed: " + str(current_speed) + " " + str(speed_display_unit)) # Print the current speed to the console.
-
 
 
 
@@ -1641,6 +1643,7 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
             # Check the plate(s) detected this around against the alert database, if necessary.
             if (realtime_output_level >= 3): # Only display this status message if the output level indicates to do so.
                 print("Checking license plate data against alert database...")
+
             active_alert = False # Reset the alert status to false so we can check for alerts on the current plate (if one was detected) next.
             if (alerts_ignore_validation == True): # If the user has enabled alerts that ignore license plate validation, then check each of the OpenALPR guesses against the license plate alert database.
                 if (len(all_current_plate_guesses) > 0): # Check to see that the all_current_plate_guesses variable isn't empty. This variable will only have entries if a plate was detected this round.
@@ -1655,6 +1658,11 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
                                         print(style.yellow + style.bold)
                                         print("===================")
                                         print("ALERT HIT - " + str(individual_detected_plate_guess))
+                                        if (alpr_alert_database_format == "json"): # If the current alert plate database is a JSON file, then display other metadata.
+                                            if ("name" in alert_database_list[alert_plate]): # Check to see if a name exists for this alert plate.
+                                                print("Name: " + str(alert_database_list[alert_plate]["name"])) # Display this alert plate's name.
+                                            if ("description" in alert_database_list[alert_plate]): # Check to see if a name exists for this alert plate.
+                                                print("Description: " + str(alert_database_list[alert_plate]["description"])) # Display this alert plate's description.
                                         print("===================")
                                         print(style.end + style.end)
 
@@ -1683,7 +1691,12 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
                                 # Display an alert that is starkly different from the rest of the console output.
                                 print(style.yellow + style.bold)
                                 print("===================")
-                                print("ALERT HIT - " + new_plate_detected)
+                                print("ALERT HIT - " + str(individual_detected_plate_guess))
+                                if (alpr_alert_database_format == "json"): # If the current alert plate database is a JSON file, then display other metadata.
+                                    if ("name" in alert_database_list[alert_plate]): # Check to see if a name exists for this alert plate.
+                                        print("Name: " + str(alert_database_list[alert_plate]["name"])) # Display this alert plate's name.
+                                    if ("description" in alert_database_list[alert_plate]): # Check to see if a name exists for this alert plate.
+                                        print("Description: " + str(alert_database_list[alert_plate]["description"])) # Display this alert plate's description.
                                 print("===================")
                                 print(style.end + style.end)
 

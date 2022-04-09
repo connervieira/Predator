@@ -254,3 +254,6 @@ This update prefaces plans for future updates, and adds 'survey mode', which all
 - Increased the default delay time on several sound effects.
 - Decreased the volume of several sound effects.
 - Added several new custom sound effects.
+- License plate alert databases can now be JSON files in order to add names and descriptions to each plate.
+    - Plain text lists are still supported for sake of backwards compatability, but they won't support metadata like JSON databases will.
+- Updated the descriptions of several configuration values in order to clarify their function.

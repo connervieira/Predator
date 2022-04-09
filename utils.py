@@ -33,6 +33,7 @@ import time # Required to add delays and handle dates/times
 import subprocess # Required for starting some shell commands
 import sys
 import urllib.request # Required to make network requests
+import requests # Required to make network requests
 import re # Required to use Regex
 import validators # Required to validate URLs
 import datetime # Required for converting between timestamps and human readable date/time information
@@ -154,16 +155,22 @@ def validate_plate(plate, template):
 
 # This function is used to download and process plain-text lists of license plates over a network.
 def download_plate_database(url):
-    raw_download_data = urllib.request.urlopen(url).read() # Save the raw data from the URL to a variable.
+    raw_download_data = requests.get(url).text # Save the raw text data from the URL to a variable.
 
     # Process the downloaded data step by step to form a list of all of the plates in the database.
     processed_download_data = str(raw_download_data) # Convert the downloaded data to a string.
-    processed_download_data = processed_download_data.replace("\\n", "\n") # Replace the indicated line-breaks with true line-breaks.
-    processed_download_data = re.sub('([^A-Z0-9\\n\\r\*\-\?\\[\\]])+', '', processed_download_data) # Remove all chracters except capital letters, numbers, and line-breaks.
 
-    download_data_list = processed_download_data.split() # Split the downloaded data line-by-line into a Python list.
+    if (processed_download_data[0] == "{" or processed_download_data[1] == "{" or processed_download_data[2] == "{"): # Check to see if the first character in the file indicates that this alert database is a JSON database.
+        alert_database_list = json.loads(processed_download_data) # Load the alert database as JSON data.
+        return alert_database_list, "json"
+    else: # The alert database appears to be a plain text list.
+        processed_download_data = processed_download_data.replace("\\n", "\n") # Replace the indicated line-breaks with true line-breaks.
+        processed_download_data = re.sub('([^A-Z0-9\\n\\r\*\-\?\\[\\]])+', '', processed_download_data) # Remove all chracters except capital letters, numbers, and line-breaks.
+        download_data_list = processed_download_data.split() # Split the downloaded data line-by-line into a Python list.
+        return download_data_list, "text"
 
-    return download_data_list
+
+
 
 
 

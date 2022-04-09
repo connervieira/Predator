@@ -17,7 +17,7 @@
             "survey": true
         },
         "alert_databases": {
-            "license_plates": "alerts.txt",
+            "license_plates": "",
             "traffic_cameras": "/home/cvieira/Downloads/camera_database.excam",
             "alpr_cameras": "/home/cvieira/Software/Programming/Python/Predator/assets/databases/alpr.json"
         },
@@ -133,7 +133,7 @@
         "big_speed_display": true,
         "record_telemetry": true,
         "alerts": {
-            "traffic_cameras": 100,
+            "traffic_cameras": 1,
             "alpr_cameras": 3 
         }
     }
