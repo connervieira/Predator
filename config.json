@@ -6,7 +6,7 @@
         "default_root": "",
         "silence_file_saving": true,
         "disable_object_recognition": false,
-        "gps_enabled": false,
+        "gps_enabled": true,
         "speed_display_unit": "mph",
         "modes_enabled": {
             "management": true,
@@ -18,10 +18,10 @@
         },
         "alert_databases": {
             "license_plates": "alerts.txt",
-            "traffic_cameras": "",
-            "alpr_cameras": ""
+            "traffic_cameras": "/home/cvieira/Downloads/camera_database.excam",
+            "alpr_cameras": "/home/cvieira/Software/Programming/Python/Predator/assets/databases/alpr.json"
         },
-        "traffic_camera_alerts_enabled": false,
+        "traffic_camera_alerts_enabled": true,
         "camera_alert_types": {
             "speed": true,
             "redlight": true,
@@ -64,27 +64,27 @@
         "notification_sound": {
             "path": "./assets/sounds/platedetected.mp3",
             "repeat": "1",
-            "delay": "0.3"
+            "delay": "0.7"
         },
         "alert_sound": {
             "path": "./assets/sounds/alerthit.mp3",
             "repeat": "1",
-            "delay": "0.3"
+            "delay": "2"
         },
         "camera1_sound": {
             "path": "./assets/sounds/camera1.mp3",
             "repeat": "1",
-            "delay": "0.3"
+            "delay": "1.5"
         },
         "camera2_sound": {
             "path": "./assets/sounds/camera2.mp3",
             "repeat": "1",
-            "delay": "0.3"
+            "delay": "1.5"
         },
         "camera3_sound": {
             "path": "./assets/sounds/camera3.mp3",
             "repeat": "1",
-            "delay": "0.3"
+            "delay": "1.5"
         },
         "alpr_sound": {
             "path": "./assets/sounds/alpr.mp3",
@@ -107,7 +107,8 @@
             "alert": "[U]&R=255&G=0&B=0",
             "warning": "[U]&R=255&G=128&B=0",
             "normal": "[U]&R=0&G=255&B=0",
-            "camera": "[U]&R=0&G=0&B=255"
+            "enforcementcamera": "[U]&R=0&G=0&B=255",
+            "alprcamera": "[U]&R=255&G=0&B=255"
         }
     },
     "dashcam": {
@@ -129,10 +130,11 @@
             "track": true,
             "satellites": true
         },
+        "big_speed_display": true,
         "record_telemetry": true,
         "alerts": {
-            "traffic_cameras": 1,
-            "alpr_cameras": 1 
+            "traffic_cameras": 100,
+            "alpr_cameras": 3 
         }
     }
 }

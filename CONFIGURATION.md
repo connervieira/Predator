@@ -318,6 +318,9 @@ In order to better integrate with an existing system, Predator can communicate w
             - This setting determines whether the current track will be displayed while operating in Information Mode.
         - `satellites`
             - This setting determines whether the current connected satellite count will be displayed while operating in Information Mode.
+- `big_speed_display`
+    - This setting determines whether or not Predator will display the current speed in a large ASCII font.
+    - This setting will only have an effect if the `speed` setting is turned on in the `displays` settings.
 - `record_telemetry`
     - This setting determines whether or not Predator will log the information it displays while operating in Information Mode.
     - When set to `true`, all of the the raw information displays that are available under the `displays` configuration value will be recorded, regardless of whether they are turned on.

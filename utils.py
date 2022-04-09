@@ -292,7 +292,8 @@ def get_gps_location(): # Placeholder that should be updated at a later date.
             gps_data_packet = gpsd.get_current() # Get the current information.
             return gps_data_packet.position()[0], gps_data_packet.position()[1], gps_data_packet.speed(), gps_data_packet.altitude(), gps_data_packet.movement()["track"], gps_data_packet.sats # Return GPS information.
         except: # If the current location can't be established, then return placeholder location data.
-            return 0.0000, 0.0000, 0.0, 0.0, 0.0, 0 # Return a default placeholder location.
+            #return 0.0000, -0.0000, 0.0, 0.0, 0.0, 0 # Return a default placeholder location.
+            return 41.50599, -81.39092, 0.0, 0.0, 0.0, 0 # Return a default placeholder location.
     else: # If GPS is disabled, then this function should never be called, but return a placeholder position regardless.
         return 0.0000, 0.0000, 0.0, 0.0, 0.0, 0 # Return a default placeholder location.
 
@@ -326,10 +327,8 @@ def load_traffic_cameras(current_lat, current_lon, database_file, radius):
 
 
 
-def nearby_traffic_cameras(current_lat, current_lon, database_information, radius=1.0):
-    nearby_speed_cameras = []
-    nearby_redlight_cameras = []
-    nearby_misc_cameras = []
+def nearby_traffic_cameras(current_lat, current_lon, database_information, radius=1.0): # This function is used to get a list of all traffic enforcement cameras within a certain range of a given location.
+    nearby_speed_cameras, nearby_redlight_cameras, nearby_misc_cameras = [], [], [] # Create empty placeholder lists for each camera type.
     for camera in database_information: # Iterate through each camera in the loaded database.
         current_distance = get_distance(current_lat, current_lon, camera['lat'], camera['lon'])
         if (current_distance < float(radius)): # Only show the camera if it's within a certain radius of the current location.
@@ -341,13 +340,13 @@ def nearby_traffic_cameras(current_lat, current_lon, database_information, radiu
             else:
                 nearby_misc_cameras.append(camera) # Add this camera to the "nearby general traffic camera" list.
 
-    return nearby_speed_cameras, nearby_redlight_cameras, nearby_misc_cameras
+    return nearby_speed_cameras, nearby_redlight_cameras, nearby_misc_cameras # Return the list of nearby cameras for all types.
 
 
 
 
 
-def nearby_database_poi(current_lat, current_lon, database_information, radius=1.0):
+def nearby_database_poi(current_lat, current_lon, database_information, radius=1.0): # This function is used to get a list of all points of interest from a particular database within a certain range of a given location.
     nearby_database_information = [] # Create a placeholder list to add the narby POIs to in the next steps.
     for entry in database_information["entries"]: # Iterate through each entry in the loaded database information.
         current_distance = get_distance(current_lat, current_lon, entry['latitude'], entry['longitude']) # Get the current distance to the POI in question.
@@ -362,7 +361,7 @@ def nearby_database_poi(current_lat, current_lon, database_information, radius=1
 
 
 
-def convert_speed(speed, unit="mph"):
+def convert_speed(speed, unit="mph"): # This function is used to convert speeds from meters per second, to other units.
     unit = unit.lower() # Convert the unit to all lowercase in order to make it easier to work with and remove inconsistencies in configuration setups.
 
     if (unit == "kph"): # Convert the speed to kilometers per hour.
@@ -378,4 +377,34 @@ def convert_speed(speed, unit="mph"):
     else: # If an invalid unit was supplied, then simply return a speed of zero.
         speed = 0
 
-    return speed
+    return speed # Return the convert speed.
+
+
+
+
+
+def display_number(display_number="0"): # This function is used to display a number as a large ASCII character.
+    numbers = {} # Create a placeholder dictionary for all numbers.
+    numbers["."] = ["    ", "    ", "    ", "    ", "    ", "    ", " ## ", " ## "] # Define each line in the ASCII art for zero.
+    numbers["0"] = [" $$$$$$\\  ", "$$$ __$$\\ ", "$$$$\\ $$ |", "$$\\$$\\$$ |", "$$ \\$$$$ |", "$$ |\\$$$ |", "\\$$$$$$  /", " \\______/ "] # Define each line in the ASCII art for zero.
+    numbers["1"] = ["  $$\\   ", "$$$$ |  ", "\\_$$ |  ", "  $$ |  ", "  $$ |  ", "  $$ |  ", "$$$$$$\ ", "\\______|"] # Define each line in the ASCII art for one.
+    numbers["2"] = [" $$$$$$\\  ", "$$  __$$\\ ", "\\__/  $$ |", " $$$$$$  |", "$$  ____/ ", "$$ |      ", "$$$$$$$$\\ ", "\\________|"] # Define each line in the ASCII art for two.
+    numbers["3"] = [" $$$$$$\\  ", "$$ ___$$\\ ", "\\_/   $$ |", "  $$$$$ / ", "  \\___$$\\ ", "$$\   $$ |", "\\$$$$$$  |", " \\______/ "] # Define each line in the ASCII art for three.
+    numbers["4"] = ["$$\\   $$\\ ", "$$ |  $$ |", "$$ |  $$ |", "$$$$$$$$ |", "\\_____$$ |", "      $$ |", "      $$ |", "      \\__|"] # Define each line in the ASCII art for four.
+    numbers["5"] = ["$$$$$$$\\  ", "$$  ____| ", "$$ |      ", "$$$$$$$\\  ", "\_____$$\\ ", "$$\\   $$ |", "\\$$$$$$  |", " \\______/ "] # Define each line in the ASCII art for five.
+    numbers["6"] = [" $$$$$$\\  ", "$$  __$$\\ ", "$$ /  \\__|", "$$$$$$$\\  ", "$$  __$$\\ ", "$$ /  $$ |", " $$$$$$  |", " \\______/ "] # Define each line in the ASCII art for six.
+    numbers["7"] = ["$$$$$$$$\\ ", "\\____$$  |", "    $$  / ", "   $$  /  ", "  $$  /   ", " $$  /    ", "$$  /     ", "\\__/      "] # Define each line in the ASCII art for seven.
+    numbers["8"] = [" $$$$$$\\  ", "$$  __$$\\ ", "$$ /  $$ |", " $$$$$$  |", "$$  __$$< ", "$$ /  $$ |", "\\$$$$$$  |", " \\______/ "] # Define each line in the ASCII art for eight.
+    numbers["9"] = [" $$$$$$\\  ", "$$  __$$\\ ", "$$ /  $$ |", "\\$$$$$$$ |", " \\____$$ |", "$$\\   $$ |", "\\$$$$$$  |", " \\______/ "] # Define each line in the ASCII art for nine.
+
+    display_lines = {} # Create a placeholder for each line that will be printed to the console.
+
+    for line_count in range(0, 8): # Iterate through each of the 8 lines that the output will have.
+        display_lines[line_count] = "" # Set each line to an empty placeholder string.
+
+    for display_character in str(display_number): # Iterate through each character that needs to be displayed.
+        for individual_display_line in range(0, 8): # Iterate through each line that will be displayed to the console output.
+            display_lines[individual_display_line] = str(display_lines[individual_display_line]) + numbers[str(display_character)][individual_display_line] # Add each number to each line of the output.
+
+    for line_index in display_lines: # Iterate through each line that needs to displayed.
+        print(display_lines[line_index]) # Print each individual line.
