@@ -207,17 +207,24 @@ information_big_speed_display = config["information"]["big_speed_display"]
 information_max_nearest_alpr_range = config["information"]["alerts"]["alpr_cameras"] # This setting determines the maxmium distance that Predator will consider when displaying the nearest ALPR camera.
 traffic_camera_alert_radius = config["information"]["alerts"]["traffic_cameras"]
 
-# Load the traffic camera database, if enabled.
+# Load the traffic enforcement camera database, if enabled.
 if (traffic_camera_alerts_enabled == True): # Check to see if traffic camera alerts are enabled.
     if (os.path.exists(traffic_camera_database) == True): # Check to see that the traffic camera database exists at the path specified in the configuration.
         loaded_traffic_camera_database = load_traffic_cameras(get_gps_location()[0], get_gps_location()[1], traffic_camera_database, traffic_camera_loaded_radius) # Load all traffic cameras within the configured loading radius.
     else:
-        print(style.yellow + "Warning: The 'traffic_camera_alerts_enabled' setting is turned on, but the 'traffic_camera_database' defined in the configuration section doesn't point to a valid file. Expect traffic camera alerts to be broken." + style.end)
-        input("Press enter to continue...")
+        loaded_traffic_camera_database = {} # Set the traffic enforcement camera database to a blank placeholder.
+        print(style.yellow + "Warning: The 'traffic_camera_alerts_enabled' setting is turned on, but the 'traffic_camera_database' defined in the configuration section doesn't point to a valid file. Expect traffic camera alerts to be broken." + style.end) # Notify the user that the traffic enforcement camera database configuration value doesn't point to a valid file.
+        input("Press enter to continue...") # Wait for the user to press enter before continuing.
+
 
 # Load the ALPR camera database, if enabled.
 if (alpr_camera_database != "" and os.path.exists(alpr_camera_database)):
     loaded_alpr_camera_database = json.load(open(alpr_camera_database))
+elif (alpr_camera_database != "" and os.path.exists(alpr_camera_database) == False):
+    loaded_alpr_camera_database = {} # Set the ALPR camera database to a blank placeholder.
+    print(style.yellow + "Warning: The 'alpr_camera_database' setting doesn't point to a valid file. Expect ALPR camera alerts to be broken." + style.end) # Notify the user that the ALPR camera database configuration value doesn't point to a valid file.
+    input("Press enter to continue...") # Wait for the user to press enter before continuing.
+    
 
 
 
@@ -1904,6 +1911,7 @@ elif (mode_selection == "4" and information_mode_enabled == True): # The user ha
                     if (shape_alerts == True): # Check to see if the user has enabled shape notifications.
                         display_shape("cross") # Display an ASCII cross in the output.
 
+                    print(style.blue + style.bold)
                     print("Nearest Enforcement Camera:")
                     if (nearest_camera == nearest_speed_camera): # Check to see if the overall nearest camera is the nearest speed camera.
                         print("    Type: Speed Camera")
@@ -1918,6 +1926,7 @@ elif (mode_selection == "4" and information_mode_enabled == True): # The user ha
                         print("    Street: " + str(nearest_camera["str"])) # Display the street that the traffic camera is on.
                     if (nearest_camera["spd"] != None): # Check to see if speed limit data exists for this camera.
                         print("    Speed: " + str(nearest_camera["spd"])) # Display the speed limit of the traffic camera.
+                    print(style.end + style.end)
 
                     # Play audio alerts, as necessary.
                     if (nearest_camera["dst"] < (float(traffic_camera_alert_radius) * 0.1)): # Check to see if the nearest camera is within 10% of the traffic camera alert radius.
@@ -1959,9 +1968,11 @@ elif (mode_selection == "4" and information_mode_enabled == True): # The user ha
                         os.system("mpg321 " + alert_sounds_alpr + " > /dev/null 2>&1 &") # Play the sound specified for this alert type in the configuration.
                         time.sleep(float(alert_sounds_alpr_delay)) # Wait before playing the sound again.
 
+                print(style.purple + style.bold)
                 print("Nearest " + loaded_alpr_camera_database["name"] + ":")
                 print("    Distance: " + str(round(nearest_camera["distance"]*1000)/1000) + " miles")
                 print("    Street: " + str(nearest_camera["road"]))
+                print(style.end + style.end)
 
 
 

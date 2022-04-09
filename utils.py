@@ -299,8 +299,7 @@ def get_gps_location(): # Placeholder that should be updated at a later date.
             gps_data_packet = gpsd.get_current() # Get the current information.
             return gps_data_packet.position()[0], gps_data_packet.position()[1], gps_data_packet.speed(), gps_data_packet.altitude(), gps_data_packet.movement()["track"], gps_data_packet.sats # Return GPS information.
         except: # If the current location can't be established, then return placeholder location data.
-            #return 0.0000, -0.0000, 0.0, 0.0, 0.0, 0 # Return a default placeholder location.
-            return 41.50599, -81.39092, 0.0, 0.0, 0.0, 0 # Return a default placeholder location.
+            return 0.0000, -0.0000, 0.0, 0.0, 0.0, 0 # Return a default placeholder location.
     else: # If GPS is disabled, then this function should never be called, but return a placeholder position regardless.
         return 0.0000, 0.0000, 0.0, 0.0, 0.0, 0 # Return a default placeholder location.
 

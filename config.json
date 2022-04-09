@@ -18,8 +18,8 @@
         },
         "alert_databases": {
             "license_plates": "",
-            "traffic_cameras": "/home/cvieira/Downloads/camera_database.excam",
-            "alpr_cameras": "/home/cvieira/Software/Programming/Python/Predator/assets/databases/alpr.json"
+            "traffic_cameras": "./assets/databases/enforcement_cameras.excam",
+            "alpr_cameras": "./assets/databases/alpr.json"
         },
         "traffic_camera_alerts_enabled": true,
         "camera_alert_types": {
@@ -133,7 +133,7 @@
         "big_speed_display": true,
         "record_telemetry": true,
         "alerts": {
-            "traffic_cameras": 1,
+            "traffic_cameras": 11,
             "alpr_cameras": 3 
         }
     }
