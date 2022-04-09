@@ -1856,7 +1856,7 @@ elif (mode_selection == "4" and information_mode_enabled == True): # The user ha
             print("Date: " + str(time.strftime('%A, %B %d, %Y'))) # Print the current date to the console.
 
         if (information_display_speed == True and gps_enabled == True and information_big_speed_display == False): # Check to see the speed display is enabled in the configuration.
-            current_speed = convert_speed(float(current_location[2]), speed_display_unit) # Convert the speed data from the GPS into the units specified by the configuration.
+            current_speed = round(convert_speed(float(current_location[2]), speed_display_unit)*100)/100 # Convert the speed data from the GPS into the units specified by the configuration.
             print("Speed: " + str(current_speed) + " " + str(speed_display_unit)) # Print the current speed to the console.
 
         if (information_display_location == True and gps_enabled == True): # Check to see if the current location display is enabled in the configuration.
