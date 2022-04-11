@@ -34,3 +34,8 @@ In order to protect privacy, alerts will not be published for the following situ
 ## Privacy
 
 Traditional ALPR platforms are designed for mass data collection and analysis. Conversely, Predator is designed to be a completely stand-alone, offline platform. Predator is not designed to track vehicles, and doesn't submit any data to a central server. Individual Predator users are responsible for protecting the privacy and integrity of the data the collect. Predator itself doesn't transmit any personal information of any kind.
+
+
+## Control
+
+Predator is designed in such a way that the user has full control over the entire system. Predator's configuration makes it easy to turn various features on and off to better fit each situation's use case and privacy concerns.
