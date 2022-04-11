@@ -2,6 +2,10 @@
 
 This document contains the information you need to know to set up and use Predator
 
+### Note
+
+For further clarification on the terms used in this document, see DEFINITIONS.md.
+
 
 ## Installation
 
