@@ -2,7 +2,7 @@
 
 **Copyright 2022 V0LT - Conner Vieira**
 
-A vision system primarily designed for license plate reading and general object recognition in both pre-recorded and real-time video.
+The ultimate situational awareness tool for drivers.
 
 ![Predator LPRS header](./assets/images/branding/PredatorHeaderLight.svg)
 
