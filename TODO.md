@@ -54,7 +54,6 @@ These are the features actively planned for Predator and are likely to be added 
 
 These are features that may require more in-depth changes, and are purely hypothetical.
 
+- [ ] Remove speed camera and ALPR alerts (replaced by 'Assassin' to simply Predator)
 - [ ] Add OBD-II integration.
-- [ ] Add "Crowdsource Mode", for reporting traffic, police, mobile speed cameras, and other hazards in real time.
-- [ ] Add the ability to detect VASCAR lines. 
 - [ ] A GUI front-end in addition to the existing command line interface.
