@@ -95,11 +95,9 @@ management_mode_enabled = config["general"]["modes_enabled"]["management"] # Thi
 prerecorded_mode_enabled = config["general"]["modes_enabled"]["prerecorded"] # This setting is used to prevent prerecorded mode from being loaded from the user menu or command line arguments of Predator.
 realtime_mode_enabled = config["general"]["modes_enabled"]["realtime"] # This setting is used to prevent realtime mode from being loaded from the user menu or command line arguments of Predator.
 dashcam_mode_enabled = config["general"]["modes_enabled"]["dashcam"] # This setting is used to prevent dashcam mode from being loaded from the user menu or command line arguments of Predator.
-information_mode_enabled = config["general"]["modes_enabled"]["information"] # This setting is used to prevent information mode from being loaded from the user menu or command line arguments of Predator.
-survey_mode_enabled = config["general"]["modes_enabled"]["survey"] # This setting is used to prevent survey mode from being loaded from the user menu or command line arguments of Predator.
 alert_database_license_plates = config["general"]["alert_databases"]["license_plates"] # This configuration value defines the file that Predator will load the alert list for license plates from.
 traffic_camera_database = config["general"]["alert_databases"]["traffic_cameras"]
-alpr_camera_database = config["general"]["alert_databases"]["alpr_cameras"]
+traffic_camera_alert_radius = config["general"]["alert_range"]["traffic_cameras"]
 
 # Traffic camera alert settings
 traffic_camera_alerts_enabled = config["general"]["traffic_camera_alerts_enabled"]
@@ -178,9 +176,6 @@ alert_sounds_camera2_delay = config["realtime"]["camera2_sound"]["delay"]
 alert_sounds_camera3 = config["realtime"]["camera3_sound"]["path"]
 alert_sounds_camera3_repeat = config["realtime"]["camera3_sound"]["repeat"]
 alert_sounds_camera3_delay = config["realtime"]["camera3_sound"]["delay"]
-alert_sounds_alpr = config["realtime"]["alpr_sound"]["path"]
-alert_sounds_alpr_repeat = config["realtime"]["alpr_sound"]["repeat"]
-alert_sounds_alpr_delay = config["realtime"]["alpr_sound"]["delay"]
 
 
 
@@ -192,39 +187,6 @@ dashcam_device = config["dashcam"]["dashcam_device"] # This setting defines what
 dashcam_background_mode_realtime = config["dashcam"]["dashcam_background_mode_realtime"] # This setting determines whether dash-cam recording will automatically start in background mode when user runs real-time mode. It should be noted that running dash-cam recording and real-time mode simutaneously is only possible with two cameras connected, since the same camera device can't be used for both processes.
 
 
-
-# ----- Information mode configuration -----
-information_refresh_delay = config["information"]["information_refresh_delay"] # This setting determines how long Predator will wait before refreshes while operating in information mode.
-information_display_time = config["information"]["displays"]["time"] # This setting determines whether the current time will be displayed while operating in information mode.
-information_display_date = config["information"]["displays"]["date"] # This setting determines whether the current date will be displayed while operating in information mode.
-information_display_speed = config["information"]["displays"]["speed"] # This setting determines whether the current speed will be displayed while operating in information mode.
-information_display_location = config["information"]["displays"]["location"] # This setting determines whether the current location will be displayed while operating in information mode.
-information_display_altitude = config["information"]["displays"]["altitude"] # This setting determines whether the current altitude will be displayed while operating in information mode.
-information_display_track = config["information"]["displays"]["track"] # This setting determines whether the current track will be displayed while operating in information mode.
-information_display_satellites = config["information"]["displays"]["satellites"] # This setting determines whether the current connected satellite count will be displayed while operating in information mode.
-information_record_telemetry = config["information"]["record_telemetry"] # This setting determines whether or not Predator will log the information it handles while operating in information mode.
-information_big_speed_display = config["information"]["big_speed_display"]
-information_max_nearest_alpr_range = config["information"]["alerts"]["alpr_cameras"] # This setting determines the maxmium distance that Predator will consider when displaying the nearest ALPR camera.
-traffic_camera_alert_radius = config["information"]["alerts"]["traffic_cameras"]
-
-# Load the traffic enforcement camera database, if enabled.
-if (traffic_camera_alerts_enabled == True): # Check to see if traffic camera alerts are enabled.
-    if (os.path.exists(traffic_camera_database) == True): # Check to see that the traffic camera database exists at the path specified in the configuration.
-        loaded_traffic_camera_database = load_traffic_cameras(get_gps_location()[0], get_gps_location()[1], traffic_camera_database, traffic_camera_loaded_radius) # Load all traffic cameras within the configured loading radius.
-    else:
-        loaded_traffic_camera_database = {} # Set the traffic enforcement camera database to a blank placeholder.
-        print(style.yellow + "Warning: The 'traffic_camera_alerts_enabled' setting is turned on, but the 'traffic_camera_database' defined in the configuration section doesn't point to a valid file. Expect traffic camera alerts to be broken." + style.end) # Notify the user that the traffic enforcement camera database configuration value doesn't point to a valid file.
-        input("Press enter to continue...") # Wait for the user to press enter before continuing.
-
-
-# Load the ALPR camera database, if enabled.
-if (alpr_camera_database != "" and os.path.exists(alpr_camera_database)):
-    loaded_alpr_camera_database = json.load(open(alpr_camera_database))
-elif (alpr_camera_database != "" and os.path.exists(alpr_camera_database) == False):
-    loaded_alpr_camera_database = {} # Set the ALPR camera database to a blank placeholder.
-    print(style.yellow + "Warning: The 'alpr_camera_database' setting doesn't point to a valid file. Expect ALPR camera alerts to be broken." + style.end) # Notify the user that the ALPR camera database configuration value doesn't point to a valid file.
-    input("Press enter to continue...") # Wait for the user to press enter before continuing.
-    
 
 
 
@@ -321,17 +283,13 @@ if (realtime_mode_enabled == True): # Only show the Real-time mode option if it'
     print("2. Real-time")
 if (dashcam_mode_enabled == True): # Only show the Dash-cam mode option if it's enabled in the Predator configuration.
     print("3. Dash-cam")
-if (information_mode_enabled == True): # Only show the Information mode option if it's enabled in the Predator configuration.
-    print("4. Information")
-if (survey_mode_enabled == True): # Only show the Survey mode option if it's enabled in the Predator configuration.
-    print("5. Survey")
 
 # Check to see if the auto_start_mode configuration value is an expected value. If it isn't execution can continue, but the user will need to manually select what mode Predator should start in.
-if (auto_start_mode != "" and auto_start_mode != "0" and auto_start_mode != "1" and auto_start_mode != "2" and auto_start_mode != "3" and auto_start_mode != "4" and auto_start_mode != "5"):
-    print(style.yellow + "Warning: The 'auto_start_mode' configuration value isn't properly set. This value should be blank, '0', '1', '2', '3', '4', or '5'. It's possible there's been a typo." + style.end)
+if (auto_start_mode != "" and auto_start_mode != "0" and auto_start_mode != "1" and auto_start_mode != "2" and auto_start_mode != "3"):
+    print(style.yellow + "Warning: The 'auto_start_mode' configuration value isn't properly set. This value should be blank, '0', '1', '2', '3'. It's possible there's been a typo." + style.end)
 
 if (len(sys.argv) > 1): # Check to see if there is at least 1 command line argument.
-    if (sys.argv[1] == "0" or sys.argv[1] == "1" or sys.argv[1] == "2" or sys.argv[1] == "3" or sys.argv[1] == "4" or sys.argv[1] == "5"): # Check to see if a mode override was specified in the Predator command arguments.
+    if (sys.argv[1] == "0" or sys.argv[1] == "1" or sys.argv[1] == "2" or sys.argv[1] == "3"): # Check to see if a mode override was specified in the Predator command arguments.
         auto_start_mode = sys.argv[1] # Set the automatic start mode to the mode specified by the command line argument.
 
 if (len(sys.argv) > 2): # Check to see if there are at least 2 command line arguments.
@@ -350,12 +308,6 @@ elif (auto_start_mode == "2" and realtime_mode_enabled == True): # Based on the 
 elif (auto_start_mode == "3" and dashcam_mode_enabled == True): # Based on the configuration, Predator will automatically boot into dash-cam mode.
     print(style.bold + "Automatically starting into dash-cam mode." + style.end)
     mode_selection = "3"
-elif (auto_start_mode == "4" and information_mode_enabled == True): # Based on the configuration, Predator will automatically boot into information mode.
-    print(style.bold + "Automatically starting into information mode." + style.end)
-    mode_selection = "4"
-elif (auto_start_mode == "5" and survey_mode_enabled == True): # Based on the configuration, Predator will automatically boot into survey mode.
-    print(style.bold + "Automatically starting into survey mode." + style.end)
-    mode_selection = "5"
 else: # No 'auto start mode' has been configured, so ask the user to select manually.
     mode_selection = input("Selection: ")
 
@@ -424,7 +376,6 @@ if (mode_selection == "0" and management_mode_enabled == True): # The user has s
                 copy_realtime_object_recognition_data  = False
                 copy_realtime_license_plate_recognition_data = False
                 copy_dashcam_video = False
-                copy_information_telemetry = False
 
                 while True: # Run the "copy files" selection menu on a loop forever until the user is finished selecting files.
                     clear() # Clear the console output before each loop.
@@ -479,11 +430,6 @@ if (mode_selection == "0" and management_mode_enabled == True): # The user has s
                     else:
                         print("D1. [ ] Dash-cam videos")
                     print("")
-                    print("===== Information Mode =====")
-                    if (copy_information_telemetry == True):
-                        print("I1. [X] Telemetry Records")
-                    else:
-                        print("I1. [ ] Telemetry Records")
 
                     selection = input("Selection: ") # Prompt the user for a selection.
 
@@ -512,8 +458,6 @@ if (mode_selection == "0" and management_mode_enabled == True): # The user has s
                         copy_realtime_license_plate_recognition_data = not copy_realtime_license_plate_recognition_data
                     elif (selection.lower() == "d1"):
                         copy_dashcam_video = not copy_dashcam_video
-                    elif (selection.lower() == "i1"):
-                        copy_information_telemetry = not copy_information_telemetry
                 
 
                 # Prompt the user for the copying destination.
@@ -544,8 +488,6 @@ if (mode_selection == "0" and management_mode_enabled == True): # The user has s
                     os.system("cp " + root + "/real_time_plates* " + copy_destination)
                 if (copy_dashcam_video):
                     os.system("cp " + root + "/predator_dashcam* " + copy_destination)
-                if (copy_information_telemetry):
-                    os.system("cp " + root + "/information_recording.* " + copy_destination)
 
                 clear()
                 print("Files have finished copying.")
@@ -563,7 +505,6 @@ if (mode_selection == "0" and management_mode_enabled == True): # The user has s
                 delete_realtime_object_recognition_data  = False
                 delete_realtime_license_plate_recognition_data = False
                 delete_dashcam_video = False
-                delete_information_telemetry  = False
 
                 while True: # Run the "delete files" selection menu on a loop forever until the user is finished selecting files.
                     clear() # Clear the console output before each loop.
@@ -618,11 +559,6 @@ if (mode_selection == "0" and management_mode_enabled == True): # The user has s
                     else:
                         print("D1. [ ] Dash-cam videos")
                     print("")
-                    print("===== Information Mode =====")
-                    if (delete_information_telemetry == True):
-                        print("I1. [X] Telemetry Records")
-                    else:
-                        print("I1. [ ] Telemetry Records")
 
                     selection = input("Selection: ") # Prompt the user for a selection.
 
@@ -650,8 +586,6 @@ if (mode_selection == "0" and management_mode_enabled == True): # The user has s
                         delete_realtime_license_plate_recognition_data = not delete_realtime_license_plate_recognition_data
                     elif (selection.lower() == "d1"):
                         delete_dashcam_video = not delete_dashcam_video
-                    elif (selection.lower() == "i1"):
-                        delete_information_telemetry = not delete_information_telemetry
 
                 if (delete_management_custom):
                     delete_custom_file_name = input("Please specify the name of the additional file you'd like to delete from the current project folder: ")
@@ -679,9 +613,6 @@ if (mode_selection == "0" and management_mode_enabled == True): # The user has s
                         os.system("rm " + root + "/real_time_plates*")
                     if (delete_dashcam_video):
                         os.system("rm " + root + "/predator_dashcam*")
-                    if (delete_information_telemetry):
-                        os.system("rm " + root + "/information_recording*")
-
                     clear()
                     print("Files have finished deleting.")
                 else:
@@ -1811,427 +1742,6 @@ elif (mode_selection == "3" and dashcam_mode_enabled == True): # The user has se
         iteration_counter = iteration_counter + 1 # Iterate the counter.
 
     print("Dashcam recording halted.")
-
-
-
-
-
-
-
-
-# Information mode
-
-elif (mode_selection == "4" and information_mode_enabled == True): # The user has set Predator to boot into information mode.
-
-    if (default_root != ""): # Check to see if the user has configured a default root directory path.
-        print(style.bold + "Using default preference for root directory." + style.end) # Notify the user that Predator is choosing the root project directory based on the default set in the configuration.
-        root = default_root # Use the default set in the configuration.
-    else:
-        root = input("Project root directory path: ") # Prompt the user to enter a path for the current project.
-
-    # Run some validation to make sure the information just entered by the user is correct.
-    if (os.path.exists(root) == False): # Check to see if the root directory entered by the user exists.
-        print(style.yellow + "Warning: The root project directory entered doesn't seem to exist. Predator will almost certainly fail." + style.end)
-        input("Press enter to continue...")
-
-
-    while True: # Run forever in a loop until terminated.
-        time.sleep(float(information_refresh_delay)) # Wait for a certain amount of time, as specified in the configuration.
-        clear() # Clear the console output at the beginning of every cycle.
-        if (status_lighting_enabled == True): # Check to see if status lighting alerts are enabled in the Predator configuration.
-            update_status_lighting("normal") # Run the function to reset the status lighting to indicate normal operation.
-
-        if (gps_enabled == True): # If GPS is enabled, then get the current location at the beginning of the cycle.
-            current_location = get_gps_location() # Get the current location.
-
-
-        if (information_display_speed == True and gps_enabled == True and information_big_speed_display == True): # Check to see the speed display is enabled in the configuration.
-            current_speed = convert_speed(float(current_location[2]), speed_display_unit) # Convert the speed data from the GPS into the units specified by the configuration.
-            display_number(current_speed) # Display the current speed in a large ASCII font.
-
-        if (information_display_time == True): # Check to see the time display is enabled in the configuration.
-            print("Time: " + str(time.strftime('%H:%M:%S'))) # Print the current time to the console.
-
-        if (information_display_date == True): # Check to see the date display is enabled in the configuration.
-            print("Date: " + str(time.strftime('%A, %B %d, %Y'))) # Print the current date to the console.
-
-        if (information_display_speed == True and gps_enabled == True and information_big_speed_display == False): # Check to see the speed display is enabled in the configuration.
-            current_speed = round(convert_speed(float(current_location[2]), speed_display_unit)*100)/100 # Convert the speed data from the GPS into the units specified by the configuration.
-            print("Speed: " + str(current_speed) + " " + str(speed_display_unit)) # Print the current speed to the console.
-
-        if (information_display_location == True and gps_enabled == True): # Check to see if the current location display is enabled in the configuration.
-            print("Position: " + str(current_location[0]) + " " + str(current_location[1])) # Print the current location as coordinates to the console.
-
-        if (information_display_altitude == True and gps_enabled == True): # Check to see if the current altitude display is enabled in the configuration.
-            print("Altitude: " + str(current_location[3]) + " meters") # Print the current altitude to the console.
-
-        if (information_display_track == True and gps_enabled == True): # Check to see if the current track display is enabled in the configuration.
-            print("Track: " + str(current_location[4])) # Print the current track to the console.
-
-        if (information_display_satellites == True and gps_enabled == True): # Check to see if the current altitude display is enabled in the configuration.
-            print("Satellites: " + str(current_location[5])) # Print the current altitude satellite count to the console.
-
-
-
-        # Traffic enforcement camera alert processing
-        if (gps_enabled == True and traffic_camera_alerts_enabled == True): # Check to see if the speed camera display is enabled in the configuration.
-            # Create placeholders for each camera type so we can add the closet camera for each category in the next step .
-            nearest_speed_camera, nearest_redlight_camera, nearest_misc_camera, nearest_camera = {"dst": 10000000.0}, {"dst": 10000000.0}, {"dst": 10000000.0}, {"dst": 10000000.0}
-
-            nearby_speed_cameras, nearby_redlight_cameras, nearby_misc_cameras = nearby_traffic_cameras(current_location[0], current_location[1], loaded_traffic_camera_database, traffic_camera_alert_radius) # Get all traffic cameras within the configured radius.
-
-            if (camera_alert_types_speed == True): # Only process alerts for speed cameras if enabled in the configuration.
-                for camera in nearby_speed_cameras: # Iterate through all nearby speed cameras.
-                    if (camera["dst"] < nearest_speed_camera["dst"]): # Check to see if the distance to this camera is lower than the current closest camera.
-                        nearest_speed_camera = camera # Make the current camera the new closest camera.
-            if (camera_alert_types_redlight == True): # Only process alerts for red light cameras if enabled in the configuration.
-                for camera in nearby_redlight_cameras: # Iterate through all nearby redlight cameras.
-                    if (camera["dst"] < nearest_redlight_camera["dst"]): # Check to see if the distance to this camera is lower than the current closest camera.
-                        nearest_redlight_camera = camera # Make the current camera the new closest camera.
-            if (camera_alert_types_misc == True): # Only process alerts for general traffic cameras if enabled in the configuration.
-                for camera in nearby_misc_cameras: # Iterate through all nearby miscellaneous cameras.
-                    if (camera["dst"] < nearest_misc_camera["dst"]): # Check to see if the distance to this camera is lower than the current closest camera.
-                        nearest_misc_camera = camera # Make the current camera the new closest camera.
-
-
-                if (nearest_speed_camera["dst"] < nearest_redlight_camera["dst"] and nearest_speed_camera["dst"] < nearest_misc_camera["dst"]): # Check to see if the nearest speed camera is closer than nearest of the other camera types
-                    nearest_camera = nearest_speed_camera # Set the overall nearest camera to the nearest speed camera.
-                elif (nearest_redlight_camera["dst"] < nearest_speed_camera["dst"] and nearest_redlight_camera["dst"] < nearest_misc_camera["dst"]): # Check to see if the nearest red-light camera is closer than nearest of the other camera types
-                    nearest_camera = nearest_redlight_camera # Set the overall nearest camera to the nearest red-light camera.
-                elif (nearest_misc_camera["dst"] < nearest_speed_camera["dst"] and nearest_misc_camera["dst"] < nearest_redlight_camera["dst"]): # Check to see if the nearest miscellaneous camera is closer than nearest of the other camera types
-                    nearest_camera = nearest_redlight_camera # Set the overall nearest camera to the nearest miscellaneous camera.
-                else:
-                    pass
-
-                # Display the nearest traffic camera, if applicable.
-                if (nearest_camera["dst"] < float(traffic_camera_alert_radius)): # Only display the nearest camera if it's within the maximum range specified in the configuration.
-                    if (status_lighting_enabled == True): # Check to see if status lighting alerts are enabled in the Predator configuration.
-                        update_status_lighting("enforcementcamera") # Run the function to update the status lighting.
-
-                    if (shape_alerts == True): # Check to see if the user has enabled shape notifications.
-                        display_shape("cross") # Display an ASCII cross in the output.
-
-                    print(style.blue + style.bold)
-                    print("Nearest Enforcement Camera:")
-                    if (nearest_camera == nearest_speed_camera): # Check to see if the overall nearest camera is the nearest speed camera.
-                        print("    Type: Speed Camera")
-                    elif (nearest_camera == nearest_redlight_camera): # Check to see if the overall nearest camera is the nearest red light camera.
-                        print("    Type: Red Light Camera")
-                    elif (nearest_camera == nearest_misc_camera): # Check to see if the overall nearest camera is the nearest general traffic camera.
-                        print("    Type: General Traffic Camera")
-                    else:
-                        print("    Type: Unknown")
-                    print("    Distance: " + str(round(nearest_camera["dst"]*1000)/1000) + " miles") # Display the current distance to the traffic camera.
-                    if (nearest_camera["str"] != None): # Check to see if street data exists for this camera.
-                        print("    Street: " + str(nearest_camera["str"])) # Display the street that the traffic camera is on.
-                    if (nearest_camera["spd"] != None): # Check to see if speed limit data exists for this camera.
-                        print("    Speed: " + str(nearest_camera["spd"])) # Display the speed limit of the traffic camera.
-                    print(style.end + style.end)
-
-                    # Play audio alerts, as necessary.
-                    if (nearest_camera["dst"] < (float(traffic_camera_alert_radius) * 0.1)): # Check to see if the nearest camera is within 10% of the traffic camera alert radius.
-                        if (audio_alerts == True and int(alert_sounds_camera3_repeat) > 0): # Check to see if the user has audio alerts enabled.
-                            for i in range(0, int(alert_sounds_camera3_repeat)): # Repeat the sound several times, if the configuration says to.
-                                os.system("mpg321 " + alert_sounds_camera3 + " > /dev/null 2>&1 &") # Play the sound specified for this alert type in the configuration.
-                                time.sleep(float(alert_sounds_camera3_delay)) # Wait before playing the sound again.
-                    elif (nearest_camera["dst"] < (float(traffic_camera_alert_radius) * 0.25)): # Check to see if the nearest camera is within 25% of the traffic camera alert radius.
-                        if (audio_alerts == True and int(alert_sounds_camera2_repeat) > 0): # Check to see if the user has audio alerts enabled.
-                            for i in range(0, int(alert_sounds_camera2_repeat)): # Repeat the sound several times, if the configuration says to.
-                                os.system("mpg321 " + alert_sounds_camera2 + " > /dev/null 2>&1 &") # Play the sound specified for this alert type in the configuration.
-                                time.sleep(float(alert_sounds_camera2_delay)) # Wait before playing the sound again.
-                    elif (nearest_camera["dst"] < (float(traffic_camera_alert_radius))): # Check to see if the nearest camera is within the traffic camera alert radius.
-                        if (audio_alerts == True and int(alert_sounds_camera1_repeat) > 0): # Check to see if the user has audio alerts enabled.
-                            for i in range(0, int(alert_sounds_camera1_repeat)): # Repeat the sound several times, if the configuration says to.
-                                os.system("mpg321 " + alert_sounds_camera1 + " > /dev/null 2>&1 &") # Play the sound specified for this alert type in the configuration.
-                                time.sleep(float(alert_sounds_camera1_delay)) # Wait before playing the sound again.
-
-
-
-
-        # ALPR camera alert processing
-        if (os.path.exists(alpr_camera_database) == True and alpr_camera_database != "" and gps_enabled == True): # Check to see if a valid ALPR database has been configured.
-            nearby_alpr_cameras = nearby_database_poi(current_location[0], current_location[1], loaded_alpr_camera_database, information_max_nearest_alpr_range) # Get nearby entries from this POI database.
-            nearest_camera = {"distance": 1000000000.0}
-            if (len(nearby_alpr_cameras) > 0): # Only iterate through the nearby cameras if there are any nearby cameras to begin with.
-                for entry in nearby_alpr_cameras: # Iterate through all nearby ALPR cameras.
-                    if (entry["distance"] < nearest_camera["distance"]): # Check to see if the distance to this camera is lower than the current closest camera.
-                        nearest_camera = entry # Make the current camera the new closest camera.
-
-                if (status_lighting_enabled == True): # Check to see if status lighting alerts are enabled in the Predator configuration.
-                    update_status_lighting("alprcamera") # Run the function to update the status lighting.
-
-                if (shape_alerts == True): # Check to see if the user has enabled shape notifications.
-                    display_shape("cross") # Display an ASCII cross in the output.
-
-                if (audio_alerts == True and int(alert_sounds_alpr_repeat) > 0): # Check to see if the user has audio alerts enabled.
-                    for i in range(0, int(alert_sounds_alpr_repeat)): # Repeat the sound several times, if the configuration says to.
-                        os.system("mpg321 " + alert_sounds_alpr + " > /dev/null 2>&1 &") # Play the sound specified for this alert type in the configuration.
-                        time.sleep(float(alert_sounds_alpr_delay)) # Wait before playing the sound again.
-
-                print(style.purple + style.bold)
-                print("Nearest " + loaded_alpr_camera_database["name"] + ":")
-                print("    Distance: " + str(round(nearest_camera["distance"]*1000)/1000) + " miles")
-                print("    Street: " + str(nearest_camera["road"]))
-                print(style.end + style.end)
-
-
-
-        # Telemetry recording
-        if (information_record_telemetry == True): # Check to see if Predator is configured to record telemetry data.
-            if (gps_enabled == True): # Check to see if GPS features are enabled.
-                export_data = str(round(time.time())) + "," + str(current_speed) + "," + str(current_location[0]) + "," + str(current_location[1]) + "," + str(current_location[3]) + "," + str(current_location[4]) + "," + str(current_location[5]) + "\n" # Add all necessary information to the export data.
-            else:
-                export_data = str(round(time.time())) + "," + str("0") + "," + str("0.000") + "," + str("0.000") + "," + str("0") + "," + str("0") + "," + str("0") + "\n" # Add all necessary information to the export data, using placeholders for information that depends on GPS.
-
-            add_to_file(root + "/information_recording.csv", export_data, silence_file_saving) # Add the export data to the end of the file and write it to disk.
-
-
-
-
-
-
-
-
-
-
-# Survey mode
-
-elif (mode_selection == "5" and information_mode_enabled == True): # The user has set Predator to boot into survey mode.
-
-    if (default_root != ""): # Check to see if the user has configured a default root directory path.
-        print(style.bold + "Using default preference for root directory." + style.end) # Notify the user that Predator is choosing the root project directory based on the default set in the configuration.
-        root = default_root # Use the default set in the configuration.
-    else:
-        root = input("Project root directory path: ") # Prompt the user to enter a path for the current project.
-
-    # Run some validation to make sure the information just entered by the user is correct.
-    if (os.path.exists(root) == False): # Check to see if the root directory entered by the user exists.
-        print(style.yellow + "Warning: The root project directory entered doesn't seem to exist. Predator will almost certainly fail." + style.end)
-        input("Press enter to continue...")
-
-
-
-    while True:
-        clear() # Clear the console output at the beginning of each loop.
-
-        # Prompt the user to select an operation.
-        print("Please select an option.")
-        print("0. Quit")
-        print("1. Create database")
-        print("2. Edit database")
-        print("3. View database")
-        print("4. Survey database")
-        selection = input("Selection: ")
-
-
-        if (selection == "0"): # The user has selected the "quit" option.
-            print("Quitting...") # Inform the user that Predator is quitting before breaking the loop.
-            break # Break the loop to terminate Predator.
-
-        elif (selection == "1"): # The user has selected the "create database" option.
-            database_name, database_description, database_author, database_file = "", "", "", "" # Set all variables related to the new database to a blank string as a placeholder.
-            while (database_name == ""): # Ask the user for a name for the database forever until they enter something.
-                database_name = input("    Database name: ") # Prompt the user to enter a name for the new database.
-            database_description = input("    Database description: ") # Prompt the user to enter a description for the new database.
-            database_author = input("    Database author: ") # Prompt the user to enter an author for the new database.
-            while (database_file == "" or ".json" not in database_file): # Ask the user for a file name for the database file forever until they enter a valid file name.
-                database_file = input("    Database file: ") # Prompt the user to enter a file name for the new database.
-
-            database_data = { # Format the database data as a Python dictionary.
-                "name": database_name,
-                "description": database_description,
-                "author": database_author,
-                "created": str(round(time.time())),
-                "modified": "",
-                "elements": {},
-                "entries": []
-            }
-
-
-            print("Enter each data element you'd like each entry in this database to have, in addition to the GPS coordinates included by default. Leave a blank and press enter to finish adding elements.")
-            element_addition_counter = 0 # This is a placeholder variable that will be incremented by one for each element added in the next step.
-            elements = {} # Create a placeholder dictionary that will be used to hold all of the entry elements specified by the user.
-            while True: # Run forever untilt he user is finished entering entry elements.
-                element_addition_counter = element_addition_counter + 1 # Increment the element addition counter by 1.
-                element_name, element_format = "", "" # Set both variables to a blank placeholder string.
-                print("    Element " + str(element_addition_counter) + ":") # Display the current element count so the user can keep track of how many they've added.
-                element_name = input("        Name: ").lower() # Prompt the user for a name for the current element
-                if (element_name != ""): # Only prompt the user to enter an element format if the element name wasn't left blank.
-                    while (element_format != "str" and element_format != "int" and element_format != "float" and element_format != "bool"): # Repeatedly prompt the user to enter an element type until they enter a valid one.
-                        element_format = input("        Format (str/int/float/bool): ").lower() # Prompt the user to enter an element format (variable type).
-
-                if (element_name == ""): # If the element name prompt was left blank, then break the loop, and finish adding elements.
-                    break
-                else: # If the element was not left blank, then add this element to the list of elements for this database.
-                    database_data["elements"][str(element_name)] = str(element_format) # Add an element to the list of entry elements for this database based on the user's inputs.
-
-            database_data["modified"] = str(round(time.time())) # Update the "last modified" time in the database.
-
-            save_to_file(str(root) + "/" + str(database_file), str(json.dumps(database_data, indent = 4)), silence_file_saving) # Save the database to disk as JSON data.
-            clear() # Clear the console output.
-            print("Database created!") # Inform the user that the database was created.
-            input("Press enter to continue...") # Wait for the user to press enter before continuing.
-
-
-        if (selection == "2"): # The user has selected the "edit database" option.
-            database_file = "" # Set the current database file name to a blank placeholder string.
-            while (os.path.exists(root + "/" + database_file) == False or database_file == ""): # Run forever until the user enters a valid database file name.
-                database_file = input("Database file name: ") # Prompt the user to enter the name of the database file they want to view.
-                if (os.path.exists(root + "/" + database_file) == False): # Check to see if the database file entered by the user exists.
-                    print(style.yellow + "Warning: The database file name entered doesn't seem to exist in the root project folder. Please enter a valid file name." + style.end) # Inform the user that the file name they entered doesn't exist in the root project directory.
-
-            database_data = json.load(open(root + "/" + database_file)) # Load the database information from the file specified by the user.
-            print("Leave an entry blank to leave the value unchanged.")
-
-            print("Database name:")
-            print("    Current: " + database_data["name"]) # Display the database's current name.
-            new_name = str(input("New: ")) # Prompt the user to enter a new name.
-            if (new_name != ""): # Only change the database name if the user didn't leave the prompt blank.
-                database_data["name"] = new_name # Set the database's name to the new name specified by the user.
-                print("    Name changed") # Notify the user that the name was changed.
-            else: # If the 'new name' prompt was left blank, then don't change the name.
-                print("    Name unchanged") # Notify the user that the name was left unchanged.
-
-            print("Database description:")
-            print("    Current: " + database_data["description"]) # Display the database's current description.
-            new_description = str(input("New: ")) # Prompt the user to enter a new description.
-            if (new_description != ""): # Only change the database description if the user didn't leave the prompt blank.
-                database_data["description"] = new_description # Set the database's description to the new description specified by the user.
-                print("    Description changed") # Notify the user that the description was changed.
-            else: # If the 'new description' prompt was left blank, then don't change the description.
-                print("    Description unchanged") # Notify the user that the description was left unchanged.
-
-            print("Database author:")
-            print("    Current: " + database_data["author"]) # Display the database's current author.
-            new_author = str(input("New: ")) # Prompt the user to enter a new author.
-            if (new_author != ""): # Only change the database author if the user didn't leave the prompt blank.
-                database_data["author"] = new_author # Set the database's author to the new author specified by the user.
-                print("    Author changed") # Notify the user that the author was changed.
-            else: # If the 'new author' prompt was left blank, then don't change the author.
-                print("    Author unchanged") # Notify the user that the author was left unchanged.
-
-
-            # Show the newly updated database information.
-            print("New name: " + str(database_data["name"]))
-            print("New description: " + str(database_data["description"]))
-            print("New author: " + str(database_data["author"]))
-
-            database_data["modified"] = str(round(time.time())) # Update the "last modified" time on the database.
-
-            overwrite_confirmation = input("Write changes to disk (y/n): ").lower() # Ask the user to confirm the changes before overwriting the database.
-
-            if (overwrite_confirmation[0] == "y"): # Only overwrite the database after the user confirms doing so.
-                save_to_file(str(root) + "/" + str(database_file), str(json.dumps(database_data, indent = 4)), silence_file_saving) # Save the database to disk as JSON data.
-                print("Saved changes.") # Inform the user that the changes were saved.
-                input("Press enter to continue...") # Wait for the user to press enter before continuing.
-            elif (overwrite_confirmation[0] == "n"): # If the user didn't confirm the changes, then simply discard them and continue without saving the changes to disk.
-                print("Discarded changes.") # Inform the user that the changes were discarded.
-                input("Press enter to continue...") # Wait for the user to press enter before continuing.
-            else: # If the user entered an invalid selection, then show a notice that an invalid selection was made, then skip.
-                print(style.yellow + "Warning: Invalid option." + style.end) # Show a warning that an invalid option was selected.
-                print("Discarded changes.") # Inform the user that the changes were discarded.
-                input("Press enter to continue...") # Wait for the user to press enter before continuing.
-
-            
-
-        if (selection == "3"): # The user has selected the "view database" option.
-            database_file = "" # Set the current selected database file name to a blank placeholder string.
-            while (os.path.exists(root + "/" + database_file) == False or database_file == ""): # Run forever until the user enters a valid database file name.
-                database_file = input("Database file name: ") # Prompt the user to enter the name of the database file they want to view.
-                if (os.path.exists(root + "/" + database_file) == False): # Check to see if the database file entered by the user exists.
-                    print(style.yellow + "Warning: The database file name entered doesn't seem to exist in the root project folder. Please enter a valid file name." + style.end) # Inform the user that the file name they entered doesn't exist in the root project directory.
-
-            database_data = json.load(open(root + "/" + database_file)) # Load the database information from the file specified by the user.
-
-            clear() # Clear the console output.
-            print("Database file: " + root + "/" + database_file) # Display the current database's file path.
-            print("Database name: " + database_data["name"]) # Display the current database's name.
-            print("Database description: " + database_data["description"]) # Display the current database's description.
-            print("Database author: " + database_data["author"]) # Display the current database's author.
-            print("Database created: " + database_data["created"]) # Display the current database's creation date.
-            print("Database modified: " + database_data["modified"]) # Display the current database's last-modified date.
-            print("Database elements: ")
-            print(json.dumps(database_data["elements"], indent = 4)) # Display all of the entry elements for the current database.
-            selection = input("Display all database entries (y/n): ").lower() # Prompt the user to decide whether or not to show all database entries.
-
-            if (selection[0] == "y"): # If the user selected to show all database entries, then clear the screen and print them to the console.
-                clear()
-                print("Database entries: ")
-                print(json.dumps(database_data["entries"], indent = 4)) # Display all of the entries in the current database.
-                input("Press enter to continue...") # Wait for the user to press enter before continuing.
-            elif (selection[0] == "n"): # If the user opted not to show all database entries, then simply skip and continue.
-                print("Skipping...")
-            else: # If the user entered an invalid selection, then show a notice that an invalid selection was made, then skip.
-                print(style.yellow + "Warning: Invalid option." + style.end)
-                print("Skipping...")
-                input("Press enter to continue...") # Wait for the user to press enter before continuing.
-
-            
-        if (selection == "4"): # The user has selected the "survey database" option.
-            database_file = "" # Set the current selected database file name to a blank placeholder string.
-            while (os.path.exists(root + "/" + database_file) == False or database_file == ""): # Run forever until the user enters a valid database file name.
-                database_file = input("Database file name: ") # Prompt the user to enter the name of the database file they want to view.
-                if (os.path.exists(root + "/" + database_file) == False): # Check to see if the database file entered by the user exists.
-                    print(style.yellow + "Warning: The database file name entered doesn't seem to exist in the root project folder. Please enter a valid file name." + style.end) # Inform the user that the file name they entered doesn't exist in the root project directory.
-
-            database_data = json.load(open(root + "/" + database_file)) # Load the database information from the file specified by the user.
-            while True: # Run forever in a loop until terminated.
-                clear() # Clear the console output.
-                print("Please select an option")
-                print("0. Quit")
-                print("1. Add Entry To " + str(database_data["name"]))
-                selection = input("Selection: ") # Prompt the user to make a selection.
-
-                if (selection == "0"): # The user has selected the "quit" option from the survey menu in survey mode.
-                    break # Break the loop to return to the main survey mode menu.
-                elif (selection == "1"): # The user has selected to add an enty to the database.
-
-                    if (gps_enabled == True): # Check to see if GPS features are enabled in the configuration.
-                        current_location = get_gps_location() # Get the current GPS location before prompting the user to fill out each element for this entry.
-
-                    entry_data = {} # Create a placeholder dictionary for all of the elements for the new entry.
-
-                    if (gps_enabled == True): # Check to see if GPS features are enabled.
-                        entry_data["latitude"] = str(current_location[0]) # Record the current GPS latitude.
-                        entry_data["longitude"] = str(current_location[1]) # Record the current GPS longitude.
-                    else: # If GPS features are disabled, then manually prompt the user for the current position.
-                        entry_data["latitude"] = float(input("latitude (float): ")) # Prompt the user to enter a value for the current latitude.
-                        entry_data["longitude"] = float(input("longitude (float): ")) # Prompt the user to enter a value for the current longitude.
-
-                    element_iteration_counter = 0 # Set the element iteration counter to 0 so it can be incremented by 1 each time an element is iterated through./
-                    for element in database_data["elements"]: # Iterate through each entry element specified in the database.
-                        element_input = input(str(element) + " (" + database_data["elements"][element] + "): ") # Prompt the user to enter a value for this entry element.
-                        if (database_data["elements"][element] == "str"): # If this element is supposed to be a string, then convert the user's input to a string.
-                            entry_data[element] = str(element_input) # Save the user's input to the data for this entry.
-                        elif (database_data["elements"][element] == "int"): # If this element is supposed to be an integer, then convert the user's input to an integer.
-                            entry_data[element] = int(element_input) # Save the user's input to the data for this entry.
-                        elif (database_data["elements"][element] == "float"): # If this element is supposed to be a floating point number, then convert the user's input to a float.
-                            entry_data[element] = float(element_input) # Save the user's input to the data for this entry.
-                        elif (database_data["elements"][element] == "bool"): # If this element is supposed to be a boolean value, then convert the user's input to a bool.
-                            if (element_input[0].lower() == "t" or element_input[0].lower() == "y"): # The user has entered an input indicating "true".
-                                entry_data[element] = True # Save the user's input to the data for this entry.
-                            elif (element_input[0].lower() == "f" or element_input[0].lower() == "n"): # The user has entered an input indicating "false".
-                                entry_data[element] = False # Save the user's input to the data for this entry.
-
-
-                    database_data["entries"].append(entry_data) # Add the data for this entry to the main database.
-                    database_data["modified"] = str(round(time.time())) # Update the "last modified" time in the database.
-                    save_to_file(str(root) + "/" + str(database_file), str(json.dumps(database_data, indent = 4)), silence_file_saving) # Save the database entry additions to disk as JSON data.
-
-                else: # The user has selected an invalid option in the survey mode survey menu.
-                    print(style.yellow + "Warning: Invalid selection" + style.end)
-                    input("Press enter to continue...")
-
-
-
-        else: # The user has selected an invalid option in the survey mode main menu.
-            print(style.yellow + "Warning: Invalid selection" + style.end)
-            input("Press enter to continue...")
-
-
-
-
-
 
 
 

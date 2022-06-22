@@ -232,28 +232,9 @@ This update adds 'information mode', which allows Predator to rapidly display us
 
 ## Version 8.0
 
-### Survey Update
+### Simplification Update
 
-*Release date: to be determined*
+This update refines Predator's functionality, and focuses it's purpose back on license plate and object recognition. Irrelevant features are moved to external programs that retain compatibility with Predator, but are entirely independent platforms.
 
-This update prefaces plans for future updates, and adds 'survey mode', which allows the user to mark the locations of various points of interest using a connected GPS.
-
-- Added 'survey mode', which allows the user to create, view, edit, and survey location databases.
-- Pre-recorded mode is now capable of processing multiple videos sequentially.
-- Added support ALPR alerts in Information mode.
-    - The ALPR database was created using Predator's new Survey Mode, and acts as an example of how to set up a Predator database.
-- Reorganized some configuration values to make custom databases more intuitive.
-    - Moved all traffic camera related configuration values to either the 'General' section or the 'Information Mode' section.
-- The second command line argumented appended to Predator can now be used to specify the project root directory.
-- Reworked enforcement camera alerts in Real-time Mode to make them appear more like enforcement camera alerts in Information Mode.
-- Enforcement camera alerts in Real-time Mode now support shape alerts, audio alerts, and status lighting alerts.
-- Moved the 'license plate validation format' prompt to the second prompt in Realtime Mode.
-- The webhook and status lighting system now use the Python 'requests' library.
-- Added the ability for Information Mode to display the current speed in a large ASCII font using the `big_speed_display` configuration value.
-- In real-time mode, status lighting will now be updated before playing audio alerts.
-- Increased the default delay time on several sound effects.
-- Decreased the volume of several sound effects.
-- Added several new custom sound effects.
-- License plate alert databases can now be JSON files in order to add names and descriptions to each plate.
-    - Plain text lists are still supported for sake of backwards compatability, but they won't support metadata like JSON databases will.
-- Updated the descriptions of several configuration values in order to clarify their function.
+- Removed 'Information Mode'
+    - All of the functionality of Information Mode has been moved to a new platform, called 'Assassin' in an effort to keep Predator focused and effective.

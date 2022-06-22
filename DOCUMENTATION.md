@@ -87,10 +87,10 @@ After configuring Predator, you can try it out for the first time!
     - To force Predator to use a particular root project directory, add the directory path as the second command line argument.
         - A mode number must be entered as the first command line argument to specify a root project directory.
         - This command-line argument will override the `default_root` configuration value.
-        - Example: `python3 main.py 4 /home/pi/Predator/`
-            - This command will force Predator to start into Information Mode, using the /home/pi/Predator directory as the root project folder.
+        - Example: `python3 main.py 2 /home/pi/Predator/`
+            - This command will force Predator to start into Real-time Mode, using the /home/pi/Predator directory as the root project folder.
 2. Select a mode
-    - Predator can operate in 6 possible modes.
+    - Predator can operate in 4 possible modes.
         - Management mode (Mode 0)
             - This mode isn't a main operating mode for Predator, and simply exists for doing management tasks.
             - In situations where Predator is hard-installed, like in a vehicle or security system, this mode makes it easy to clear folders, copy files, and maintain Predator without having to remove the central processor.
@@ -103,16 +103,6 @@ After configuring Predator, you can try it out for the first time!
         - Dash-cam mode (Mode 3)
             - In this mode, Predator will operate like a dash-cam, and simply record video without processing it.
             - This mode can be used to record video to be used analyzed with pre-recorded mode later.
-        - Information mode (Mode 4)
-            - In this mode, Predator will act like an information dashboard, and will show customizable information displays, including the current time, GPS location, altitude, nearest speed cameras, and more.
-            - In this mode, Predator doesn't require a camera to be connected.
-        - Survey mode (Mode 5)
-            - In this mode, Predator allows the user to create, view, edit, and survey databases of points of interest.
-                - The 'create' function allows the user to create a fresh database with a name, description, author, and entry elements.
-                - The 'view' function allows the user to view the metadata and entries in a particular database.
-                - The 'edit' function allows the user to change the name, description, and author of a database.
-                - The 'survey' function allows the user to add entries to the database by filling out the entry elements specified when the database was created.
-            - In this mode, Predator doesn't required a camera to be connected, but a GPS is highly recommended. If GPS is disabled, then Predator will prompt the user for the current location coordinates every time an entry is added to a database.
     - Select a mode by entering the number associated with it in the selection menu.
 3. Set preferences
     - Next Predator will prompt you to set your preferences for this session. The settings you are prompted for will change depending on the mode you choose. Below are the preference menus you'll see for all modes.
@@ -167,15 +157,7 @@ After configuring Predator, you can try it out for the first time!
     - Dash-cam mode:
         - In dash-cam mode, you'll only be asked for a root project directory. Simply create an empty folder, and specify it's full absolute path here.
             - Example: `/home/cvieira/Downloads/MyProjectFolder`
-    - Information mode:
-        - In information mode, you'll only be asked for a root project directory. Simply create an empty folder or select an already created one, and specify it's full absolute path here.
-            - Example: `/home/cvieira/Downloads/MyProjectFolder`
-    - Survey mode:
-        - In survey mode, you'll be asked for a root project directory. Simply create or select a folder containing the project you'd like to manage, or specify an empty folder to work from a clean state.
-            - Example: `/home/cvieira/Downloads/MyProjectFolder`
-        - Depending on the function you select in survey mode, you may also be asked to enter a database file. For this, simply enter the file name of a database file in the root project directory you specified previously.
-            - Example: `database.json`
-4. Run Predator
+4. Using Predator
     - After finishing setting up your preferences, Predator will begin running automatically. Below you'll see information for all operation modes of Predator.
         - Management mode
             - Unlike the other modes, the entirety of management mode involves user menus.
@@ -198,24 +180,10 @@ After configuring Predator, you can try it out for the first time!
                     - Images taken will be saved as `realtime_imageN.jpg` in the root project folder. If saving images is turned on, 'N' with the sequential image number. Otherwise, the N will be removed.
                     - Saved license plates will be saved to `real_time_plates.csv` in the root project folder, provided license plate saving is enabled.
                 - If a plate detected is in the alert database specified during the preferences stage earlier, it will show a prominent alert message in the console output.
-            - Predator is also capable of displaying speed camera and red-light camera alerts in Real-time mode. However, traffic camera alerts are primarily designed around Information mode.
+            - Predator is also capable of displaying speed camera and red-light camera alerts in Real-time mode.
         - Dash-cam mode
             - In dash-cam mode, Predator will record video indefinitely until disk space runs out, the return key is pressed, or the Predator process is terminated.
             - Predator will not detect license plates in this mode. However, you can use video recorded in this mode with pre-recorded mode in order to scan for license plates at a later date.
             - The dash-cam video recorded will be saved to the project folder as `predator_dashcam_TIME_CHANNEL.mkv`.
                 - `TIME` is replaced by a Unix timestamp of when the file was created.
                 - `CHANNEL` is replaced by the name of the device used, as specified in the configuration.
-        - Information mode
-            - In information mode, Predator will run in an endless loop, displaying information based on the configuration.
-                - Information mode is capable of displaying general information like the current time, GPS location, speed, etc as well as more specific information, like the distance to the nearest traffic monitoring camera.
-            - Depending on the configuration, Predator may also record telemetry to the `information_recording.csv` file in the root project directory.
-        - Survey mode
-            - In survey mode, Predator will display a menu prompting the user to select to create, view, edit, or survey a database.
-                - The 'create' function allows the user to create a fresh database.
-                - The 'view' function allows the user to view the metadata and entries in a database.
-                - The 'edit' function allows the user to edit the metadata associated with a database.
-                - The 'survey' function allows the user to add entries to the database by filling out the entry elements specified when the database was created.
-            - Create, surveying, and using databases can be a somewhat complex task, and you should take care to set everything up appropriately.
-                - "Entry elements" are the elements that each entry in a database has. For example, if you have a database for gas stations, you might have elements for "address" (string), "gasoline" (boolean), and "diesel" (boolean). These elements will be shown to the user as prompts in survey mode.
-                    - The following entry elements names can't be used, since they would interfere Predator's database processing abilities.
-                        - `longitude`, `latitude`, `distance`

@@ -12,14 +12,14 @@
             "management": true,
             "prerecorded": true,
             "realtime": true,
-            "dashcam": true,
-            "information": true,
-            "survey": true
+            "dashcam": true
         },
         "alert_databases": {
             "license_plates": "",
-            "traffic_cameras": "./assets/databases/enforcement_cameras.excam",
-            "alpr_cameras": "./assets/databases/alpr.json"
+            "traffic_cameras": "./assets/databases/enforcement_cameras.excam"
+        },
+        "alert_range": {
+            "traffic_cameras": 11
         },
         "traffic_camera_alerts_enabled": true,
         "camera_alert_types": {
@@ -86,11 +86,6 @@
             "repeat": "1",
             "delay": "1.5"
         },
-        "alpr_sound": {
-            "path": "./assets/sounds/alpr.mp3",
-            "repeat": "1",
-            "delay": "0.3"
-        },
         "webhook": "",
         "shape_alerts": false,
         "save_real_time_object_recognition": true,
@@ -120,21 +115,5 @@
         "dashcam_background_mode_realtime": false
     },
     "information": {
-        "information_refresh_delay": 1.0,
-        "displays": {
-            "time": true,
-            "date": true,
-            "speed": true,
-            "location": true,
-            "altitude": true,
-            "track": true,
-            "satellites": true
-        },
-        "big_speed_display": true,
-        "record_telemetry": true,
-        "alerts": {
-            "traffic_cameras": 11,
-            "alpr_cameras": 3 
-        }
     }
 }

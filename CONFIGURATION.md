@@ -21,8 +21,6 @@ This section of configuration values will effect Predator's general operation.
         - When set to "1", Predator will skip the 'mode' prompt, and automatically boot into Pre-recorded Mode.
         - When set to "2", Predator will skip the 'mode' prompt, and automatically boot into Real-time Mode.
         - When set to "3", Predator will skip the 'mode' prompt, and automatically boot into Dash-cam Mode.
-        - When set to "4", Predator will skip the 'mode' prompt, and automatically boot into Information Mode.
-        - When set to "5", Predator will skip the 'mode' prompt, and automatically boot into Survey Mode.
     - It may be useful to change this setting in several different situations:
         - If you only ever use the same mode when using Predator, setting this to your preferred mode can save time.
         - When installing Predator in a vehicle, this setting can allow Predator to load without any user input.
@@ -65,6 +63,8 @@ This section of configuration values will effect Predator's general operation.
             - This file should be an absolute file path.
     - Each value in this section should either be left blank, or be a file path relative to the root project folder.
         - For example, if your alert database is in `/home/pi/Data/alerts.txt`, and your root project directory is `/home/pi/Data/`, then then the alert database value should simply be set to `alerts.txt`, not the the full file path.
+- `alert_range`
+    - This configuration value contains the alerting distances for alert databases. Currently, this only includes the traffic enforcement camera database.
 - `traffic_camera_alerts_enabled`
     - This configuration value determines whether or not traffic enforcement camera alerts are enabled.
         - This includes red-light cameras, speed cameras, and other enforcement cameras.
@@ -80,7 +80,6 @@ This section of configuration values will effect Predator's general operation.
     - This is the radius, in miles, that Predator will load traffic cameras from during the initial loading process.
     - For example, if this value is set to `100`, then Predator will only load traffic cameras in a 100 mile radius from the current location when it boots. If you travel more than 100 miles away from your original location without reloading Predator then you won't get traffic camera alerts.
     - If you're running Predator on a high performance processor, you can comfortable set this to a very high number, which could be useful on long road trips where you might not restart Predator for hundreds of miles at a time. However, if you're running Predator on a low powered device, like a Raspberry Pi, you should reduce this radius to make Predator faster at checking traffic camera proximity when running in Real-time Mode.
-    - This setting does not determine the distance at which alerts will be displayed. To configure the alert distance for traffic cameras, see the `alerts` configuration value in the Information Mode section below.
 
 
 
@@ -171,7 +170,6 @@ Configuration values in this section are settings specific to Real-time Mode.
         - `camera1_sound` is the sound played to alert the user of a traffic camera (speed/red-light camera) detected at a far distance.
         - `camera2_sound` is the sound played to alert the user of a traffic camera (speed/red-light camera) detected at a moderate distance.
         - `camera3_sound` is the sound played to alert the user of a traffic camera (speed/red-light camera) detected at a critically near distance.
-        - `alpr_sound` is played to alert the user of an ALPR camera detected within the configured distance in Information Mode.
     - The `path` value should be set to the file path of the audio file you want to play.
     - The `repeat` value should be set to how many times you want the sound effect to be repeated.
         - Under normal circumstances, this value should just be "1", but there might be some cases in which you want to play a particular sound repeatedly.
@@ -298,45 +296,3 @@ In order to better integrate with an existing system, Predator can communicate w
 - `dashcam_background_mode_realtime`
     - This setting determines whether Predator will automatically enabled background dashcam recording when starting in Real-time Mode.
     - Note that Predator can only use each recording device for one task at a time, so if you run Real-time Mode with background recording enabled, you'll need to specify two different devices by changing `fswebcam_device` and `dashcam_device`.
-
-
-
-## Information Mode Configuration
-
-- `information_refresh_delay`
-    - This setting determines how long Predator will wait before refreshes while operating in Information Mode.
-    - Having a short pause between refreshes allows the user to read the information displayed on the screen.
-- `displays`
-    - The configuration values in this section are used to enabled and disable whether or not certain pieces of information are displayed.
-    - Below are all the values that can be turned on and off.
-        - `time`
-            - This setting determines whether the current time will be displayed while operating in Information Mode.
-        - `date`
-            - This setting determines whether the current date will be displayed while operating in Information Mode.
-        - `speed`
-            - This setting determines whether the current speed will be displayed while operating in Information Mode.
-        - `location`
-            - This setting determines whether the current location will be displayed while operating in Information Mode.
-        - `altitude`
-            - This setting determines whether the current altitude will be displayed while operating in Information Mode.
-        - `track`
-            - This setting determines whether the current track will be displayed while operating in Information Mode.
-        - `satellites`
-            - This setting determines whether the current connected satellite count will be displayed while operating in Information Mode.
-- `big_speed_display`
-    - This setting determines whether or not Predator will display the current speed in a large ASCII font.
-    - This setting will only have an effect if the `speed` setting is turned on in the `displays` settings.
-- `record_telemetry`
-    - This setting determines whether or not Predator will log the information it displays while operating in Information Mode.
-    - When set to `true`, all of the the raw information displays that are available under the `displays` configuration value will be recorded, regardless of whether they are turned on.
-        - This configuration value only records raw data, like speed, altitude, and number of connected satellites. It does not record the nearest traffic camera, or similar information.
-        - If `gps_enabled` is set to `false`, then all GPS-dependent information will be left as placeholders.
-    - When enabled, a log file will be created in the root project directory named `information_recording.csv`.
-        - This file follows this format: `time,current_speed,current_latitude,current_longitude,current_altitude,current_track,current_connected_satellite_count`
-- `alerts`
-    - Configurations made in this section may also influence Predator while operating in Real-time Mode.
-    - This setting is a dictonary of alert databases and their alert ranges, in miles.
-        - The `traffic_cameras` alert database is used for speed and red-light camera alerts. Use this value to specify the distance (in miles) at which Predator should consider a speed camera to be within alert distance.
-            - Example: `"traffic_cameras": 0.5` will show alerts for the `traffic_cameras` database within 0.5 miles of a point-of-interest.
-    - The databases in this section correspond the databases specified by the `alert_databases` configuration value in the general configuration section.
-        - In a future update, the user will be able to add custom alert databases by adding the databases to `alert_databases`, then referencing them in this configuration value with an alert distance.
