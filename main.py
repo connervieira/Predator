@@ -124,6 +124,7 @@ delay_between_rounds = config["realtime"]["delay_between_rounds"] # This setting
 print_invalid_plates = config["realtime"]["print_invalid_plates"] # In real-time mode, print all plates that get invalided by the formatting rules in red. When this is set to false, only valid plates are displayed.
 print_detected_plate_count = config["realtime"]["print_detected_plate_count"] # This setting determines whether or not Predator will print how many license plates it detects in each frame while operating in real-time mode.
 realtime_guesses = config["realtime"]["realtime_guesses"] # This setting determines how many guesses Predator will make per plate in real-time mode. The higher this number, the less accurate guesses will be, but the more likely it will be that a plate matching the formatting guidelines is found.
+manual_trigger = config["realtime"]["manual_trigger"] # This setting determines whether or not Predator will wait to be manually triggered before taking an image.
 alpr_location_tagging = config["realtime"]["alpr_location_tagging"] # This setting determines whether or not detected license plates will be tagged with the current GPS location.
 alerts_ignore_validation = config["realtime"]["alerts_ignore_validation"] # This setting determines whether alerts will respect or ignore the license plate validation formatting template.
 camera_resolution = config["realtime"]["camera_resolution"] # This is the resolution you want to use when taking images using the connected camera. Under normal circumstances, this should be the maximum resoultion supported by your camera.
@@ -1295,6 +1296,10 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
 
 
         if (realtime_alpr_enabled == True): # Only run license plate recognition if enabled in the configuration.
+
+            if (manual_trigger == True): # If the manual trigger configuration value is enabled, then wait for the user to press enter before continuing.
+                input("Press enter to trigger image capture...")
+
             # Take an image using the camera device specified in the configuration.
             if (realtime_output_level >= 3): # Only display this status message if the output level indicates to do so.
                 print("Taking image...")

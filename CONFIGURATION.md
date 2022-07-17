@@ -124,7 +124,12 @@ Configuration values in this section are settings specific to Real-time Mode.
 - `realtime_guesses`
     - This setting is a number in the form of a string that determines how many OpenALPR guesses Predator will take into account when analyzing a plate.
     - The higher this number is, the more likely Predator is to guess a plate incorrectly. The lower this number is, the less likely Predator will be to find a valid guess at all.
-    - By default this value is set to 10, which tends to be a healthy balance for the majority of tasks.
+    - By default this value is set to 20, which tends to be a healthy balance for the majority of tasks.
+- `manual_trigger`
+    - This setting determines whether or not Predator will wait to be manually triggered before taking a picture for license plate analysis.
+    - When this setting is set to `true`, Predator will only take pictures when the enter key is pressed.
+    - When this setting is set to `false`, Predator will take pictures as fast as the processing allows.
+    - It can be useful to enable this setting when you want to improve Predator's efficiency by only triggering it when a car passes.
 - `alpr_location_tagging`
     - This setting determines whether or not the current GPS location will be saved to the log file when each plate is detected.
     - For this setting to do anything, both the "save license plates" preference, and `gps_enabled` configuration value need to be turned on.

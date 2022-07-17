@@ -43,6 +43,7 @@
         "print_invalid_plates": false,
         "print_detected_plate_count": true,
         "realtime_guesses": "20",
+        "manual_trigger": true,
         "alpr_location_tagging": true,
         "alerts_ignore_validation": true,
         "camera_resolution": "1920x1080",
