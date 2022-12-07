@@ -783,6 +783,61 @@
             "direction": 270,
             "owner": "",
             "type": "standalone"
+        },
+        {
+            "latitude": 41.424870,
+            "longitude": -81.338161,
+            "brand": "Flock Safety",
+            "name": "Falcon",
+            "road": "Chillicothe Road",
+            "description": "A black solar powered unit mounted on a stand-alone pole on the side of the road, facing the backs of cars traveling north on Chillicothe Road.",
+            "direction": 340,
+            "owner": "Russell Township Ohio",
+            "type": "standalone"
+        },
+        {
+            "latitude": 41.440229,
+            "longitude": -81.338317,
+            "brand": "Flock Safety",
+            "name": "Falcon",
+            "road": "Chillicothe Road",
+            "description": "A black solar powered unit mounted on a stand-alone pole on the side of the road, facing the backs of cars traveling south on Chillicothe Road.",
+            "direction": 160,
+            "owner": "Russell Township Ohio",
+            "type": "standalone"
+        },
+        {
+            "latitude": 41.431666,
+            "longitude": -81.3740530,
+            "brand": "Flock Safety",
+            "name": "Falcon",
+            "road": "Bell Street",
+            "description": "A black solar powered unit mounted on a stand-alone pole on the side of the road, facing the backs of cars traveling east on Bell Street.",
+            "direction": 80,
+            "owner": "Russell Township Ohio",
+            "type": "standalone"
+        },
+        {
+            "latitude": 41.421292,
+            "longitude": -81.360529,
+            "brand": "Flock Safety",
+            "name": "Falcon",
+            "road": "Washington Street",
+            "description": "Russell Township Ohio",
+            "direction": 270,
+            "owner": "",
+            "type": "standalone"
+        },
+        {
+            "latitude": 41.515005, ,
+            "longitude": -81.438655,
+            "brand": "",
+            "name": "",
+            "road": "SOM Center Road",
+            "description": "Mounted on a traffic light cross bar, facing the backs of cars headed south on SOM Center Road, just after passing Marsol Road.",
+            "direction": 180,
+            "owner": "",
+            "type": "trafficlight_crossbar"
         }
     ]
 }
