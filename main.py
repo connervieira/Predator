@@ -822,8 +822,6 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
         for key, video in enumerate(videos):
             videos[key] = os.path.basename(video)
  
-        print(videos) # TODO REMOVE
-        input() # TODO REMOVE
     else:
         videos = video.split(", ") # Split the video input into a list, based on the position of commas.
     for video in videos: # Iterate through each video specified by the user.
