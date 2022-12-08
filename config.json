@@ -56,7 +56,7 @@
         "fswebcam_device": "/dev/video0",
         "fswebcam_flags": "--set brightness=70%",
         "speed_display_enabled": false,
-        "audio_alerts": true,
+        "audio_alerts": false,
         "startup_sound": {
             "path": "./assets/sounds/testnoise.mp3",
             "repeat": "1",

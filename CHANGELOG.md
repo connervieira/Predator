@@ -240,3 +240,4 @@ This update refines Predator's functionality, and focuses it's purpose back on l
     - All of the functionality of Information Mode has been moved to a new platform, called 'Assassin' in an effort to keep Predator focused and effective.
 - Added `manual_trigger` configuration value.
     - This configuration value allows for Predator to be manually trigger in Realtime mode, where images are only captured when a button is presed by the user.
+- Predator now accepts wildcard file names in Prerecorded Mode.

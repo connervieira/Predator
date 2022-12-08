@@ -816,7 +816,16 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
         print(style.yellow + "Warning: The root project directory entered doesn't seem to exist. Predator will almost certainly fail." + style.end)
         input("Press enter to continue...")
 
-    videos = video.split(", ") # Split the video input into a list, based on the position of commas.
+    if (video[0] == "*"): # Check to see if the first character is a wilcard.
+        video_list_command = "ls " + root + "/" + video + " | tr '\n' ','";
+        videos = str(os.popen(video_list_command).read())[:-1].split(",") # Run the command, and record the raw output string.
+        for key, video in enumerate(videos):
+            videos[key] = os.path.basename(video)
+ 
+        print(videos) # TODO REMOVE
+        input() # TODO REMOVE
+    else:
+        videos = video.split(", ") # Split the video input into a list, based on the position of commas.
     for video in videos: # Iterate through each video specified by the user.
         if (os.path.exists(root + "/" + video) == False): # Check to see if each video file name supplied by the user actually exists in the root project folder.
             print(style.yellow + "Warning: The video file " + str(video) + " entered doesn't seem to exist in the root project directory. Predator will almost certainly fail." + style.end) # Inform the user that this video file couldn't be found.
@@ -910,7 +919,7 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
 
 
 
-    # Check the possible plate IDs and validate based on general Ohio plate formatting.
+    # Check the possible plate IDs and validate based on general plate formatting specified by the user.
     print("Validating license plates...")
     for frame in lpr_scan: # Iterate through each frame of video in the database of scanned plates.
         for i in range(0,len(lpr_scan)): # Run repeatedly to make sure the list shifting around doesn't lead to invalid license plates being skipped.
