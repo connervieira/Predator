@@ -48,12 +48,12 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Redo CONFIGURATION.md to better represent the newly changed configuration values.
 - [X] Test ALPR alerts.
 - [X] Transition Real-time Mode license plate alert databases from plain text lists to JSON databases.
-- [X] Remove speed camera and ALPR alerts (replaced by 'Assassin' to simplify Predator)
+- [X] Remove speed camera and ALPR alerts (replaced by 'Assassin' to simplify Predator).
+- [ ] Add more resilent GPX position correlating.
 
 
 # Hypothetical
 
 These are features that may require more in-depth changes, and are purely hypothetical.
 
-- [ ] Add OBD-II integration.
 - [ ] A GUI front-end in addition to the existing command line interface.
