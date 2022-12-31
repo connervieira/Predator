@@ -32,18 +32,18 @@ config = json.load(open(predator_root_directory + "/config.json")) # Load the co
 import time # Required to add delays and handle dates/times
 import subprocess # Required for starting some shell commands
 import sys
-import urllib.request # Required to make network requests
-import requests # Required to make network requests
+if (config["realtime"]["status_lighting_enabled"] == True or config["realtime"]["push_notifications_enabled"] == True or config["realtime"]["webhook"] != ""):
+    import requests # Required to make network requests
+    import validators # Required to validate URLs
 import re # Required to use Regex
-import validators # Required to validate URLs
 import datetime # Required for converting between timestamps and human readable date/time information
 from xml.dom import minidom # Required for processing GPX data
 import fnmatch # Required to use wildcards to check strings
 import lzma # Required to load ExCam database
 import math # Required to run more complex math calculations
-from geopy.distance import great_circle # Required to calculate distance between locations.
-from gps import * # Required to access GPS information.
-import gpsd
+if (config["general"]["gps_enabled"] == True): # Only import the GPS libraries if GPS settings are enabled.
+    from gps import * # Required to access GPS information.
+    import gpsd
 
 
 
@@ -302,66 +302,6 @@ def get_gps_location(): # Placeholder that should be updated at a later date.
             return 0.0000, -0.0000, 0.0, 0.0, 0.0, 0 # Return a default placeholder location.
     else: # If GPS is disabled, then this function should never be called, but return a placeholder position regardless.
         return 0.0000, 0.0000, 0.0, 0.0, 0.0, 0 # Return a default placeholder location.
-
-
-
-
-# Define a simple function to calculate the approximate distance between two points.
-def get_distance(lat1, lon1, lat2, lon2):
-    return great_circle((lat1, lon1), (lat2, lon2)).miles
-
-
-
-
-
-# Define the function that will be used to get nearby speed, red light, and traffic cameras.
-def load_traffic_cameras(current_lat, current_lon, database_file, radius):
-    if (os.path.exists(database_file) == True): # Check to make sure the database specified in the configuration actually exists.
-        with lzma.open(database_file, "rt", encoding="utf-8") as f: # Open the database file.
-            database_lines = list(map(json.loads, f)) # Load the camera database
-            loaded_database_information = [] # Load an empty placeholder database so we can write data to it later.
-            
-            for camera in database_lines: # Iterate through each camera in the database.
-                if ("lat" in camera and "lon" in camera): # Only check this camera if it has a latitude and longitude defined in the database.
-                    if (get_distance(current_lat, current_lon, camera['lat'], camera['lon']) < float(radius)): # Check to see if this camera is inside the initial loading radius.
-                        loaded_database_information.append(camera)
-    else:
-        loaded_database_information = {} # Return a blank database if the file specified doesn't exist.
-
-    return loaded_database_information # Return the newly edited database information.
-
-
-
-
-def nearby_traffic_cameras(current_lat, current_lon, database_information, radius=1.0): # This function is used to get a list of all traffic enforcement cameras within a certain range of a given location.
-    nearby_speed_cameras, nearby_redlight_cameras, nearby_misc_cameras = [], [], [] # Create empty placeholder lists for each camera type.
-    for camera in database_information: # Iterate through each camera in the loaded database.
-        current_distance = get_distance(current_lat, current_lon, camera['lat'], camera['lon'])
-        if (current_distance < float(radius)): # Only show the camera if it's within a certain radius of the current location.
-            camera["dst"] = current_distance # Save the current distance from this camera to it's data before adding it to the list of nearby speed cameras.
-            if (camera["flg"] == 0 or camera["flg"] == 2 or camera["flg"] == 3): # Check to see if this particular camera is speed related.
-                nearby_speed_cameras.append(camera) # Add this camera to the "nearby speed camera" list.
-            elif (camera["flg"] == 1): # Check to see if this particular camera is red-light related.
-                nearby_redlight_cameras.append(camera) # Add this camera to the "nearby red light camera" list.
-            else:
-                nearby_misc_cameras.append(camera) # Add this camera to the "nearby general traffic camera" list.
-
-    return nearby_speed_cameras, nearby_redlight_cameras, nearby_misc_cameras # Return the list of nearby cameras for all types.
-
-
-
-
-
-def nearby_database_poi(current_lat, current_lon, database_information, radius=1.0): # This function is used to get a list of all points of interest from a particular database within a certain range of a given location.
-    nearby_database_information = [] # Create a placeholder list to add the narby POIs to in the next steps.
-    for entry in database_information["entries"]: # Iterate through each entry in the loaded database information.
-        current_distance = get_distance(current_lat, current_lon, entry['latitude'], entry['longitude']) # Get the current distance to the POI in question.
-        entry["distance"] = current_distance # Append the current POI's distance to it's database information.
-        if (current_distance < float(radius)): # Check to see if the current POI is within range of the user.
-            nearby_database_information.append(entry) # Add this entry to the list of POIs within range.
-    return nearby_database_information # Return the new database with the newly added distance information.
-
-
 
 
 

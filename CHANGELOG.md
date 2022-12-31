@@ -241,3 +241,8 @@ This update refines Predator's functionality, and focuses it's purpose back on l
 - Added `manual_trigger` configuration value.
     - This configuration value allows for Predator to be manually trigger in Realtime mode, where images are only captured when a button is presed by the user.
 - Predator now accepts wildcard file names in Prerecorded Mode.
+- Simplified library importing process.
+    - Libraries are now only imported if the configuration causes Predator to need them.
+- Added a fall-back in case the ALPR library encounters an error.
+- Removed logic for traffic camera alert processing.
+- Fixed a bug that could cause Predator to crash when object recognition was globally disabled in the configuration.
