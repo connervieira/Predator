@@ -14,11 +14,9 @@ While Predator is designed to be stable and reliable, you should not depend on i
 
 ## Description
 
-Predator is an advanced multipurpose platform focused on license plate reading and object recognition. Predator can analyze pre-recorded video from dashcams, security cameras, or other devices, as well as real-time video streams from live vehicle-mounted cameras and static webcams. In addition to video analysis, Predator is also capable of acting as a standard dash-cam or security camera, eliminating the need to install multiple devices for a single usage situation. When installed in a vehicle Predator can seamlessly detect objects and license plates as you drive, sending you alerts automatically based on customizable criteria. When installed as a stationary security camera, Predator can run in the background, sending information to webhooks, or using audio alerts to indicate important events.
+Predator is a multipurpose camera platform focused on license plate reading and object recognition. Predator can analyze pre-recorded video from dashcams, security cameras, or other devices, as well as real-time video streams from live vehicle-mounted cameras and static webcams. In addition to video analysis, Predator is also capable of acting as a traditional dash-cam or security camera, eliminating the need to install multiple devices for a single usage situation. When installed in a vehicle, Predator can seamlessly detect objects and license plates as you drive, sending you alerts automatically based on customizable criteria. When installed as a stationary security camera, Predator can run in the background, sending information to webhooks, or use audio alerts to indicate important events.
 
 Predator's license plate recognition is heavily based on OpenALPR, which is arguably the gold standard for license plate recognition in the open source software community. While OpenALPR provides a rock solid foundation, Predator adds dozens of powerful features that drastically amplify it's abilities. Through extensive customizability, Predator gives you the power to dial in the performance and accuracy of your camera system without ever needing an internet connection or central database. Regardless of what you're looking to accomplish, Predator gives you the means to get there.
-
-Predator goes above just a computer vision platform. Making use of other data sources, like GPS devices, Predator can seamlessly provide alerts for potential points of interest, like speed cameras and red-light cameras. Once again, due to the sheer number of customizability options, all of Predator's alerting and monitoring functionality can be easily configured, disabled, or activated based on what you're looking to accomplish.
 
 
 ## General Features
@@ -65,7 +63,7 @@ Predator is designed to support low-energy-usage hardware such that it can be ea
 
 ### Location Aware
 
-Predator supports GPX files to allow for correlating license plates detected in pre-recorded video to their physical coordinates.
+Predator supports GPX files to allow for correlating license plates detected in pre-recorded video to their physical coordinates. This makes information gathered from analyzing long streams of dashcam video much more useful and effective.
 
 ### Alerts
 
@@ -73,11 +71,11 @@ Predator supports customizable real-time alerts, allowing the user to be notifie
 
 ### Safe
 
-Predator is designed to be safe, regardless of the installation context. It's easy to configure Predator to completely hands free, ensuring that you don't have to look away from the road when Predator runs in a mobile context.
+Predator is designed to be safe, regardless of the installation context. It's easy to configure Predator to completely hands (and eyes) free, ensuring that you don't have to look away from the road when Predator runs in a mobile context.
 
-### Dash-cam
+### Dashcam
 
-Predator comes with a dash-cam mode, allowing for customizable real-time recording without processing license plates. Dash-cam videos can later be processed by Predator in pre-recorded mode. Predator's dash-cam mode allows for multi-channel recording, making it easy to simultaneously record multiple angles using multiple cameras.
+Predator comes with a dash-cam mode, allowing for customizable real-time recording without processing license plates. Dash-cam videos can later be processed by Predator in pre-recorded mode. Predator's dash-cam mode allows for multi-channel recording, provided the hardware supports it, making it easy to simultaneously record multiple angles using multiple cameras.
 
 ### Headless Ready
 
@@ -87,14 +85,13 @@ While Predator comes with a straight forward interface, it can be fully configur
 
 In addition to license plate scanning, Predator also supports general object recognition. It can collect a list of common objects and save them to a file, making it easy to find important events in recorded video.
 
-### Database Alerts
-
-While Predator's powerful real-time video analysis can provide useful information to the driver, Predator also supports offline database alerts for known locations of speed cameras and red-light cameras. Using a connected GPS, Predator can alert the driver when alerting a known point of interest.
-
 ### Documented
 
 Predator's extreme customizability can be a bit overwhelming to new users. For this reason, Predator is extensively documented, and comes bundled with step-by-step guides on how to download it, install it, configure it, and run it.
 
+### Dependable
+
+While it shouldn't be trusted with safety critical tasks, Predator is designed to be extremely dependable regardless. When configured appropriately, steps are taken to decrease the likelihood that Predator will fail to alert to a true positive due minor mistakes in the analysis.
 
 
 ## Modes
@@ -117,15 +114,6 @@ Real-time mode allows Predator to detect license plates and objects in real-time
 
 Dash-cam mode allows Predator to record video without running any analysis or computer-vision processing.
 
-### Information Mode (4)
-
-Information mode allows Predator to display and record telemetry data from various sources.
-
-### Survey Mode (5)
-
-Survey mode allows the user to create, view, edit, and modify custom databases containing the locations of certain points of interest.
-
-
 
 ## Screenshots
 
@@ -137,7 +125,7 @@ When operating in real-time mode, Predator can display alerts when it detects a 
 
 ### Pre-recorded Mode Sample Image
 
-While operating in pre-recorded mode, Predator can analyze any video, including dashcam video
+While operating in pre-recorded mode, Predator can analyze any video, including dashcam video. Note that the screenshot below is for demonstrative purposes, and shows what kinds of information Predator can detect. It does not accurately reflect the Predator user interface.
 
 ![Dashcam sample image](./assets/images/screenshots/dashcamsample.png)
 
