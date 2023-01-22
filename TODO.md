@@ -49,6 +49,7 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Test ALPR alerts.
 - [X] Transition Real-time Mode license plate alert databases from plain text lists to JSON databases.
 - [X] Remove speed camera and ALPR alerts (replaced by 'Assassin' to simplify Predator).
+- [ ] Add dashcam recording segmentation support.
 - [ ] Add more resilent GPX position correlating.
 
 

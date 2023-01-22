@@ -276,3 +276,6 @@ In order to better integrate with an existing system, Predator can communicate w
 - `dashcam_background_mode_realtime`
     - This setting determines whether Predator will automatically enabled background dashcam recording when starting in Real-time Mode.
     - Note that Predator can only use each recording device for one task at a time, so if you run Real-time Mode with background recording enabled, you'll need to specify two different devices by changing `fswebcam_device` and `dashcam_device`.
+- `segment_length`
+    - This setting is an integer that determines the length of each dashcam video clip before a new segment is created, measured in seconds.
+    - When this value is set to '0', recordings will not be separated into segments.

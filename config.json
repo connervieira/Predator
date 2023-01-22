@@ -87,7 +87,8 @@
         "dashcam_device": {
             "main": "/dev/video0"
         },
-        "dashcam_background_mode_realtime": false
+        "dashcam_background_mode_realtime": false,
+        "segment_length": 60
     },
     "information": {
     }
