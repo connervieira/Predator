@@ -30,9 +30,10 @@ config = json.load(open(predator_root_directory + "/config.json")) # Load the co
 import time # Required to add delays and handle dates/times
 import subprocess # Required for starting some shell commands
 import sys
-if (config["realtime"]["status_lighting_enabled"] == True or config["realtime"]["push_notifications_enabled"] == True or config["realtime"]["webhook"] != ""):
-    import urllib.request # Required to make network requests
-    import validators # Required to validate URLs
+if (config["developer"]["offline"] == False): # Only import networking libraries if offline mode is turned off.
+    if (config["realtime"]["status_lighting_enabled"] == True or config["realtime"]["push_notifications_enabled"] == True or config["realtime"]["webhook"] != ""):
+        import urllib.request # Required to make network requests
+        import validators # Required to validate URLs
 import re # Required to use Regex
 import datetime # Required for converting between timestamps and human readable date/time information
 import fnmatch # Required to use wildcards to check strings
@@ -58,6 +59,22 @@ convert_speed = utils.convert_speed # Load the function used to convert speeds f
 display_number = utils.display_number # Load the function used to display numbers as large ASCII font.
 
 
+import ignore # Import the library to handle license plates in the ignore list.
+ignore_list = ignore.fetch_ignore_list() # Fetch the ignore lists.
+
+
+
+
+if (config["developer"]["offline"] == True): # If offline mode is enabled, then disable all network based features.
+    config["realtime"]["webhook"] = ""
+    config["realtime"]["push_notifications_enabled"] = False
+    config["realtime"]["gotify_server"] = "" # This is redundant, since 'push_notifications_enabled' is disabled, but it serves as a backup.
+    config["realtime"]["status_lighting_enabled"] = False
+    config["realtime"]["status_lighting_base_url"] = "" # This is redundant, since 'status_lighting_enabled' is disabled, but it serves as a backup.
+    config["developer"]["remote_sources"] = []
+
+
+
 if (config["general"]["disable_object_recognition"] == False): # Check to see whether or not object recognition (Tensorflow/OpenCV) has been globally disabled.
     try: # "Try" to import Tensorflow and OpenCV; Don't quit the entire program if an error is encountered.
         import silence_tensorflow.auto # Silences tensorflow warnings
@@ -66,7 +83,7 @@ if (config["general"]["disable_object_recognition"] == False): # Check to see wh
         from cvlib.object_detection import draw_bbox # Required for object recognition (not license plate recognition)
     except Exception:
         print (Exception) # Display the exception that was encountered
-        countdown(3) # Start a countdown to allow the user to see the error, then continue loading.
+        countdown(5) # Start a countdown to allow the user to see the error, then continue loading.
 
 
 import lighting # Import the lighting.py script.
@@ -766,6 +783,7 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
     license_plate_format = input("Optional: License plate validation format: ")
     if (disable_object_recognition == True): # Check to see whether or not object recognition has been globally disabled in the Predator configuration.
         print(style.yellow + "Warning: Skipping object recognition prompt, since object recognition has been globally disabled in the Predator configuration. Adjust the `disable_object_recognition` configuration value to change this." + style.end)
+        object_recognition_preference = "n"
     else:
         object_recognition_preference = input("Enable object recognition (y/n): ")
     video_start_time = input("Optional: Video starting time (YYYY-mm-dd HH:MM:SS): ") # Ask the user when the video recording started so we can correlate it's frames to a GPX file.
@@ -899,7 +917,9 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
     for frame in lpr_scan: # Iterate through each frame of video in the database of scanned plates.
         for i in range(0,len(lpr_scan)): # Run repeatedly to make sure the list shifting around doesn't lead to invalid license plates being skipped.
             for plate in lpr_scan[frame]: # Iterate through each plate detected per frame.
-                if (validate_plate(plate, license_plate_format) == False and license_plate_format != ""): # Remove the plate if it fails the validation test (and the license plate format isn't blank).
+                if (plate in ignore_list): # Check to see if this plate is in the ignore list.
+                    lpr_scan[frame].remove(plate) # Remove this plate, since it was found in the ignore list.
+                elif (validate_plate(plate, license_plate_format) == False and license_plate_format != ""): # Remove the plate if it fails the validation test (and the license plate format isn't blank).
                     lpr_scan[frame].remove(plate) # Since the plate failed the validation test, delete it from the array.
     print("Done.\n")
 
@@ -1237,8 +1257,11 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
     alpr_alert_database_format = "none"
     if (alert_database != None and alert_database != ""): # Check to see if the user has supplied a database to scan for alerts.
         if (validators.url(alert_database)): # Check to see if the user supplied a URL as their alert database.
-            # If so, download the data at the URL as the databse.
-            alert_database_list, alpr_alert_database_format = download_plate_database(alert_database)
+            if (config["developer"]["offline"] == False): # Check to see if offline mode is disabled.
+                alert_database_list, alpr_alert_database_format = download_plate_database(alert_database) # If so, download the data at the URL as the database.
+            else:
+                alert_database_list = [] # Set the alert database to an empty list.
+                print(style.yellow + "Warning: A remote alert database source was specified, but Predator is in offline mode. Alerts have been disabled." + style.end)
         else: # The input the user supplied doesn't appear to be a URL.
             if (os.path.exists(root + "/" + alert_database)): # Check to see if the database specified by the user actually exists.
                 f = open(root + "/" + alert_database, "r") # Open the user-specified datbase file.
@@ -1251,8 +1274,8 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
                     alpr_alert_database_format = "text"
                 f.close() # Close the file.
             else: # If the alert database specified by the user does not exist, alert the user of the error.
-                print(style.yellow + "Warning: The alert database specified at " + root + "/" + alert_database + " does not exist. Alerts have been disabled." + style.end)
                 alert_database_list = [] # Set the alert database to an empty list.
+                print(style.yellow + "Warning: The alert database specified at " + root + "/" + alert_database + " does not exist. Alerts have been disabled." + style.end)
     else: # The user has not entered in an alert database.
         alert_database_list = [] # Set the alert database to an empty list.
 
@@ -1356,12 +1379,19 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
             # Organize all of the detected license plates and their list of potential guess candidates to a dictionary to make them easier to manipulate.
             all_current_plate_guesses = {} # Create an empty place-holder dictionary that will be used to store all of the potential plates and their guesses.
             for detected_plate in reading_output["results"]: # Iterate through each potential plate detected by the OpenALPR command.
-                all_current_plate_guesses[detected_plate["plate_index"]] = [] # Create an empty list for this plate so we can add all the potential plate guesses to it in the next step.
+                ignore_plate = False # Reset this value to false for each plate.
                 for plate_guess in detected_plate["candidates"]: # Iterate through each plate guess candidate for each potential plate detected.
-                    all_current_plate_guesses[detected_plate["plate_index"]].append(plate_guess["plate"]) # Add the current plate guess candidate to the list of plate guesses.
+                    if (plate_guess["plate"] in ignore_list): # Check to see if this plate guess matches in a plate in the loaded ignore list.
+                        ignore_plate = True # Indicate that this plate should be ignored.
+
+                if (ignore_plate == False): # Only process this plate if it isn't set to be ignored.
+                    all_current_plate_guesses[detected_plate["plate_index"]] = [] # Create an empty list for this plate so we can add all the potential plate guesses to it in the next step.
+
+                    for plate_guess in detected_plate["candidates"]: # Iterate through each plate guess candidate for each potential plate detected.
+                        all_current_plate_guesses[detected_plate["plate_index"]].append(plate_guess["plate"]) # Add the current plate guess candidate to the list of plate guesses.
 
             if (print_detected_plate_count == True): # Only print the number of plates detected this round if it's enabled in the configuration.
-                print("Number of plates detected: " + str(len(all_current_plate_guesses))) # Show the number of plates detected this round.
+                print("Plates Detected: " + str(len(all_current_plate_guesses))) # Show the number of plates detected this round.
 
             if (realtime_output_level >= 3): # Only display this status message if the output level indicates to do so.
                 print("Done\n----------")
@@ -1448,7 +1478,7 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
                         detected_license_plates.append(detected_plate) # Save the most likely license plate ID to the detected_license_plates complete list.
                         new_plate_detected.append(detected_plate) # Save the most likely license plate ID to this round's new_plate_detected list.
                         if (realtime_output_level >= 2): # Only display this status message if the output level indicates to do so.
-                            print("Detected plate: " + detected_plate) # Print the detected plate.
+                            print("Detected Plate: " + detected_plate) # Print the detected plate.
 
                         if (audio_alerts == True and int(alert_sounds_notice_repeat) > 0): # Check to see if the user has audio alerts enabled.
                             for i in range(0, int(alert_sounds_notice_repeat)): # Repeat the sound several times, if the configuration says to.

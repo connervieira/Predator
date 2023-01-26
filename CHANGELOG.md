@@ -246,3 +246,5 @@ This update refines Predator's functionality, and focuses it's purpose back on l
 - Added a fall-back in case the ALPR library encounters an error.
 - Removed logic for traffic camera alert processing.
 - Fixed a bug that could cause Predator to crash when object recognition was globally disabled in the configuration.
+- Added support for 'ignore lists' which allow users and administrators to set a list of license plates that should be ignored.
+- Updated the way several messages are displayed to be me concise and organized.

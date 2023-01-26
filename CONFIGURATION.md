@@ -279,3 +279,21 @@ In order to better integrate with an existing system, Predator can communicate w
 - `segment_length`
     - This setting is an integer that determines the length of each dashcam video clip before a new segment is created, measured in seconds.
     - When this value is set to '0', recordings will not be separated into segments.
+
+
+
+
+
+## Developer Configuration
+
+- `ignore_list`
+    - `enabled`
+        - This setting determines whether custom ignore lists are enabled or disabled.
+    - `local_file`
+        - This setting specifies the absolute path to a local file to be used as an ignore list. If you only intend on using remote ignore lists, this file can simply contains a blank JSON list.
+    - `remote_sources`
+        - This setting defines a list of custom remote hosts that Predator will attempt to fetch ignore lists from.
+- `offline`
+    - This is a boolean that controls whether Predator is forced to run offline. When set to true, all network functions are disabled, even if Predator is connected to the internet.
+    - To be clear, this setting does not need to be changed if you want to run Predator offline. If no internet connection is available, Predator will automatically adjust accordingly.
+    - Enabling this will break functionality that depends on network features, even if it doesn't require an internet connection. Notably, push notifications and status lighting will be disabled.

@@ -2,8 +2,8 @@
     "general": {
         "ascii_art_header": false,
         "custom_startup_message": "",
-        "auto_start_mode": "2",
-        "default_root": "",
+        "auto_start_mode": "1",
+        "default_root": "/home/pi/Predator",
         "silence_file_saving": true,
         "disable_object_recognition": true,
         "gps_enabled": false,
@@ -37,10 +37,10 @@
         "alerts_ignore_validation": true,
         "camera_resolution": "1920x1080",
         "real_time_cropping_enabled": false,
-        "real_time_left_margin": "400",
-        "real_time_right_margin": "400",
-        "real_time_top_margin": "200",
-        "real_time_bottom_margin": "200",
+        "real_time_left_margin": "100",
+        "real_time_right_margin": "100",
+        "real_time_top_margin": "300",
+        "real_time_bottom_margin": "300",
         "real_time_image_rotation": "0",
         "fswebcam_device": "/dev/video0",
         "fswebcam_flags": "--set brightness=70%",
@@ -64,9 +64,9 @@
         "webhook": "",
         "shape_alerts": false,
         "save_real_time_object_recognition": true,
-        "default_save_license_plates_preference": "y",
-        "default_save_images_preference": "y",
-        "default_license_plate_format": "",
+        "default_save_license_plates_preference": "n",
+        "default_save_images_preference": "n",
+        "default_license_plate_format": " ",
         "default_realtime_object_recognition": "n",
         "push_notifications_enabled": false,
         "gotify_server": "http://10.3.141.1:1522",
@@ -76,9 +76,7 @@
         "status_lighting_values": {
             "alert": "[U]&R=255&G=0&B=0",
             "warning": "[U]&R=255&G=128&B=0",
-            "normal": "[U]&R=0&G=255&B=0",
-            "enforcementcamera": "[U]&R=0&G=0&B=255",
-            "alprcamera": "[U]&R=255&G=0&B=255"
+            "normal": "[U]&R=0&G=255&B=0"
         }
     },
     "dashcam": {
@@ -90,6 +88,12 @@
         "dashcam_background_mode_realtime": false,
         "segment_length": 60
     },
-    "information": {
+    "developer": {
+        "ignore_list": {
+            "enabled": true,
+            "local_file": "ignore.json",
+            "remote_sources": ["https://v0lttech.com/predator/ignorelist/serve.php?key=public"]
+        },
+        "offline": false
     }
 }
