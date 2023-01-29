@@ -1249,7 +1249,7 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
             if (int(config["dashcam"]["segment_length"]) <= 0):
                 dashcam_process.append(subprocess.Popen(["ffmpeg", "-y", "-nostdin", "-loglevel" , "error", "-f", "v4l2", "-framerate", dashcam_frame_rate, "-video_size", dashcam_resolution, "-input_format", "mjpeg", "-i",  dashcam_device[device], root + "/predator_dashcam_" + str(int(time.time())) + "_camera" + str(iteration_counter) + ".mkv"], shell=False))
             else:
-                dashcam_process.append(subprocess.Popen(["ffmpeg", "-y", "-nostdin", "-loglevel" , "error", "-f", "v4l2", "-framerate", dashcam_frame_rate, "-video_size", dashcam_resolution, "-input_format", "mjpeg", "-i",  dashcam_device[device], "-f","segment", "-segment_time", "30", "-reset_timestamps", "1", root + "/predator_dashcam_" + str(int(time.time())) + "_camera" + str(iteration_counter) + ".mkv"], shell=False))
+                dashcam_process.append(subprocess.Popen(["ffmpeg", "-y", "-nostdin", "-loglevel" , "error", "-f", "v4l2", "-framerate", dashcam_frame_rate, "-video_size", dashcam_resolution, "-input_format", "mjpeg", "-i",  dashcam_device[device], "-f","segment", "-segment_time", str(int(config["dashcam"]["segment_length"])), "-reset_timestamps", "1", root + "/predator_dashcam_" + str(int(time.time())) + "_camera" + str(iteration_counter) + ".mkv"], shell=False))
 
             iteration_counter = iteration_counter + 1 # Iterate the counter. This value will be used to create unique file names for each recorded video.
             print("Started background dashcam recording on " + str(dashcam_device[device])) # Inform the user that recording was initiation for this camera device.
@@ -1675,7 +1675,7 @@ elif (mode_selection == "3" and dashcam_mode_enabled == True): # The user has se
         if (int(config["dashcam"]["segment_length"]) <= 0):
             dashcam_process.append(subprocess.Popen(["ffmpeg", "-y", "-nostdin", "-loglevel" , "error", "-f", "v4l2", "-framerate", dashcam_frame_rate, "-video_size", dashcam_resolution, "-input_format", "mjpeg", "-i",  dashcam_device[device], root + "/predator_dashcam_" + str(int(time.time())) + "_" + str(device) + ".mkv"], shell=False))
         else:
-            dashcam_process.append(subprocess.Popen(["ffmpeg", "-y", "-nostdin", "-loglevel" , "error", "-f", "v4l2", "-framerate", dashcam_frame_rate, "-video_size", dashcam_resolution, "-input_format", "mjpeg", "-i",  dashcam_device[device], "-f","segment", "-segment_time", "30", "-reset_timestamps", "1", root + "/predator_dashcam_" + str(int(time.time())) + "_" + str(device) + ".mkv"], shell=False))
+            dashcam_process.append(subprocess.Popen(["ffmpeg", "-y", "-nostdin", "-loglevel" , "error", "-f", "v4l2", "-framerate", dashcam_frame_rate, "-video_size", dashcam_resolution, "-input_format", "mjpeg", "-i",  dashcam_device[device], "-f","segment", "-segment_time", str(int(config["dashcam"]["segment_length"])), "-reset_timestamps", "1", root + "/predator_dashcam_" + str(int(time.time())) + "_" + str(device) + ".mkv"], shell=False))
         iteration_counter = iteration_counter + 1 # Iterate the counter. This value will be used to create unique file names for each recorded video.
         print("Started recording on " + str(dashcam_device[device])) # Inform the user that recording was initiation for this camera device.
 
