@@ -2,8 +2,8 @@
     "general": {
         "ascii_art_header": false,
         "custom_startup_message": "",
-        "auto_start_mode": "1",
-        "default_root": "/home/pi/Predator",
+        "auto_start_mode": "3",
+        "default_root": "/home/cvieira/Downloads/predator",
         "silence_file_saving": true,
         "disable_object_recognition": true,
         "gps_enabled": false,
@@ -86,7 +86,7 @@
             "main": "/dev/video0"
         },
         "dashcam_background_mode_realtime": false,
-        "segment_length": 60
+        "segment_length": 5 
     },
     "developer": {
         "ignore_list": {
@@ -94,6 +94,6 @@
             "local_file": "ignore.json",
             "remote_sources": ["https://v0lttech.com/predator/ignorelist/serve.php?key=public"]
         },
-        "offline": false
+        "offline": true
     }
 }

@@ -1,6 +1,6 @@
 # Predator
 
-# Copyright (C) 2022 V0LT - Conner Vieira 
+# Copyright (C) 2023 V0LT - Conner Vieira 
 
 # This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by# the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
@@ -57,6 +57,7 @@ countdown = utils.countdown # Load the timer countdown function from the utils s
 get_gps_location = utils.get_gps_location # Load the function to get the current GPS location.
 convert_speed = utils.convert_speed # Load the function used to convert speeds from meters per second to other units.
 display_number = utils.display_number # Load the function used to display numbers as large ASCII font.
+start_dashcam = utils.start_dashcam # Load the function used to start dashcam recording.
 
 
 import ignore # Import the library to handle license plates in the ignore list.
@@ -1242,17 +1243,10 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
         input("Press enter to continue...")
 
 
-    if (dashcam_background_mode_realtime == True): # Check to see if the user has enabled auto dashcam background recording in real-time mode.
-        dashcam_process = [] # Create a placeholder list to store the dashcam processes.
-        iteration_counter = 0 # Set the iteration counter to 0 so that we can increment it for each recording device specified.
-        for device in dashcam_device: # Run through each camera device specified in the configuration, and launch an FFMPEG recording instance for it.
-            if (int(config["dashcam"]["segment_length"]) <= 0):
-                dashcam_process.append(subprocess.Popen(["ffmpeg", "-y", "-nostdin", "-loglevel" , "error", "-f", "v4l2", "-framerate", dashcam_frame_rate, "-video_size", dashcam_resolution, "-input_format", "mjpeg", "-i",  dashcam_device[device], root + "/predator_dashcam_" + str(int(time.time())) + "_camera" + str(iteration_counter) + ".mkv"], shell=False))
-            else:
-                dashcam_process.append(subprocess.Popen(["ffmpeg", "-y", "-nostdin", "-loglevel" , "error", "-f", "v4l2", "-framerate", dashcam_frame_rate, "-video_size", dashcam_resolution, "-input_format", "mjpeg", "-i",  dashcam_device[device], "-f","segment", "-segment_time", str(int(config["dashcam"]["segment_length"])), "-reset_timestamps", "1", root + "/predator_dashcam_" + str(int(time.time())) + "_camera" + str(iteration_counter) + ".mkv"], shell=False))
 
-            iteration_counter = iteration_counter + 1 # Iterate the counter. This value will be used to create unique file names for each recorded video.
-            print("Started background dashcam recording on " + str(dashcam_device[device])) # Inform the user that recording was initiation for this camera device.
+    
+    if (dashcam_background_mode_realtime == True): # Check to see if the user has enabled auto dashcam background recording in real-time mode.
+        start_dashcam(dashcam_device, int(config["dashcam"]["segment_length"]), config["dashcam"]["dashcam_resolution"], config["dashcam"]["dashcam_frame_rate"], root, True) # Start the dashcam recording process.
 
         print("Started background dash-cam recording.")
 
@@ -1668,24 +1662,8 @@ elif (mode_selection == "3" and dashcam_mode_enabled == True): # The user has se
 
 
     print("\nStarting dashcam recording at " + dashcam_resolution + "@" + dashcam_frame_rate + "fps") # Print information about the recording settings.
+    start_dashcam(dashcam_device, int(config["dashcam"]["segment_length"]), config["dashcam"]["dashcam_resolution"], config["dashcam"]["dashcam_frame_rate"], root, False) # Start the dashcam recording process.
 
-    dashcam_process = [] # Create a placeholder list to store the dashcam processes.
-    iteration_counter = 0 # Set the iteration counter to 0 so that we can increment it for each recording device specified.
-    for device in dashcam_device: # Run through each camera device specified in the configuration, and launch an FFMPEG recording instance for it.
-        if (int(config["dashcam"]["segment_length"]) <= 0):
-            dashcam_process.append(subprocess.Popen(["ffmpeg", "-y", "-nostdin", "-loglevel" , "error", "-f", "v4l2", "-framerate", dashcam_frame_rate, "-video_size", dashcam_resolution, "-input_format", "mjpeg", "-i",  dashcam_device[device], root + "/predator_dashcam_" + str(int(time.time())) + "_" + str(device) + ".mkv"], shell=False))
-        else:
-            dashcam_process.append(subprocess.Popen(["ffmpeg", "-y", "-nostdin", "-loglevel" , "error", "-f", "v4l2", "-framerate", dashcam_frame_rate, "-video_size", dashcam_resolution, "-input_format", "mjpeg", "-i",  dashcam_device[device], "-f","segment", "-segment_time", str(int(config["dashcam"]["segment_length"])), "-reset_timestamps", "1", root + "/predator_dashcam_" + str(int(time.time())) + "_" + str(device) + ".mkv"], shell=False))
-        iteration_counter = iteration_counter + 1 # Iterate the counter. This value will be used to create unique file names for each recorded video.
-        print("Started recording on " + str(dashcam_device[device])) # Inform the user that recording was initiation for this camera device.
-
-    input("Press enter to cancel recording...") # Wait for the user to press enter before continuing, since continuing will cause Predator to terminate, causing the dashcam recording process(es) to stop as well.
-    iteration_counter = 0 # Set the iteration counter to 0 so that we can increment it for each recording device specified.
-    for device in dashcam_device: # Run a loop once for every camera device specified for dashcam recording.
-        dashcam_process[iteration_counter].terminate() # Terminate the FFMPEG process for this iteration.
-        iteration_counter = iteration_counter + 1 # Iterate the counter.
-
-    print("Dashcam recording halted.")
 
 
 

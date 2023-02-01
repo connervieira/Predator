@@ -247,5 +247,9 @@ This update refines Predator's functionality, and focuses it's purpose back on l
 - Removed logic for traffic camera alert processing.
 - Fixed a bug that could cause Predator to crash when object recognition was globally disabled in the configuration.
 - Added support for 'ignore lists' which allow users and administrators to set a list of license plates that should be ignored.
-- Updated the way several messages are displayed to be me concise and organized.
-- Added dashcam video segmentation support.
+- Updated the way several messages are displayed to be more concise and organized.
+- Added 'offline mode', which restricts all network functions.
+- Refined dashcam recording.
+    - Dashcam recording now launches from a function, for sake of consistency and organization.
+    - Dashcam recording now uses consistent file names between background and foreground mode.
+    - Added dashcam video segmentation support.

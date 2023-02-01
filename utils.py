@@ -1,6 +1,6 @@
 # Predator
 
-# Copyright (C) 2022 V0LT - Conner Vieira 
+# Copyright (C) 2023 V0LT - Conner Vieira 
 
 # This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by# the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
@@ -354,3 +354,35 @@ def display_number(display_number="0"): # This function is used to display a num
 
     for line_index in display_lines: # Iterate through each line that needs to displayed.
         print(display_lines[line_index]) # Print each individual line.
+
+
+
+def start_dashcam(dashcam_devices, segment_length, resolution, framerate, directory, background=False): # This function starts dashcam recording on a given list of dashcam devices.
+    dashcam_process = [] # Create a placeholder list to store the dashcam processes.
+    iteration_counter = 0 # Set the iteration counter to 0 so that we can increment it for each recording device specified.
+    
+    for device in dashcam_devices: # Run through each camera device specified in the configuration, and launch an FFMPEG recording instance for it.
+        launch_command = ["ffmpeg", "-y", "-nostdin", "-loglevel", "error", "-f", "v4l2", "-framerate", framerate, "-video_size", resolution, "-input_format", "mjpeg", "-i",  dashcam_devices[device]] # Create the base of the dashcam process launch command.
+        if (segment_length > 0): # Only add command arguments for segment length if a segment length is set.
+            for entry in ["-f","segment", "-segment_time", str(segment_length), "-reset_timestamps", "1"]: # Add the arguments for file segmentation to the launch command, one at a time.
+                launch_command.append(entry) # Add each argument.
+
+        launch_command.append(directory + "/predator_dashcam_" + str(int(time.time())) + "_" + str(device) + "_%03d.mkv") # Add the rest of the command to the launch command.
+
+        dashcam_process.append(subprocess.Popen(launch_command, shell=False)) # Execute the launch command, and add the process to the list of dashcam processes.
+
+        iteration_counter = iteration_counter + 1 # Iterate the counter. This value will be used to create unique file names for each recorded video.
+        print("Started dashcam recording on " + str(dashcam_devices[device])) # Inform the user that recording was initiation for this camera device.
+
+
+
+    if (background == False): # If background recording is disabled, then prompt the user to press enter to halt recording.
+
+        input("Press enter to cancel recording...") # Wait for the user to press enter before continuing, since continuing will terminate recording.
+        iteration_counter = 0 # Set the iteration counter to 0 so that we can increment it for each recording device specified.
+
+        for device in dashcam_devices: # Run a loop once for every camera device specified for dashcam recording.
+            dashcam_process[iteration_counter].terminate() # Terminate the FFMPEG process for this iteration.
+            iteration_counter = iteration_counter + 1 # Iterate the counter.
+
+        print("Dashcam recording halted.")
