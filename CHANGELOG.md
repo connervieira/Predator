@@ -259,10 +259,12 @@ This update refines Predator's functionality, and focuses it's purpose back on l
 - Organized various code sections.
 - Added a timeout to all network functions to improve reliability.
 - Added more consistent error handling.
-- Create a dedicated function for user input to make future modifications easier.
+- Create a dedicated function for user input prompts.
+    - User inputs are now much more fault tolerant, and will repeatedly prompt the user if they don't enter an expected input.
 - Made some adjustments to pre-recorded mode.
     - Fixed an issue where selecting the object recognition menu in pre-recorded mode would give an unexpected error when object recognition was disabled.
     - Renamed the "raw data" option to "JSON data" through-out the menu.
     - Renamed the "GPS data" option to "positional data".
     - License plates detected in pre-recorded mode can now be correlated to nearby GPX points, even if they don't match timestamps exactly.
     - Multiple license plates can now be detected per frame.
+        - This change indirectly fixed an issue where fractional frame intervals could cause crashes.

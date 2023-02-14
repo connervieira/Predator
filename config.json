@@ -20,9 +20,9 @@
         }
     },
     "prerecorded": {
-        "left_margin": "700",
-        "right_margin": "700",
-        "top_margin": "700",
+        "left_margin": "0",
+        "right_margin": "400",
+        "top_margin": "900",
         "bottom_margin": "300",
         "max_gpx_time_difference": 5.0
     },

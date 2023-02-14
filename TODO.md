@@ -54,7 +54,7 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Add Phantom ALPR support to real-time mode.
 - [X] Add more resilent GPX position correlating.
 - [X] Add more fault tolerance to user input prompt function.
-- [ ] Add support for multiple plates in pre-recorded mode.
+- [X] Add support for multiple plates in pre-recorded mode.
 
 
 # Hypothetical

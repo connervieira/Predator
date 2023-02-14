@@ -130,7 +130,7 @@ def prompt(message, optional=True, input_type=str, default=""):
         while (is_number(user_input) == False):
             display_message("The input needs to be a number.", 2)
             user_input = input(message)
-        return user_input
+        return float(user_input)
 
     elif (input_type == bool):
         if (len(user_input) > 0):
