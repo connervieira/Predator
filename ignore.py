@@ -57,6 +57,7 @@ def fetch_ignore_list():
                 complete_ignore_list.append(entry)
         else:
             print(style.red + "The local ignore list file does not exist. The local ignore list is effectively disabled." + style.end)
+            input("Press enter to continue...")
 
 
     remote_ignore_sources = ["https://v0lttech.com/predator/ignorelist/serve.php?key=public"] # This holds a list of hard-coded remote sources that ignore lists will be fetched from. This allows administrators to automatically issue ignore lists from an external services. Administrators can create ignore lists without needing to manually modify the local ignore list for all their devices. Remote sources don't receive any telemetry from Predator, only a simple JSON list is fetched. Custom remote sources from the configuration are added in the next steps.
@@ -71,7 +72,8 @@ def fetch_ignore_list():
     for host in remote_ignore_sources: # Iterate through all of the hosts specified in the list of remote ignore list sources.
         if (validators.url(host)): # Verify that this 'host' value is a valid URL.
             try: # Run the network request in a try block so the entire program doesn't fail if something goes wrong.
-                response_content = requests.get(host, timeout=3).text # Make a request to this host that times out after 3 seconds.
+                response = requests.get(host, timeout=3.0) # Make a request to this host that times out after 3 seconds.
+                response_content = response.text # Grab the text from the response.
             except: # If the network request fails, do the following steps instead.
                 response_content = "[]" # Use a blank placeholder response database.
 
@@ -82,6 +84,7 @@ def fetch_ignore_list():
 
             for entry in remote_ignore_list: # Iterate through each entry in this remote ignore list, and add it to the complete ignore list.
                 complete_ignore_list.append(entry)
+
         else: # This remote ignore list source is not a valid URL.
             pass
 

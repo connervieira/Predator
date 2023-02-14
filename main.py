@@ -225,7 +225,7 @@ if (push_notifications_enabled == True): # Check to see if the user has push not
 
 # Run some basic error checks to see if any of the data supplied in the configuration seems wrong.
 config["general"]["alpr_engine"] = config["general"]["alpr_engine"].lower().strip() # Convert the ALPR engine configuration value to all lowercase, and trim leading and trailing whitespaces.
-if (config["general"]["alpr_engine"] !== "phantom" and config["general"]["alpr_engine"] !== "openalpr"): # Check to see if the configured ALPR engine is invalid.
+if (config["general"]["alpr_engine"] != "phantom" and config["general"]["alpr_engine"] != "openalpr"): # Check to see if the configured ALPR engine is invalid.
     print(style.red + "Error: The configured ALPR engine is invalid. Please select either 'phantom' or 'openalpr' in the configuration." + style.end)
     input()
 

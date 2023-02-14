@@ -91,10 +91,10 @@
     },
     "developer": {
         "ignore_list": {
-            "enabled": true,
-            "local_file": "ignore.json",
-            "remote_sources": ["https://v0lttech.com/predator/ignorelist/serve.php?key=public"]
+            "enabled": false,
+            "local_file": "",
+            "remote_sources": []
         },
-        "offline": true
+        "offline": false
     }
 }
