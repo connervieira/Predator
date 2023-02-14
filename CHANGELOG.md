@@ -257,3 +257,4 @@ This update refines Predator's functionality, and focuses it's purpose back on l
     - Phantom ALPR is a modified version of OpenALPR, designed specifically to be used as Predator's back-end.
 - Organized various code sections.
 - Added a timeout to all network functions to improve reliability.
+- Added more consistent error handling.

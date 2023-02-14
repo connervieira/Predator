@@ -86,6 +86,17 @@ def clear():
 
 
 
+def display_message(message, level=1):
+    if (level == 1): # Display the message as a plain message.
+        print(message)
+    elif (level == 2): # Display the message as a warning.
+        print(style.yellow + "Warning: " + message + style.end)
+    elif (level == 3): # Display the message as an error.
+        print(style.red + "Error: " + message + style.end)
+        input(style.faint + "Press enter to continue..." + style.end)
+
+
+
 # Define the function that will be used to save files for exported data.
 def save_to_file(file_name, contents, silence=False):
     fh = None

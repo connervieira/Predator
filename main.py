@@ -47,6 +47,7 @@ import random # Required to generate random numbers.
 import utils # Import the utils.py scripts.
 style = utils.style # Load the style from the utils script.
 clear = utils.clear # Load the screen clearing function from the utils script.
+display_message = utils.display_message # Load the message display function from the utils script.
 process_gpx = utils.process_gpx # Load the GPX processing function from the utils script.
 save_to_file = utils.save_to_file # Load the file saving function from the utils script.
 add_to_file = utils.add_to_file # Load the file appending function from the utils script.
@@ -226,32 +227,31 @@ if (push_notifications_enabled == True): # Check to see if the user has push not
 # Run some basic error checks to see if any of the data supplied in the configuration seems wrong.
 config["general"]["alpr_engine"] = config["general"]["alpr_engine"].lower().strip() # Convert the ALPR engine configuration value to all lowercase, and trim leading and trailing whitespaces.
 if (config["general"]["alpr_engine"] != "phantom" and config["general"]["alpr_engine"] != "openalpr"): # Check to see if the configured ALPR engine is invalid.
-    print(style.red + "Error: The configured ALPR engine is invalid. Please select either 'phantom' or 'openalpr' in the configuration." + style.end)
-    input()
+    display_message("The configured ALPR engine is invalid. Please select either 'phantom' or 'openalpr' in the configuration.", 3)
 
 if (os.path.exists(crop_script_path) == False): # Check to see that the cropping script exists at the path specified by the user in the configuration.
-    print(style.yellow + "Warning: The 'crop_script_path' defined in the configuration section doesn't point to a valid file. Image cropping will be broken. Please make sure the 'crop_script_path' points to a valid file." + style.end)
+    display_message("The 'crop_script_path' defined in the configuration section doesn't point to a valid file. Image cropping will be broken. Please make sure the 'crop_script_path' points to a valid file.", 3)
 
 if (int(left_margin) < 0 or int(right_margin) < 0 or int(bottom_margin) < 0 or int(top_margin) < 0): # Check to make sure that all of the pre-recorded mode cropping margins are positive numbers.
-    print(style.yellow + "Warning: One or more of the cropping margins for pre-recorded mode are below 0. This should never happen, and it's likely there's a configuration issue somewhere. Cropping margins have all been set to 0." + style.end)
+    display_message("One or more of the cropping margins for pre-recorded mode are below 0. This should never happen, and it's likely there's a configuration issue somewhere. Cropping margins have all been set to 0.", 3)
     left_margin = "0"
     right_margin = "0"
     bottom_margin = "0"
     top_margin = "0"
 
 if (int(real_time_left_margin) < 0 or int(real_time_right_margin) < 0 or int(real_time_bottom_margin) < 0 or int(real_time_top_margin) < 0): # Check to make sure that all of the real-time mode cropping margins are positive numbers.
-    print(style.yellow + "Warning: One or more of the cropping margins for real-time mode are below 0. This should never happen, and it's likely there's a configuration issue somewhere. Cropping margins have all been set to 0." + style.end)
+    display_message("One or more of the cropping margins for real-time mode are below 0. This should never happen, and it's likely there's a configuration issue somewhere. Cropping margins have all been set to 0.", 3)
     real_time_left_margin = "0"
     real_time_right_margin = "0"
     real_time_bottom_margin = "0"
     real_time_top_margin = "0"
 
 if (re.fullmatch("(\d\d\dx\d\d\d)", dashcam_resolution) == None and re.fullmatch("(\d\d\d\dx\d\d\d)", dashcam_resolution) == None and re.fullmatch("(\d\d\d\dx\d\d\d\d)", dashcam_resolution) == None): # Verify that the dashcam_resolution setting matches the format 000x000, 0000x000, or 0000x0000.
-    print(style.yellow + "Warning: The 'dashcam_resolution' specified in the real-time configuration section doesn't seem to align with the '0000x0000' format. It's possible there has been a typo. defaulting to '1280x720'" + style.end)
+    display_message("The 'dashcam_resolution' specified in the real-time configuration section doesn't seem to align with the '0000x0000' format. It's possible there has been a typo. defaulting to '1280x720'", 3)
     dashcam_resolution = "1280x720"
 
 if (fswebcam_device == ""): # Check to make sure that a camera device has been specified in the real-time configuration section.
-    print(style.yellow + "Warning: The 'fswebcam_device' specified in the real-time configuration section is blank. It's possible there has been a typo. Defaulting to /dev/video0" + style.end)
+    display_message("The 'fswebcam_device' specified in the real-time configuration section is blank. It's possible there has been a typo. Defaulting to '/dev/video0'", 3)
     fswebcam_device = "/dev/video0"
 
 
@@ -261,15 +261,15 @@ for device in dashcam_device:
         shared_realtime_dashcam_device = True
         dashcam_background_mode_realtime = False
 if (shared_realtime_dashcam_device == True):
-        print(style.yellow + "Warning: The 'dashcam_background_mode_realtime' setting is turned on, but the same recording device has been specified for 'dashcam_device' and 'fswebcam_device'. Predator can't use the same device for two different tasks. Background dash-cam recording in real-time mode has been temporarily disabled." + style.end)
+    display_message("The 'dashcam_background_mode_realtime' setting is turned on, but the same recording device has been specified for 'dashcam_device' and 'fswebcam_device'. Predator can't use the same device for two different tasks. Background dash-cam recording in real-time mode has been disabled.", 3)
 
 
 if (push_notifications_enabled == True): # Check to see if the user has Gotify notifications turned on in the configuration.
     if (gotify_server == "" or gotify_server == None): # Check to see if the gotify server has been left blank
-        print(style.yellow + "Warning: The 'push_notifications_enabled' setting is turned on, but the 'gotify_server' hasn't been set. Push notifications have been disabled." + style.end)
+        display_message("The 'push_notifications_enabled' setting is turned on, but the 'gotify_server' hasn't been set. Push notifications have been disabled.", 3)
         push_notifications_enabled = False
     if (gotify_application_token == "" or gotify_application_token == None): # Check to see if the Gotify application token has been left blank.
-        print(style.yellow + "Warning: The 'push_notifications_enabled' setting is turned on, but the 'gotify_application_token' hasn't been set. Push notifications have been disabled." + style.end)
+        display_message("The 'push_notifications_enabled' setting is turned on, but the 'gotify_application_token' hasn't been set. Push notifications have been disabled.", 3)
         push_notifications_enabled = False
 
 
@@ -287,7 +287,7 @@ if (dashcam_mode_enabled == True): # Only show the Dash-cam mode option if it's 
 
 # Check to see if the auto_start_mode configuration value is an expected value. If it isn't execution can continue, but the user will need to manually select what mode Predator should start in.
 if (auto_start_mode != "" and auto_start_mode != "0" and auto_start_mode != "1" and auto_start_mode != "2" and auto_start_mode != "3"):
-    print(style.yellow + "Warning: The 'auto_start_mode' configuration value isn't properly set. This value should be blank, '0', '1', '2', '3'. It's possible there's been a typo." + style.end)
+    display_message("The 'auto_start_mode' configuration value isn't properly set. This value should be blank, '0', '1', '2', '3'. It's possible there's been a typo.", 3)
 
 if (len(sys.argv) > 1): # Check to see if there is at least 1 command line argument.
     if (sys.argv[1] == "0" or sys.argv[1] == "1" or sys.argv[1] == "2" or sys.argv[1] == "3"): # Check to see if a mode override was specified in the Predator command arguments.
@@ -335,8 +335,7 @@ if (mode_selection == "0" and management_mode_enabled == True): # The user has s
 
     # Run some validation to make sure the information just entered by the user is correct.
     if (os.path.exists(root) == False): # Check to see if the root directory entered by the user exists.
-        print(style.yellow + "Warning: The root project directory entered doesn't seem to exist. Predator will almost certainly fail." + style.end)
-        input("Press enter to continue...")
+        display_message("The root project directory entered doesn't seem to exist. Predator will almost certainly fail.", 3)
 
 
     while True:
@@ -621,7 +620,7 @@ if (mode_selection == "0" and management_mode_enabled == True): # The user has s
 
 
             else: # The user has selected an invalid option in the file management menu.
-                print(style.yellow + "Warning: Invalid selection." + style.end)
+                display_message("Invalid selection.", 2)
 
 
 
@@ -652,7 +651,7 @@ if (mode_selection == "0" and management_mode_enabled == True): # The user has s
                 print("Used space: " + str(round(((psutil.disk_usage(path=root).used)/1000000000)*100)/100) + "GB") # Display the used space on the storage device containing the current root project folder.
                 print("Total space: " + str(round(((psutil.disk_usage(path=root).total)/1000000000)*100)/100) + "GB") # Display the total space on the storage device containing the current root project folder.
             else: # The user has selected an invalid option in the information menu.
-                print(style.yellow + "Warning: Invalid selection." + style.end) # Inform the user that they have selected an invalid option.
+                display_message("Invalid selection.", 2)
             
 
 
@@ -704,13 +703,13 @@ if (mode_selection == "0" and management_mode_enabled == True): # The user has s
                                             config[selection1][selection2][selection3] = False 
                                         else:
                                             config[selection1][selection2][selection3] = False 
-                                            print(style.warning + "Warning: This configuration value is a boolean variable, but a non-boolean value was entered. Defaulting to 'false'.")
+                                            display_message("This configuration value is a boolean variable, but a non-boolean value was entered. Defaulting to 'false'.", 3)
                                     elif (type(config[selection1][selection2][selection3]) == int):
                                         config[selection1][selection2][selection3] = int(input("                New Value (Integer): "))
                                     elif (type(config[selection1][selection2][selection3]) == float):
                                         config[selection1][selection2][selection3] = float(input("                New Value (Float): "))
                                     else:
-                                        print(style.red + "Error: This configuration value didn't match any known variable type. This error should never occur and there's almost certainly a bug." + style.end)
+                                        display_message("This configuration value didn't match any known variable type. This error should never occur and there's almost certainly a bug.", 3)
                         else: # If the current selection isn't a dictionary or list, assume that it's an configuration entry. (Tier 2)
                             print("            Current Value: " + str(config[selection1][selection2]))
                             if (type(config[selection1][selection2]) == str):
@@ -723,13 +722,13 @@ if (mode_selection == "0" and management_mode_enabled == True): # The user has s
                                     config[selection1][selection2] = False 
                                 else:
                                     config[selection1][selection2] = False 
-                                    print(style.warning + "Warning: This configuration value is a boolean variable, but a non-boolean value was entered. Defaulting to 'false'.")
+                                    display_message("This configuration value is a boolean variable, but a non-boolean value was entered. Defaulting to 'false'.", 3)
                             elif (type(config[selection1][selection2]) == int):
                                 config[selection1][selection2] = int(input("            New Value (Integer): "))
                             elif (type(config[selection1][selection2]) == float):
                                 config[selection1][selection2] = float(input("            New Value (Float): "))
                             else:
-                                print(style.red + "Error: This configuration value didn't match any known variable type. This error should never occur and there's almost certainly a bug.." + style.end)
+                                display_message("This configuration value didn't match any known variable type. This error should never occur and there's almost certainly a bug.", 3)
 
                 else: # If the current selection isn't a dictionary or list, assume that it's an configuration entry. (Tier 1)
                     print("        Current Value: " + str(config[selection1]))
@@ -743,13 +742,13 @@ if (mode_selection == "0" and management_mode_enabled == True): # The user has s
                             config[selection1] = False 
                         else:
                             config[selection1] = False 
-                            print(style.warning + "Warning: This configuration value is a boolean variable, but a non-boolean value was entered. Defaulting to 'false'.")
+                            display_message("This configuration value is a boolean variable, but a non-boolean value was entered. Defaulting to 'false'.", 3)
                     elif (type(config[selection1]) == int):
                         config[selection1] = int(input("            New Value (Integer): "))
                     elif (type(config[selection1]) == float):
                         config[selection1] = float(input("            New Value (Float): "))
                     else:
-                        print(style.red + "Error: This configuration value didn't match any known variable type. This error should never occur and there's almost certainly a bug.." + style.end)
+                        display_message("This configuration value didn't match any known variable type. This error should never occur and there's almost certainly a bug.", 3)
                     config[selection1] = input("        New Value: ")
 
 
@@ -760,7 +759,7 @@ if (mode_selection == "0" and management_mode_enabled == True): # The user has s
 
 
         else: # The user has selected an invalid option in the main management menu.
-            print(style.yellow + "Warning: Invalid selection." + style.end)
+            display_message("Invalid selection.", 2)
 
         input("\nPress enter to continue...") # Wait for the user to press enter before repeating the management menu loop.
 
@@ -788,7 +787,7 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
         framerate = float(framerate) # Convert the framerate string input into a floating point value.
     license_plate_format = input("Optional: License plate validation format: ")
     if (disable_object_recognition == True): # Check to see whether or not object recognition has been globally disabled in the Predator configuration.
-        print(style.yellow + "Warning: Skipping object recognition prompt, since object recognition has been globally disabled in the Predator configuration. Adjust the `disable_object_recognition` configuration value to change this." + style.end)
+        display_message("Skipping object recognition prompt, since object recognition has been globally disabled in the Predator configuration. Adjust the `disable_object_recognition` configuration value to change this.", 2)
         object_recognition_preference = "n"
     else:
         object_recognition_preference = input("Enable object recognition (y/n): ")
@@ -814,8 +813,7 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
 
     # Run some validation to make sure the information just entered by the user is correct.
     if (os.path.exists(root) == False): # Check to see if the root directory entered by the user exists.
-        print(style.yellow + "Warning: The root project directory entered doesn't seem to exist. Predator will almost certainly fail." + style.end)
-        input("Press enter to continue...")
+        display_message("The root project directory entered doesn't seem to exist. Predator will almost certainly fail.", 3)
 
     if (video[0] == "*"): # Check to see if the first character is a wilcard.
         video_list_command = "ls " + root + "/" + video + " | tr '\n' ','";
@@ -827,16 +825,13 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
         videos = video.split(", ") # Split the video input into a list, based on the position of commas.
     for video in videos: # Iterate through each video specified by the user.
         if (os.path.exists(root + "/" + video) == False): # Check to see if each video file name supplied by the user actually exists in the root project folder.
-            print(style.yellow + "Warning: The video file " + str(video) + " entered doesn't seem to exist in the root project directory. Predator will almost certainly fail." + style.end) # Inform the user that this video file couldn't be found.
-            input("Press enter to continue...") # Wait for the user to press enter before continuing.
+            display_message("The video file " + str(video) + " entered doesn't seem to exist in the root project directory. Predator will almost certainly fail.", 3) # Inform the user that this video file couldn't be found.
 
     if (gpx_file != "" and os.path.exists(root + "/" + gpx_file) == False): # Check to see if the GPX file name supplied by the user actually exists in the root project folder.
-        print(style.yellow + "Warning: The GPX file name entered doesn't seem to exist. Predator will almost certainly encounter issues." + style.end)
-        input("Press enter to continue...")
+        display_message("The GPX file name entered doesn't seem to exist. Predator will almost certainly encounter errors.", 3)
 
     if (len(license_plate_format) > 12): # Check to see if the license plate template supplied by the user abnormally long.
-        print(style.yellow + "Warning: The license plate template supplied is abnormally long. Predator will still be able to operate as usual, but it's possible there's been a typo, since extremely few license plates are this long." + style.end)
-        input("Press enter to continue...")
+        display_message("The license plate template supplied is abnormally long. Processing can continue, but it's likely something has gone wrong.", 3)
 
 
 
@@ -908,7 +903,7 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
             reading_output = str(os.popen(analysis_command).read()) # Run the command, and record the raw output string.
             reading_output = json.loads(reading_output) # Convert the JSON string from the command output to actual JSON data that Python can manipulate.
         else: # If the configured ALPR engine is unknown, then return an error.
-            print("Error: The configured ALPR engine is not recognized.")
+            display_message("The configured ALPR engine is not recognized.", 3)
 
         # Organize all of the detected license plates and their list of potential guess candidates to a dictionary to make them easier to manipulate.
         all_current_plate_guesses = {} # Create an empty place-holder dictionary that will be used to store all of the potential plates and their guesses.
@@ -974,7 +969,7 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
                 frame_locations[frame_timestamp] = [decoded_gpx_data[frame_timestamp], lpr_scan[element]]
             else:
                 frame_locations[frame_timestamp] = ["X", lpr_scan[element]]
-                print(style.yellow + "Warning: There is no GPX data matching the timestamp of frame " + element + ". Does the GPX file specified line up with the video?" + style.end)
+                display_message("There is no GPX data matching the timestamp of frame " + element + ". Does the GPX file specified line up with the video?", 3)
         print("Done.\n")
 
 
@@ -1032,7 +1027,7 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
                 elif (selection == "4"): # The user has selected to view license plate data as raw data.
                     print(raw_lpr_scan)
                 else:
-                    print(style.yellow + "Warning: Invalid selection." + style.end)
+                    display_message("Invalid selection.", 2)
 
             elif (selection == "2"): # The user has opened the license plate data exporting menu.
                 print("        Please select an option")
@@ -1061,7 +1056,7 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
                 elif (selection == "4"): # The user has selected to export license plate data as raw data.
                     save_to_file(root + "/pre_recorded_license_plate_export.txt", str(raw_lpr_scan), silence_file_saving) # Save raw license plate analysis data to disk.
                 else:
-                    print(style.yellow + "Warning: Invalid selection." + style.end)
+                    display_message("Invalid selection.", 2)
 
             input("\nPress enter to continue...") # Wait for the user to press enter before repeating the menu loop.
 
@@ -1088,7 +1083,7 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
                     elif (selection == "2"):
                         print(json.dumps(object_count, indent=4))
                     else:
-                        print(style.yellow + "Warning: Invalid selection." + style.end)
+                        display_message("Invalid selection.", 2)
 
                 elif (selection == "2"): # The user has selected to export object recognition data.
                     print("        Please select an option")
@@ -1104,13 +1099,13 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
                     elif (selection == "2"):
                         save_to_file(root + "/pre_recorded_object_detection_export.json", json.dumps(object_count, indent=4), silence_file_saving) # Save to disk.
                     else:
-                        print(style.yellow + "Warning: Invalid selection." + style.end)
+                        display_message("Invalid selection.", 2)
 
                 else: # The user has selected an invalid option in the object recognition data management menu.
-                    print(style.yellow + "Warning: Invalid selection." + style.end)
+                    display_message("Invalid selection.", 2)
 
             else: # The user has selected the object recognition data management menu, but object recognition has been disabled.
-                print(style.yellow + "Warning: Object recognition has been disabled. There is not object recogntion data to manage." + style.end)
+                display_message("Object recognition has been disabled. There is not object recogntion data to manage.", 2)
 
             input("\nPress enter to continue...") # Wait for the user to press enter before repeating the menu loop.
 
@@ -1139,7 +1134,7 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
                     elif (selection == "2"):
                         print(json.dumps(frame_locations, indent=4))
                     else:
-                        print(style.yellow + "Warning: Invalid selection." + style.end)
+                        display_message("Invalid selection.", 2)
 
                 elif (selection == "2"): # The user has selected to export GPX location information.
                     print("        Please select an option")
@@ -1155,13 +1150,13 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
                     elif (selection == "2"):
                         save_to_file(root + "/pre_recorded_license_plate_location_data_export.json", json.dumps(frame_locations, indent=4), silence_file_saving) # Save to disk.
                     else:
-                        print(style.yellow + "Warning: Invalid selection." + style.end)
+                        display_message("Invalid selection.", 2)
 
                 else:
-                    print(style.yellow + "Warning: Invalid selection." + style.end)
+                    display_message("Invalid selection.", 2)
 
             else:
-                print(style.yellow + "Warning: GPX processing has been disabled since a GPX file wasn't provided. There is not GPX location data to manage." + style.end)
+                display_message("GPX processing has been disabled since a GPX file wasn't provided. There is not GPX location data to manage.", 2)
 
             input("\nPress enter to continue...") # Wait for the user to press enter before repeating the menu loop.
 
@@ -1174,7 +1169,7 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
 
 
         else: # If the user selects an unrecognized option on the main menu for pre-recorded mode, then show a warning.
-            print(style.yellow + "Warning: Invalid selection." + style.end)
+            display_message("Invalid selection.", 2)
             input("\nPress enter to continue...") # Wait for the user to press enter before repeating the menu loop.
 
 
@@ -1225,7 +1220,7 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
 
 
     if (disable_object_recognition == True): # Check to see whether or not object recognition has been globally disabled in the Predator configuration.
-        print(style.yellow + "Warning: Skipping object recognition prompt, since object recognition has been globally disabled in the Predator configuration. Adjust the `disable_object_recognition` configuration value to change this." + style.end)
+        display_message("Skipping object recognition prompt, since object recognition has been globally disabled in the Predator configuration. Adjust the `disable_object_recognition` configuration value to change this.", 2)
         realtime_object_recognition = "n" # Automatically reject the realtime object recognition prompt.
     else:
         if (default_realtime_object_recognition != ""): # Check to see if the user has configured a default for this preference.
@@ -1255,8 +1250,7 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
 
 
     if (os.path.exists(root) == False): # Check to see if the root directory entered by the user exists.
-        print(style.yellow + "Warning: The root project directory entered doesn't seem to exist. Predator will almost certainly fail." + style.end)
-        input("Press enter to continue...")
+        display_message("The root project directory entered doesn't seem to exist. Predator will almost certainly fail.", 3)
 
 
 
@@ -1275,7 +1269,7 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
                 alert_database_list, alpr_alert_database_format = download_plate_database(alert_database) # If so, download the data at the URL as the database.
             else:
                 alert_database_list = [] # Set the alert database to an empty list.
-                print(style.yellow + "Warning: A remote alert database source was specified, but Predator is in offline mode. Alerts have been disabled." + style.end)
+                display_message("A remote alert database source was specified, but Predator is in offline mode. Alerts have been disabled.", 2)
         else: # The input the user supplied doesn't appear to be a URL.
             if (os.path.exists(root + "/" + alert_database)): # Check to see if the database specified by the user actually exists.
                 f = open(root + "/" + alert_database, "r") # Open the user-specified datbase file.
@@ -1289,7 +1283,7 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
                 f.close() # Close the file.
             else: # If the alert database specified by the user does not exist, alert the user of the error.
                 alert_database_list = [] # Set the alert database to an empty list.
-                print(style.yellow + "Warning: The alert database specified at " + root + "/" + alert_database + " does not exist. Alerts have been disabled." + style.end)
+                display_message("The alert database specified at " + root + "/" + alert_database + " does not exist. Alerts have been disabled.", 3)
     else: # The user has not entered in an alert database.
         alert_database_list = [] # Set the alert database to an empty list.
 
@@ -1380,14 +1374,14 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
                 elif (config["general"]["alpr_engine"] == "openalpr"): # Check to see if the configuration indicates that the OpenALPR engine should be used.
                     analysis_command = "alpr -j -n " + realtime_guesses  + " '" + root + "/realtime_image" + str(i) + ".jpg'" # Prepare the analysis command so we can run it next.
                 else:
-                    print("Error: The configured ALPR engine is not recognized.")
+                    display_message("The configured ALPR engine is not recognized.", 3)
             else:
                 if (config["general"]["alpr_engine"] == "phantom"): # Check to see if the configuration indicates that the Phantom ALPR engine should be used.
                     analysis_command = "alpr -n " + realtime_guesses  + " '" + root + "/realtime_image.jpg'" # Prepare the analysis command so we can run it next.
                 elif (config["general"]["alpr_engine"] == "openalpr"): # Check to see if the configuration indicates that the OpenALPR engine should be used.
                     analysis_command = "alpr -j -n " + realtime_guesses  + " '" + root + "/realtime_image.jpg'" # Prepare the analysis command so we can run it next.
                 else:
-                    print("Error: The configured ALPR engine is not recognized.")
+                    display_message("The configured ALPR engine is not recognized.", 3)
 
             i = i + 1 # Increment the counter for this cycle so we can count how many images we've analyzed during this session.
             new_plate_detected = [] # This variable will be used to determine whether or not a plate was detected this round. If no plate is detected, this will remain blank. If a plate is detected, it will change to be that plate. This is used to determine whether or not the database of detected plates needs to updated.
@@ -1644,7 +1638,7 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
                         response = e
 
                     if (str(webhook_response) != "200"): # If the webhook didn't respond with a 200 code; Warn the user that there was an error.
-                        print(style.yellow + "Warning: Unable to submit data to webhook." + style.end)
+                        display_message("Failed to submit data to webhook.", 2)
 
             if (realtime_output_level >= 3 and webhook != None and webhook != ""): # Only display this status message if the output level indicates to do so.
                 print("Done.\n----------")
@@ -1692,9 +1686,7 @@ elif (mode_selection == "3" and dashcam_mode_enabled == True): # The user has se
 
 
     if (os.path.exists(root) == False): # Check to see if the root directory entered by the user exists.
-        print(style.yellow + "Warning: The root project directory entered doesn't seem to exist. Predator will almost certainly fail." + style.end)
-        input("Press enter to continue...")
-
+        display_message("The root project directory entered doesn't seem to exist. Predator will almost certainly fail.", 3)
 
 
     print("\nStarting dashcam recording at " + dashcam_resolution + "@" + dashcam_frame_rate + "fps") # Print information about the recording settings.
@@ -1706,4 +1698,4 @@ elif (mode_selection == "3" and dashcam_mode_enabled == True): # The user has se
 
 
 else: # The user has selected an unrecognized mode.
-    print(style.yellow + "Warning: Invalid mode selected." + style.end)
+    display_message("The selected mode is invalid.", 3)
