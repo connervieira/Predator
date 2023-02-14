@@ -253,3 +253,6 @@ This update refines Predator's functionality, and focuses it's purpose back on l
     - Dashcam recording now launches from a function, for sake of consistency and organization.
     - Dashcam recording now uses consistent file names between background and foreground mode.
     - Added dashcam video segmentation support.
+- Added support for the Phantom ALPR engine.
+    - Phantom ALPR is a modified version of OpenALPR, designed specifically to be used as Predator's back-end.
+- Organized various code sections.

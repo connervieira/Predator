@@ -1,9 +1,10 @@
 {
     "general": {
+        "alpr_engine": "phantom",
         "ascii_art_header": false,
         "custom_startup_message": "",
         "auto_start_mode": "3",
-        "default_root": "/home/cvieira/Downloads/predator",
+        "default_root": "/home/pi/predator",
         "silence_file_saving": true,
         "disable_object_recognition": true,
         "gps_enabled": false,
@@ -27,7 +28,7 @@
     "realtime": {
         "realtime_alpr_enabled": true,
         "realtime_output_level": "2",
-        "clear_between_rounds": false,
+        "clear_between_rounds": true,
         "delay_between_rounds": "0.2",
         "print_invalid_plates": false,
         "print_detected_plate_count": true,
@@ -42,7 +43,7 @@
         "real_time_top_margin": "300",
         "real_time_bottom_margin": "300",
         "real_time_image_rotation": "0",
-        "fswebcam_device": "/dev/video0",
+        "fswebcam_device": "/dev/video1",
         "fswebcam_flags": "--set brightness=70%",
         "speed_display_enabled": false,
         "audio_alerts": false,

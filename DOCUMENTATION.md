@@ -15,11 +15,14 @@ This is the installation process for Predator and all of it's dependencies. This
     - `pip3 install validators opencv-python-headless==4.5.3.56 cvlib tensorflow keras silence-tensorflow psutil gps geopy gpsd-py3 requests`
     - When tested on a Raspberry Pi 3, this step occasionally caused some issues. If you receive errors related to OpenCV when attempting to run Predator later, try uninstalling OpenCV Headless and replace it with the standard OpenCV library.
         - `pip3 uninstall opencv-python-headless; pip3 install opencv-python`
-2. Optionally, install OpenALPR (Highly Recommended)
-    - Since Predator depends on OpenALPR as the core of its license plate recognition, you'll need to install it for it to work properly.
-    - If you don't install OpenALPR, Predator will encounter errors while operating in modes that require license plate reading.
-    - You can learn about the OpenALPR installation process at <https://github.com/openalpr/openalpr>
-    - After installing, you should be able to run OpenALPR using the `alpr` command. If not, Predator won't be able to run OpenALPR, and will fail to analyze license plates.
+2. Install an ALPR engine.
+    - Predator needs an ALPR engine to be able to process license plates. The two main options are Phantom ALPR and OpenALPR.
+        - OpenALPR is the arguably industry standard for open source license plate recognition.
+            - If you already have OpenALPR installed, and don't want to replace it, you can use it with Predator.
+        - Phantom ALPR is a modified version of OpenALPR designed specifically for Predator. Phantom ALPR offers more in-depth integration, and is more fault tolerant.
+            - If you want the best experience with Predator, and conflicts aren't a concern, Phantom ALPR is a great option.
+    -  You can learn more about the installation process for each program in their documentation.
+    - After installing, you should be able to run the ALPR engine of your choice using the `alpr` command. If not, Predator won't be able to run the ALPR process, and will fail to analyze license plates.
 3. Optionally, install FFMPEG (Highly Recommended)
     - Predator uses FFMPEG to process videos.
     - If you don't install FFMPEG, Predator will encounter errors while operating in modes that require video processing.

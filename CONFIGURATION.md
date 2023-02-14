@@ -7,6 +7,9 @@ This document describes the configuration values found `config.json`.
 
 This section of configuration values will effect Predator's general operation.
 
+- `alpr_engine`
+    - This is a string that determines what ALPR engine Predator will use.
+    - This can be set to either "openalpr" or "phantom".
 - `ascii_art_header`
     - This value is a boolean that determines whether or not Predator will display a large ASCII art banner on start up. When set to `false`, the ASCII art banner will be replaced with a small, normal text title.
     - This setting may be useful to change in the event that Predator is being run on a device with a tiny display, where a large ASCII art header might cause formatting issues.

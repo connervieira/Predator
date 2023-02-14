@@ -51,6 +51,7 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Remove speed camera and ALPR alerts (replaced by 'Assassin' to simplify Predator).
 - [X] Add ignore-list support.
 - [X] Add dashcam recording segmentation support.
+- [X] Add Phantom ALPR support to real-time mode.
 - [ ] Add more resilent GPX position correlating.
 
 
