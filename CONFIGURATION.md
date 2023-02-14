@@ -73,6 +73,9 @@ Configuration values in this section are settings specific to Pre-recorded Mode.
     - This value should be specified as tight as reasonably possible to make Predator as accurate and efficient as it can be.
     - In most videos there will be a portion of the frame in which a license plate would never reasonably appear.
         - For example, in dash-cam video, there will rarely be a license plate in the top half of the frame when the camera is mounted facing straight forward.
+- `max_gpx_time_difference`
+    - This value is a number that determines the maximum time, in seconds, between the timestamp of a video frame and an entry in the corresponding GPX file, before they are considered to be different.
+    - Setting this to lower values will force locations to be more accurate, but will increase the likelihood that no corresponding location is found for a given frame.
 
 
 ## Real-time Mode Configuration

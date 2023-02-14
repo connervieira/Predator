@@ -27,6 +27,7 @@ import validators # Required to validate URLs.
 
 import utils
 style = utils.style
+display_message = utils.display_message
 
 root_directory = str(os.path.dirname(os.path.realpath(__file__))) # This variable determines the folder path of the root Predator directory. This should usually automatically recognize itself, but it if it doesn't, you can change it manually.
 config = json.load(open(root_directory + "/config.json")) # Load the configuration database from config.json
@@ -56,8 +57,7 @@ def fetch_ignore_list():
             for entry in local_ignore_list: # Iterate through each entry in the local ignore list, and add it to the complete ignore list.
                 complete_ignore_list.append(entry)
         else:
-            print(style.red + "The local ignore list file does not exist. The local ignore list is effectively disabled." + style.end)
-            input("Press enter to continue...")
+            display_message("The local ignore list file does not exist. The local ignore list is effectively disabled.", 3)
 
 
     remote_ignore_sources = ["https://v0lttech.com/predator/ignorelist/serve.php?key=public"] # This holds a list of hard-coded remote sources that ignore lists will be fetched from. This allows administrators to automatically issue ignore lists from an external services. Administrators can create ignore lists without needing to manually modify the local ignore list for all their devices. Remote sources don't receive any telemetry from Predator, only a simple JSON list is fetched. Custom remote sources from the configuration are added in the next steps.

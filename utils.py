@@ -86,6 +86,7 @@ def clear():
 
 
 
+# Define the function to display warning and error messages.
 def display_message(message, level=1):
     if (level == 1): # Display the message as a plain message.
         print(message)
@@ -93,7 +94,15 @@ def display_message(message, level=1):
         print(style.yellow + "Warning: " + message + style.end)
     elif (level == 3): # Display the message as an error.
         print(style.red + "Error: " + message + style.end)
-        input(style.faint + "Press enter to continue..." + style.end)
+        prompt(style.faint + "Press enter to continue..." + style.end)
+
+
+
+
+# Define the function used to prompt the user for input.
+def prompt(message):
+    return input(message)
+
 
 
 
@@ -368,6 +377,17 @@ def display_number(display_number="0"): # This function is used to display a num
 
 
 
+def closest_key(array, search_key): # This function returns the nearest timestamp key in dictionary to a given timestamp.
+    current_best = [0, time.time()]
+    for key in array: # Iterate through each timestamp in the given dictionary.
+        difference = abs(float(search_key) - float(key)) # Calculate the difference in time between the given timestamp, and this timestamp.
+        if (difference < current_best[1]): # Check to see if this entry is closer than the current best.
+            current_best = [key, difference] # Make this entry the current best.
+
+    return current_best # Return the closest found entry.
+
+
+
 def start_dashcam(dashcam_devices, segment_length, resolution, framerate, directory, background=False): # This function starts dashcam recording on a given list of dashcam devices.
     dashcam_process = [] # Create a placeholder list to store the dashcam processes.
     iteration_counter = 0 # Set the iteration counter to 0 so that we can increment it for each recording device specified.
@@ -389,7 +409,7 @@ def start_dashcam(dashcam_devices, segment_length, resolution, framerate, direct
 
     if (background == False): # If background recording is disabled, then prompt the user to press enter to halt recording.
 
-        input("Press enter to cancel recording...") # Wait for the user to press enter before continuing, since continuing will terminate recording.
+        prompt("Press enter to cancel recording...") # Wait for the user to press enter before continuing, since continuing will terminate recording.
         iteration_counter = 0 # Set the iteration counter to 0 so that we can increment it for each recording device specified.
 
         for device in dashcam_devices: # Run a loop once for every camera device specified for dashcam recording.

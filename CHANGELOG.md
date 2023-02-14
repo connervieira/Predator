@@ -107,7 +107,7 @@ December 29th, 2021
 - Added native support for push notifications via Gotify.
 - Changed the audio backend from Python playsound to mpg321 in order to fix audio on Raspberry Pi.
 - Fixed an issue where the 'separate line' wouldn't appear under detected plates in real-time mode.
-- Added a hyphen to 'Real-time' in the mode selection menu.
+- Added a hyphen to 'real-time' in the mode selection menu.
 
 
 
@@ -204,7 +204,7 @@ This update adds 'information mode', which allows Predator to rapidly display us
 - Adjusted some comments that had typos or confusing wording.
 - License plate recognition can now be entirely disabled in real-time mode using the `realtime_alpr_enabled` configuration value.
     - A custom artificial delay can be (optionally) added when license plate recognition is disabled in order to prevent Predator from running through the real-time mode processing cycle unreasonably fast.
-- Added the ability to display the current speed during each processing cycle in Real-time Mode.
+- Added the ability to display the current speed during each processing cycle in real-time mode.
     - This feature can be turned on and off in the configuration using the `speed_display_enabled` setting.
     - The current speed can be displayed in kilometers per hour, miles per hour, meters per second, feet per second, or knots.
 - Moved the `gps_enabled` and `speed_display_unit` configuration values to the `general` section.
@@ -239,11 +239,10 @@ This update refines Predator's functionality, and focuses it's purpose back on l
 - Removed 'Information Mode'
     - All of the functionality of Information Mode has been moved to a new platform, called 'Assassin' in an effort to keep Predator focused and effective.
 - Added `manual_trigger` configuration value.
-    - This configuration value allows for Predator to be manually trigger in Realtime mode, where images are only captured when a button is presed by the user.
-- Predator now accepts wildcard file names in Prerecorded Mode.
+    - This configuration value allows for Predator to be manually trigger in real-time mode, where images are only captured when a button is presed by the user.
+- Predator now accepts wildcard file names in pre-recorded mode.
 - Simplified library importing process.
     - Libraries are now only imported if the configuration causes Predator to need them.
-- Added a fall-back in case the ALPR library encounters an error.
 - Removed logic for traffic camera alert processing.
 - Fixed a bug that could cause Predator to crash when object recognition was globally disabled in the configuration.
 - Added support for 'ignore lists' which allow users and administrators to set a list of license plates that should be ignored.
@@ -253,8 +252,17 @@ This update refines Predator's functionality, and focuses it's purpose back on l
     - Dashcam recording now launches from a function, for sake of consistency and organization.
     - Dashcam recording now uses consistent file names between background and foreground mode.
     - Added dashcam video segmentation support.
-- Added support for the Phantom ALPR engine.
-    - Phantom ALPR is a modified version of OpenALPR, designed specifically to be used as Predator's back-end.
+- Upgraded ALPR engine
+    - Added support for the Phantom ALPR engine.
+        - Phantom ALPR is a modified version of OpenALPR, designed specifically to be used as Predator's back-end.
+    - Added a default fall-back in the event that the ALPR process fails.
 - Organized various code sections.
 - Added a timeout to all network functions to improve reliability.
 - Added more consistent error handling.
+- Create a dedicated function for user input to make future modifications easier.
+- Made some adjustments to pre-recorded mode.
+    - Fixed an issue where selecting the object recognition menu in pre-recorded mode would give an unexpected error when object recognition was disabled.
+    - Renamed the "raw data" option to "JSON data" through-out the menu.
+    - Renamed the "GPS data" option to "positional data".
+    - License plates detected in pre-recorded mode can now be correlated to nearby GPX points, even if they don't match timestamps exactly.
+    - Multiple license plates can now be detected per frame.

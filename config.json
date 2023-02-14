@@ -23,7 +23,8 @@
         "left_margin": "700",
         "right_margin": "700",
         "top_margin": "700",
-        "bottom_margin": "300"
+        "bottom_margin": "300",
+        "max_gpx_time_difference": 5.0
     },
     "realtime": {
         "realtime_alpr_enabled": true,

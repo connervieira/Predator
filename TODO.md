@@ -52,7 +52,9 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Add ignore-list support.
 - [X] Add dashcam recording segmentation support.
 - [X] Add Phantom ALPR support to real-time mode.
-- [ ] Add more resilent GPX position correlating.
+- [X] Add more resilent GPX position correlating.
+- [ ] Add support for multiple plates in pre-recorded mode.
+- [ ] Add more fault tolerance to user input prompt function.
 
 
 # Hypothetical

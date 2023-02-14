@@ -47,6 +47,7 @@ import random # Required to generate random numbers.
 import utils # Import the utils.py scripts.
 style = utils.style # Load the style from the utils script.
 clear = utils.clear # Load the screen clearing function from the utils script.
+prompt = utils.prompt # Load the user input prompt function from the utils script.
 display_message = utils.display_message # Load the message display function from the utils script.
 process_gpx = utils.process_gpx # Load the GPX processing function from the utils script.
 save_to_file = utils.save_to_file # Load the file saving function from the utils script.
@@ -58,6 +59,7 @@ countdown = utils.countdown # Load the timer countdown function from the utils s
 get_gps_location = utils.get_gps_location # Load the function to get the current GPS location.
 convert_speed = utils.convert_speed # Load the function used to convert speeds from meters per second to other units.
 display_number = utils.display_number # Load the function used to display numbers as large ASCII font.
+closest_key = utils.closest_key # Load the function used to find the closest entry in a dictionary to a given number.
 start_dashcam = utils.start_dashcam # Load the function used to start dashcam recording.
 
 
@@ -310,7 +312,7 @@ elif (auto_start_mode == "3" and dashcam_mode_enabled == True): # Based on the c
     print(style.bold + "Automatically starting into dash-cam mode." + style.end)
     mode_selection = "3"
 else: # No 'auto start mode' has been configured, so ask the user to select manually.
-    mode_selection = input("Selection: ")
+    mode_selection = prompt("Selection: ")
 
 
 
@@ -331,7 +333,7 @@ if (mode_selection == "0" and management_mode_enabled == True): # The user has s
         print(style.bold + "Using default preference for root directory." + style.end)
         root = default_root
     else:
-        root = input("Project root directory path: ")
+        root = prompt("Project root directory path: ")
 
     # Run some validation to make sure the information just entered by the user is correct.
     if (os.path.exists(root) == False): # Check to see if the root directory entered by the user exists.
@@ -346,7 +348,7 @@ if (mode_selection == "0" and management_mode_enabled == True): # The user has s
         print("2. Information")
         print("3. Configuration")
 
-        selection = input("Selection: ")
+        selection = prompt("Selection: ")
 
         if (selection == "0"): # The user has selected to quit Predator.
             break # Break the 'while true' loop to terminate Predator.
@@ -357,7 +359,7 @@ if (mode_selection == "0" and management_mode_enabled == True): # The user has s
             print("    1. View")
             print("    2. Copy")
             print("    3. Delete")
-            selection = input("    Selection: ")
+            selection = prompt("    Selection: ")
 
             if (selection == "0"): # The user has selected to return back to the previous menu.
                 pass # Do nothing, and just finish this loop.
@@ -431,7 +433,7 @@ if (mode_selection == "0" and management_mode_enabled == True): # The user has s
                         print("D1. [ ] Dash-cam videos")
                     print("")
 
-                    selection = input("Selection: ") # Prompt the user for a selection.
+                    selection = prompt("Selection: ") # Prompt the user for a selection.
 
 
                     if (selection == "0"):
@@ -463,7 +465,7 @@ if (mode_selection == "0" and management_mode_enabled == True): # The user has s
                 # Prompt the user for the copying destination.
                 copy_destination = "" # Set the copy_destination as a blank placeholder.
                 while os.path.exists(copy_destination) == False: # Repeatedly ask the user for a valid copy destination until they enter one that is valid.
-                    copy_destination = input("Destination path: ") # Prompt the user for a destination path.
+                    copy_destination = prompt("Destination path: ") # Prompt the user for a destination path.
 
 
                 # Copy the files as per the user's inputs.
@@ -560,7 +562,7 @@ if (mode_selection == "0" and management_mode_enabled == True): # The user has s
                         print("D1. [ ] Dash-cam videos")
                     print("")
 
-                    selection = input("Selection: ") # Prompt the user for a selection.
+                    selection = prompt("Selection: ") # Prompt the user for a selection.
 
                     if (selection == "0"):
                         break
@@ -588,10 +590,10 @@ if (mode_selection == "0" and management_mode_enabled == True): # The user has s
                         delete_dashcam_video = not delete_dashcam_video
 
                 if (delete_management_custom):
-                    delete_custom_file_name = input("Please specify the name of the additional file you'd like to delete from the current project folder: ")
+                    delete_custom_file_name = prompt("Please specify the name of the additional file you'd like to delete from the current project folder: ")
 
                 # Delete the files as per the user's inputs, after confirming the deletion process.
-                if (input("Are you sure you want to delete the selected files permanently? (y/n): ").lower() == "y"):
+                if (prompt("Are you sure you want to delete the selected files permanently? (y/n): ").lower() == "y"):
                     print("Deleting files...")
                     if (delete_management_custom):
                         os.system("rm -r " + root + "/" + delete_custom_file_name)
@@ -631,7 +633,7 @@ if (mode_selection == "0" and management_mode_enabled == True): # The user has s
             print("    2. Neofetch")
             print("    3. Print Current Configuration")
             print("    4. Disk Usage")
-            selection = input("    Selection: ")
+            selection = prompt("    Selection: ")
             if (selection == "0"): # The user has selected to return back to the previous menu.
                 pass # Do nothing, and just finish this loop.
             elif (selection == "1"): # The user has selected the "about" option.
@@ -662,7 +664,7 @@ if (mode_selection == "0" and management_mode_enabled == True): # The user has s
                     print("    '" + style.bold + str(section) + style.end + "'") # If the entry is a list, display it in bold.
                 else:
                     print("    '" + style.italic + str(section) + style.end + "'") # If the entry is not a list (meaning it's an actual configuration value), display it in italics.
-            selection1 = input("=== Selection (Tier 1): ")
+            selection1 = prompt("=== Selection (Tier 1): ")
 
             if (selection1 in config): # Check to make sure the section entered by the user actually exists in the configuration database.
                 if (type(config[selection1]) is dict or type(config[selection1]) is list): # Check to make sure the current selection is a dictionary or list before trying to iterate through it.
@@ -672,7 +674,7 @@ if (mode_selection == "0" and management_mode_enabled == True): # The user has s
                             print("        '" + style.bold + str(section) + style.end + "'") # If the entry is a list, display it in bold.
                         else:
                             print("        '" + style.italic + str(section) + style.end + "': '" + str(config[selection1][section]) + "'") # If the entry is not a list (meaning it's an actual configuration value), display it in italics.
-                    selection2 = input("======= Selection (Tier 2): ")
+                    selection2 = prompt("======= Selection (Tier 2): ")
                     if selection2 in config[selection1]: # Check to make sure the section entered by the user actually exists in the configuration database.
                         if (type(config[selection1][selection2]) is dict or type(config[selection1][selection2]) is list): # Check to make sure the current selection is a dictionary or list before trying to iterate through it.
                             print("            Please enter the name of a configuration section to edit")
@@ -681,7 +683,7 @@ if (mode_selection == "0" and management_mode_enabled == True): # The user has s
                                     print("            '" + style.bold + str(section) + style.end + "'") # If the entry is a list, display it in bold.
                                 else:
                                     print("            '" + style.italic + str(section) + style.end + "': '" + str(config[selection1][selection2][section]) + "'") # If the entry is not a list (meaning it's an actual configuration value), display it in italics.
-                            selection3 = input("=========== Selection (Tier 3): ")
+                            selection3 = prompt("=========== Selection (Tier 3): ")
                             if selection3 in config[selection1][selection2]: # Check to make sure the section entered by the user actually exists in the configuration database.
                                 if (type(config[selection1][selection2][selection3]) is dict or type(config[selection1][selection2][selection3]) is list): # Check to make sure the current selection is a dictionary or list before trying to iterate through it.
                                     print("                Please enter the name of a configuration section to edit")
@@ -690,13 +692,13 @@ if (mode_selection == "0" and management_mode_enabled == True): # The user has s
                                             print("                '" + style.bold + str(section) + style.end + "'") # If the entry is a list, display it in bold.
                                         else:
                                             print("                '" + style.italic + str(section) + style.end + "': '" + str(config[selection1][selection2][selection3][section]) + "'") # If the entry is not a list (meaning it's an actual configuration value), display it in italics.
-                                    selection4 = input("=============== Selection (Tier 4): ")
+                                    selection4 = prompt("=============== Selection (Tier 4): ")
                                 else: # If the current selection isn't a dictionary or list, assume that it's an configuration entry. (Tier 3)
                                     print("                Current Value: " + str(config[selection1][selection2][selection3]))
                                     if (type(config[selection1][selection2][selection3]) == str):
-                                        config[selection1][selection2][selection3] = str(input("                New Value (String): "))
+                                        config[selection1][selection2][selection3] = str(prompt("                New Value (String): "))
                                     elif (type(config[selection1][selection2][selection3]) == bool):
-                                        new_value = input("                New Value (Boolean): ")
+                                        new_value = prompt("                New Value (Boolean): ")
                                         if (new_value[0].lower() == "t" or new_value[0].lower() == "y"):
                                             config[selection1][selection2][selection3] = True
                                         elif (new_value[0].lower() == "f" or new_value[0].lower() == "n"):
@@ -705,17 +707,17 @@ if (mode_selection == "0" and management_mode_enabled == True): # The user has s
                                             config[selection1][selection2][selection3] = False 
                                             display_message("This configuration value is a boolean variable, but a non-boolean value was entered. Defaulting to 'false'.", 3)
                                     elif (type(config[selection1][selection2][selection3]) == int):
-                                        config[selection1][selection2][selection3] = int(input("                New Value (Integer): "))
+                                        config[selection1][selection2][selection3] = int(prompt("                New Value (Integer): "))
                                     elif (type(config[selection1][selection2][selection3]) == float):
-                                        config[selection1][selection2][selection3] = float(input("                New Value (Float): "))
+                                        config[selection1][selection2][selection3] = float(prompt("                New Value (Float): "))
                                     else:
                                         display_message("This configuration value didn't match any known variable type. This error should never occur and there's almost certainly a bug.", 3)
                         else: # If the current selection isn't a dictionary or list, assume that it's an configuration entry. (Tier 2)
                             print("            Current Value: " + str(config[selection1][selection2]))
                             if (type(config[selection1][selection2]) == str):
-                                config[selection1][selection2] = str(input("            New Value (String): "))
+                                config[selection1][selection2] = str(prompt("            New Value (String): "))
                             elif (type(config[selection1][selection2]) == bool):
-                                new_value = input("            New Value (Boolean): ")
+                                new_value = prompt("            New Value (Boolean): ")
                                 if (new_value[0].lower() == "t" or new_value[0].lower() == "y"):
                                     config[selection1][selection2] = True
                                 elif (new_value[0].lower() == "f" or new_value[0].lower() == "n"):
@@ -724,18 +726,18 @@ if (mode_selection == "0" and management_mode_enabled == True): # The user has s
                                     config[selection1][selection2] = False 
                                     display_message("This configuration value is a boolean variable, but a non-boolean value was entered. Defaulting to 'false'.", 3)
                             elif (type(config[selection1][selection2]) == int):
-                                config[selection1][selection2] = int(input("            New Value (Integer): "))
+                                config[selection1][selection2] = int(prompt("            New Value (Integer): "))
                             elif (type(config[selection1][selection2]) == float):
-                                config[selection1][selection2] = float(input("            New Value (Float): "))
+                                config[selection1][selection2] = float(prompt("            New Value (Float): "))
                             else:
                                 display_message("This configuration value didn't match any known variable type. This error should never occur and there's almost certainly a bug.", 3)
 
                 else: # If the current selection isn't a dictionary or list, assume that it's an configuration entry. (Tier 1)
                     print("        Current Value: " + str(config[selection1]))
                     if (type(config[selection1]) == str):
-                        config[selection1] = str(input("            New Value (String): "))
+                        config[selection1] = str(prompt("            New Value (String): "))
                     elif (type(config[selection1]) == bool):
-                        new_value = input("            New Value (Boolean): ")
+                        new_value = prompt("            New Value (Boolean): ")
                         if (new_value[0].lower() == "t" or new_value[0].lower() == "y"):
                             config[selection1] = True
                         elif (new_value[0].lower() == "f" or new_value[0].lower() == "n"):
@@ -744,12 +746,12 @@ if (mode_selection == "0" and management_mode_enabled == True): # The user has s
                             config[selection1] = False 
                             display_message("This configuration value is a boolean variable, but a non-boolean value was entered. Defaulting to 'false'.", 3)
                     elif (type(config[selection1]) == int):
-                        config[selection1] = int(input("            New Value (Integer): "))
+                        config[selection1] = int(prompt("            New Value (Integer): "))
                     elif (type(config[selection1]) == float):
-                        config[selection1] = float(input("            New Value (Float): "))
+                        config[selection1] = float(prompt("            New Value (Float): "))
                     else:
                         display_message("This configuration value didn't match any known variable type. This error should never occur and there's almost certainly a bug.", 3)
-                    config[selection1] = input("        New Value: ")
+                    config[selection1] = prompt("        New Value: ")
 
 
             config_file = open(predator_root_directory + "/config.json", "w") # Open the configuration file.
@@ -761,7 +763,7 @@ if (mode_selection == "0" and management_mode_enabled == True): # The user has s
         else: # The user has selected an invalid option in the main management menu.
             display_message("Invalid selection.", 2)
 
-        input("\nPress enter to continue...") # Wait for the user to press enter before repeating the management menu loop.
+        prompt("\nPress enter to continue...") # Wait for the user to press enter before repeating the management menu loop.
 
 
 
@@ -778,22 +780,22 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
         print(style.bold + "Using default preference for root directory." + style.end)
         root = default_root
     else:
-        root = input("Project root directory path: ")
-    video = input("Video file name: ")
-    framerate = input("Optional: Frame analysis interval: ")
+        root = prompt("Project root directory path: ")
+    video = prompt("Video file name: ")
+    framerate = prompt("Optional: Frame analysis interval: ")
     if (framerate == None or framerate == "" or framerate == " "): # Check to see if the frame analysis interval prompt was left blank.
         framerate = 1.0 # If nothing was entered for the frame analysis interval prompt, default to 1.0
     else:
         framerate = float(framerate) # Convert the framerate string input into a floating point value.
-    license_plate_format = input("Optional: License plate validation format: ")
+    license_plate_format = prompt("Optional: License plate validation format: ")
     if (disable_object_recognition == True): # Check to see whether or not object recognition has been globally disabled in the Predator configuration.
         display_message("Skipping object recognition prompt, since object recognition has been globally disabled in the Predator configuration. Adjust the `disable_object_recognition` configuration value to change this.", 2)
         object_recognition_preference = "n"
     else:
-        object_recognition_preference = input("Enable object recognition (y/n): ")
-    video_start_time = input("Optional: Video starting time (YYYY-mm-dd HH:MM:SS): ") # Ask the user when the video recording started so we can correlate it's frames to a GPX file.
+        object_recognition_preference = prompt("Enable object recognition (y/n): ")
+    video_start_time = prompt("Optional: Video starting time (YYYY-mm-dd HH:MM:SS): ") # Ask the user when the video recording started so we can correlate it's frames to a GPX file.
     if (video_start_time != ""):
-        gpx_file = input("Optional: GPX file name: ")
+        gpx_file = prompt("Optional: GPX file name: ")
     else:
         gpx_file = ""
 
@@ -838,9 +840,14 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
     clear() # Clear the console output
 
     
+
+
     # Split the supplied video(s) into individual frames based on the user's input.
     video_counter = 0 # Create a placeholder counter that will be incremented by 1 for each video. This will be appended to the file names of the video frames to keep frames from different videos separate.
     print("Splitting video into discrete images...")
+    if (os.path.exists(root + "/frames/")): # Check to see the frames directory already exists.
+        os.system("rm -r " + root + "/frames") # Remove the frames directory.
+
     for video in videos: # Iterate through each video specified by the user.
         video_counter = video_counter + 1 # Increment the video counter by 1.
         frame_split_command = "mkdir " + root + "/frames; ffmpeg -i " + root + "/" + video + " -r " + str(1/framerate) + " " + root + "/frames/video" + str(video_counter) + "output%04d.png -loglevel quiet" # Set up the FFMPEG command that will be used to split each video into individual frames.
@@ -888,9 +895,12 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
 
     # Analyze each individual frame, and collect possible plate IDs.
     print("Scanning for license plates...")
-    lpr_scan = {} # Create an empty dictionary that will hold each frame and the potential license plates IDs.
-    for frame in frames:
-        lpr_scan[frame] = [] # Set the license plate recognition information for this frame to an empty list as a placeholder.
+    alpr_frames = {} # Create an empty dictionary that will hold each frame and the potential license plates IDs.
+    for frame in frames: # Iterate through each frame of video.
+        alpr_frames[frame] = [] # Set the license plate recognition information for this frame to an empty list as a placeholder.
+
+
+        # Run license plate analysis on this frame.
         if (config["general"]["alpr_engine"] == "phantom"): # Check to see if the configuration indicates that the Phantom ALPR engine should be used.
             analysis_command = "alpr -n 5 " + root + "/frames/" + frame # Set up the Phantom ALPR command.
             reading_output = str(os.popen(analysis_command).read()) # Run the command, and record the raw output string.
@@ -905,35 +915,45 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
         else: # If the configured ALPR engine is unknown, then return an error.
             display_message("The configured ALPR engine is not recognized.", 3)
 
+
+
         # Organize all of the detected license plates and their list of potential guess candidates to a dictionary to make them easier to manipulate.
         all_current_plate_guesses = {} # Create an empty place-holder dictionary that will be used to store all of the potential plates and their guesses.
+        plate_index = 0 # Reset the plate index counter to 0 before the loop.
         for detected_plate in reading_output["results"]: # Iterate through each potential plate detected by the ALPR command.
-            all_current_plate_guesses[detected_plate["plate_index"]] = [] # Create an empty list for this plate so we can add all the potential plate guesses to it in the next step.
+            all_current_plate_guesses[plate_index] = [] # Create an empty list for this plate so we can add all the potential plate guesses to it in the next step.
             for plate_guess in detected_plate["candidates"]: # Iterate through each plate guess candidate for each potential plate detected.
-                all_current_plate_guesses[detected_plate["plate_index"]].append(plate_guess["plate"]) # Add the current plate guess candidate to the list of plate guesses.
+                all_current_plate_guesses[plate_index].append(plate_guess["plate"]) # Add the current plate guess candidate to the list of plate guesses.
+            plate_index = plate_index + 1 # Increment the plate index counter.
 
-        if (len(all_current_plate_guesses) > 0): # Only add data to the current frame if data actually exists to add in the first place.
-            lpr_scan[frame] = all_current_plate_guesses[0] # Collect the information for only the first plate detected by ALPR.
+        if (len(all_current_plate_guesses) > 0): # Only add license plate data to the current frame if data actually exists to add in the first place.
+            #alpr_frames[frame] = all_current_plate_guesses[0] # Collect the information for only the first plate detected by ALPR.
+            alpr_frames[frame] = all_current_plate_guesses # TODO: Figure out how to make this work
 
     print("Done.\n")
 
 
 
 
-    raw_lpr_scan = lpr_scan # Save the data collected to a variable before sanitizing and validating it so we can access the raw data later.
+    raw_alpr_frames = alpr_frames # Save the data collected to a variable before sanitizing and validating it so we can access the raw data later.
 
 
 
     # Check the possible plate IDs and validate based on general plate formatting specified by the user.
     print("Validating license plates...")
-    for frame in lpr_scan: # Iterate through each frame of video in the database of scanned plates.
-        for i in range(0,len(lpr_scan)): # Run repeatedly to make sure the list shifting around doesn't lead to invalid license plates being skipped.
-            for plate in lpr_scan[frame]: # Iterate through each plate detected per frame.
-                if (plate in ignore_list): # Check to see if this plate is in the ignore list.
-                    lpr_scan[frame].remove(plate) # Remove this plate, since it was found in the ignore list.
-                elif (validate_plate(plate, license_plate_format) == False and license_plate_format != ""): # Remove the plate if it fails the validation test (and the license plate format isn't blank).
-                    lpr_scan[frame].remove(plate) # Since the plate failed the validation test, delete it from the array.
+    for frame in alpr_frames: # Iterate through each frame of video in the database of scanned plates.
+        for i in range(0,len(alpr_frames)): # Run repeatedly to make sure the list shifting around doesn't lead to invalid license plates being skipped.
+            for plate in alpr_frames[frame]: # Iterate through each plate detected per frame.
+                for guess in alpr_frames[frame][plate]: # Iterate through each guess for each plate.
+                    if (guess in ignore_list): # Check to see if this plate is in the ignore list.
+                        alpr_frames[frame][plate] = [] # Remove this plate, since it was found in the ignore list. Since this only sets the plate information to a blank list, the plate index will still exist in the dictionary.
+                        break # Break the loop, since this entire plate, including all of its guesses, has just been removed.
+                    elif (validate_plate(guess, license_plate_format) == False and license_plate_format != ""): # Check to see if this plate fails validation.
+                        alpr_frames[frame][plate].remove(guess) # Since this plate guess failed the validation test, delete it from the list of guesses.
     print("Done.\n")
+
+
+
 
 
 
@@ -942,10 +962,12 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
     # Run through the data for each frame, and save only the first (most likely) license plate.
     print("Collecting most likely plate per frame...")
     plates_detected = [] # Create an empty list that the detected plates will be added to.
-    for frame in lpr_scan:
-        if (len(lpr_scan[frame]) >= 1): # Only grab the first plate if a plate was detected at all.
-            plates_detected.append(lpr_scan[frame][0]) # Add the first plate in the list of plate guesses from ALPR to the list of plates detected by Predator.
+    for frame in alpr_frames: # Iterate through all frames.
+        for plate in alpr_frames[frame]: # Iterate through all plates detected this frame.
+            if (len(alpr_frames[frame][plate]) > 0): # Check to see if this plate has any guesses associated with it.
+                plates_detected.append(alpr_frames[frame][plate][0]) # Add the first guess for this plate to this list of plates detected.
     print("Done.\n")
+
 
 
 
@@ -962,14 +984,21 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
         print("Processing location data...")
         decoded_gpx_data = process_gpx(root + "/" + gpx_file) # Decode the data from the GPX file.
         iteration = 0 # Set the iteration counter to 0 so we can add one to it each frame we iterate through.
-        for element in lpr_scan: # Iterate through each frame.
+        for element in alpr_frames: # Iterate through each frame.
             iteration = iteration + 1 # Add one to the iteration counter.
             frame_timestamp = video_start_time + (iteration * framerate) # Calculate the timestamp of this frame.
-            if (decoded_gpx_data[frame_timestamp] != None): # Check to see that the timestamp for this frame exists in the GPX data.
-                frame_locations[frame_timestamp] = [decoded_gpx_data[frame_timestamp], lpr_scan[element]]
-            else:
-                frame_locations[frame_timestamp] = ["X", lpr_scan[element]]
-                display_message("There is no GPX data matching the timestamp of frame " + element + ". Does the GPX file specified line up with the video?", 3)
+
+            if (frame_timestamp in decoded_gpx_data): # Check to see if the exact timestamp for this frame exists in the GPX data.
+                frame_locations[frame_timestamp] = [decoded_gpx_data[frame_timestamp], alpr_frames[element]]
+            else: # If the exact timestamp doesn't exist, try to find a nearby timestamp.
+                closest_gpx_entry = closest_key(decoded_gpx_data, frame_timestamp)
+
+                if (closest_gpx_entry[1] < config["prerecorded"]["max_gpx_time_difference"]): # Check to see if the closest GPX entry is inside the maximum configured range.
+                    frame_locations[frame_timestamp] = [decoded_gpx_data[closest_gpx_entry[0]], alpr_frames[element]]
+                else: # Otherwise, indicate that a corresponding location couldn't be found.
+                    frame_locations[frame_timestamp] = [{"lat": 0.0, "lon": 0.0}, alpr_frames[element]] # Set this location of this frame to latitude and longitude 0.0 as a placeholder.
+                    display_message("There is no GPX data matching the timestamp of frame " + element + ". The closest location stamp is " + str(closest_gpx_entry[1]) + " seconds away. Does the GPX file specified line up with the video?", 3)
+
         print("Done.\n")
 
 
@@ -978,7 +1007,7 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
     # Analysis has been completed. Next, the user will choose what to do with the analysis data.
 
 
-    input("Press enter to continue...")
+    prompt("Press enter to continue...")
 
     while True: # Run the pre-recorded mode menu in a loop forever until the user exits.
         clear()
@@ -988,9 +1017,9 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
         print("0. Quit")
         print("1. Manage license plate data")
         print("2. Manage object recognition data")
-        print("3. Manage license plate GPS data")
+        print("3. Manage license plate positional data")
         print("4. View session statistics")
-        selection = input("Selection: ")
+        selection = prompt("Selection: ")
 
 
         if (selection == "0"): # If the user selects option 0 on the main menu, then exit Predator.
@@ -1002,7 +1031,7 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
             print("    0. Back")
             print("    1. View data")
             print("    2. Export data")
-            selection = input("    Selection: ")
+            selection = prompt("    Selection: ")
 
             if (selection == "1"): # The user has opened the license plate data viewing menu.
                 print("        Please select an option")
@@ -1010,9 +1039,9 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
                 print("        1. View as Python data")
                 print("        2. View as list")
                 print("        3. View as CSV")
-                print("        4. View as raw data")
+                print("        4. View as JSON data")
             
-                selection = input("        Selection: ")
+                selection = prompt("        Selection: ")
 
                 if (selection == "0"):
                     print("Returning to main menu.")
@@ -1024,8 +1053,8 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
                 elif (selection == "3"): # The user has selected to view license plate data as CSV data.
                     for plate in plates_detected:
                         print(plate + ",")
-                elif (selection == "4"): # The user has selected to view license plate data as raw data.
-                    print(raw_lpr_scan)
+                elif (selection == "4"): # The user has selected to view license plate data as raw JSON data.
+                    print(json.dumps(raw_alpr_frames))
                 else:
                     display_message("Invalid selection.", 2)
 
@@ -1035,8 +1064,8 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
                 print("        1. Export as Python data")
                 print("        2. Export as list")
                 print("        3. Export as CSV")
-                print("        4. Export as raw data")
-                selection = input("        Selection: ")
+                print("        4. Export as JSON")
+                selection = prompt("        Selection: ")
 
                 export_data = "" # Create a blank variable to store the export data.
 
@@ -1053,28 +1082,28 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
                     for plate in plates_detected:
                         export_data = export_data + plate + ",\n"
                     save_to_file(root + "/pre_recorded_license_plate_export.csv", export_data, silence_file_saving) # Save to disk.
-                elif (selection == "4"): # The user has selected to export license plate data as raw data.
-                    save_to_file(root + "/pre_recorded_license_plate_export.txt", str(raw_lpr_scan), silence_file_saving) # Save raw license plate analysis data to disk.
+                elif (selection == "4"): # The user has selected to export license plate data as JSON data.
+                    save_to_file(root + "/pre_recorded_license_plate_export.json", str(raw_alpr_frames), silence_file_saving) # Save raw license plate analysis data to disk.
                 else:
                     display_message("Invalid selection.", 2)
 
-            input("\nPress enter to continue...") # Wait for the user to press enter before repeating the menu loop.
+            prompt("\nPress enter to continue...") # Wait for the user to press enter before repeating the menu loop.
 
 
-        elif (selection == "2" and object_recognition_preference == True): # The user has selected to manage object recognition data.
+        elif (selection == "2"): # The user has selected to manage object recognition data.
             if (object_recognition_preference == True):
                 print("    Please select an option")
                 print("    0. Back")
                 print("    1. View data")
                 print("    2. Export data")
-                selection = input("    Selection: ")
+                selection = prompt("    Selection: ")
 
                 if (selection == "1"): # The user has selected to view object recognition data.
                     print("        Please select an option")
                     print("        0. Back")
                     print("        1. View as Python data")
                     print("        2. View as JSON data")
-                    selection = input("        Selection: ")
+                    selection = prompt("        Selection: ")
 
                     if (selection == "0"):
                         print("Returning to main menu.")
@@ -1090,7 +1119,7 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
                     print("        0. Back")
                     print("        1. Export as Python data")
                     print("        2. Export as JSON data")
-                    selection = input("Selection: ")
+                    selection = prompt("Selection: ")
 
                     if (selection == "0"):
                         print("Returning to main menu.")
@@ -1105,9 +1134,9 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
                     display_message("Invalid selection.", 2)
 
             else: # The user has selected the object recognition data management menu, but object recognition has been disabled.
-                display_message("Object recognition has been disabled. There is not object recogntion data to manage.", 2)
+                display_message("Object recognition has been disabled. There is no object recogntion data to manage.", 2)
 
-            input("\nPress enter to continue...") # Wait for the user to press enter before repeating the menu loop.
+            prompt("\nPress enter to continue...") # Wait for the user to press enter before repeating the menu loop.
 
 
         elif (selection == "3"): # The user has selected to manage GPX location information.
@@ -1116,7 +1145,7 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
                 print("    0. Back")
                 print("    1. View data")
                 print("    2. Export data")
-                selection = input("    Selection: ")
+                selection = prompt("    Selection: ")
 
                 if (selection == "0"):
                     print("Returning to main menu.")
@@ -1125,7 +1154,7 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
                     print("        0. Back")
                     print("        1. View as Python data")
                     print("        2. View as JSON data")
-                    selection = input("        Selection: ")
+                    selection = prompt("        Selection: ")
 
                     if (selection == 0):
                         print("Returning to main menu.")
@@ -1141,7 +1170,7 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
                     print("        0. Back")
                     print("        1. Export as Python data")
                     print("        2. Export as JSON data")
-                    selection = input("        Selection: ")
+                    selection = prompt("        Selection: ")
 
                     if (selection == 0):
                         print("Returning to main menu.")
@@ -1156,21 +1185,21 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
                     display_message("Invalid selection.", 2)
 
             else:
-                display_message("GPX processing has been disabled since a GPX file wasn't provided. There is not GPX location data to manage.", 2)
+                display_message("GPX processing has been disabled since a GPX file wasn't provided. There is no GPX location data to manage.", 2)
 
-            input("\nPress enter to continue...") # Wait for the user to press enter before repeating the menu loop.
+            prompt("\nPress enter to continue...") # Wait for the user to press enter before repeating the menu loop.
 
 
         elif (selection == "4"): # If the user selects option 4 on the main menu, then show the statstics for this session.
-            print("    Frames analyzed: " + str(len(raw_lpr_scan))) # Show how many frames of video were analyzed.
+            print("    Frames analyzed: " + str(len(raw_alpr_frames))) # Show how many frames of video were analyzed.
             print("    Plates found: " + str(len(plates_detected))) # Show how many unique plates were detected.
             print("    Videos analyzed: " + str(len(videos))) # Show how many videos were analyzed.
-            input("\nPress enter to continue...") # Wait for the user to press enter before repeating the menu loop.
+            prompt("\nPress enter to continue...") # Wait for the user to press enter before repeating the menu loop.
 
 
         else: # If the user selects an unrecognized option on the main menu for pre-recorded mode, then show a warning.
             display_message("Invalid selection.", 2)
-            input("\nPress enter to continue...") # Wait for the user to press enter before repeating the menu loop.
+            prompt("\nPress enter to continue...") # Wait for the user to press enter before repeating the menu loop.
 
 
 
@@ -1195,7 +1224,7 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
         print(style.bold + "Using default preference for root directory." + style.end)
         root = default_root
     else:
-        root = input("Project root directory path: ")
+        root = prompt("Project root directory path: ")
 
     if (default_license_plate_format != ""): # Check to see if the user has configured a default for this preference.
         print(style.bold + "Using default preference for license plate formatting." + style.end)
@@ -1204,19 +1233,19 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
         else:
             license_plate_format = default_license_plate_format
     else:
-        license_plate_format = input("Optional: License plate validation format: ")
+        license_plate_format = prompt("Optional: License plate validation format: ")
 
     if (default_save_license_plates_preference != ""): # Check to see if the user has configured a default for this preference.
         print(style.bold + "Using default preference for license plate saving." + style.end)
         save_license_plates_preference = default_save_license_plates_preference
     else:
-        save_license_plates_preference = input("Optional: Enable license plate saving (y/n): ")
+        save_license_plates_preference = prompt("Optional: Enable license plate saving (y/n): ")
 
     if (default_save_images_preference != ""): # Check to see if the user has configured a default for this preference.
         print(style.bold + "Using default preference for image saving." + style.end)
         save_images_preference = default_save_images_preference
     else:
-        save_images_preference = input("Optional: Enable image saving: (y/n): ")
+        save_images_preference = prompt("Optional: Enable image saving: (y/n): ")
 
 
     if (disable_object_recognition == True): # Check to see whether or not object recognition has been globally disabled in the Predator configuration.
@@ -1228,7 +1257,7 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
             if (default_realtime_object_recognition != ""):
                 realtime_object_recognition = default_realtime_object_recognition
         else:
-            realtime_object_recognition = input("Enable real-time object recognition? (y/n): ")
+            realtime_object_recognition = prompt("Enable real-time object recognition? (y/n): ")
 
 
     # Save yes/no preferences as boolean values for easier access.
@@ -1314,7 +1343,7 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
         if (realtime_alpr_enabled == True): # Only run license plate recognition if enabled in the configuration.
 
             if (manual_trigger == True): # If the manual trigger configuration value is enabled, then wait for the user to press enter before continuing.
-                input("Press enter to trigger image capture...")
+                prompt("Press enter to trigger image capture...")
 
 
 
@@ -1392,8 +1421,7 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
                 reading_output = json.loads(raw_reading_output) # Convert the JSON string from the command output to actual JSON data that Python can manipulate.
             except:
                 reading_output = json.loads('{"version":0,"data_type":"alpr_results","epoch_time":0,"img_width":1920,"img_height":1080,"processing_time_ms":0,"regions_of_interest":[{"x":0,"y":0,"width":1920,"height":1080}],"results":[]}') # Use a blank placeholder for the ALPR reading output, since the actual reading output was malformed.
-                print(style.red + "The JSON data returned by the ALPR process is malformed. This likely means there's a problem with the ALPR library." + style.end)
-                input(style.faint + "Press enter to continue" + style.end)
+                display_message("The JSON data returned by the ALPR process is malformed. This likely means there's a problem with the ALPR library.", 3)
 
             if (config["general"]["alpr_engine"] == "phantom"): # Check to see if the configured ALPR engine is Phantom ALPR.
                 if ("error" in raw_reading_output): # Check to see if there were errors reported by Phantom ALPR.
@@ -1682,7 +1710,7 @@ elif (mode_selection == "3" and dashcam_mode_enabled == True): # The user has se
         print(style.bold + "Using default preference for root directory." + style.end)
         root = default_root
     else:
-        root = input("Project root directory path: ")
+        root = prompt("Project root directory path: ")
 
 
     if (os.path.exists(root) == False): # Check to see if the root directory entered by the user exists.
