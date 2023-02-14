@@ -780,22 +780,23 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
         print(style.bold + "Using default preference for root directory." + style.end)
         root = default_root
     else:
-        root = prompt("Project root directory path: ")
-    video = prompt("Video file name: ")
-    framerate = prompt("Optional: Frame analysis interval: ")
-    if (framerate == None or framerate == "" or framerate == " "): # Check to see if the frame analysis interval prompt was left blank.
-        framerate = 1.0 # If nothing was entered for the frame analysis interval prompt, default to 1.0
-    else:
-        framerate = float(framerate) # Convert the framerate string input into a floating point value.
-    license_plate_format = prompt("Optional: License plate validation format: ")
+        root = prompt("Project root directory path: ", optional=False, input_type=str)
+
+    while (os.path.exists(root) == False):
+        display_message("The specified root project directory doesn't appear to exist", 2)
+        root = prompt("Project root directory path: ", optional=False, input_type=str)
+
+    video = prompt("Video file name(s): ", optional=False, input_type=str)
+    framerate = prompt("Optional: Frame analysis interval: ", optional=True, input_type=float, default=1.0)
+    license_plate_format = prompt("Optional: License plate validation format: ", optional=True, input_type=str)
     if (disable_object_recognition == True): # Check to see whether or not object recognition has been globally disabled in the Predator configuration.
         display_message("Skipping object recognition prompt, since object recognition has been globally disabled in the Predator configuration. Adjust the `disable_object_recognition` configuration value to change this.", 2)
         object_recognition_preference = "n"
     else:
-        object_recognition_preference = prompt("Enable object recognition (y/n): ")
+        object_recognition_preference = prompt("Optional: Enable object recognition (y/n): ", optional=True, input_type=bool, default=False)
     video_start_time = prompt("Optional: Video starting time (YYYY-mm-dd HH:MM:SS): ") # Ask the user when the video recording started so we can correlate it's frames to a GPX file.
     if (video_start_time != ""):
-        gpx_file = prompt("Optional: GPX file name: ")
+        gpx_file = prompt("Optional: GPX file name: ", optional=True, input_type=str)
     else:
         gpx_file = ""
 
@@ -805,11 +806,6 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
     else:
         video_start_time = round(time.mktime(datetime.datetime.strptime(video_start_time, "%Y-%m-%d %H:%M:%S").timetuple())) # Convert the video_start_time human readable date and time into a Unix timestamp.
 
-    if (object_recognition_preference.lower() == "y"): # Change the 'object_recognition_preference' to a boolean for easier manipulation.
-        object_recognition_preference = True
-    else:
-        object_recognition_preference = False
-        
 
 
 

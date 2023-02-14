@@ -6,7 +6,7 @@
         "auto_start_mode": "3",
         "default_root": "/home/pi/predator",
         "silence_file_saving": true,
-        "disable_object_recognition": true,
+        "disable_object_recognition": false,
         "gps_enabled": false,
         "speed_display_unit": "mph",
         "modes_enabled": {

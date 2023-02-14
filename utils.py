@@ -72,7 +72,7 @@ def process_gpx(gpx_file):
 
         point_time = round(time.mktime(datetime.datetime.strptime(point_time, "%Y-%m-%d %H:%M:%S").timetuple())) # Convert the human readable timestamp into a Unix timestamp.
 
-        gpx_data[point_time] = {"lat":point_lat, "lon":point_lon} # Add this point to the decoded GPX data.
+        gpx_data[point_time] = {"lat": point_lat, "lon": point_lon} # Add this point to the decoded GPX data.
 
 
     return gpx_data
@@ -98,10 +98,59 @@ def display_message(message, level=1):
 
 
 
+# Define the function to check if a variable is a number.
+def is_number(value):
+    try:
+        float(value)
+        return True
+    except ValueError:
+        return False
+
+
+
 
 # Define the function used to prompt the user for input.
-def prompt(message):
-    return input(message)
+def prompt(message, optional=True, input_type=str, default=""):
+    user_input = input(message)
+
+    if (optional == True and user_input == ""): # If the this input is optional, and the user didn't enter anything, then simply return a blank string.
+        return default
+
+    if (optional == False): # If this input is not optional, then repeatedly take an input until an input is given.
+        while (user_input == ""): # Repeated take the user's input until something is entered.
+            display_message("This input is not optional.", 2)
+            user_input = input(message)
+
+
+
+    if (input_type == str):
+        return str(user_input)
+
+    elif (input_type == float or input_type == int):
+        while (is_number(user_input) == False):
+            display_message("The input needs to be a number.", 2)
+            user_input = input(message)
+        return user_input
+
+    elif (input_type == bool):
+        if (len(user_input) > 0):
+            if (user_input[0].lower() == "y" or user_input[0].lower() == "t"):
+                user_input = True
+            elif (user_input[0].lower() == "n" or user_input[0].lower() == "f"):
+                user_input = False
+
+        while (type(user_input) != bool): # Run repeatedly until the input is a boolean.
+            display_message("The input needs to be a boolean.", 2)
+            user_input = input(message)
+            if (len(user_input) > 0):
+                if (user_input[0].lower() == "y" or user_input[0].lower() == "t"):
+                    user_input = True
+                elif (user_input[0].lower() == "n" or user_input[0].lower() == "f"):
+                    user_input = False
+
+        return user_input
+
+
 
 
 
