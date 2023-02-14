@@ -20,9 +20,9 @@
         }
     },
     "prerecorded": {
-        "left_margin": "0",
-        "right_margin": "400",
-        "top_margin": "900",
+        "left_margin": "500",
+        "right_margin": "500",
+        "top_margin": "500",
         "bottom_margin": "300",
         "max_gpx_time_difference": 5.0
     },
@@ -88,7 +88,7 @@
             "main": "/dev/video0"
         },
         "dashcam_background_mode_realtime": false,
-        "segment_length": 5 
+        "segment_length": 5
     },
     "developer": {
         "ignore_list": {
