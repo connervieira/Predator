@@ -297,7 +297,8 @@ In order to better integrate with an existing system, Predator can communicate w
         - This setting determines whether custom ignore lists are enabled or disabled.
         - This does not disable any hard-coded remote ignore lists services that may be in place from the system administrator. To completely disable remote ignore lists, set the `offline` configuration value to `true`.
     - `local_file`
-        - This setting specifies the absolute path to a local file to be used as an ignore list. If you only intend on using remote ignore lists, this file can simply contains a blank JSON list.
+        - This setting specifies the absolute path to a local file to be used as an ignore list.
+        - If you don't want to use a local ignore list file, this value can be left blank to disable it.
     - `remote_sources`
         - This setting defines a list of custom remote hosts that Predator will attempt to fetch ignore lists from.
 - `offline`
