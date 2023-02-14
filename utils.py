@@ -155,7 +155,7 @@ def validate_plate(plate, template):
 
 # This function is used to download and process plain-text lists of license plates over a network.
 def download_plate_database(url):
-    raw_download_data = requests.get(url).text # Save the raw text data from the URL to a variable.
+    raw_download_data = requests.get(url, timeout=6).text # Save the raw text data from the URL to a variable.
 
     # Process the downloaded data step by step to form a list of all of the plates in the database.
     processed_download_data = str(raw_download_data) # Convert the downloaded data to a string.

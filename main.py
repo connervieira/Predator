@@ -1639,7 +1639,7 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
                     url = url.replace("[A]", str(active_alert)) # Replace "[A]" with the current alert status.
 
                     try: # Try sending a request to the webook.
-                        response = requests.get(url)
+                        response = requests.get(url, timeout=4)
                     except Exception as e:
                         response = e
 

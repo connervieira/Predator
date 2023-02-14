@@ -71,7 +71,7 @@ def fetch_ignore_list():
     for host in remote_ignore_sources: # Iterate through all of the hosts specified in the list of remote ignore list sources.
         if (validators.url(host)): # Verify that this 'host' value is a valid URL.
             try: # Run the network request in a try block so the entire program doesn't fail if something goes wrong.
-                response_content = requests.get(host).text # Make a request to this host.
+                response_content = requests.get(host, timeout=3).text # Make a request to this host that times out after 3 seconds.
             except: # If the network request fails, do the following steps instead.
                 response_content = "[]" # Use a blank placeholder response database.
 

@@ -28,7 +28,8 @@ config = json.load(open(predator_root_directory + "/config.json")) # Load the co
 
 def update_status_lighting(url_id):
     status_lighting_update_url = str(config["realtime"]["status_lighting_values"][url_id]).replace("[U]", str(config["realtime"]["status_lighting_base_url"]))# Prepare the URL where a request will be sent in order to update the status lighting.
-    if (validators.url(status_lighting_update_url)): # Check to make sure the URL ID supplied actually resolves to a valid URL in the configuration database.
-        response = requests.get(status_lighting_update_url)
-    else:
-        print(style.yellow + "Warning: Unable to update status lighting. Invalid URL configured for " + url_id + style.end) # Display a warning that the URL was invalid, and no network request was sent.
+    if (config["developer"]["offline"] == False): # Check to make sure offline mode is disabled before sending the network request to update the status lighting.
+        if (validators.url(status_lighting_update_url)): # Check to make sure the URL ID supplied actually resolves to a valid URL in the configuration database.
+            response = requests.get(status_lighting_update_url, timeout=2)
+        else:
+            print(style.yellow + "Warning: Unable to update status lighting. Invalid URL configured for " + url_id + style.end) # Display a warning that the URL was invalid, and no network request was sent.
