@@ -32,8 +32,8 @@
         "max_gpx_time_difference": 5.0
     },
     "realtime": {
-        "delay_on_alert": 10,
-        "realtime_output_level": "3",
+        "delay_on_alert": 10.0,
+        "output_level": 2,
         "clear_between_rounds": true,
         "delay_between_rounds": "1",
         "print_invalid_plates": false,

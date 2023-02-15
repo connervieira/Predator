@@ -112,7 +112,7 @@ Configuration values in this section are settings specific to real-time mode.
 - `realtime_alpr_disabled_delay`
     - This setting is used to add an artificial delay when Predator's real-time license plate recogition is disabled.
     - Typically, the license plate recognition process will take at least a second or two, allowing the user to read any on-screen messages before the processing cycle continues. This setting allows the user to specify in time, in seconds, that Predator will wait when `realtime_alpr_enabled` is set to `false`.
-- `realtime_output_level`
+- `output_level`
     - This setting determines how much information Predator prints to the console while operating in real-time mode.
     - This setting has 3 different options.
         - Level "1": Only alerts are displayed.

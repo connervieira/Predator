@@ -59,7 +59,7 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Made real-time alert handling more efficient.
 - [X] Add alerts to pre-recorded mode.
 - [X] Add support for multiple alert databases.
-- [ ] Add the ability to update lists in the configuration from management mode.
+- [X] Add the ability to update lists in the configuration from management mode.
 
 
 # Hypothetical

@@ -111,13 +111,27 @@ def prompt(message, optional=True, input_type=str, default=""):
     user_input = input(message)
 
     if (optional == True and user_input == ""): # If the this input is optional, and the user didn't enter anything, then simply return a blank string.
-        return default
+        if (input_type == str):
+            return default
+        elif (input_type == int):
+            return int(default)
+        elif (input_type == float):
+            return float(default)
+        elif (input_type == bool):
+            if (type(default) != bool):
+                return False
+            else:
+                return default
+        elif (input_type == list):
+            if (type(default) != list):
+                return []
+            else:
+                return default
 
     if (optional == False): # If this input is not optional, then repeatedly take an input until an input is given.
         while (user_input == ""): # Repeated take the user's input until something is entered.
             display_message("This input is not optional.", 2)
             user_input = input(message)
-
 
 
     if (input_type == str):
@@ -145,7 +159,16 @@ def prompt(message, optional=True, input_type=str, default=""):
                 elif (user_input[0].lower() == "n" or user_input[0].lower() == "f"):
                     user_input = False
 
-        return user_input
+    elif (input_type == list):
+        user_input = user_input.split(",") # Convert the user's input into a list.
+        user_input = [element.strip() for element in user_input]
+        input(user_input)
+
+    return user_input
+
+
+
+
 
 
 

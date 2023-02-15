@@ -127,7 +127,7 @@ bottom_margin = config["prerecorded"]["bottom_margin"] # How many pixels will be
 
 
 # ----- Real-time mode configuration -----
-realtime_output_level = int(config["realtime"]["realtime_output_level"]) # This setting determines how much information Predator shows the user while operating in real-time mode.
+realtime_output_level = int(config["realtime"]["output_level"]) # This setting determines how much information Predator shows the user while operating in real-time mode.
 clear_between_rounds = config["realtime"]["clear_between_rounds"] # This setting determines whether or not Predator will clear the output screen between analysis rounds in real-time mode.
 delay_between_rounds = config["realtime"]["delay_between_rounds"] # This setting defines how long Predator will wait in between analysis rounds in real-time mode.
 print_invalid_plates = config["realtime"]["print_invalid_plates"] # In real-time mode, print all plates that get invalided by the formatting rules in red. When this is set to false, only valid plates are displayed.
@@ -651,89 +651,62 @@ if (mode_selection == "0" and management_mode_enabled == True): # The user has s
         elif (selection == "3"): # The user has selected the "Configuration" option.
             print("    Please enter the name of a configuration section to edit")
             for section in config: # Iterate through each top-level section of the configuration database, and display them all to the user.
-                if (type(config[section]) is list or type(config[section]) is dict): # Check to see if the current section we're iterating over is a list.
-                    print("    '" + style.bold + str(section) + style.end + "'") # If the entry is a list, display it in bold.
+                if (type(config[section]) is dict): # Check to see if the current section we're iterating over is a dictionary.
+                    print("    '" + style.bold + str(section) + style.end + "'") # If the entry is a dictionary, display it in bold.
                 else:
-                    print("    '" + style.italic + str(section) + style.end + "'") # If the entry is not a list (meaning it's an actual configuration value), display it in italics.
-            selection1 = prompt("=== Selection (Tier 1): ", optional=False, input_type=str)
+                    print("    '" + style.italic + str(section) + style.end + "'") # If the entry is not a dictionary (meaning it's an actual configuration value), display it in italics.
+            selection1 = prompt("=== Selection (Tier 1): ", optional=True, input_type=str, default="")
 
             if (selection1 in config): # Check to make sure the section entered by the user actually exists in the configuration database.
-                if (type(config[selection1]) is dict or type(config[selection1]) is list): # Check to make sure the current selection is a dictionary or list before trying to iterate through it.
-                    print("        Please enter the name of a configuration section to edit")
+                if (type(config[selection1]) is dict): # Check to make sure the current selection is a dictionary before trying to iterate through it.
                     for section in config[selection1]: # Iterate through each second-level section of the configuration database, and display them all to the user.
-                        if (type(config[selection1][section]) is list or type(config[selection1][section]) is dict): # Check to see if the current section we're iterating over is a list.
-                            print("        '" + style.bold + str(section) + style.end + "'") # If the entry is a list, display it in bold.
+                        if (type(config[selection1][section]) is dict): # Check to see if the current entry is a dictionary.
+                            print("        '" + style.bold + str(section) + style.end + "'") # If the entry is a dictionary, display it in bold.
                         else:
-                            print("        '" + style.italic + str(section) + style.end + "': '" + str(config[selection1][section]) + "'") # If the entry is not a list (meaning it's an actual configuration value), display it in italics.
-                    selection2 = prompt("======= Selection (Tier 2): ", optional=False, input_type=str)
-                    if selection2 in config[selection1]: # Check to make sure the section entered by the user actually exists in the configuration database.
-                        if (type(config[selection1][selection2]) is dict or type(config[selection1][selection2]) is list): # Check to make sure the current selection is a dictionary or list before trying to iterate through it.
-                            print("            Please enter the name of a configuration section to edit")
+                            print("        '" + style.italic + str(section) + style.end + "': '" + str(config[selection1][section]) + "'") # If the entry is not a dictionary (meaning it's an actual configuration value), display it in italics.
+                    selection2 = prompt("======= Selection (Tier 2): ", optional=True, input_type=str, default="")
+                    if (selection2 in config[selection1]): # Check to make sure the section entered by the user actually exists in the configuration database.
+                        if (type(config[selection1][selection2]) is dict): # Check to make sure the current selection is a dictionary before trying to iterate through it.
                             for section in config[selection1][selection2]: # Iterate through each third-level section of the configuration database, and display them all to the user.
-                                if (type(config[selection1][selection2][section]) is list or type(config[selection1][selection2][section]) is dict): # Check to see if the current section we're iterating over is a list.
-                                    print("            '" + style.bold + str(section) + style.end + "'") # If the entry is a list, display it in bold.
+                                if (type(config[selection1][selection2][section]) is dict): # Check to see if the current element is a dictionary.
+                                    print("            '" + style.bold + str(section) + style.end + "'") # If the entry is a dictionary, display it in bold.
                                 else:
-                                    print("            '" + style.italic + str(section) + style.end + "': '" + str(config[selection1][selection2][section]) + "'") # If the entry is not a list (meaning it's an actual configuration value), display it in italics.
-                            selection3 = prompt("=========== Selection (Tier 3): ", optional=False, input_type=str)
-                            if selection3 in config[selection1][selection2]: # Check to make sure the section entered by the user actually exists in the configuration database.
-                                if (type(config[selection1][selection2][selection3]) is dict or type(config[selection1][selection2][selection3]) is list): # Check to make sure the current selection is a dictionary or list before trying to iterate through it.
-                                    print("                Please enter the name of a configuration section to edit")
+                                    print("            '" + style.italic + str(section) + style.end + "': '" + str(config[selection1][selection2][section]) + "'") # If the entry is not a dictionary (meaning it's an actual configuration value), display it in italics.
+                            selection3 = prompt("=========== Selection (Tier 3): ", optional=True, input_type=str, default="")
+                            if (selection3 in config[selection1][selection2]): # Check to make sure the section entered by the user actually exists in the configuration database.
+                                if (type(config[selection1][selection2][selection3]) is dict): # Check to make sure the current selection is a dictionary before trying to iterate through it.
                                     for section in config[selection1][selection2][selection3]: # Iterate through each third-level section of the configuration database, and display them all to the user.
-                                        if (type(config[selection1][selection2][selection3][section]) is list or type(config[selection1][selection2][selection3][section]) is dict): # Check to see if the current section we're iterating over is a list.
-                                            print("                '" + style.bold + str(section) + style.end + "'") # If the entry is a list, display it in bold.
+                                        if (type(config[selection1][selection2][selection3][section]) is dict): # Check to see if the current section we're iterating over is a dictionary.
+                                            print("                '" + style.bold + str(section) + style.end + "'") # If the entry is a dictionary, display it in bold.
                                         else:
-                                            print("                '" + style.italic + str(section) + style.end + "': '" + str(config[selection1][selection2][selection3][section]) + "'") # If the entry is not a list (meaning it's an actual configuration value), display it in italics.
+                                            print("                '" + style.italic + str(section) + style.end + "': '" + str(config[selection1][selection2][selection3][section]) + "'") # If the entry is not a dictionary (meaning it's an actual configuration value), display it in italics.
                                     selection4 = prompt("=============== Selection (Tier 4): ", optional=False, input_type=str)
-                                else: # If the current selection isn't a dictionary or list, assume that it's an configuration entry. (Tier 3)
+                                else: # If the current selection isn't a dictionary, assume that it's an configuration entry. (Tier 3)
                                     print("                Current Value: " + str(config[selection1][selection2][selection3]))
-                                    if (type(config[selection1][selection2][selection3]) == str):
-                                        config[selection1][selection2][selection3] = str(prompt("                New Value (String): ", optional=False, input_type=str))
-                                    elif (type(config[selection1][selection2][selection3]) == bool):
-                                        config[selection1][selection2][selection3] = prompt("                New Value (Boolean): ", optional=False, input_type=bool)
-                                    elif (type(config[selection1][selection2][selection3]) == int):
-                                        config[selection1][selection2][selection3] = int(prompt("                New Value (Integer): ", optional=False, input_type=str))
-                                    elif (type(config[selection1][selection2][selection3]) == float):
-                                        config[selection1][selection2][selection3] = float(prompt("                New Value (Float): ", optional=False, input_type=str))
-                                    else:
-                                        display_message("This configuration value didn't match any known variable type. This error should never occur and there's almost certainly a bug.", 3)
+                                    config[selection1][selection2][selection3] = prompt("                New Value (" + str(type(config[selection1][selection2][selection3])) + "): ", optional=True, input_type=type(config[selection1][selection2][selection3]), default="")
+                            elif (selection3 != ""):
+                                display_message("Unknown configuration entry selected.", 3)
                         else: # If the current selection isn't a dictionary or list, assume that it's an configuration entry. (Tier 2)
                             print("            Current Value: " + str(config[selection1][selection2]))
-                            if (type(config[selection1][selection2]) == str):
-                                config[selection1][selection2] = str(prompt("            New Value (String): ", optional=False, input_type=str))
-                            elif (type(config[selection1][selection2]) == bool):
-                                config[selection1][selection2] = prompt("            New Value (Boolean): ", optional=False, input_type=bool)
-                            elif (type(config[selection1][selection2]) == int):
-                                config[selection1][selection2] = int(prompt("            New Value (Integer): ", optional=False, input_type=str))
-                            elif (type(config[selection1][selection2]) == float):
-                                config[selection1][selection2] = float(prompt("            New Value (Float): ", optional=False, input_type=str))
-                            else:
-                                display_message("This configuration value didn't match any known variable type. This error should never occur and there's almost certainly a bug.", 3)
+                            config[selection1][selection2] = prompt("            New Value (" + str(type(config[selection1][selection2])) + "): ", optional=True, input_type=type(config[selection1][selection2]), default="")
+                    elif (selection2 != ""):
+                        display_message("Unknown configuration entry selected.", 3)
 
                 else: # If the current selection isn't a dictionary or list, assume that it's an configuration entry. (Tier 1)
                     print("        Current Value: " + str(config[selection1]))
-                    if (type(config[selection1]) == str):
-                        config[selection1] = str(prompt("            New Value (String): ", optional=False, input_type=str))
-                    elif (type(config[selection1]) == bool):
-                        config[selection1] = prompt("            New Value (Boolean): ", optional=False, input_type=bool)
-                    elif (type(config[selection1]) == int):
-                        config[selection1] = int(prompt("            New Value (Integer): "))
-                    elif (type(config[selection1]) == float):
-                        config[selection1] = float(prompt("            New Value (Float): "))
-                    else:
-                        display_message("This configuration value didn't match any known variable type. This error should never occur and there's almost certainly a bug.", 3)
-                    config[selection1] = prompt("        New Value: ")
+                    config[selection1] = prompt("        New Value (" + str(type(config[selection1])) + "): ", optional=True, input_type=type(config[selection1]), default="")
+            elif (selection1 != ""):
+                display_message("Unknown configuration entry selected.", 3)
 
 
             config_file = open(predator_root_directory + "/config.json", "w") # Open the configuration file.
             json.dump(config, config_file, indent=4) # Dump the JSON data into the configuration file on the disk.
             config_file.close() # Close the configuration file.
-            config = json.load(open(predator_root_directory + "/config.json")) # Load the configuration database from config.json
+            config = json.load(open(predator_root_directory + "/config.json")) # Re-load the configuration database from disk.
 
 
         else: # The user has selected an invalid option in the main management menu.
             display_message("Invalid selection.", 2)
-
-        prompt("\nPress enter to continue...") # Wait for the user to press enter before repeating the management menu loop.
 
 
 

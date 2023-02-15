@@ -288,3 +288,7 @@ This update refines Predator's functionality, and focuses its purpose back on li
     - Multiple alert databases can now be specified.
 - Improved sound playing process.
     - Sounds are now played with a function for sake of reliability and organization.
+- Updated the configuration manager in management mode.
+    - Lists can now be edited.
+    - The back-end structure is more organized and simplified.
+    - The configuration interface can now detect when an unrecognized configuration value is entered.
