@@ -294,3 +294,4 @@ This update refines Predator's functionality, and focuses its purpose back on li
     - Lists can now be edited.
     - The back-end structure is more organized and simplified.
     - The configuration interface can now detect when an unrecognized configuration value is entered.
+- Added a check during loading to verify that the configuation file exists, and is valid.

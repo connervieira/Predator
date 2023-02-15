@@ -29,17 +29,28 @@ import utils
 style = utils.style
 display_message = utils.display_message
 
-root_directory = str(os.path.dirname(os.path.realpath(__file__))) # This variable determines the folder path of the root Predator directory. This should usually automatically recognize itself, but it if it doesn't, you can change it manually.
-config = json.load(open(root_directory + "/config.json")) # Load the configuration database from config.json
+predator_root_directory = str(os.path.dirname(os.path.realpath(__file__))) # This variable determines the folder path of the root Predator directory. This should usually automatically recognize itself, but it if it doesn't, you can change it manually.
+
+try:
+    if (os.path.exists(predator_root_directory + "/config.json")):
+        config = json.load(open(predator_root_directory + "/config.json")) # Load the configuration database from config.json
+    else:
+        print("The configuration file doesn't appear to exist at " + predator_root_directory + "/config.json.")
+        exit()
+except:
+    print("The configuration database couldn't be loaded. It may be corrupted.")
+    exit()
+
+
 
 if (config["developer"]["offline"] == False): # Only import networking libraries if offline mode is turned off.
     import requests # Required to fetch information from network hosts.
 
 
 def fetch_ignore_list():
-    root_directory = str(os.path.dirname(os.path.realpath(__file__))) # This variable determines the folder path of the root Predator directory. This should usually automatically recognize itself, but it if it doesn't, you can change it manually.
+    predator_root_directory = str(os.path.dirname(os.path.realpath(__file__))) # This variable determines the folder path of the root Predator directory. This should usually automatically recognize itself, but it if it doesn't, you can change it manually.
 
-    config = json.load(open(root_directory + "/config.json")) # Load the configuration database from config.json
+    config = json.load(open(predator_root_directory + "/config.json")) # Load the configuration database from config.json
 
 
 

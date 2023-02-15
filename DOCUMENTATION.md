@@ -179,10 +179,13 @@ After configuring Predator, you can try it out for the first time!
             - To navigate through each menu, simply enter the characters associated with the menu selection you'd like to make.
                 - Typically, menu items will be identified simply with numbers, but there may also be an additional letter, like in the case of the 'Copy' and 'Delete' menus.
         - Pre-recorded mode
-            - You should note that while Predator is running it's analysis, you'll notice a folder named 'frames' appear in the project folder. Individual frames will begin to appear in this folder as Predator runs. Do not modify or delete these, since Predator will repeatedly access and modify these during the course of it's analysis. After analysis completes, you can safely delete these files either manually, or by using Predator's management mode.
+            - You should note that while Predator is running it's analysis, a folder named 'frames' will appear in the project folder.
+                - Individual frames will begin to appear in this folder as Predator runs.
+                - Do not modify or delete these, since Predator will repeatedly access and modify these during the course of it's analysis.
+                - After analysis completes, you can safely delete these files either manually, or by using Predator's management mode. However, these files will automatically be deleted the next time Predator runs in pre-recorded mode.
             - After Predator finishes running, you'll be sent to the analysis menu.
                 - This menu allows you to manage, view, export, and manipulate the data collected in the current session.
-                - To navigate this menu, simply enter the ID number of the menu item you want to select.
+                - To navigate this menu, simply enter the ID number of the menu item you want to select, and press enter.
         - Real-time mode
             - While in real-time mode, Predator will run in an endless loop until quit by holding `Ctrl + C` for a few seconds.
                 - Since Predator launches some of it's processes in different threads, pressing `Ctrl + C` a single time might not kill the entire Predator system.
