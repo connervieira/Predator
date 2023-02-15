@@ -60,6 +60,7 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Add alerts to pre-recorded mode.
 - [X] Add support for multiple alert databases.
 - [X] Add the ability to update lists in the configuration from management mode.
+- [ ] Add configuration value for the number of guesses the ALPR engine should make in pre-recorded mode.
 
 
 # Hypothetical

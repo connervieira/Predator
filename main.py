@@ -140,7 +140,6 @@ clear_between_rounds = config["realtime"]["clear_between_rounds"] # This setting
 delay_between_rounds = config["realtime"]["delay_between_rounds"] # This setting defines how long Predator will wait in between analysis rounds in real-time mode.
 print_invalid_plates = config["realtime"]["print_invalid_plates"] # In real-time mode, print all plates that get invalided by the formatting rules in red. When this is set to false, only valid plates are displayed.
 print_detected_plate_count = config["realtime"]["print_detected_plate_count"] # This setting determines whether or not Predator will print how many license plates it detects in each frame while operating in real-time mode.
-realtime_guesses = config["realtime"]["realtime_guesses"] # This setting determines how many guesses Predator will make per plate in real-time mode. The higher this number, the less accurate guesses will be, but the more likely it will be that a plate matching the formatting guidelines is found.
 manual_trigger = config["realtime"]["manual_trigger"] # This setting determines whether or not Predator will wait to be manually triggered before taking an image.
 alpr_location_tagging = config["realtime"]["alpr_location_tagging"] # This setting determines whether or not detected license plates will be tagged with the current GPS location.
 camera_resolution = config["realtime"]["camera_resolution"] # This is the resolution you want to use when taking images using the connected camera. Under normal circumstances, this should be the maximum resoultion supported by your camera.
@@ -852,18 +851,18 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
     print("Scanning for license plates...")
     alpr_frames = {} # Create an empty dictionary that will hold each frame and the potential license plates IDs.
     for frame in frames: # Iterate through each frame of video.
-        alpr_frames[frame] = [] # Set the license plate recognition information for this frame to an empty list as a placeholder.
+        alpr_frames[frame] = {} # Set the license plate recognition information for this frame to an empty list as a placeholder.
 
         # Run license plate analysis on this frame.
         if (config["general"]["alpr_engine"] == "phantom"): # Check to see if the configuration indicates that the Phantom ALPR engine should be used.
-            analysis_command = "alpr -n 5 " + root + "/frames/" + frame # Set up the Phantom ALPR command.
+            analysis_command = "alpr -n " + str(config["general"]["alpr_guesses"]) + " " + root + "/frames/" + frame # Set up the Phantom ALPR command.
             reading_output = str(os.popen(analysis_command).read()) # Run the command, and record the raw output string.
             reading_output = json.loads(reading_output) # Convert the JSON string from the command output to actual JSON data that Python can manipulate.
             if ("error" in reading_output): # Check to see if there were errors.
                 print("Phantom ALPR encountered an error: " + reading_output["error"]) # Display the ALPR error.
                 reading_output["results"] = [] # Set the results of the reading output to a blank placeholder list.
         elif (config["general"]["alpr_engine"] == "openalpr"): # Check to see if the configuration indicates that the OpenALPR engine should be used.
-            analysis_command = "alpr -j -n 5 " + root + "/frames/" + frame # Set up the OpenALPR command.
+            analysis_command = "alpr -j -n " + str(config["general"]["alpr_guesses"]) + " " + root + "/frames/" + frame # Set up the OpenALPR command.
             reading_output = str(os.popen(analysis_command).read()) # Run the command, and record the raw output string.
             reading_output = json.loads(reading_output) # Convert the JSON string from the command output to actual JSON data that Python can manipulate.
         else: # If the configured ALPR engine is unknown, then return an error.
@@ -890,19 +889,36 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
 
     # Check the possible plate IDs and validate based on general plate formatting specified by the user.
     print("Validating license plates...")
-    validated_alpr_frames = {}
+    validated_alpr_frames = {} # This is a placeholder variable that will be used to store the validated ALPR information for each frame.
+
+    # Handle ignore list processing.
     for frame in alpr_frames: # Iterate through each frame of video in the database of scanned plates.
         validated_alpr_frames[frame] = {} # Set the validated license plate recognition information for this frame to an empty list as a placeholder.
-        for plate in alpr_frames[frame]: # Iterate through each plate detected per frame.
+        for plate in alpr_frames[frame].keys(): # Iterate through each plate detected per frame.
             for guess in alpr_frames[frame][plate]: # Iterate through each guess for each plate.
-                if (guess in ignore_list): # Check to see if this plate is in the ignore list.
-                    alpr_frames[frame][plate] = [] # Remove this plate, since it was found in the ignore list. Since this only sets the plate information to a blank list, the plate index will still exist in the dictionary.
-                    break # Break the loop, since this entire plate, including all of its guesses, has just been removed.
-                else:
-                    if (validate_plate(guess, license_plate_format) == True or license_plate_format == ""): # Check to see if this plate passes validation.
-                        if (plate not in validated_alpr_frames[frame]): # Check to see if this plate hasn't been added to the validated information yet.
-                            validated_alpr_frames[frame][plate] = [] # Add the plate to the validated information as a blank placeholder list.
-                        validated_alpr_frames[frame][plate].append(guess) # Since this plate guess failed the validation test, delete it from the list of guesses.
+                for ignore_plate in ignore_list: # Iterate through each plate in the ignore list.
+                    if fnmatch.fnmatch(guess, ignore_plate):
+                        alpr_frames[frame][plate] = [] # Remove this plate from the ALPR dictionary.
+                        break # Break the loop, since this entire plate, including all of its guesses, has just been removed.
+
+    # Remove any empty plates.
+    for frame in alpr_frames: # Iterate through each frame of video in the database of scanned plates.
+        plates = list(alpr_frames[frame].keys())
+        for plate in plates:
+            if (len(alpr_frames[frame][plate]) <= 0):
+                print ("nuked")
+                del alpr_frames[frame][plate]
+
+    # Handle formatting validation.
+    for frame in alpr_frames: # Iterate through each frame of video in the database of scanned plates.
+        validated_alpr_frames[frame] = {} # Set the validated license plate recognition information for this frame to an empty list as a placeholder.
+        for plate in alpr_frames[frame].keys(): # Iterate through each plate detected per frame.
+            for guess in alpr_frames[frame][plate]: # Iterate through each guess for each plate.
+                if (validate_plate(guess, license_plate_format) == True or license_plate_format == ""): # Check to see if this plate passes validation.
+                    if (plate not in validated_alpr_frames[frame]): # Check to see if this plate hasn't been added to the validated information yet.
+                        validated_alpr_frames[frame][plate] = [] # Add the plate to the validated information as a blank placeholder list.
+                    validated_alpr_frames[frame][plate].append(guess) # Since this plate guess failed the validation test, delete it from the list of guesses.
+
     print("Done.\n")
 
 
@@ -1374,16 +1390,16 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
         time.sleep(0.2) # Sleep to give the user time to quit Predator if they want to.
         if (save_images_preference == True): # Check to see whether or not the user wants to save all images captured by Predator.
             if (config["general"]["alpr_engine"] == "phantom"): # Check to see if the configuration indicates that the Phantom ALPR engine should be used.
-                analysis_command = "alpr -n " + realtime_guesses  + " '" + root + "/realtime_image" + str(i) + ".jpg'" # Prepare the analysis command so we can run it next.
+                analysis_command = "alpr -n " + str(config["general"]["alpr_guesses"])  + " '" + root + "/realtime_image" + str(i) + ".jpg'" # Prepare the analysis command so we can run it next.
             elif (config["general"]["alpr_engine"] == "openalpr"): # Check to see if the configuration indicates that the OpenALPR engine should be used.
-                analysis_command = "alpr -j -n " + realtime_guesses  + " '" + root + "/realtime_image" + str(i) + ".jpg'" # Prepare the analysis command so we can run it next.
+                analysis_command = "alpr -j -n " + str(config["general"]["alpr_guesses"]) + " '" + root + "/realtime_image" + str(i) + ".jpg'" # Prepare the analysis command so we can run it next.
             else:
                 display_message("The configured ALPR engine is not recognized.", 3)
         else:
             if (config["general"]["alpr_engine"] == "phantom"): # Check to see if the configuration indicates that the Phantom ALPR engine should be used.
-                analysis_command = "alpr -n " + realtime_guesses  + " '" + root + "/realtime_image.jpg'" # Prepare the analysis command so we can run it next.
+                analysis_command = "alpr -n " + str(config["general"]["alpr_guesses"]) + " '" + root + "/realtime_image.jpg'" # Prepare the analysis command so we can run it next.
             elif (config["general"]["alpr_engine"] == "openalpr"): # Check to see if the configuration indicates that the OpenALPR engine should be used.
-                analysis_command = "alpr -j -n " + realtime_guesses  + " '" + root + "/realtime_image.jpg'" # Prepare the analysis command so we can run it next.
+                analysis_command = "alpr -j -n " + str(config["general"]["alpr_guesses"]) + " '" + root + "/realtime_image.jpg'" # Prepare the analysis command so we can run it next.
             else:
                 display_message("The configured ALPR engine is not recognized.", 3)
 

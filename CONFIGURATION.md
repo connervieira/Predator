@@ -10,6 +10,10 @@ This section of configuration values will effect Predator's general operation.
 - `alpr_engine`
     - This is a string that determines what ALPR engine Predator will use.
     - This can be set to either "openalpr" or "phantom".
+- `alpr_guesses`
+    - This setting is a number in the form of a string that determines how many guesses the ALPR engine will make when analyzing a plate.
+    - The higher this number is, the more likely Predator is to guess a plate incorrectly. The lower this number is, the less likely Predator will be to find a valid guess at all.
+    - By default this value is set to 20, which tends to be a healthy balance for the majority of tasks.
 - `ascii_art_header`
     - This value is a boolean that determines whether or not Predator will display a large ASCII art banner on start up. When set to `false`, the ASCII art banner will be replaced with a small, normal text title.
     - This setting may be useful to change in the event that Predator is being run on a device with a tiny display, where a large ASCII art header might cause formatting issues.
@@ -129,10 +133,6 @@ Configuration values in this section are settings specific to real-time mode.
         - In the event that you consistently get Predator to identify a plate, but it can't find a valid guess as to what its contents are, turning this on can help you figure out what Predator thinks its seeing.
 - `print_detected_plate_count`
     - This setting is a boolean that determines whether or not Predator will show how many plates are detected in each frame while operating in real-time mode.
-- `realtime_guesses`
-    - This setting is a number in the form of a string that determines how many OpenALPR guesses Predator will take into account when analyzing a plate.
-    - The higher this number is, the more likely Predator is to guess a plate incorrectly. The lower this number is, the less likely Predator will be to find a valid guess at all.
-    - By default this value is set to 20, which tends to be a healthy balance for the majority of tasks.
 - `manual_trigger`
     - This setting determines whether or not Predator will wait to be manually triggered before taking a picture for license plate analysis.
     - When this setting is set to `true`, Predator will only take pictures when the enter key is pressed.

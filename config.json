@@ -1,6 +1,7 @@
 {
     "general": {
         "alpr_engine": "phantom",
+        "alpr_guesses": 50,
         "ascii_art_header": true,
         "custom_startup_message": "",
         "auto_start_mode": "",
@@ -38,7 +39,6 @@
         "delay_between_rounds": "1",
         "print_invalid_plates": false,
         "print_detected_plate_count": true,
-        "realtime_guesses": "20",
         "manual_trigger": false,
         "alpr_location_tagging": true,
         "camera_resolution": "1920x1080",
