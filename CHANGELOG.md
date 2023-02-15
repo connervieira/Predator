@@ -247,7 +247,7 @@ This update refines Predator's functionality, and focuses its purpose back on li
 - Fixed a bug that could cause Predator to crash when object recognition was globally disabled in the configuration.
 - Added support for 'ignore lists' which allow users and administrators to set a list of license plates that should be ignored.
 - Updated the way several messages are displayed to be more concise and organized.
-- Added 'offline mode', which restricts all network functions.
+- Added 'offline mode', which restricts all network functions globally.
 - Refined dashcam recording.
     - Dashcam recording now launches from a function, for sake of consistency and organization.
     - Dashcam recording now uses consistent file names between background and foreground mode.
@@ -261,11 +261,14 @@ This update refines Predator's functionality, and focuses its purpose back on li
     - Errors messages are now handled using a function.
 - Create a dedicated function for user input prompts.
     - User inputs are now much more fault tolerant, and will repeatedly prompt the user if they don't enter an expected input.
-- Made some adjustments to pre-recorded mode.
+- Made various improvements to pre-recorded mode.
     - Predator now accepts wildcard file names in pre-recorded mode.
     - Fixed an issue where selecting the object recognition menu in pre-recorded mode would give an unexpected error when object recognition was disabled.
-    - Renamed the "raw data" option to "JSON data" through-out the menu.
-    - Renamed the "GPS data" option to "positional data".
+    - Updated the pre-recorded mode post-processing menu.
+        - CSV data display in the menu no longer has a trailing comma.
+        - Renamed the "raw data" option to "JSON data" through-out the menu.
+        - Renamed the "GPS data" option to "position data".
+        - Options that are disabled now appear in a darker style.
     - License plates detected in pre-recorded mode can now be correlated to nearby GPX points, even if they don't match timestamps exactly.
     - Multiple license plates can now be detected per frame.
         - This change indirectly fixed an issue where fractional frame intervals could cause crashes.
@@ -274,7 +277,6 @@ This update refines Predator's functionality, and focuses its purpose back on li
         - Moved the `default_license_plate_format` configuration value to the 'general' section.
     - Pre-recorded mode now supports alerts.
         - The `alerts_ignore_validation` configuration value has been moved to the 'general' section.
-    - CSV data display in the menu no longer has a trailing comma.
 - Dramatically improved alert handling.
     - Alerts detected in real-time mode are now recorded to a dictionary every round, which makes processing and handling alerts more efficient and organized.
     - Alerts are now handled on a plate by plate basis, instead of by frame.

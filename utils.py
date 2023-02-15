@@ -162,7 +162,6 @@ def prompt(message, optional=True, input_type=str, default=""):
     elif (input_type == list):
         user_input = user_input.split(",") # Convert the user's input into a list.
         user_input = [element.strip() for element in user_input]
-        input(user_input)
 
     return user_input
 
@@ -494,34 +493,37 @@ def display_alerts(active_alerts):
 
 
 
-def load_alert_database(sources):
+def load_alert_database(sources, project_directory):
     complete_alert_database = {} # Set the complete alert database to a placeholder dictionary.
     for source in sources: # Iterate through each source in the list of sources.
         if (validators.url(source)): # Check to see if the user supplied a URL as their alert database.
             if (config["developer"]["offline"] == False): # Check to see if offline mode is disabled.
-                raw_download_data = requests.get(source, timeout=6).text # Save the raw text data from the URL to a variable.
+                try:
+                    raw_download_data = requests.get(source, timeout=6).text # Save the raw text data from the URL to a variable.
+                except:
+                    raw_download_data = ""
                 processed_download_data = str(raw_download_data) # Convert the downloaded data to a string.
                 try:
                     alert_database = json.loads(processed_download_data) # Load the alert database as JSON data.
                 except:
                     alert_database = {}
-                    display_message("The license plate alert database returned by the remote source doesn't appear to be compatible JSON data. This source has not been loaded.", 3)
+                    display_message("The license plate alert database returned by the remote source " + source + " doesn't appear to be compatible JSON data. This source has not been loaded.", 3)
             else: # Predator is in offline mode, but a remote alert database source was specified.
                 alert_database = {} # Set the alert database to an empty dictionary.
-                display_message("A remote alert database source was specified, but Predator is in offline mode. This source has not been loaded.", 2)
+                display_message("A remote alert database source " + source + " was specified, but Predator is in offline mode. This source has not been loaded.", 2)
         else: # The input the user supplied doesn't appear to be a URL, so assume it is a file.
-            if (os.path.exists(root + "/" + source)): # Check to see if the database specified by the user actually exists.
-                f = open(root + "/" + source, "r") # Open the user-specified datbase file.
+            if (os.path.exists(project_directory + "/" + source)): # Check to see if the database specified by the user actually exists.
+                f = open(project_directory + "/" + source, "r") # Open the user-specified datbase file.
                 file_contents = f.read() # Read the file.
                 if (file_contents[0] == "{"): # Check to see if the first character in the file indicates that this alert database is a JSON database.
                     alert_database = json.loads(file_contents) # Load the alert database as JSON data.
                 else:
                     alert_database = {}
-                    display_message("The specified database doesn't appear to be a compatible JSON file. This source has not been loaded.", 3)
+                    display_message("The alert database specified at " + project_directory + "/" + source + " does appear to contain compatible JSON data. This source has not been loaded.", 3)
                 f.close() # Close the file.
             else: # If the alert database specified by the user does not exist, alert the user of the error.
                 alert_database = {}
-                display_message("The alert database specified at " + root + "/" + source + " does not exist. This source has not been loaded.", 3)
+                display_message("The alert database specified at " + project_directory + "/" + source + " does not exist. This source has not been loaded.", 3)
 
         for rule in alert_database: # Iterate over each rule in this database.
             complete_alert_database[rule] = alert_database[rule] # Add this rule to the complete alert database.

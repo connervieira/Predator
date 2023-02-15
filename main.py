@@ -466,7 +466,7 @@ if (mode_selection == "0" and management_mode_enabled == True): # The user has s
                 if (copy_prerecorded_object_recognition_data):
                     os.system("cp " + root + "/pre_recorded_object_detection_export.* " + copy_destination)
                 if (copy_prerecorded_license_plate_location_data):
-                    os.system("cp " + root + "/pre_recorded_license_plate_location_data_export.* " + copy_destination)
+                    os.system("cp " + root + "/pre_recorded_location_data_export.* " + copy_destination)
                 if (copy_realtime_images):
                     os.system("cp " + root + "/realtime_image* " + copy_destination)
                 if (copy_realtime_object_recognition_data):
@@ -591,7 +591,7 @@ if (mode_selection == "0" and management_mode_enabled == True): # The user has s
                     if (delete_prerecorded_object_recognition_data):
                         os.system("rm " + root + "/pre_recorded_object_detection_export.*")
                     if (delete_prerecorded_license_plate_location_data):
-                        os.system("rm " + root + "/pre_recorded_license_plate_location_data_export.*")
+                        os.system("rm " + root + "/pre_recorded_location_data_export.*")
                     if (delete_realtime_images):
                         os.system("rm " + root + "/realtime_image*")
                     if (delete_realtime_object_recognition_data):
@@ -924,7 +924,7 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
 
 
     print("Checking for alerts...")
-    alert_database = load_alert_database(license_plate_alert_database_source) # Load the license plate alert database.
+    alert_database = load_alert_database(license_plate_alert_database_source, root) # Load the license plate alert database.
     active_alerts = {} # This is an empty placeholder that will hold all of the active alerts. 
     if (len(alert_database) > 0): # Only run alert processing if the alert database isn't empty.
         for rule in alert_database: # Run through every plate in the alert plate database supplied by the user.
@@ -985,8 +985,14 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
         print("Please select an option")
         print("0. Quit")
         print("1. Manage license plate data")
-        print("2. Manage object recognition data")
-        print("3. Manage license plate positional data")
+        if (object_recognition_preference == True): # Check to see if object recognition is enabled before displaying the object recognition option.
+            print("2. Manage object recognition data")
+        else:
+            print(style.faint + "2. Manage object recognition data" + style.end)
+        if (gpx_file != ""): # Check to see if a GPX correlation is enabled before displaying the position data option.
+            print("3. Manage position data")
+        else:
+            print(style.faint + "3. Manage position data" + style.end)
         print("4. View session statistics")
         selection = prompt("Selection: ", optional=False, input_type=str)
 
@@ -1180,9 +1186,9 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
                     if (selection == 0):
                         print("Returning to main menu.")
                     elif (selection == "1"):
-                        save_to_file(root + "/pre_recorded_license_plate_location_data_export.txt", frame_locations, silence_file_saving) # Save to disk.
+                        save_to_file(root + "/pre_recorded_location_data_export.txt", frame_locations, silence_file_saving) # Save to disk.
                     elif (selection == "2"):
-                        save_to_file(root + "/pre_recorded_license_plate_location_data_export.json", json.dumps(frame_locations, indent=4), silence_file_saving) # Save to disk.
+                        save_to_file(root + "/pre_recorded_location_data_export.json", json.dumps(frame_locations, indent=4), silence_file_saving) # Save to disk.
                     else:
                         display_message("Invalid selection.", 2)
 
@@ -1276,7 +1282,7 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
 
 
     # Load the license plate alert database.
-    alert_database = load_alert_database(license_plate_alert_database_source)
+    alert_database = load_alert_database(license_plate_alert_database_source, root)
 
 
     detected_license_plates = [] # Create an empty list that will hold each license plate detected by Predator during this session.
@@ -1569,7 +1575,7 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
 
 
         # If enabled, submit data about each newly detected plate to a network server.
-        if (realtime_output_level >= 3 and webhook != None and webhook != ""): # Only display this status message if the output level indicates to do so.
+        if (realtime_output_level >= 3 and webhook != None and webhook != ""): # Only display this status message if the output level indicates to do so, and webhooks are enabled.
             print("Submitting data to webhook...")
 
         for plate in new_plates_detected: # Iterate through each plate that was detected this round.
@@ -1586,7 +1592,7 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
                 if (str(webhook_response) != "200"): # If the webhook didn't respond with a 200 code; Warn the user that there was an error.
                     display_message("Failed to submit data to webhook.", 2)
 
-        if (realtime_output_level >= 3 and webhook != None and webhook != ""): # Only display this status message if the output level indicates to do so.
+        if (realtime_output_level >= 3 and webhook != None and webhook != ""): # Only display this status message if the output level indicates to do so, and webhooks are enabled.
             print("Done.\n----------")
 
 
