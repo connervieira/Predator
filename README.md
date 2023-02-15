@@ -9,7 +9,7 @@ An offline, privacy centric license plate recognition platform.
 
 ## Disclaimer
 
-While Predator is designed to be stable and reliable, you should not depend on it for safety or security critical tasks. See the SECURITY.md document for more information.
+While Predator is designed to be stable and reliable, you should not depend on it for safety or security critical tasks. See the [SECURITY.md](SECURITY.md) document for more information.
 
 
 ## Description

@@ -3,11 +3,11 @@
 Predator is primarily developed by V0LT. However, this wouldn't be possible without the hard work of dozens of other projects. This document contains credits to all of the software and people Predator depends on to function.
 
 
-## People
+## Individuals
 
 ### Brandon Paroff
 
-Brandon is responsible for helping to create and print the camera mounting brackets used during the development of Predator. You can find these files in the `assets` folder.
+Brandon is responsible for creating the camera mounting brackets used during the development of Predator. You can find these files in the `assets` folder, should you want to use them.
 
 
 ## Software

@@ -24,7 +24,7 @@ While much simpler than building a Predator device from scratch, there are still
 
 ### DIY
 
-If you'd like to try to build a Predator device yourself, see the HARDWARE.md document.
+If you'd like to try to build a Predator device yourself, see the [HARDWARE.md](HARDWARE.md) document.
 
 
 ## Support
