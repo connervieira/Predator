@@ -158,7 +158,7 @@ After configuring Predator, you can try it out for the first time!
             - This file follows this format: `plate,timestamp,alert_status,latitude,longitude`
                 - `plate` is replaced by the characters in the detected plate.
                 - `timestamp` is replaced by the time the plate was detected.
-                - `alert_status` is replaced with a boolean indicating whether or not one of the plates detected in the frame were alert plates.
+                - `alert_status` is replaced with a boolean indicating whether or not the plate matches an alert rule.
                 - `latitude` is replaced by the GPS latitude that the plate was detected, if enabled.
                 - `longitude` is replaced by the GPS longitude that the plate was detected, if enabled.
             - If you leave this setting blank, license plate saving will be disabled by default.

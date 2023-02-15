@@ -56,8 +56,10 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Add more fault tolerance to user input prompt function.
 - [X] Add support for multiple plates in pre-recorded mode.
 - [X] Make sound playing more organized.
-- [ ] Made real-time alert handling more efficient.
-- [ ] Add alerts to pre-recorded mode.
+- [X] Made real-time alert handling more efficient.
+- [X] Add alerts to pre-recorded mode.
+- [X] Add support for multiple alert databases.
+- [ ] Add the ability to update lists in the configuration from management mode.
 
 
 # Hypothetical

@@ -15,8 +15,10 @@
             "realtime": true,
             "dashcam": true
         },
+        "default_license_plate_format": "",
+        "alerts_ignore_validation": true,
         "alert_databases": {
-            "license_plates": "https://v0lttech.com/predator/plates/police.json"
+            "license_plates": []
         }
     },
     "management": {
@@ -39,7 +41,6 @@
         "realtime_guesses": "20",
         "manual_trigger": false,
         "alpr_location_tagging": true,
-        "alerts_ignore_validation": true,
         "camera_resolution": "1920x1080",
         "real_time_cropping_enabled": false,
         "real_time_left_margin": "100",
@@ -71,7 +72,6 @@
         "save_real_time_object_recognition": true,
         "default_save_license_plates_preference": true,
         "default_save_images_preference": false,
-        "default_license_plate_format": " ",
         "default_realtime_object_recognition": false,
         "push_notifications_enabled": false,
         "gotify_server": "http://10.3.141.1:1522",

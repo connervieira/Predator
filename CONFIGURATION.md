@@ -55,9 +55,23 @@ This section of configuration values will effect Predator's general operation.
     - When the value for a particular mode is set to `false`, that mode's option will be hidden from the mode selection menu shown to the user when Predator starts, and the auto-start-mode command line arguments won't allow the user to boot Predator directly to that mode.
     - Under normal circumstances, all of these settings should be left as 'true', in order to enable full functionality of Predator, but there may be certain situations in which is useful to block certain modes from starting.
         - This setting is not intended to a be a security feature. It's completely trivial to bypass this setting by simply modifying the configuration file directly.
+- `default_license_plate_format`
+    - When this default setting isn't empty, Predator will use it's value as the default license plate format, and will skip the 'license plate format' prompt when running Predator in real-time mode and pre-recorded mode.
+    - The 'license plate format' preference provides Predator with an example of how license plates in your region should work.
+        - For example, license plates in the state of Ohio generally follow the pattern of 3 letters followed by 4 numbers. In Ohio, this preference might be set to `AAA0000` to filter out plate guesses that don't match the most common formatting pattern.
+        - This preference only considers the type of each character, not the character itself.
+            - In other words, `AAA0000` and `ABC1234` will function identically.
+            - This also means you can simply enter a random plate from a car located in the region you're scanning in to have a reasonably good chance at matching your region's formatting guidelines for license plates.
+        - It should be noted that some regions will have varying license plate formatting guidelines. In this case, setting this preference could inadvertently cause Predator to filter out valid plates.
+            - If you want to skip the preference prompt associated with this setting, but you don't want to supply a license plate format, set this preference to a single space.
+                - Example: `"default_license_plate_format": " "`
+- `alerts_ignore_validation`
+    - This setting determines whether alerts will respect or ignore the plate validation format.
+    - When this setting is set to `true`, if a plate fails the validation test, but matches an alert database plate, the alert will be displayed anyway.
+    - When set to `false`, only plates that have passed the validation test will be checked against the alert database.
 - `alert_databases`
     - This setting contains the file names all of the alert databases used by Predator.
-        - `license_plates` should be set to (if anything), a local file or remote network source containing a database of license plates that Predator should show heightened alerts for.
+        - `license_plates` should be set to (if anything), a JSON source containing a database of license plates that Predator should show heightened alerts for.
             - If this is a file, the file path should be relative to the root project directory.
                 - For example, if your alert database is in `/home/pi/Data/alerts.json`, and your root project directory is `/home/pi/Data/`, then then the alert database value should simply be set to `alerts.json`, not the the full file path.
             - If this is set to a remote source, the remote source should be a complete URL.
@@ -127,10 +141,6 @@ Configuration values in this section are settings specific to real-time mode.
 - `alpr_location_tagging`
     - This setting determines whether or not the current GPS location will be saved to the log file when each plate is detected.
     - For this setting to do anything, both the "save license plates" preference, and `gps_enabled` configuration value need to be turned on.
-- `alerts_ignore_validation`
-    - This setting determines whether alerts will respect or ignore the plate validation format.
-    - When this setting is set to `true`, if a plate fails the validation test, but matches an alert database plate, the alert will be displayed anyway.
-    - When set to `false`, only plates that have passed the validation test will be checked against the alert database.
 - `camera_resoultion`
     - This setting is a string that defines the resolution that FSWebcam will use when taking images through the connected camera.
     - It takes the format of `width x height`, with no spaces.
@@ -159,8 +169,9 @@ Configuration values in this section are settings specific to real-time mode.
         - `"--set brightness=100% -F 15 -S 5"`
     - For more information on what this setting can be used for, see the FSWebcam documentation by running `man fswebcam`.
 - `audio_alerts`
-    - This setting determines whether or not Predator will make use of audible alerts.
+    - This setting globally determines whether or not Predator will make use of audible alerts.
     - With this is set to `true`, Predator will play subtle alert noises when a plate is detected, and much more prominent noises when a plate in an alert database is detected.
+    - Individual sounds can be be customized as well.
 - `startup_sound`, `notification_sound`, `alert_sound`, `camera1_sound`, `camera2_sound`, `camera3_sound`
     - These are the audio sound effects played when `audio_alerts` is enabled.
         - `startup_sound` is the sound played just after Predator finishes loading.
@@ -179,8 +190,7 @@ Configuration values in this section are settings specific to real-time mode.
     - Flags can be used to supply information to the webhook.
         - Predator will replace `[L]` with the detected license plate.
         - Predator will replace `[T]` with the current time as a Unix epoch timestamp.
-        - Predator will replace `[A]` with the current alert status (`true` or `false`).
-            - Note that if multiple license plates are detected simultaneously, and one of them is in an alert database, then all of the license plates detected that frame will be marked as `true` for alert status, regardless of whether the individual plates are actually in the alert database themselves.
+        - Predator will replace `[A]` with the alert status of the license plate (`true` or `false`).
     - Examples:
         - `http://localhost/app.php?plate=[L]&time=[T]&alert=[A]`
         - `http://domain.tld/app/[L]`
@@ -217,16 +227,6 @@ Settings in the 'default settings' section allow you to configure Predator to sk
     - The 'image saving' preference determines whether or not Predator will save every image it takes in real-time mode.
         - This should typically be turned off (set to `false`), but it might be useful to turn it on (set to `true`) if you want Predator to operate like a time-lapse dashcam while running.
     - This should be set to either `true`, `false`, or be left blank.
-- `default_license_plate_format`
-    - When this default setting isn't empty, Predator will use it's value as the default license plate format, and will skip the 'license plate format' prompt when running Predator in real-time mode.
-    - The 'license plate format' preference provides Predator with an example of how license plates in your region should work.
-        - For example, license plates in the state of Ohio generally follow the pattern of 3 letters followed by 4 numbers. In Ohio, this preference might be set to `AAA0000` to filter out plate guesses that don't match the most common formatting pattern.
-        - This preference only considers the type of each character, not the character itself.
-            - In other words, `AAA0000` and `ABC1234` will function identically.
-            - This also means you can simply enter a random plate from a car located in the region you're scanning in to have a reasonably good chance at matching your region's formatting guidelines for license plates.
-        - It should be noted that some regions will have varying license plate formatting guidelines. In this case, setting this preference could inadvertently cause Predator to filter out valid plates.
-            - If you want to skip the preference prompt associated with this setting, but you don't want to supply a license plate format, set this preference to a single space.
-                - Example: `"default_license_plate_format": " "`
 - `default_realtime_object_recognition`
     - When this default setting isn't empty, Predator will use it's value as the default real-time object recognition preference, and will skip the 'real-time object recognition' prompt when running Predator in real-time mode.
     - This should be set to either `true`, `false`, or be left blank.
@@ -297,6 +297,7 @@ In order to better integrate with an existing system, Predator can communicate w
     - Note that Predator can only use each recording device for one task at a time, so if you run real-time mode with background recording enabled, you'll need to specify two different devices by changing `fswebcam_device` and `dashcam_device`.
 - `segment_length`
     - This setting is an integer that determines the length of each dashcam video clip before a new segment is created, measured in seconds.
+        - It should be noted that video segments are not guaranteed to exactly match the length set here.
     - When this value is set to '0', recordings will not be separated into segments.
 
 

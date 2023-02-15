@@ -33,7 +33,7 @@ December 5th, 2021
 
 ### Real-time Update
 
-This is the 'real-time update' of Predator, and adds real-time mode to Predator, where plates can be detected on a second-by-second basis, with automatic alerts and logging.
+This update adds real-time mode to Predator, where plates can be detected on a second-by-second basis, with automatic alerts and logging.
 
 December 6th, 2021
 
@@ -240,7 +240,6 @@ This update refines Predator's functionality, and focuses its purpose back on li
     - All of the functionality of Information Mode has been moved to a new platform, called 'Assassin' in an effort to keep Predator focused and effective.
 - Added `manual_trigger` configuration value.
     - This configuration value allows for Predator to be manually trigger in real-time mode, where images are only captured when a button is presed by the user.
-- Predator now accepts wildcard file names in pre-recorded mode.
 - Simplified library importing process.
     - Libraries are now only imported if the configuration causes Predator to need them.
 - Removed logic for traffic camera alert processing.
@@ -263,12 +262,29 @@ This update refines Predator's functionality, and focuses its purpose back on li
 - Create a dedicated function for user input prompts.
     - User inputs are now much more fault tolerant, and will repeatedly prompt the user if they don't enter an expected input.
 - Made some adjustments to pre-recorded mode.
+    - Predator now accepts wildcard file names in pre-recorded mode.
     - Fixed an issue where selecting the object recognition menu in pre-recorded mode would give an unexpected error when object recognition was disabled.
     - Renamed the "raw data" option to "JSON data" through-out the menu.
     - Renamed the "GPS data" option to "positional data".
     - License plates detected in pre-recorded mode can now be correlated to nearby GPX points, even if they don't match timestamps exactly.
     - Multiple license plates can now be detected per frame.
         - This change indirectly fixed an issue where fractional frame intervals could cause crashes.
-- Added `delay_on_alert` configuration value, which allows for an additional delay to be triggered when a heightened alert is displayed.
+    - The license plate validation process is now exponentially more efficient.
+    - Pre-recorded mode now respects the `default_license_plate_format` configuration value.
+        - Moved the `default_license_plate_format` configuration value to the 'general' section.
+    - Pre-recorded mode now supports alerts.
+        - The `alerts_ignore_validation` configuration value has been moved to the 'general' section.
+    - CSV data display in the menu no longer has a trailing comma.
+- Dramatically improved alert handling.
+    - Alerts detected in real-time mode are now recorded to a dictionary every round, which makes processing and handling alerts more efficient and organized.
+    - Alerts are now handled on a plate by plate basis, instead of by frame.
+        - This means only the plates that match alert rules will be marked as alerts in webhook submissions, logs, and similar context.
+        - When the `alerts_ignore_validation` configuration value is enabled, a single rule matching multiple guesses for a particular plate will only be considered one alert.
+            - This prevents an alert with wildcards from repeatedly triggering for every similar guess.
+            - Separate rules and separate plates will still trigger multiple alerts.
+    - Added `delay_on_alert` configuration value, which allows for an additional delay to be triggered when a heightened alert is displayed in real-time mode.
+    - Removed support for plain text license plate alert databases.
+        - This dramatically simplifies the license plate alert database loading process, so the function to download remote alert databases was removed and replaced with a complete database loading function.
+    - Multiple alert databases can now be specified.
 - Improved sound playing process.
     - Sounds are now played with a function for sake of reliability and organization.

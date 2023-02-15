@@ -227,26 +227,6 @@ def validate_plate(plate, template):
 
 
 
-# This function is used to download and process plain-text lists of license plates over a network.
-def download_plate_database(url):
-    raw_download_data = requests.get(url, timeout=6).text # Save the raw text data from the URL to a variable.
-
-    # Process the downloaded data step by step to form a list of all of the plates in the database.
-    processed_download_data = str(raw_download_data) # Convert the downloaded data to a string.
-
-    if (processed_download_data[0] == "{" or processed_download_data[1] == "{" or processed_download_data[2] == "{"): # Check to see if the first character in the file indicates that this alert database is a JSON database.
-        alert_database_list = json.loads(processed_download_data) # Load the alert database as JSON data.
-        return alert_database_list, "json"
-    else: # The alert database appears to be a plain text list.
-        processed_download_data = processed_download_data.replace("\\n", "\n") # Replace the indicated line-breaks with true line-breaks.
-        processed_download_data = re.sub('([^A-Z0-9\\n\\r\*\-\?\\[\\]])+', '', processed_download_data) # Remove all chracters except capital letters, numbers, and line-breaks.
-        download_data_list = processed_download_data.split() # Split the downloaded data line-by-line into a Python list.
-        return download_data_list, "text"
-
-
-
-
-
 
 # This is a simple function used to display large ASCII shapes.
 def display_shape(shape):
@@ -471,3 +451,56 @@ def start_dashcam(dashcam_devices, segment_length, resolution, framerate, direct
             iteration_counter = iteration_counter + 1 # Iterate the counter.
 
         print("Dashcam recording halted.")
+
+
+def display_alerts(active_alerts):
+    for alert in active_alerts: # Iterate through each active alert.
+        # Display an alert that is starkly different from the rest of the console output.
+        print(style.yellow + style.bold)
+        print("===================")
+        print("ALERT HIT - " + str(alert))
+        if ("rule" in active_alerts[alert]): # Check to see if a rule exists for this alert plate. This should always be the case, but it's worth checking for sake of stability.
+            print("Rule: " + str(active_alerts[alert]["rule"])) # Display the rule that triggered this alert.
+        if ("name" in active_alerts[alert]): # Check to see if a name exists for this alert plate.
+            print("Name: " + str(active_alerts[alert]["name"])) # Display this alert plate's name.
+        if ("description" in active_alerts[alert]): # Check to see if a name exists for this alert plate.
+            print("Description: " + str(active_alerts[alert]["description"])) # Display this alert plate's description.
+        print("===================")
+        print(style.end + style.end)
+
+
+
+
+def load_alert_database(sources):
+    complete_alert_database = {} # Set the complete alert database to a placeholder dictionary.
+    for source in sources: # Iterate through each source in the list of sources.
+        if (validators.url(source)): # Check to see if the user supplied a URL as their alert database.
+            if (config["developer"]["offline"] == False): # Check to see if offline mode is disabled.
+                raw_download_data = requests.get(source, timeout=6).text # Save the raw text data from the URL to a variable.
+                processed_download_data = str(raw_download_data) # Convert the downloaded data to a string.
+                try:
+                    alert_database = json.loads(processed_download_data) # Load the alert database as JSON data.
+                except:
+                    alert_database = {}
+                    display_message("The license plate alert database returned by the remote source doesn't appear to be compatible JSON data. This source has not been loaded.", 3)
+            else: # Predator is in offline mode, but a remote alert database source was specified.
+                alert_database = {} # Set the alert database to an empty dictionary.
+                display_message("A remote alert database source was specified, but Predator is in offline mode. This source has not been loaded.", 2)
+        else: # The input the user supplied doesn't appear to be a URL, so assume it is a file.
+            if (os.path.exists(root + "/" + source)): # Check to see if the database specified by the user actually exists.
+                f = open(root + "/" + source, "r") # Open the user-specified datbase file.
+                file_contents = f.read() # Read the file.
+                if (file_contents[0] == "{"): # Check to see if the first character in the file indicates that this alert database is a JSON database.
+                    alert_database = json.loads(file_contents) # Load the alert database as JSON data.
+                else:
+                    alert_database = {}
+                    display_message("The specified database doesn't appear to be a compatible JSON file. This source has not been loaded.", 3)
+                f.close() # Close the file.
+            else: # If the alert database specified by the user does not exist, alert the user of the error.
+                alert_database = {}
+                display_message("The alert database specified at " + root + "/" + source + " does not exist. This source has not been loaded.", 3)
+
+        for rule in alert_database: # Iterate over each rule in this database.
+            complete_alert_database[rule] = alert_database[rule] # Add this rule to the complete alert database.
+
+    return complete_alert_database
