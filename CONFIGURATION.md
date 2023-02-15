@@ -20,17 +20,17 @@ This section of configuration values will effect Predator's general operation.
     - This setting is a string determines which mode (if any) that Predator will automatically load into when being started.
     - There are 6 possible values this can be set to, not including being left blank.
         - When set to an empty string, Predator will prompt the user to select a mode each time it starts. This is the default.
-        - When set to "0", Predator will skip the 'mode' prompt, and automatically boot into Management Mode.
-        - When set to "1", Predator will skip the 'mode' prompt, and automatically boot into Pre-recorded Mode.
-        - When set to "2", Predator will skip the 'mode' prompt, and automatically boot into Real-time Mode.
-        - When set to "3", Predator will skip the 'mode' prompt, and automatically boot into Dash-cam Mode.
+        - When set to "0", Predator will skip the 'mode' prompt, and automatically boot into management mode.
+        - When set to "1", Predator will skip the 'mode' prompt, and automatically boot into pre-recorded mode.
+        - When set to "2", Predator will skip the 'mode' prompt, and automatically boot into real-time mode.
+        - When set to "3", Predator will skip the 'mode' prompt, and automatically boot into dash-cam mode.
     - It may be useful to change this setting in several different situations:
         - If you only ever use the same mode when using Predator, setting this to your preferred mode can save time.
         - When installing Predator in a vehicle, this setting can allow Predator to load without any user input.
             - See the "default" settings later in this document for more information on auto-starting.
 - `default_root`
-    - When this default setting isn't empty, Predator will use it's value as the default root project directory path, and will skip the 'root directory' prompt when running Predator in Real-time Mode and Dash-cam Node.
-    - This setting has no effect on Pre-recorded Mode.
+    - When this default setting isn't empty, Predator will use it's value as the default root project directory path, and will skip the 'root directory' prompt when running Predator in real-time mode and dash-cam mode.
+    - This setting has no effect on pre-recorded mode.
 - `silence_file_saving`
     - This setting determines whether or not Predator will display informational messages about file saving.
     - When this is set to `true`, Predator won't show information or notices when it saves information to disk.
@@ -57,19 +57,29 @@ This section of configuration values will effect Predator's general operation.
         - This setting is not intended to a be a security feature. It's completely trivial to bypass this setting by simply modifying the configuration file directly.
 - `alert_databases`
     - This setting contains the file names all of the alert databases used by Predator.
-        - `license_plates` should be set to (if anything), a plain-text list of license plates that Predator should show a heightened alert for.
-            - This file should be relative to the root project directory.
-    - Each value in this section should either be left blank, or be a file path relative to the root project folder.
-        - For example, if your alert database is in `/home/pi/Data/alerts.txt`, and your root project directory is `/home/pi/Data/`, then then the alert database value should simply be set to `alerts.txt`, not the the full file path.
+        - `license_plates` should be set to (if anything), a local file or remote network source containing a database of license plates that Predator should show heightened alerts for.
+            - If this is a file, the file path should be relative to the root project directory.
+                - For example, if your alert database is in `/home/pi/Data/alerts.json`, and your root project directory is `/home/pi/Data/`, then then the alert database value should simply be set to `alerts.json`, not the the full file path.
+            - If this is set to a remote source, the remote source should be a complete URL.
+                - For example, this might be set to `https://website.tld/alerts.json`
+
+
+## Management Mode Configuration
+
+Configuration values in this section are settings specific to management mode.
+
+- `disk_statistics`
+    - This configuration value is a boolean that enables and disables the disk statistics feature of management mode.
+    - Setting this to `false` disables disk statistics, and eliminates the need for the 'psutil' Python package.
 
 
 
 ## Pre-recorded Mode Configuration
 
-Configuration values in this section are settings specific to Pre-recorded Mode.
+Configuration values in this section are settings specific to pre-recorded mode.
 
 - `left_margin`, `right_margin`, `top_margin`, `bottom_margin`
-    - This value determines how many pixels will be cropped from each side of each frame in Pre-recorded Mode.
+    - This value determines how many pixels will be cropped from each side of each frame in pre-recorded mode.
     - This value should be specified as tight as reasonably possible to make Predator as accurate and efficient as it can be.
     - In most videos there will be a portion of the frame in which a license plate would never reasonably appear.
         - For example, in dash-cam video, there will rarely be a license plate in the top half of the frame when the camera is mounted facing straight forward.
@@ -80,22 +90,22 @@ Configuration values in this section are settings specific to Pre-recorded Mode.
 
 ## Real-time Mode Configuration
 
-Configuration values in this section are settings specific to Real-time Mode.
+Configuration values in this section are settings specific to real-time mode.
 
-- `realtime_alpr_enabled`
-    - This setting is a boolean that determines whether or not Predator will run license plate recognition while operating in Real-time Mode.
-    - Under normal circumstances, this should be left as `true`, since it will allow Predator to use it's full functionality. However, if you don't want license plate recognition, and only care about some of Predator's other functionality, then license plate recognition can be disabled to save time and improve efficiency.
+- `delay_on_alert`
+    - This setting is a decimal number that defines how many seconds Predator will delay after a heightened alert is displayed.
+    - This delay is in addition to the normal delay between rounds.
 - `realtime_alpr_disabled_delay`
     - This setting is used to add an artificial delay when Predator's real-time license plate recogition is disabled.
     - Typically, the license plate recognition process will take at least a second or two, allowing the user to read any on-screen messages before the processing cycle continues. This setting allows the user to specify in time, in seconds, that Predator will wait when `realtime_alpr_enabled` is set to `false`.
 - `realtime_output_level`
-    - This setting determines how much information Predator prints to the console while operating in Real-time Mode.
+    - This setting determines how much information Predator prints to the console while operating in real-time mode.
     - This setting has 3 different options.
         - Level "1": Only alerts are displayed.
         - Level "2": Only detections and other important events are displayed.
         - Level "3": All messages are displayed.
 - `clear_between_rounds`
-    - This setting determines whether or not Predator will clear the output screen between analysis rounds during Real-time Mode.
+    - This setting determines whether or not Predator will clear the output screen between analysis rounds during real-time mode.
 - `delay_between_rounds`
     - This setting changes how long Predator will wait in between analysis rounds.
     - This should usually be set to something very short, in order to allow Predator to process as much data as possible. However, there might be some cases in which it makes sense to slow down the process to allow the user to see what's happening.
@@ -104,7 +114,7 @@ Configuration values in this section are settings specific to Real-time Mode.
     - This setting is usually set to `false`, but there may be some situations in which it would make sense to turn it on for sake of troubleshooting.
         - In the event that you consistently get Predator to identify a plate, but it can't find a valid guess as to what its contents are, turning this on can help you figure out what Predator thinks its seeing.
 - `print_detected_plate_count`
-    - This setting is a boolean that determines whether or not Predator will show how many plates are detected in each frame while operating in Real-time Mode.
+    - This setting is a boolean that determines whether or not Predator will show how many plates are detected in each frame while operating in real-time mode.
 - `realtime_guesses`
     - This setting is a number in the form of a string that determines how many OpenALPR guesses Predator will take into account when analyzing a plate.
     - The higher this number is, the more likely Predator is to guess a plate incorrectly. The lower this number is, the less likely Predator will be to find a valid guess at all.
@@ -127,7 +137,7 @@ Configuration values in this section are settings specific to Real-time Mode.
     - Example:
         - `"1920x1080"`
 - `real_time_left_margin`, `real_time_right_margin`, `real_time_top_margin`, `real_time_bottom_margin`
-    - This value determines how many pixels will be cropped from each side of each frame in Real-time Mode.
+    - This value determines how many pixels will be cropped from each side of each frame in real-time mode.
     - This value should be specified as tight as reasonably possible to make Predator as accurate as it can be.
     - It should be noted that it's better to physically move and zoom your camera if possible.
         - Use of optical zoom and framing will lead to higher quality images for Predator to process.
@@ -143,7 +153,7 @@ Configuration values in this section are settings specific to Real-time Mode.
     - This setting simply determines the video device that Predator will use FSWebcam to access.
     - This should almost always be set to `"/dev/video0"`, but there may be some situations it which it would make sense to change this, such as when you want to run multiple cameras.
 - `fswebcam_flags`
-    - This setting specifies any additional arguments that you want to add to the FSWebcam command in Real-time Mode.
+    - This setting specifies any additional arguments that you want to add to the FSWebcam command in real-time mode.
     - This setting can be used to fine tune the way FSWebcam handles your camera.
     - Example:
         - `"--set brightness=100% -F 15 -S 5"`
@@ -154,7 +164,7 @@ Configuration values in this section are settings specific to Real-time Mode.
 - `startup_sound`, `notification_sound`, `alert_sound`, `camera1_sound`, `camera2_sound`, `camera3_sound`
     - These are the audio sound effects played when `audio_alerts` is enabled.
         - `startup_sound` is the sound played just after Predator finishes loading.
-        - `notification_sound` is the sound played when a valid plate is detected in Real-time Mode, and the plate is not in an alert database.
+        - `notification_sound` is the sound played when a valid plate is detected in real-time mode, and the plate is not in an alert database.
         - `alert_sound` is the sound played when a valid plate is detected, and the plate is in an alert database.
     - The `path` value should be set to the file path of the audio file you want to play.
     - The `repeat` value should be set to how many times you want the sound effect to be repeated.
@@ -164,7 +174,7 @@ Configuration values in this section are settings specific to Real-time Mode.
         - For example, if the audio clip you're repeating takes 2 seconds to play, and you want a 1 second delay between audio clips, this setting should be 3 seconds.
         - If the delay is set to zero, then all of the repetitions will play over top of each-other.
 - `webhook`
-    - This setting is a string used to define a webhook that Predator will send a request to when it detects a license plate in Real-time Mode.
+    - This setting is a string used to define a webhook that Predator will send a request to when it detects a license plate in real-time mode.
     - This setting should either be left blank, or be set to a URL.
     - Flags can be used to supply information to the webhook.
         - Predator will replace `[L]` with the detected license plate.
@@ -179,36 +189,36 @@ Configuration values in this section are settings specific to Real-time Mode.
     - When set to `true`, Predator will use things like large ASCII circles, squares, and triangles to indicate when a plate has been detected, when an alert has been triggered, and when a plate has been read, but failed validation.
     - If you intend on using Predator in a vehicle, this setting can drastically reduce the time it takes for you to look at the console output in order to figure out what Predator is doing.
 - `save_real_time_object_recognition`
-    - This setting determines whether or not Predator will save all of the objects it recognizes to disk while running in Real-time Mode.
+    - This setting determines whether or not Predator will save all of the objects it recognizes to disk while running in real-time mode.
     - When this is set to `false`, the objects recognized will only be printed to the console, and won't be saved to a file.
 - `speed_display_enabled`
-    - This configuration value is a boolean that determines whether or not the driver's current speed will be printed to the console during each processing cycle in Real-time Mode.
+    - This configuration value is a boolean that determines whether or not the driver's current speed will be printed to the console during each processing cycle in real-time mode.
     - For this configuration value to be active, `gps_enabled` needs to be enabled as well.
 
 
 ### Real-time Mode Default Settings
 
-Settings in the 'default settings' section allow you to configure Predator to skip some or all of the preferences prompts that appear when launching Predator in Real-time Mode. By configuring all of the default settings, as well as the `auto_start_mode` setting described above in the "General" section, it's possible to get Predator to start 100% autonomously after it's been executed.
+Settings in the 'default settings' section allow you to configure Predator to skip some or all of the preferences prompts that appear when launching Predator in real-time mode. By configuring all of the default settings, as well as the `auto_start_mode` setting described above in the "General" section, it's possible to get Predator to start 100% autonomously after it's been executed.
 
 - `default_alert_database`
-    - When this default setting isn't empty, Predator will use it's value as the default alert database file path, and will skip the 'alert database' prompt when running Predator in Real-time Mode.
+    - When this default setting isn't empty, Predator will use it's value as the default alert database file path, and will skip the 'alert database' prompt when running Predator in real-time mode.
     - The 'alert database' preference specifies a file path to a plain text file containing a list of license plates that Predator should alert for.
         - The text file should simply contain one license plate per line, and no other characters.
     - Just like the standard prompt that appears when loading Predator, this setting also accepts URLs to alert databases hosted over a network.
     - If you want to skip the 'alert database' prompt without supplying a database, simply set this variable to a single space.
         - Example: `"default_alert_database": " "`
 - `default_save_license_plates_preference`
-    - When this default setting isn't empty, Predator will use it's value as the default license plate saving preference, and will skip the 'license plate saving preference' prompt when running Predator in Real-time Mode.
+    - When this default setting isn't empty, Predator will use it's value as the default license plate saving preference, and will skip the 'license plate saving preference' prompt when running Predator in real-time mode.
     - The 'license plate saving' preference specifies whether or not Predator will write each of the license plates it detects to the root project directory.
-        - If you're running Predator in a headless configuration, this should almost certainly be turned on (set to `"y"`) so you can access the license plates detected at a later date.
-    - This should be set to either `"y"`, `"n"`, or be left blank.
+        - If you're running Predator in a headless configuration, this should almost certainly be turned on (set to `true`) so you can access the license plates detected at a later date.
+    - This should be set to either `true`, `false`, or be left blank.
 - `default_save_images_preference`
-    - When this default setting isn't empty, Predator will use it's value as the default image saving preference, and will skip the 'image saving preference' prompt when running Predator in Real-time Mode.
-    - The 'image saving' preference determines whether or not Predator will save every image it takes in Real-time Mode.
-        - This should typically be turned off (set to "n"), but it might be useful to turn it on (set to `"y"`) if you want Predator to operate like a time-lapse dashcam while running.
-    - This should be set to either `"y"`, `"n"`, or be left blank.
+    - When this default setting isn't empty, Predator will use it's value as the default image saving preference, and will skip the 'image saving preference' prompt when running Predator in real-time mode.
+    - The 'image saving' preference determines whether or not Predator will save every image it takes in real-time mode.
+        - This should typically be turned off (set to `false`), but it might be useful to turn it on (set to `true`) if you want Predator to operate like a time-lapse dashcam while running.
+    - This should be set to either `true`, `false`, or be left blank.
 - `default_license_plate_format`
-    - When this default setting isn't empty, Predator will use it's value as the default license plate format, and will skip the 'license plate format' prompt when running Predator in Real-time Mode.
+    - When this default setting isn't empty, Predator will use it's value as the default license plate format, and will skip the 'license plate format' prompt when running Predator in real-time mode.
     - The 'license plate format' preference provides Predator with an example of how license plates in your region should work.
         - For example, license plates in the state of Ohio generally follow the pattern of 3 letters followed by 4 numbers. In Ohio, this preference might be set to `AAA0000` to filter out plate guesses that don't match the most common formatting pattern.
         - This preference only considers the type of each character, not the character itself.
@@ -217,6 +227,9 @@ Settings in the 'default settings' section allow you to configure Predator to sk
         - It should be noted that some regions will have varying license plate formatting guidelines. In this case, setting this preference could inadvertently cause Predator to filter out valid plates.
             - If you want to skip the preference prompt associated with this setting, but you don't want to supply a license plate format, set this preference to a single space.
                 - Example: `"default_license_plate_format": " "`
+- `default_realtime_object_recognition`
+    - When this default setting isn't empty, Predator will use it's value as the default real-time object recognition preference, and will skip the 'real-time object recognition' prompt when running Predator in real-time mode.
+    - This should be set to either `true`, `false`, or be left blank.
 
 
 ### Real-time Mode Push Notification Settings
@@ -272,7 +285,7 @@ In order to better integrate with an existing system, Predator can communicate w
     - If you enter a frame rate too slow for the encoder, it might automatically be sped to a higher frame rate.
     - Example: `"dashcam_frame_rate": "30"`
 - `dashcam_device`
-    - This setting contains the camera devices Predator will attempt to use when recording video in Dash-cam Mode.
+    - This setting contains the camera devices Predator will attempt to use when recording video in dash-cam mode.
     - Each entry under this setting should contain a device identifier/name, as well as a reference to the device itself.
     - Example:
         - `"main_camera": "/dev/video0"`
@@ -280,8 +293,8 @@ In order to better integrate with an existing system, Predator can communicate w
     - The device name will be appended to any video file names in order to give the user a quick indication of which camera recorded each file.
     - Note: While you can specify an infinite number of cameras here, be aware that Predator might not be able to record with all of them. Bottlenecks like processor speed, RAM, and USB controller capabilities can cause issues with high numbers of cameras. Be sure to test your configuration before you start using it formally.
 - `dashcam_background_mode_realtime`
-    - This setting determines whether Predator will automatically enabled background dashcam recording when starting in Real-time Mode.
-    - Note that Predator can only use each recording device for one task at a time, so if you run Real-time Mode with background recording enabled, you'll need to specify two different devices by changing `fswebcam_device` and `dashcam_device`.
+    - This setting determines whether Predator will automatically enabled background dashcam recording when starting in real-time mode.
+    - Note that Predator can only use each recording device for one task at a time, so if you run real-time mode with background recording enabled, you'll need to specify two different devices by changing `fswebcam_device` and `dashcam_device`.
 - `segment_length`
     - This setting is an integer that determines the length of each dashcam video clip before a new segment is created, measured in seconds.
     - When this value is set to '0', recordings will not be separated into segments.

@@ -234,7 +234,7 @@ This update adds 'information mode', which allows Predator to rapidly display us
 
 ### Simplification Update
 
-This update refines Predator's functionality, and focuses it's purpose back on license plate and object recognition. Irrelevant features are moved to external programs that retain compatibility with Predator, but are entirely independent platforms.
+This update refines Predator's functionality, and focuses its purpose back on license plate and object recognition. Irrelevant features are moved to external programs that retain compatibility with Predator, but are entirely independent platforms. This update also emphasizes stability, reliability, and consistency.
 
 - Removed 'Information Mode'
     - All of the functionality of Information Mode has been moved to a new platform, called 'Assassin' in an effort to keep Predator focused and effective.
@@ -244,6 +244,7 @@ This update refines Predator's functionality, and focuses it's purpose back on l
 - Simplified library importing process.
     - Libraries are now only imported if the configuration causes Predator to need them.
 - Removed logic for traffic camera alert processing.
+- Removed the `realtime_alpr_enabled` configuration option.
 - Fixed a bug that could cause Predator to crash when object recognition was globally disabled in the configuration.
 - Added support for 'ignore lists' which allow users and administrators to set a list of license plates that should be ignored.
 - Updated the way several messages are displayed to be more concise and organized.
@@ -254,11 +255,11 @@ This update refines Predator's functionality, and focuses it's purpose back on l
     - Added dashcam video segmentation support.
 - Upgraded ALPR engine
     - Added support for the Phantom ALPR engine.
-        - Phantom ALPR is a modified version of OpenALPR, designed specifically to be used as Predator's back-end.
-    - Added a default fall-back in the event that the ALPR process fails.
+    - Added a default fall-back ALPR output in the event that the ALPR process fails.
 - Organized various code sections.
 - Added a timeout to all network functions to improve reliability.
 - Added more consistent error handling.
+    - Errors messages are now handled using a function.
 - Create a dedicated function for user input prompts.
     - User inputs are now much more fault tolerant, and will repeatedly prompt the user if they don't enter an expected input.
 - Made some adjustments to pre-recorded mode.
@@ -268,3 +269,4 @@ This update refines Predator's functionality, and focuses it's purpose back on l
     - License plates detected in pre-recorded mode can now be correlated to nearby GPX points, even if they don't match timestamps exactly.
     - Multiple license plates can now be detected per frame.
         - This change indirectly fixed an issue where fractional frame intervals could cause crashes.
+- Added `delay_on_alert` configuration value, which allows for an additional delay to be triggered when a heightened alert is displayed.

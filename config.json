@@ -1,10 +1,10 @@
 {
     "general": {
         "alpr_engine": "phantom",
-        "ascii_art_header": false,
+        "ascii_art_header": true,
         "custom_startup_message": "",
-        "auto_start_mode": "3",
-        "default_root": "/home/pi/predator",
+        "auto_start_mode": "",
+        "default_root": "",
         "silence_file_saving": true,
         "disable_object_recognition": false,
         "gps_enabled": false,
@@ -16,8 +16,11 @@
             "dashcam": true
         },
         "alert_databases": {
-            "license_plates": ""
+            "license_plates": "https://v0lttech.com/predator/plates/police.json"
         }
+    },
+    "management": {
+        "disk_statistics": false
     },
     "prerecorded": {
         "left_margin": "500",
@@ -27,10 +30,10 @@
         "max_gpx_time_difference": 5.0
     },
     "realtime": {
-        "realtime_alpr_enabled": true,
-        "realtime_output_level": "2",
+        "delay_on_alert": 10,
+        "realtime_output_level": "3",
         "clear_between_rounds": true,
-        "delay_between_rounds": "0.2",
+        "delay_between_rounds": "1",
         "print_invalid_plates": false,
         "print_detected_plate_count": true,
         "realtime_guesses": "20",
@@ -44,7 +47,7 @@
         "real_time_top_margin": "300",
         "real_time_bottom_margin": "300",
         "real_time_image_rotation": "0",
-        "fswebcam_device": "/dev/video1",
+        "fswebcam_device": "/dev/video0",
         "fswebcam_flags": "--set brightness=70%",
         "speed_display_enabled": false,
         "audio_alerts": false,
@@ -66,10 +69,10 @@
         "webhook": "",
         "shape_alerts": false,
         "save_real_time_object_recognition": true,
-        "default_save_license_plates_preference": "n",
-        "default_save_images_preference": "n",
+        "default_save_license_plates_preference": true,
+        "default_save_images_preference": false,
         "default_license_plate_format": " ",
-        "default_realtime_object_recognition": "n",
+        "default_realtime_object_recognition": false,
         "push_notifications_enabled": false,
         "gotify_server": "http://10.3.141.1:1522",
         "gotify_application_token": "",

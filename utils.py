@@ -32,15 +32,13 @@ config = json.load(open(predator_root_directory + "/config.json")) # Load the co
 import time # Required to add delays and handle dates/times
 import subprocess # Required for starting some shell commands
 import sys
-if (config["realtime"]["status_lighting_enabled"] == True or config["realtime"]["push_notifications_enabled"] == True or config["realtime"]["webhook"] != ""):
-    import requests # Required to make network requests
-    import validators # Required to validate URLs
+if (config["developer"]["offline"] == False): # Only import networking libraries if offline mode is turned off.
+    if (config["realtime"]["status_lighting_enabled"] == True or config["realtime"]["push_notifications_enabled"] == True or config["realtime"]["webhook"] != "" or config["general"]["alert_databases"]["license_plates"] != ""):
+        import requests # Required to make network requests
+        import validators # Required to validate URLs
 import re # Required to use Regex
 import datetime # Required for converting between timestamps and human readable date/time information
 from xml.dom import minidom # Required for processing GPX data
-import fnmatch # Required to use wildcards to check strings
-import lzma # Required to load ExCam database
-import math # Required to run more complex math calculations
 if (config["general"]["gps_enabled"] == True): # Only import the GPS libraries if GPS settings are enabled.
     from gps import * # Required to access GPS information.
     import gpsd
@@ -105,7 +103,6 @@ def is_number(value):
         return True
     except ValueError:
         return False
-
 
 
 

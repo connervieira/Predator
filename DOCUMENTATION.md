@@ -11,8 +11,18 @@ For further clarification on the terms used in this document, see DEFINITIONS.md
 
 This is the installation process for Predator and all of it's dependencies. This process is written assuming you're running a distribution of GNU/Linux, but it's theoretically possible to get Predator to function on MacOS as well.
 
-1. Install the required Python packages.
-    - `pip3 install validators opencv-python cvlib tensorflow keras silence-tensorflow psutil gps geopy gpsd-py3 requests`
+1. Install the necessary Python packages.
+    - Highly recommended: `pip3 install validators requests`
+        - Without these packages, Predator will lose the a wide gamut of features, including push notifications, status light interfacing, remote alert lists, and more.
+        - Unless you have good reason not to, it is highly recommended that you install these packages to avoid problems later.
+    - Optional, but necessary for GPS functions: `pip3 install gps geopy gpsd-py3`
+        - These packages are optional, but are required to enable live GPS features.
+        - These packages are not necessary to handle information from GPX files, and are only required to interact with live GPS devices.
+    - Optional, but necessary for object recognition: `pip3 install opencv-python cvlib tensorflow keras silence-tensorflow psutil`
+        - These packages are optional, but are required to enable object recognition features.
+        - These packages are not necessary for basic license plate recognition.
+    - Optional, but necessary disk usage analysis: `pip3 install psutil`
+        - This package is option, but enables the ability for Predator to view information regarding disk usage.
 2. Install an ALPR engine.
     - Predator needs an ALPR engine to be able to process license plates. The two main options are Phantom ALPR and OpenALPR.
         - OpenALPR is the arguably industry standard for open source license plate recognition.
@@ -43,7 +53,7 @@ This is the installation process for Predator and all of it's dependencies. This
     - If you don't install GPSD, Predator will encounter errors when GPS features are enabled in the configuration.
     - You can install GPSD using this command on a Debian based Linux machine: `sudo apt-get install gpsd gpsd-clients`
     - It may also be necessary to start GPSD. You can test to see if GPSD is working properly using the `cgps` command.
-8. Optionally, install RaspAP
+8. Optionally, install remote access software.
     - If you're installing Predator on a Raspberry Pi, you may find it useful to install a program like [RaspAP](https://github.com/RaspAP/raspap-webgui) (or similar program) in order to remotely manage your Predator instance, and eliminate the need for a full keyboard and display.
     - Predator works entirely via command line, meaning any set up that enables SSH access to the host will allow for remote management of Predator.
     - If you already have an access point installed in the same area as Predator, you can simply connect Predator to it, and use SSH on a separate device to access the instance remotely.
