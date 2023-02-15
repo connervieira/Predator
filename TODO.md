@@ -55,7 +55,7 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Add more resilent GPX position correlating.
 - [X] Add more fault tolerance to user input prompt function.
 - [X] Add support for multiple plates in pre-recorded mode.
-- [ ] Make sound playing more organized.
+- [X] Make sound playing more organized.
 - [ ] Made real-time alert handling more efficient.
 - [ ] Add alerts to pre-recorded mode.
 

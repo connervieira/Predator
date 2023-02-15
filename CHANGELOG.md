@@ -270,3 +270,5 @@ This update refines Predator's functionality, and focuses its purpose back on li
     - Multiple license plates can now be detected per frame.
         - This change indirectly fixed an issue where fractional frame intervals could cause crashes.
 - Added `delay_on_alert` configuration value, which allows for an additional delay to be triggered when a heightened alert is displayed.
+- Improved sound playing process.
+    - Sounds are now played with a function for sake of reliability and organization.

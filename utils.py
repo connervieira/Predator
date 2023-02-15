@@ -149,6 +149,14 @@ def prompt(message, optional=True, input_type=str, default=""):
 
 
 
+def play_sound(sound_id):
+    sound_key = sound_id + "_sound"
+    if (config["realtime"]["audio_alerts"] == True and int(config["realtime"][sound_key]["repeat"]) > 0): # Check to see if the user has audio alerts enabled.
+        for i in range(0, int(config["realtime"][sound_key]["repeat"])): # Repeat the sound several times, if the configuration says to.
+            os.system("mpg321 " + config["realtime"][sound_key]["path"] + " > /dev/null 2>&1 &") # Play the sound specified for this alert type in the configuration.
+            time.sleep(float(config["realtime"][sound_key]["delay"])) # Wait before playing the sound again.
+    else: # No sound with this ID exists in the configuration database, and therefore the sound can't be played.
+        display_message("No sound with the ID (" + str(sound_id) + ") exists in the configuration.", 3)
 
 
 
