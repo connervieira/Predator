@@ -132,7 +132,7 @@ March 1st, 2022
 
 ### Management Update
 
-This update adds "Management Mode", and improves the efficiency and organization of various user interfaces. This update also adds new functionality and several new features, including support for GPS.
+This update adds "management mode", and improves the efficiency and organization of various user interfaces. This update also adds new functionality and several new features, including support for GPS.
 
 March 26th, 2022
 
@@ -141,7 +141,7 @@ March 26th, 2022
 - Changed the import process for Tensorflow and OpenCV to allow for failure without terminating Predator.
 - Adjusted the status messages in real-time mode to more accurate represent the current processing step.
 - Added the ability to export license plate GPX location data collected in pre-recorded mode.
-- Added a new 'Management Mode', which allows the user to run basic system management tasks from inside the Predator interface.
+- Added a new 'management mode', which allows the user to run basic system management tasks from inside the Predator interface.
     - Users can now view files in a given Predator project folder.
     - Users can copy any combination of Predator project files to any directory on the system, including an external drive.
     - Users can delete any combination of Predator project files from any project directory.
@@ -199,7 +199,7 @@ March 26th, 2022
 
 March 30th, 2022
 
-This update adds 'information mode', which allows Predator to rapidly display useful information in the console output, as well as several new features to real-time mode.
+This update adds "information mode", which allows Predator to rapidly display useful information in the console output, as well as several new features to real-time mode.
 
 - Adjusted some comments that had typos or confusing wording.
 - License plate recognition can now be entirely disabled in real-time mode using the `realtime_alpr_enabled` configuration value.
@@ -208,7 +208,7 @@ This update adds 'information mode', which allows Predator to rapidly display us
     - This feature can be turned on and off in the configuration using the `speed_display_enabled` setting.
     - The current speed can be displayed in kilometers per hour, miles per hour, meters per second, feet per second, or knots.
 - Moved the `gps_enabled` and `speed_display_unit` configuration values to the `general` section.
-- Added 'Information Mode', which allows Predator to show customizable information displays in the console output.
+- Added 'information mode', which allows Predator to show customizable information displays in the console output.
     - This mode also adds several new configuration values.
         - `information_refresh_delay`
         - `displays`
@@ -234,10 +234,12 @@ This update adds 'information mode', which allows Predator to rapidly display us
 
 ### Simplification Update
 
+February 15th, 2023
+
 This update refines Predator's functionality, and focuses its purpose back on license plate and object recognition. Irrelevant features are moved to external programs that retain compatibility with Predator, but are entirely independent platforms. This update also emphasizes stability, reliability, and consistency.
 
-- Removed 'Information Mode'
-    - All of the functionality of Information Mode has been moved to a new platform, called 'Assassin' in an effort to keep Predator focused and effective.
+- Removed 'information mode'
+    - All of the functionality of information mode has been moved to a new platform, called 'Assassin' in an effort to keep Predator focused and effective.
 - Added `manual_trigger` configuration value.
     - This configuration value allows for Predator to be manually trigger in real-time mode, where images are only captured when a button is presed by the user.
 - Simplified library importing process.
