@@ -96,11 +96,14 @@ Configuration values in this section are settings specific to management mode.
 
 Configuration values in this section are settings specific to pre-recorded mode.
 
-- `left_margin`, `right_margin`, `top_margin`, `bottom_margin`
-    - This value determines how many pixels will be cropped from each side of each frame in pre-recorded mode.
-    - This value should be specified as tight as reasonably possible to make Predator as accurate and efficient as it can be.
-    - In most videos there will be a portion of the frame in which a license plate would never reasonably appear.
-        - For example, in dash-cam video, there will rarely be a license plate in the top half of the frame when the camera is mounted facing straight forward.
+- `image` contains settings related to image handling.
+    - `processing` contains settings related to image processing.
+        - `cropping` contains settings regarding image cropping.
+            - `enabled` determines whether image cropping is enabled in pre-recorded mode.
+            - `left_margin` determines how many pixels will be cropped off of the left side of the frame.
+            - `right_margin` determines how many pixels will be cropped off of the right side of the frame.
+            - `top_margin` determines how many pixels will be cropped off of the top of the frame.
+            - `bottom_margin` determines how many pixels will be cropped off of the bottom of the frame.
 - `max_gpx_time_difference`
     - This value is a number that determines the maximum time, in seconds, between the timestamp of a video frame and an entry in the corresponding GPX file, before they are considered to be different.
     - Setting this to lower values will force locations to be more accurate, but will increase the likelihood that no corresponding location is found for a given frame.
@@ -141,49 +144,38 @@ Configuration values in this section are settings specific to real-time mode.
 - `alpr_location_tagging`
     - This setting determines whether or not the current GPS location will be saved to the log file when each plate is detected.
     - For this setting to do anything, both the "save license plates" preference, and `gps_enabled` configuration value need to be turned on.
-- `camera_resoultion`
-    - This setting is a string that defines the resolution that FSWebcam will use when taking images through the connected camera.
-    - It takes the format of `width x height`, with no spaces.
-    - Example:
-        - `"1920x1080"`
-- `real_time_left_margin`, `real_time_right_margin`, `real_time_top_margin`, `real_time_bottom_margin`
-    - This value determines how many pixels will be cropped from each side of each frame in real-time mode.
-    - This value should be specified as tight as reasonably possible to make Predator as accurate as it can be.
-    - It should be noted that it's better to physically move and zoom your camera if possible.
-        - Use of optical zoom and framing will lead to higher quality images for Predator to process.
-    - In most videos there will be a portion of the frame in which a license plate would never reasonably appear.
-        - For example, in dash-cam video, there will rarely be a license plate in the top half of the frame when the camera is mounted facing straight forward.
-    - Note: The cropping process takes place after the rotating process described under `real_time_image_rotation`.
-- `real_time_image_rotation`
-    - This setting can be used to rotate images if your camera is mounted at an angle.
-    - Set this value to a number between 0 and 360 in order to rotate your images a certain number of degrees clockwise.
-        - For example, setting this value to '180' would flip the image upside down.
-    - Note: The rotating process takes place before the cropping process.
-- `fswebcam_device`
-    - This setting simply determines the video device that Predator will use FSWebcam to access.
-    - This should almost always be set to `"/dev/video0"`, but there may be some situations it which it would make sense to change this, such as when you want to run multiple cameras.
-- `fswebcam_flags`
-    - This setting specifies any additional arguments that you want to add to the FSWebcam command in real-time mode.
-    - This setting can be used to fine tune the way FSWebcam handles your camera.
-    - Example:
-        - `"--set brightness=100% -F 15 -S 5"`
-    - For more information on what this setting can be used for, see the FSWebcam documentation by running `man fswebcam`.
-- `audio_alerts`
-    - This setting globally determines whether or not Predator will make use of audible alerts.
-    - With this is set to `true`, Predator will play subtle alert noises when a plate is detected, and much more prominent noises when a plate in an alert database is detected.
-    - Individual sounds can be be customized as well.
-- `startup_sound`, `notification_sound`, `alert_sound`, `camera1_sound`, `camera2_sound`, `camera3_sound`
-    - These are the audio sound effects played when `audio_alerts` is enabled.
+- `image` contains settings related to image handling.
+    - `camera` contains settings related to image capture.
+        - `resoultion` determines the maximum resolution that images will be captured with, and is a string that takes the format of `[width]x[height]`.
+            - Example: `"1920x1080"`
+        - `device` specifies the camera device that will be used to capture images.
+            - Example: `"/dev/video0"`
+        - `arguments` specifies custom command line arguments that will be added to the FSWebcam command. This setting is entirely optional.
+            - Example: `"--set brightness=100% -F 15 -S 5"`
+    - `processing` contains settings related to image processing.
+        - `cropping` contains settings regarding image cropping.
+            - `enabled` determines whether image cropping is enabled in real-time mode.
+            - `left_margin` determines how many pixels will be cropped off of the left side of the frame.
+            - `right_margin` determines how many pixels will be cropped off of the right side of the frame.
+            - `bottom_margin` determines how many pixels will be cropped off of the bottom of the frame.
+            - `top_margin` determines how many pixels will be cropped off of the top of the frame.
+        - `rotation` contains settings regarding image cropping.
+            - `enabled` determines whether image rotation is enabled in real-time mode.
+            - `angle` determines the number of degrees clockwise that the image will be rotated.
+- `sounds` contains the sound effects that Predator can play when certain events occur.
+    - Each entry in this section has 3 attributes.
+        - The `path` value should be set to the file path of the audio file you want to play.
+        - The `repeat` value should be set to how many times you want the sound effect to be repeated.
+            - To disable a sound from playing, set this to 0.
+            - Under normal circumstances, this value should just be "1", but there might be some cases in which you want to play a particular sound repeatedly.
+        - The `delay` value determines how long Predator will wait, in seconds, between repetitions, if `reptition` is set to more than 1.
+            - Note that this delay includes the time it takes for the previous instances of the sound effect to play.
+            - For example, if the audio clip you're repeating takes 2 seconds to play, and you want a 1 second delay between audio clips, this setting should be 3 seconds.
+            - If the delay is set to zero, then all of the repetitions will play over top of each-other.
+    - Each entry in this section corresponds to a sound effect.
         - `startup_sound` is the sound played just after Predator finishes loading.
         - `notification_sound` is the sound played when a valid plate is detected in real-time mode, and the plate is not in an alert database.
         - `alert_sound` is the sound played when a valid plate is detected, and the plate is in an alert database.
-    - The `path` value should be set to the file path of the audio file you want to play.
-    - The `repeat` value should be set to how many times you want the sound effect to be repeated.
-        - Under normal circumstances, this value should just be "1", but there might be some cases in which you want to play a particular sound repeatedly.
-    - The `delay` value determines how long Predator will wait, in seconds, between repetitions, if `reptition` is set to more than 1.
-        - Note that this delay includes the time it takes for the previous instances of the sound effect to play.
-        - For example, if the audio clip you're repeating takes 2 seconds to play, and you want a 1 second delay between audio clips, this setting should be 3 seconds.
-        - If the delay is set to zero, then all of the repetitions will play over top of each-other.
 - `webhook`
     - This setting is a string used to define a webhook that Predator will send a request to when it detects a license plate in real-time mode.
     - This setting should either be left blank, or be set to a URL.
