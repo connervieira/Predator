@@ -55,6 +55,7 @@ import utils # Import the utils.py scripts.
 style = utils.style # Load the style from the utils script.
 clear = utils.clear # Load the screen clearing function from the utils script.
 prompt = utils.prompt # Load the user input prompt function from the utils script.
+is_json = utils.is_json # Load the function used to determine if a given string is valid JSON.
 play_sound = utils.play_sound # Load the function used to play sounds from the utils script.
 display_message = utils.display_message # Load the message display function from the utils script.
 process_gpx = utils.process_gpx # Load the GPX processing function from the utils script.
@@ -70,6 +71,9 @@ closest_key = utils.closest_key # Load the function used to find the closest ent
 start_dashcam = utils.start_dashcam # Load the function used to start dashcam recording.
 display_alerts = utils.display_alerts # Load the function used to display license plate alerts given the dictionary of alerts.
 load_alert_database = utils.load_alert_database # Load the function used to load license plate alert databases.
+heartbeat = utils.heartbeat # Load the function to issue heartbeats to the interface directory.
+log_plates = utils.log_plates # Load the function to issue ALPR results to the interface directory.
+log_alerts = utils.log_alerts # Load the function to issue active alerts to the interface directory.
 
 
 import ignore # Import the library to handle license plates in the ignore list.
@@ -912,7 +916,8 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
                             active_alerts[guess] = alert_database[rule] # Add this plate to the active alerts dictionary.
                             active_alerts[guess]["rule"] = rule # Add the rule that triggered this alert to the alert information.
                             active_alerts[guess]["frame"] = frame # Add the rule that triggered this alert to the alert information.
-                            break # Break the loop if an alert is found for this guess, in order to avoid triggering multiple alerts for each guess of the same plate.
+                            if (config["general"]["alerts"]["allow_duplicate_alerts"] == False):
+                                break # Break the loop if an alert is found for this guess, in order to avoid triggering multiple alerts for each guess of the same plate.
 
     display_alerts(active_alerts) # Display all active alerts.
     print("Done.\n")
@@ -1196,6 +1201,25 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
 # Real-time mode
 
 elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has set Predator to boot into real-time mode.
+
+
+    # Load the license plate history file.
+    if (config["realtime"]["saving"]["license_plates"] != ""): # Check to see if the license plate logging file name is not empty. If the file name is empty, then license plate logging will be disabled.
+        plate_log_file_location = config["general"]["working_directory"] + "/" + config["realtime"]["saving"]["license_plates"]
+        if (os.path.exists(plate_log_file_location) == False): # If the plate log file doesn't exist, create it.
+            save_to_file(plate_log_file_location, "{}", True) # Save a blank placeholder dictionary to the plate log file.
+
+        plate_log_file = open(plate_log_file_location, "r") # Open the plate log file for reading.
+        plate_log_file_contents = plate_log_file.read() # Read the raw contents of the plate file as a string.
+        plate_log_file.close() # Close the plate log file.
+
+        if (is_json(plate_log_file_contents) == True): # If the plate file contains valid JSON data, then load it.
+            plate_log = json.loads(plate_log_file_contents) # Read and load the plate log from the file contents.
+        else: # If the plate log file doesn't contain valid JSON data, then load a blank placeholder in it's place.
+            plate_log = json.loads("{}") # Load a blank placeholder dictionary.
+
+
+
     if (dashcam_background_mode_realtime == True): # Check to see if the user has enabled auto dashcam background recording in real-time mode.
         start_dashcam(dashcam_device, int(config["dashcam"]["segment_length"]), config["dashcam"]["dashcam_resolution"], config["dashcam"]["dashcam_frame_rate"], config["general"]["working_directory"], True) # Start the dashcam recording process.
         print("Started background dash-cam recording.")
@@ -1329,10 +1353,11 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
                     exit() # Terminate the program.
 
             if (ignore_plate == False): # Only process this plate if it isn't set to be ignored.
-                all_current_plate_guesses[detected_plate["plate_index"]] = [] # Create an empty list for this plate so we can add all the potential plate guesses to it in the next step.
+                all_current_plate_guesses[detected_plate["candidates"][0]["plate"]] = {} # Create an empty dictionary for this plate so we can add all the potential plate guesses to it in the next step.
 
                 for plate_guess in detected_plate["candidates"]: # Iterate through each plate guess candidate for each potential plate detected.
-                    all_current_plate_guesses[detected_plate["plate_index"]].append(plate_guess["plate"]) # Add the current plate guess candidate to the list of plate guesses.
+                    #all_current_plate_guesses[detected_plate["plate_index"]][plate_guess["plate"]] = plate_guess["confidence"] # Add the current plate guess candidate to the list of plate guesses.
+                    all_current_plate_guesses[detected_plate["candidates"][0]["plate"]][plate_guess["plate"]] = plate_guess["confidence"] # Add the current plate guess candidate to the list of plate guesses.
 
         if (config["realtime"]["interface"]["display"]["detected_plate_count"] == True): # Only print the number of plates detected this round if it's enabled in the configuration.
             print("Plates Detected: " + str(len(all_current_plate_guesses))) # Show the number of plates detected this round.
@@ -1391,7 +1416,7 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
 
                 # Run validation according to the configuration on the plate(s) detected.
                 if (config["general"]["alpr"]["license_plate_format"] == ""): # If the user didn't supply a license plate format, then skip license plate validation.
-                    detected_plate = str(all_current_plate_guesses[individual_detected_plate][1]) # Grab the most likely detected plate as the 'detected plate'.
+                    detected_plate = str(list(all_current_plate_guesses[individual_detected_plate].keys())[1]) # Grab the most likely detected plate as the 'detected plate'.
                     successfully_found_plate = True # Plate validation wasn't needed, so the fact that a plate existed at all means a valid plate was detected. Indicate that a plate was successfully found this round.
 
                 else: # If the user did supply a license plate format, then check all of the results against the formatting example.
@@ -1462,7 +1487,8 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
                         if (fnmatch.fnmatch(guess, rule)): # Check to see this detected plate guess matches this particular plate in the alert database, taking wildcards into account.
                             active_alerts[guess] = alert_database[rule] # Add this plate to the active alerts dictionary.
                             active_alerts[guess]["rule"] = rule # Add the rule that triggered this alert to the alert information.
-                            break # Break the loop if an alert is found for this guess, in order to avoid triggering multiple alerts for each guess of the same plate.
+                            if (config["general"]["alerts"]["allow_duplicate_alerts"] == False):
+                                break # Break the loop if an alert is found for this guess, in order to avoid triggering multiple alerts for each guess of the same plate.
 
         else: #  If the user has disabled alerts that ignore license plate validation, then only check the validated plate array against the alert database.
             for rule in alert_database: # Run through every plate in the alert plate database supplied by the user. If no database was supplied, this list will be empty, and will not run.
@@ -1497,30 +1523,45 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
 
 
 
-        # If enabled, save the detected license plate (if any) to a file on disk.
-        if (config["realtime"]["interface"]["display"]["output_level"] >= 3 and config["realtime"]["saving"]["license_plates"] == True): # Only display this status message if the output level indicates to do so.
-            print("Saving license plate data to disk...")
 
-        if (config["realtime"]["saving"]["license_plates"] == True): # Check to see if the user has the 'save detected license plates' preference enabled.
-            if (len(new_plates_detected) > 0): # Check to see if the new_plates_detected value is empty. If it is blank, that means no new plate was detected this round.
-                for plate in new_plates_detected: # Iterate through each plate that was detected this round.
-                    if (config["realtime"]["gps"]["alpr_location_tagging"] == True and config["realtime"]["gps"]["enabled"] == True): # Check to see if the configuration value for geotagging license plate detections has been enabled.
-                        current_location = get_gps_location() # Get the current location.
-                        export_data = plate + "," + str(round(time.time())) + "," + str(plate in active_alerts).lower() + "," + str(current_location[0]) + "," + str(current_location[1]) + "\n" # Add the individual plate to the export data.
-                    else:
-                        export_data = plate + "," + str(round(time.time())) + "," + str(plate in active_alerts).lower() + ",0.000,0.000\n" # Add the individual plate to the export data.
-                    add_to_file(config["general"]["working_directory"] + "/real_time_plates.csv", export_data, silence_file_saving) # Add the export data to the end of the file and write it to disk.
+        # Save detected license plates to file.
+        if (config["realtime"]["saving"]["license_plates"] != ""): # Check to see if license plate history saving is enabled.
+            current_time = time.time() # Get the current timestamp.
 
-        if (config["realtime"]["interface"]["display"]["output_level"] >= 3 and config["realtime"]["saving"]["license_plates"] == True): # Only display this status message if the output level indicates to do so.
-            print("Done.\n----------")
+            plate_log[current_time] = {} # Initialize an entry in the plate history log using the current time.
+
+            if (config["realtime"]["gps"]["alpr_location_tagging"] == True): # Check to see if the configuration value for geotagging license plate detections has been enabled.
+                if (config["realtime"]["gps"]["enabled"] == True): # Check to see if GPS functionality is enabled.
+                    current_location = get_gps_location() # Get the current location.
+                else:
+                    current_location = [0.0, 0.0] # Grab a placeholder for the current location, since GPS functionality is disabled.
+
+                plate_log[current_time]["location"] = {"lat": current_location[0],"lon": current_location[1]} # Add the current location to the plate history log entry.
+
+            plate_log[current_time]["plates"] = {}
+
+            for plate in all_current_plate_guesses: # Iterate though each plate detected this round.
+                plate_log[current_time]["plates"][plate] = {"alerts": [], "guesses": {}} # Initialize this plate in the plate log.
+                for guess in all_current_plate_guesses[plate]: # Iterate through each guess in this plate.
+                    if (guess in active_alerts): # Check to see if this guess matches one of the active alerts.
+                        plate_log[current_time]["plates"][plate]["alerts"].append(active_alerts[guess]["rule"]) # Add the rule that triggered the alert to a separate list.
+                    plate_log[current_time]["plates"][plate]["guesses"][guess] = all_current_plate_guesses[plate][guess] # Add this guess to the log, with its confidence level.
+
+
+                plate_log[current_time]["plates"][plate]["alerts"] = list(dict.fromkeys(plate_log[current_time]["plates"][plate]["alerts"])) # De-duplicate the 'alerts' list for this plate.
+
+            save_to_file(plate_log_file_location, json.dumps(plate_log), True) # Save the modified plate log to the disk as JSON data.
 
 
 
-        # TODO: Issue interface updates.
+
+
+        # Issue interface file updates.
         if (config["realtime"]["interface"]["display"]["output_level"] >= 3 and config["realtime"]["saving"]["license_plates"] == True): # Only display this status message if the output level indicates to do so.
             print("Issuing interface updates...")
-        # heartbeat() # Issue a status heartbeat.
-        # log_plates(alpr_results) # Update the list of recently detected license plates.
+        heartbeat() # Issue a status heartbeat.
+        log_plates(all_current_plate_guesses) # Update the list of recently detected license plates.
+        log_alerts(active_alerts) # Update the list of active_alerts.
         # log_alerts(active_alerts) # Update the list of active license plate alerts.
         if (config["realtime"]["interface"]["display"]["output_level"] >= 3 and config["realtime"]["saving"]["license_plates"] == True): # Only display this status message if the output level indicates to do so.
             print("Done.\n----------")
@@ -1545,7 +1586,6 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
 # Dash-cam mode
 
 elif (mode_selection == "3" and dashcam_mode_enabled == True): # The user has set Predator to boot into dash-cam mode.
-
     print("\nStarting dashcam recording at " + dashcam_resolution + "@" + dashcam_frame_rate + "fps") # Print information about the recording settings.
     start_dashcam(dashcam_device, int(config["dashcam"]["segment_length"]), config["dashcam"]["dashcam_resolution"], config["dashcam"]["dashcam_frame_rate"], config["general"]["working_directory"], False) # Start the dashcam recording process.
 

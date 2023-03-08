@@ -53,51 +53,209 @@ if (config["realtime"]["gps"]["enabled"] == True): # Only import the GPS librari
 
 
 
-
-
-
-
-# This function will be used to process GPX files into a Python dictionary.
-def process_gpx(gpx_file):
-    gpx_file = open(gpx_file, 'r') # Open the GPX document.
-
-    xmldoc = minidom.parse(gpx_file) # Load the full XML GPX document.
-
-    track = xmldoc.getElementsByTagName('trkpt') # Get all of the location information from the GPX document.
-    timing = xmldoc.getElementsByTagName('time') # Get all of the timing information from the GPX document.
-
-    gpx_data = {} 
-
-    for i in range(0, len(timing)): # Iterate through each point in the GPX file.
-        point_lat = track[i].getAttribute('lat') # Get the latitude for this point.
-        point_lon = track[i].getAttribute('lon') # Get the longitude for this point.
-        point_time = str(timing[i].toxml().replace("<time>", "").replace("</time>", "").replace("Z", "").replace("T", " ")) # Get the time for this point in human readable text format.
-
-        point_time = round(time.mktime(datetime.datetime.strptime(point_time, "%Y-%m-%d %H:%M:%S").timetuple())) # Convert the human readable timestamp into a Unix timestamp.
-
-        gpx_data[point_time] = {"lat": point_lat, "lon": point_lon} # Add this point to the decoded GPX data.
-
-
-    return gpx_data
-
-
-
-
 # Define the function that will be used to clear the screen.
 def clear():
     os.system("clear")
 
 
+def is_json(string):
+    try:
+        json_object = json.loads(string) # Try to load string as JSON information.
+    except ValueError as error_message: # If the process fails, then the string is not valid JSON.
+        return False # Return 'false' to indicate that the string is not JSON.
+
+    return True # If the try statement is successful, then return 'true' to indicate that the string is valid JSON.
+
+
+
+# Define a function for running a countdown timer.
+def countdown(timer):
+    for iteration in range(1, timer + 1): # Loop however many times specified by the `timer` variable.
+        print(str(timer - iteration + 1)) # Display the current countdown number for this iteration, but subtracting the current iteration count from the total timer length.
+        time.sleep(1) # Wait for 1 second.
+
+
+
+
+
+# Define the function that will be used to save files for exported data.
+def save_to_file(file_name, contents, silence=False):
+    fh = None
+    success = False
+    try:
+        fh = open(file_name, 'w')
+        fh.write(contents)
+        success = True   
+        if (silence == False):
+            print("Successfully saved at " + file_name + ".")
+    except IOError as e:
+        success = False
+        if (silence == False):
+            print(e)
+            print("Failed to save!")
+    finally:
+        try:
+            if fh:
+                fh.close()
+        except:
+            success = False
+    return success
+
+
+
+# Define the fuction that will be used to add to the end of a file.
+def add_to_file(file_name, contents, silence=False):
+    fh = None
+    success = False
+    try:
+        fh = open(file_name, 'a')
+        fh.write(contents)
+        success = True
+        if (silence == False):
+            print("Successfully saved at " + file_name + ".")
+    except IOError as e:
+        success = False
+        if (silence == False):
+            print(e)
+            print("Failed to save!")
+    finally:
+        try:
+            if fh:
+                fh.close()
+        except:
+            success = False
+    return success
+
+
+
+
+
+
+# Define the function used to handle the license plate interface file. This function is extremely similar to the `log_alerts()` function.
+plate_file_location = config["general"]["interface_directory"] + "/plates.json"
+if (os.path.exists(plate_file_location) == False): # If the plate log file doesn't exist, create it.
+    save_to_file(plate_file_location, "{}", True) # Save a blank placeholder dictionary to the plate log file.
+
+plate_file = open(plate_file_location, "r") # Open the plate log file for reading.
+plate_file_contents = plate_file.read() # Read the raw contents of the plate file as a string.
+plate_file.close() # Close the plate log file.
+
+if (is_json(plate_file_contents) == True): # If the plate file contains valid JSON data, then load it.
+    plate_log = json.loads(plate_file_contents) # Read and load the plate log from the file contents.
+else: # If the plate log file doesn't contain valid JSON data, then load a blank placeholder in it's place.
+    plate_log = json.loads("{}") # Load a blank placeholder dictionary.
+
+def log_plates(detected_plates):
+    global plate_log
+
+    plate_log[time.time()] = detected_plates
+
+
+    entries_to_remove = [] # Create a blank placeholder list to hold all of the entry keys that have expired and need to be removed.
+
+    for entry in plate_log.keys(): # Iterate through each entry in the plate history.
+        if (time.time() - float(entry) > 10): # Check to see if this entry has expired according the max age configuration value.
+            entries_to_remove.append(entry) # Add this entry key to the list of entries to remove.
+
+    for key in entries_to_remove: # Iterate through each of the keys designated to be removed.
+        plate_log.pop(key)
+
+    save_to_file(plate_file_location, json.dumps(plate_log), True) # Save the modified plate log to the disk as JSON data.
+
+
+
+
+# Define the function used to handle the alert interface file. This function is extremely similar to the `log_plates()` function.
+alert_file_location = config["general"]["interface_directory"] + "/alerts.json"
+if (os.path.exists(alert_file_location) == False): # If the alert log file doesn't exist, create it.
+    save_to_file(alert_file_location, "{}", True) # Save a blank placeholder dictionary to the alert log file.
+
+alert_file = open(alert_file_location, "r") # Open the alert log file for reading.
+alert_file_contents = alert_file.read() # Read the raw contents of the alert file as a string.
+alert_file.close() # Close the alert log file.
+
+if (is_json(alert_file_contents) == True): # If the alert file contains valid JSON data, then load it.
+    alert_log = json.loads(alert_file_contents) # Read and load the alert log from the file contents.
+else: # If the alert log file doesn't contain valid JSON data, then load a blank placeholder in it's place.
+    alert_log = json.loads("{}") # Load a blank placeholder dictionary.
+
+def log_alerts(active_alerts):
+    global alert_log
+
+    alert_log[time.time()] = active_alerts
+
+
+    entries_to_remove = [] # Create a blank placeholder list to hold all of the entry keys that have expired and need to be removed.
+
+    for entry in alert_log.keys(): # Iterate through each entry in the alert history.
+        if (time.time() - float(entry) > 10): # Check to see if this entry has expired according the max age configuration value.
+            entries_to_remove.append(entry) # Add this entry key to the list of entries to remove.
+
+    for key in entries_to_remove: # Iterate through each of the keys designated to be removed.
+        alert_log.pop(key)
+
+    save_to_file(alert_file_location, json.dumps(alert_log), True) # Save the modified alert log to the disk as JSON data.
+
+
+
+
+
+# Define the function used to handle system heartbeats, which allow external services to verify that the program is running.
+heartbeat_file_location = config["general"]["interface_directory"] + "/heartbeat.json"
+if (os.path.exists(heartbeat_file_location) == False): # If the heartbeat log file doesn't exist, create it.
+    save_to_file(heartbeat_file_location, "[]", True) # Save a blank placeholder list to the heartbeat log file.
+
+heartbeat_file = open(heartbeat_file_location, "r") # Open the heartbeat log file for reading.
+heartbeat_file_contents = heartbeat_file.read() # Read the raw contents of the heartbeat file as a string.
+heartbeat_file.close() # Close the heartbeat log file.
+
+if (is_json(heartbeat_file_contents) == True): # If the heartbeat file contains valid JSON data, then load it.
+    heartbeat_log = json.loads(heartbeat_file_contents) # Read and load the heartbeat log from the file.
+else: # If the heartbeat file doesn't contain valid JSON data, then load a blank placeholder in it's place.
+    heartbeat_log = json.loads("[]") # Load a blank placeholder list.
+
+def heartbeat():
+    global heartbeat_log
+    heartbeat_log.append(time.time()) # Add this pulse to the heartbeat log file, using the current time as the key.
+    heartbeat_log = heartbeat_log[-10:] # Trim the list to only contain the last entries.
+    save_to_file(heartbeat_file_location, json.dumps(heartbeat_log), True) # Save the modified heartbeat log to the disk as JSON data.
+
+
+
+
+
+
+
 
 # Define the function to display warning and error messages.
+
+# Load the error log file.
+error_file_location = config["general"]["interface_directory"] + "/errors.json"
+if (os.path.exists(error_file_location) == False): # If the error log file doesn't exist, create it.
+    save_to_file(error_file_location, "{}", True) # Save a blank placeholder dictionary to the error log file.
+
+error_file = open(error_file_location, "r") # Open the error log file for reading.
+error_file_contents = error_file.read() # Read the raw contents of the error file as a string.
+error_file.close() # Close the error log file.
+
+if (is_json(error_file_contents) == True): # If the error file contains valid JSON data, then load it.
+    error_log = json.loads(error_file_contents) # Read and load the error log from the file.
+else: # If the error file doesn't contain valid JSON data, then load a blank placeholder in it's place.
+    error_log = json.loads("{}") # Load a blank placeholder dictionary.
+
 def display_message(message, level=1):
     if (level == 1): # Display the message as a plain message.
         print(message)
     elif (level == 2): # Display the message as a warning.
         print(style.yellow + "Warning: " + message + style.end)
     elif (level == 3): # Display the message as an error.
+        error_log[time.time()] = message # Add this error message to the log file, using the current time as the key.
+        save_to_file(error_file_location, json.dumps(error_log), True) # Save the modified error log to the disk as JSON data.
         print(style.red + "Error: " + message + style.end)
-        prompt(style.faint + "Press enter to continue..." + style.end)
+        countdown(3)
+        #prompt(style.faint + "Press enter to continue..." + style.end)
+
+
 
 
 
@@ -178,62 +336,16 @@ def prompt(message, optional=True, input_type=str, default=""):
 
 def play_sound(sound_id):
     sound_key = sound_id + "_sound"
-    if (int(config["realtime"]["sounds"][sound_key]["repeat"]) > 0): # Check to see if the user has audio alerts enabled.
-        for i in range(0, int(config["realtime"]["sounds"][sound_key]["repeat"])): # Repeat the sound several times, if the configuration says to.
-            os.system("mpg321 " + config["realtime"]["sounds"][sound_key]["path"] + " > /dev/null 2>&1 &") # Play the sound specified for this alert type in the configuration.
-            time.sleep(float(config["realtime"]["sounds"][sound_key]["delay"])) # Wait before playing the sound again.
+    if (sound_key in config["realtime"]["sounds"]): # Check to make sure this sound ID actually exists in the configuration
+        if (int(config["realtime"]["sounds"][sound_key]["repeat"]) > 0): # Check to see if the user has audio alerts enabled.
+            for i in range(0, int(config["realtime"]["sounds"][sound_key]["repeat"])): # Repeat the sound several times, if the configuration says to.
+                os.system("mpg321 " + config["realtime"]["sounds"][sound_key]["path"] + " > /dev/null 2>&1 &") # Play the sound specified for this alert type in the configuration.
+                time.sleep(float(config["realtime"]["sounds"][sound_key]["delay"])) # Wait before playing the sound again.
     else: # No sound with this ID exists in the configuration database, and therefore the sound can't be played.
         display_message("No sound with the ID (" + str(sound_id) + ") exists in the configuration.", 3)
 
 
 
-# Define the function that will be used to save files for exported data.
-def save_to_file(file_name, contents, silence=False):
-    fh = None
-    success = False
-    try:
-        fh = open(file_name, 'w')
-        fh.write(contents)
-        success = True   
-        if (silence == False):
-            print("Successfully saved at " + file_name + ".")
-    except IOError as e:
-        success = False
-        if (silence == False):
-            print(e)
-            print("Failed to save!")
-    finally:
-        try:
-            if fh:
-                fh.close()
-        except:
-            success = False
-    return success
-
-
-
-# Define the fuction that will be used to add to the end of a file.
-def add_to_file(file_name, contents, silence=False):
-    fh = None
-    success = False
-    try:
-        fh = open(file_name, 'a')
-        fh.write(contents)
-        success = True
-        if (silence == False):
-            print("Successfully saved at " + file_name + ".")
-    except IOError as e:
-        success = False
-        if (silence == False):
-            print(e)
-            print("Failed to save!")
-    finally:
-        try:
-            if fh:
-                fh.close()
-        except:
-            success = False
-    return success
 
 
 def validate_plate(plate, template):
@@ -361,11 +473,6 @@ class style:
 
 
 
-# Define a function for running a countdown timer.
-def countdown(timer):
-    for iteration in range(1, timer + 1): # Loop however many times specified by the `timer` variable.
-        print(str(timer - iteration + 1)) # Display the current countdown number for this iteration, but subtracting the current iteration count from the total timer length.
-        time.sleep(1) # Wait for 1 second.
 
 
 
@@ -534,3 +641,33 @@ def load_alert_database(sources, project_directory):
             complete_alert_database[rule] = alert_database[rule] # Add this rule to the complete alert database.
 
     return complete_alert_database
+
+
+
+
+
+# This function will be used to process GPX files into a Python dictionary.
+def process_gpx(gpx_file):
+    gpx_file = open(gpx_file, 'r') # Open the GPX document.
+
+    xmldoc = minidom.parse(gpx_file) # Load the full XML GPX document.
+
+    track = xmldoc.getElementsByTagName('trkpt') # Get all of the location information from the GPX document.
+    timing = xmldoc.getElementsByTagName('time') # Get all of the timing information from the GPX document.
+
+    gpx_data = {} 
+
+    for i in range(0, len(timing)): # Iterate through each point in the GPX file.
+        point_lat = track[i].getAttribute('lat') # Get the latitude for this point.
+        point_lon = track[i].getAttribute('lon') # Get the longitude for this point.
+        point_time = str(timing[i].toxml().replace("<time>", "").replace("</time>", "").replace("Z", "").replace("T", " ")) # Get the time for this point in human readable text format.
+
+        point_time = round(time.mktime(datetime.datetime.strptime(point_time, "%Y-%m-%d %H:%M:%S").timetuple())) # Convert the human readable timestamp into a Unix timestamp.
+
+        gpx_data[point_time] = {"lat": point_lat, "lon": point_lon} # Add this point to the decoded GPX data.
+
+
+    return gpx_data
+
+
+

@@ -26,6 +26,8 @@ This section of configuration values will effect Predator's general operation.
     - `alerts_ignore_validation` is a boolean determines whether alerts will respect or ignore the plate validation format.
         - When this is set to `true`, if a plate fails the validation test, but matches an alert database plate, the alert will be displayed anyway.
         - When set to `false`, only plates that have passed the validation test will be checked against the alert database.
+    - `allow_duplicate_alerts` is a boolean determines whether a single license plate can trigger multiple alert rules.
+        - Setting this to `true` will cause Predator to check all guesses against all alert rules. This can lead to situations where alert rules with wildcards cause a single license plate to alert repeatedly, for each of its guesses.
     - `databases` is a list that contains strings, with each string pointing to either a local or remote license plate hot-list.
         - If a particular entry in this list is a file, the file path should be relative to the working directory.
             - For example, if your alert database is in `/home/pi/Data/alerts.json`, and your root project directory is `/home/pi/Data/`, then then the alert database value should simply be set to `"alerts.json"`, not the the full file path.
@@ -155,7 +157,10 @@ Configuration values in this section are settings specific to real-time mode.
         - `notification_sound` is the sound played when a valid plate is detected in real-time mode, and the plate is not in an alert database.
         - `alert_sound` is the sound played when a valid plate is detected, and the plate is in an alert database.
 - `saving` contains settings related to information logging while operating in real-time mode.
-    - `license_plates` is a boolean that determines whether or not Predator will log the license plates it detects.
+    - `license_plates` is a string that determines the JSON file name will use to save the license plates it detects in real-time mode.
+        - This file is created in the working directory.
+        - When this value is left as a blank string, license plate logging will be disabled.
+        - Example: `"plate_history.json"`
     - `object_recognition` is a boolean that determines whether or not Predator will log the objects it detects when object recognition is enabled.
     - `images` is a boolean that determines whether or not Predator will save every image it captures, instead of repeatedly overwriting a single image.
 - `push_notifications`

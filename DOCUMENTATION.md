@@ -175,7 +175,7 @@ After configuring Predator, you can try it out for the first time!
                 - Depending on the preferences, Predator might submit the license plate detected to a push notification service.
                 - Depending on the preferences for the session, Predator might also save images taken and the license plates detected.
                     - Images taken will be saved as `realtime_imageN.jpg` in the working directory. If saving images is turned on, 'N' with the sequential image number. Otherwise, the N will be removed.
-                    - Saved license plates will be saved to `real_time_plates.csv` in the working directory, provided license plate saving is enabled.
+                    - Detected license plates will be saved to disk in the working directory, provided license plate saving is enabled in the configuration.
                 - If a plate detected is in the alert database specified during the preferences stage earlier, it will show a prominent alert message in the console output.
         - Dash-cam mode
             - In dash-cam mode, Predator will record video indefinitely until disk space runs out, the return key is pressed, or the Predator process is terminated.

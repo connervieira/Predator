@@ -1,14 +1,16 @@
 {
     "general": {
         "working_directory": "/home/cvieira/Downloads/predator",
+        "interface_directory": "/home/cvieira/Downloads/interface",
         "alpr": {
             "engine": "phantom",
-            "guesses": 50,
+            "guesses": 5,
             "license_plate_format": ""
         },
         "alerts": {
             "alerts_ignore_validation": true,
-            "databases": []
+            "allow_duplicate_alerts": true,
+            "databases": ["https://v0lttech.com/predator/plates/test.json"]
         },
         "ascii_art_header": true,
         "custom_startup_message": "",
@@ -89,13 +91,13 @@
         "sounds": {
             "startup_sound": {
                 "path": "./assets/sounds/testnoise.mp3",
-                "repeat": "1",
+                "repeat": "0",
                 "delay": "0.3"
             },
             "notification_sound": {
                 "path": "./assets/sounds/platedetected.mp3",
                 "repeat": "1",
-                "delay": "0.7"
+                "delay": "0.3"
             },
             "alert_sound": {
                 "path": "./assets/sounds/alerthit.mp3",
@@ -104,7 +106,7 @@
             }
         },
         "saving": {
-            "license_plates": true,
+            "license_plates": "plate_history.json",
             "object_recognition": true,
             "images": false
         },
