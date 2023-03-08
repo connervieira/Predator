@@ -41,21 +41,18 @@ import time # Required to add delays and handle dates/times
 import subprocess # Required for starting some shell commands
 import sys
 if (config["developer"]["offline"] == False): # Only import networking libraries if offline mode is turned off.
-    if (config["realtime"]["status_lighting_enabled"] == True or config["realtime"]["push_notifications_enabled"] == True or config["realtime"]["webhook"] != "" or config["general"]["alert_databases"]["license_plates"] != ""):
+    if (config["realtime"]["status_lighting"]["enabled"] == True or config["realtime"]["push_notifications"]["enabled"] == True or len(config["general"]["alerts"]["databases"]) > 0):
         import requests # Required to make network requests
         import validators # Required to validate URLs
 import re # Required to use Regex
 import datetime # Required for converting between timestamps and human readable date/time information
 from xml.dom import minidom # Required for processing GPX data
-if (config["general"]["gps_enabled"] == True): # Only import the GPS libraries if GPS settings are enabled.
+if (config["realtime"]["gps"]["enabled"] == True): # Only import the GPS libraries if GPS settings are enabled.
     from gps import * # Required to access GPS information.
     import gpsd
 
 
 
-
-
-gps_enabled = config["general"]["gps_enabled"] # This setting determines whether or not Predator's GPS features are enabled.
 
 
 
@@ -181,7 +178,7 @@ def prompt(message, optional=True, input_type=str, default=""):
 
 def play_sound(sound_id):
     sound_key = sound_id + "_sound"
-    if (int(config["realtime"][sound_key]["repeat"]) > 0): # Check to see if the user has audio alerts enabled.
+    if (int(config["realtime"]["sounds"][sound_key]["repeat"]) > 0): # Check to see if the user has audio alerts enabled.
         for i in range(0, int(config["realtime"]["sounds"][sound_key]["repeat"])): # Repeat the sound several times, if the configuration says to.
             os.system("mpg321 " + config["realtime"]["sounds"][sound_key]["path"] + " > /dev/null 2>&1 &") # Play the sound specified for this alert type in the configuration.
             time.sleep(float(config["realtime"]["sounds"][sound_key]["delay"])) # Wait before playing the sound again.
@@ -377,7 +374,7 @@ def countdown(timer):
 
 # Define the function that will be used to get the current GPS coordinates.
 def get_gps_location(): # Placeholder that should be updated at a later date.
-    if (gps_enabled == True): # Check to see if GPS is enabled.
+    if (config["realtime"]["gps"]["enabled"] == True): # Check to see if GPS is enabled.
         try: # Don't terminate the entire script if the GPS location fails to be aquired.
             gpsd.connect() # Connect to the GPS daemon.
             gps_data_packet = gpsd.get_current() # Get the current information.

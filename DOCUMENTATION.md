@@ -96,11 +96,10 @@ After configuring Predator, you can try it out for the first time!
             - This command will force Predator to start into mode #3, which is dash-cam mode.
         - To learn more about each mode, see the mode descriptions below.
         - This command-line argument will override the `auto_start_mode` configuration value.
-    - To force Predator to use a particular root project directory, add the directory path as the second command line argument.
-        - A mode number must be entered as the first command line argument to specify a root project directory.
-        - This command-line argument will override the `default_root` configuration value.
+    - To force Predator to use a particular working directory, instead of the one specified in the configuration, add the directory path as the second command line argument.
+        - A mode number must be entered as the first command line argument to specify a working directory.
         - Example: `python3 main.py 2 /home/pi/PredatorData/`
-            - This command will force Predator to start into real-time mode, using the /home/pi/PredatorData directory as the root project folder.
+            - This command will force Predator to start into real-time mode, using the /home/pi/PredatorData directory as the working directory.
 2. Select a mode
     - Predator can operate in 4 possible modes.
         - Management mode (Mode 0)
@@ -119,12 +118,13 @@ After configuring Predator, you can try it out for the first time!
 3. Set preferences
     - Next Predator will prompt you to set your preferences for this session. The settings you are prompted for will change depending on the mode you choose. Below are the preference menus you'll see for all modes.
     - Management mode:
-        - In management mode, you'll only be asked for a root project directory. Simply create or select a folder containing the project you'd like to manage, or specify an empty folder to work from a clean state.
+        - In management mode, you'll only be asked for a working directory. Simply enter the absolute file path to a folder containing the project you'd like to manage.
+            - Leave this option blank to use the default value.
             - Example: `/home/user/Downloads/MyProjectFolder`
     - Pre-recorded mode:
-        - First, you'll be asked to set the root project folder. Simply create an empty folder, then place your video(s) into it. Specify the absolute path to this folder here.
+        - First, you'll be asked to set the working directory. Simply create an empty folder, then place your video(s) into it. Specify the absolute path to this folder here.
             - Example: `/home/pi/Downloads/MyProjectFolder`
-        - Next, you'll be asked to enter the file name(s) of the video(s) you want to analyze. Video(s) should be placed in the root project directory you just specified. If you have multiple video files, separate their names with a comma and space. If you want to scan an entire directory, Use a `*` wildcard as the first character.
+        - Next, you'll be asked to enter the file name(s) of the video(s) you want to analyze. Video(s) should be placed in the working directory you just specified. If you have multiple video files, separate their names with a comma and space. If you want to scan an entire directory, Use a `*` wildcard as the first character.
             - Example 1: `MyVideo.mp4`
             - Example 2: `MyFirstVideo.mp4, MySecondVideo.mp4`
             - Example 3: `*.mp4`
@@ -132,6 +132,7 @@ After configuring Predator, you can try it out for the first time!
             - Example: `2` will take a frame to process every 2 seconds of video. This would break up a 10 second video into 5 frames.
             - If you leave this setting blank, Predator will default to 1 frame per second.
         - Next, you'll be asked for a license plate format example. Filling out this value is highly recommended, since it will greatly reduce the number of incorrectly read plates. If this is left blank, no formatting validation will be used.
+            - Leave this option blank to use the default value.
             - This value can be set to any alphanumeric string. For example, if all the plates in your state have 3 letters followed by 4 numbers, you could set this value to "AAA0000" or "ABC1234". Both values will work the exact same way. Predator only looks at the type of each character, not the character itself.
             - For sake of simplicity, you can also just enter the license plate of another car in your state or region. Since Predator only looks to see whether a character is a number or letter, not the character itself, "EGY4011" will act identically to "AAA0000".
             - Example: `AAA0000`
@@ -142,36 +143,15 @@ After configuring Predator, you can try it out for the first time!
         - Next, you'll be asked for the time and date that the specified video recording started.
             - This preference takes the following format: YYYY-mm-dd HH:MM:SS
             - This preference is optional but will enabled the GPX file setting which grants the ability to correlate license plates to physical GPS locations.
-                - If you wish to correlate license plates to location data from a GPX file, simply place the GPX file in the root project directory, then enter it's file name at the prompt. Otherwise, leave it blank.
+                - If you wish to correlate license plates to location data from a GPX file, simply place the GPX file in the working directory, then enter it's file name at the prompt. Otherwise, leave it blank.
         - Finally, you'll be asked for the file name of a GPX file containing location information relevant to the video file you've specified.
             - This setting is optional, but supplying a GPX file with location data allows Predator to pin-point physical locations for each license plate it detects.
             - If you don't see this setting prompt when running Predator in pre-recorded mode, it's likely that you didn't supply a time and date in the previous prompt. This is required to enable GPX location correlation.
             - Example: `DashcamVideoLocation.gpx`
     - Real-time mode:
-        - First, you'll be asked to set the root project folder. Simply create an empty folder, or choose an already existing project folder, then place any files you want to use later into it. Specify the absolute path to this folder here.
-            - Example: `/home/pi/Downloads/MyProjectFolder`
-        - Next, you'll be asked for a license plate format example. Filling out this value is highly recommended, since it will greatly reduce the number of incorrectly read plates. If this is left blank, no formatting validation will be used.
-            - This value can be set to any alphanumeric string. For example, if all the plates in your state have 3 letters followed by 4 numbers, you could set this value to "AAA0000" or "ABC1234". Both values will work the exact same way.
-            - For sake of simplicity, you can also just enter the license plate of another car in your state or region. Since Predator only looks to see whether a character is a number or letter, not the character itself, "EGY4011" will act identically to "AAA0000".
-            - If you leave this setting blank, plate format validation will be disabled, and Predator will display/record every license plate it detects, regardless of formatting.
-        - Next, you'll be asked whether or not you want to save the license plates detected by Predator in real-time mode. When this turned on, Predator will automatically save every plate it detects in a file named `real_time_plates.csv` in the root project directory, along with a timestamp and whether or not the plate was in the alert database you specified before.
-            - This file follows this format: `plate,timestamp,alert_status,latitude,longitude`
-                - `plate` is replaced by the characters in the detected plate.
-                - `timestamp` is replaced by the time the plate was detected.
-                - `alert_status` is replaced with a boolean indicating whether or not the plate matches an alert rule.
-                - `latitude` is replaced by the GPS latitude that the plate was detected, if enabled.
-                - `longitude` is replaced by the GPS longitude that the plate was detected, if enabled.
-            - If you leave this setting blank, license plate saving will be disabled by default.
-            - Example: `y`
-        - Next, you'll be asked whether or not you want Predator to save every image it takes in real-time mode. For sake of storage, this should usually be turned off, but there may be times where you want Predator to act somewhat like a timelapse dashcam, and save every image it takes to the root project folder.
-            - If you leave this setting blank, image saving will be disabled by default.
-        - Finally, you'll be asked if you want to enable real-time object detection.
-            - If you don't see this prompt, it's likely object recognition is disabled in the configuration.
-            - Unless you have a good reason to enable this, it's generally advised to leave it disabled, since it can dramatically slow down Predator's processing speed.
-            - When this is enabled, Predator will search each image it takes for common objects, like cars, pedestrians, traffic signals, etc.
+        - Real-time mode has no preferences, and can only be modified in the configuration file.
     - Dash-cam mode:
-        - In dash-cam mode, you'll only be asked for a root project directory. Simply create an empty folder, and specify it's full absolute path here.
-            - Example: `/home/user/Downloads/MyProjectFolder`
+        - Dash-cam mode has no preferences, and can only be modified in the configuration file.
 4. Using Predator
     - After finishing setting up your preferences, Predator will begin running automatically. Below you'll see information for all operation modes of Predator.
         - Management mode
@@ -192,10 +172,10 @@ After configuring Predator, you can try it out for the first time!
             - When a license plate is detected, Predator will display it on screen.
                 - Depending on the preferences, Predator might also display a large ASCII shape to make it easier to see important information at a glance.
                 - Depending on the preferences, Predator might play an audio sound indicating the type of plate detected.
-                - Depending on the preferences, Predator might submit the license plate detected to a webhook and/or push notification service.
+                - Depending on the preferences, Predator might submit the license plate detected to a push notification service.
                 - Depending on the preferences for the session, Predator might also save images taken and the license plates detected.
-                    - Images taken will be saved as `realtime_imageN.jpg` in the root project folder. If saving images is turned on, 'N' with the sequential image number. Otherwise, the N will be removed.
-                    - Saved license plates will be saved to `real_time_plates.csv` in the root project folder, provided license plate saving is enabled.
+                    - Images taken will be saved as `realtime_imageN.jpg` in the working directory. If saving images is turned on, 'N' with the sequential image number. Otherwise, the N will be removed.
+                    - Saved license plates will be saved to `real_time_plates.csv` in the working directory, provided license plate saving is enabled.
                 - If a plate detected is in the alert database specified during the preferences stage earlier, it will show a prominent alert message in the console output.
         - Dash-cam mode
             - In dash-cam mode, Predator will record video indefinitely until disk space runs out, the return key is pressed, or the Predator process is terminated.

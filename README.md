@@ -14,7 +14,7 @@ While Predator is designed to be stable and reliable, you should not depend on i
 
 ## Description
 
-Predator is a multipurpose camera platform focused on license plate reading and object recognition. Predator can analyze pre-recorded video from dashcams, security cameras, or other devices, as well as real-time video streams from live vehicle-mounted cameras and static webcams. In addition to video analysis, Predator is also capable of acting as a traditional dash-cam or security camera, eliminating the need to install multiple devices for a single usage situation. When installed in a vehicle, Predator can seamlessly detect objects and license plates as you drive, sending you alerts automatically based on customizable criteria. When installed as a stationary security camera, Predator can run in the background, sending information to webhooks, or use audio alerts to indicate important events.
+Predator is a multipurpose camera platform focused on license plate reading and object recognition. Predator can analyze pre-recorded video from dashcams, security cameras, or other devices, as well as real-time video streams from live vehicle-mounted cameras and static webcams. In addition to video analysis, Predator is also capable of acting as a traditional dash-cam or security camera, eliminating the need to install multiple devices for a single usage situation. When installed in a vehicle, Predator can seamlessly detect objects and license plates as you drive, sending you alerts automatically based on customizable criteria. When installed as a stationary security camera, Predator can run in the background, and use push notifications or audio alerts to indicate important events.
 
 
 ## General Features
@@ -65,7 +65,7 @@ Predator supports GPX files to allow for correlating license plates detected in 
 
 ### Alerts
 
-Predator supports customizable real-time alerts, allowing the user to be notified when a license plate matching one on a list is detected through audible sound alerts, visual cues, webhooks, and even push notifications!
+Predator supports customizable real-time alerts, allowing the user to be notified when a license plate matching one on a list is detected through audible sound alerts, visual cues, and push notifications!
 
 ### Safe
 

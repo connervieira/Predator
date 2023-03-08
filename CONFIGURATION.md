@@ -7,14 +7,31 @@ This document describes the configuration values found `config.json`.
 
 This section of configuration values will effect Predator's general operation.
 
-- `alpr_engine`
-    - This is a string that determines what ALPR engine Predator will use.
-    - This can be set to either "openalpr" or "phantom".
-- `alpr_guesses`
-    - This setting is a number in the form of a string that determines how many guesses the ALPR engine will make when analyzing a plate.
-    - The higher this number is, the more likely Predator is to guess a plate incorrectly. The lower this number is, the less likely Predator will be to find a valid guess at all.
-    - By default this value is set to 20, which tends to be a healthy balance for the majority of tasks.
-- `ascii_art_header`
+- `working_directory` specifies the default directory that Predator will use for projects.
+    - This value can be over-ridden using command line arguments.
+    - In management mode and pre-recorded mode, this value serves as a default, but can be over-ridden by user input.
+    - In real-time mode and dash-cam mode, this value will be automatically used without user input.
+- `alpr` contains settings related to license plate recognition.
+    - `engine` is a string that determines what ALPR engine Predator will use.
+        - This can be set to either `"openalpr"` or `"phantom"`.
+    - `guesses` is an integer that determines how many guesses the ALPR engine will make when analyzing a plate.
+        - The higher this number is, the more likely Predator is to guess a plate incorrectly. The lower this number is, the less likely Predator will be to find a valid guess at all.
+    - `license_plate_format` is a string that provides Predator with an example of how license plates in your region should be formatted.
+        - For example, license plates in the state of Ohio generally follow the pattern of 3 letters followed by 4 numbers. In Ohio, this preference might be set to `AAA0000` to filter out plate guesses that don't match the most common formatting pattern.
+        - This preference only considers the type of each character, not the character itself.
+            - In other words, `AAA0000` and `ABC1234` will function identically.
+            - This also means you can simply enter any given plate from a car located in the region you're scanning in to have a reasonably good chance at matching your region's formatting guidelines for license plates.
+        - Leaving this blank will disable license plate format validation.
+- `alerts` contains settings related to license plate alerting.
+    - `alerts_ignore_validation` is a boolean determines whether alerts will respect or ignore the plate validation format.
+        - When this is set to `true`, if a plate fails the validation test, but matches an alert database plate, the alert will be displayed anyway.
+        - When set to `false`, only plates that have passed the validation test will be checked against the alert database.
+    - `databases` is a list that contains strings, with each string pointing to either a local or remote license plate hot-list.
+        - If a particular entry in this list is a file, the file path should be relative to the working directory.
+            - For example, if your alert database is in `/home/pi/Data/alerts.json`, and your root project directory is `/home/pi/Data/`, then then the alert database value should simply be set to `"alerts.json"`, not the the full file path.
+        - If a particular entry in this list is a remote source, the remote source should be a complete URL.
+            - For example, an entry might be set to `"https://website.tld/alerts.json"`.
+- `ascii_art_header`.
     - This value is a boolean that determines whether or not Predator will display a large ASCII art banner on start up. When set to `false`, the ASCII art banner will be replaced with a small, normal text title.
     - This setting may be useful to change in the event that Predator is being run on a device with a tiny display, where a large ASCII art header might cause formatting issues.
 - `custom_startup_message`
@@ -22,7 +39,7 @@ This section of configuration values will effect Predator's general operation.
     - By default, this is left blank, but you can use this to show a custom message to the user when Predator starts.
 - `auto_start_mode`
     - This setting is a string determines which mode (if any) that Predator will automatically load into when being started.
-    - There are 6 possible values this can be set to, not including being left blank.
+    - There are 4 possible values this can be set to, not including being left blank.
         - When set to an empty string, Predator will prompt the user to select a mode each time it starts. This is the default.
         - When set to "0", Predator will skip the 'mode' prompt, and automatically boot into management mode.
         - When set to "1", Predator will skip the 'mode' prompt, and automatically boot into pre-recorded mode.
@@ -32,9 +49,6 @@ This section of configuration values will effect Predator's general operation.
         - If you only ever use the same mode when using Predator, setting this to your preferred mode can save time.
         - When installing Predator in a vehicle, this setting can allow Predator to load without any user input.
             - See the "default" settings later in this document for more information on auto-starting.
-- `default_root`
-    - When this default setting isn't empty, Predator will use it's value as the default root project directory path, and will skip the 'root directory' prompt when running Predator in real-time mode and dash-cam mode.
-    - This setting has no effect on pre-recorded mode.
 - `silence_file_saving`
     - This setting determines whether or not Predator will display informational messages about file saving.
     - When this is set to `true`, Predator won't show information or notices when it saves information to disk.
@@ -43,43 +57,11 @@ This section of configuration values will effect Predator's general operation.
     - This setting can be used to globally disable object recognition (Tensorflow and OpenCV).
     - If you're on a platform that doesn't support OpenCV or Tensorflow, then you can set this to 'true' in order to prevent errors while using Predator.
     - Under normal usage, this should be set to `false`, since this will allow Predator to use it's full functionality.
-- `gps_enabled`
-    - This configuration value is used to globally enable and disable Predator's GPS functionality.
-    - If you don't have a GPS connected, or don't want to use location aware features, set this to `false`.
-- `speed_display_unit`
-    - This configuration value determines what units Predator will use to display the current speed.
-    - This value can only be set to the following strings:
-        - "mph" for miles-per-hour
-        - "kph" for kilometers-per-hour
-        - "mps" for meters-per-second
-        - "fps" for feet-per-second
-        - "knot" for knots
 - `modes_enabled`
     - This setting determines whether or not each mode is activated in Predator.
     - When the value for a particular mode is set to `false`, that mode's option will be hidden from the mode selection menu shown to the user when Predator starts, and the auto-start-mode command line arguments won't allow the user to boot Predator directly to that mode.
     - Under normal circumstances, all of these settings should be left as 'true', in order to enable full functionality of Predator, but there may be certain situations in which is useful to block certain modes from starting.
         - This setting is not intended to a be a security feature. It's completely trivial to bypass this setting by simply modifying the configuration file directly.
-- `default_license_plate_format`
-    - When this default setting isn't empty, Predator will use it's value as the default license plate format, and will skip the 'license plate format' prompt when running Predator in real-time mode and pre-recorded mode.
-    - The 'license plate format' preference provides Predator with an example of how license plates in your region should work.
-        - For example, license plates in the state of Ohio generally follow the pattern of 3 letters followed by 4 numbers. In Ohio, this preference might be set to `AAA0000` to filter out plate guesses that don't match the most common formatting pattern.
-        - This preference only considers the type of each character, not the character itself.
-            - In other words, `AAA0000` and `ABC1234` will function identically.
-            - This also means you can simply enter a random plate from a car located in the region you're scanning in to have a reasonably good chance at matching your region's formatting guidelines for license plates.
-        - It should be noted that some regions will have varying license plate formatting guidelines. In this case, setting this preference could inadvertently cause Predator to filter out valid plates.
-            - If you want to skip the preference prompt associated with this setting, but you don't want to supply a license plate format, set this preference to a single space.
-                - Example: `"default_license_plate_format": " "`
-- `alerts_ignore_validation`
-    - This setting determines whether alerts will respect or ignore the plate validation format.
-    - When this setting is set to `true`, if a plate fails the validation test, but matches an alert database plate, the alert will be displayed anyway.
-    - When set to `false`, only plates that have passed the validation test will be checked against the alert database.
-- `alert_databases`
-    - This setting contains the file names all of the alert databases used by Predator.
-        - `license_plates` should be set to (if anything), a JSON source containing a database of license plates that Predator should show heightened alerts for.
-            - If this is a file, the file path should be relative to the root project directory.
-                - For example, if your alert database is in `/home/pi/Data/alerts.json`, and your root project directory is `/home/pi/Data/`, then then the alert database value should simply be set to `alerts.json`, not the the full file path.
-            - If this is set to a remote source, the remote source should be a complete URL.
-                - For example, this might be set to `https://website.tld/alerts.json`
 
 
 ## Management Mode Configuration
@@ -113,37 +95,33 @@ Configuration values in this section are settings specific to pre-recorded mode.
 
 Configuration values in this section are settings specific to real-time mode.
 
-- `delay_on_alert`
-    - This setting is a decimal number that defines how many seconds Predator will delay after a heightened alert is displayed.
-    - This delay is in addition to the normal delay between rounds.
-- `realtime_alpr_disabled_delay`
-    - This setting is used to add an artificial delay when Predator's real-time license plate recogition is disabled.
-    - Typically, the license plate recognition process will take at least a second or two, allowing the user to read any on-screen messages before the processing cycle continues. This setting allows the user to specify in time, in seconds, that Predator will wait when `realtime_alpr_enabled` is set to `false`.
-- `output_level`
-    - This setting determines how much information Predator prints to the console while operating in real-time mode.
-    - This setting has 3 different options.
-        - Level "1": Only alerts are displayed.
-        - Level "2": Only detections and other important events are displayed.
-        - Level "3": All messages are displayed.
-- `clear_between_rounds`
-    - This setting determines whether or not Predator will clear the output screen between analysis rounds during real-time mode.
-- `delay_between_rounds`
-    - This setting changes how long Predator will wait in between analysis rounds.
-    - This should usually be set to something very short, in order to allow Predator to process as much data as possible. However, there might be some cases in which it makes sense to slow down the process to allow the user to see what's happening.
-- `print_invalid_plates`
-    - This setting is a boolean that determines whether or not Predator will print every guess it makes as to the contents of a license plates, even if those guesses are invalidated by the license plate format sample.
-    - This setting is usually set to `false`, but there may be some situations in which it would make sense to turn it on for sake of troubleshooting.
-        - In the event that you consistently get Predator to identify a plate, but it can't find a valid guess as to what its contents are, turning this on can help you figure out what Predator thinks its seeing.
-- `print_detected_plate_count`
-    - This setting is a boolean that determines whether or not Predator will show how many plates are detected in each frame while operating in real-time mode.
-- `manual_trigger`
-    - This setting determines whether or not Predator will wait to be manually triggered before taking a picture for license plate analysis.
-    - When this setting is set to `true`, Predator will only take pictures when the enter key is pressed.
-    - When this setting is set to `false`, Predator will take pictures as fast as the processing allows.
-    - It can be useful to enable this setting when you want to improve Predator's efficiency by only triggering it when a car passes.
-- `alpr_location_tagging`
-    - This setting determines whether or not the current GPS location will be saved to the log file when each plate is detected.
-    - For this setting to do anything, both the "save license plates" preference, and `gps_enabled` configuration value need to be turned on.
+- `interface` contains settings related to the command line interface.
+    - `display` contains settings related to what information is displayed.
+        - `show_invalid_plates` is a boolean that determines whether or not Predator will print every guess it makes as to the contents of a license plates, even if those guesses are invalidated by the license plate format sample.
+        - `detected_plate_count` is a boolean that determines whether or not Predator will show how many plates were detected each frame while operating in real-time mode.
+        - `shape_alerts` is a boolean that determines whether or not large ASCII shapes will be printed to the console to indicate certain important events at a glance.
+        - `output_level` is an integer that determines how verbose Predator's console output will be.
+            - This setting only has 3 different options.
+                - Level "1": Only alerts are displayed.
+                - Level "2": Only detections and other important events are displayed.
+                - Level "3": All messages are displayed.
+        - `speed_display` contains settings related to displaying the current GPS speed. These settings are only applicable when the `realtime>gps>enabled` setting is set to `true`.
+            - `enabled` is a boolean value that determines whether Predator will display the current speed at the beginning of each processing round.
+            - `unit` determines the unit of measurement that Predator will display the current speed in. This can only be set to one of the following values:
+                - `"mph"` for miles-per-hour
+                - `"kph"` for kilometers-per-hour
+                - `"mps"` for meters-per-second
+                - `"fps"` for feet-per-second
+                - `"knot"` for knots
+    - `behavior` contains settings related to how information is displayed.
+        - `delays` contains values related to delays between processing rounds.
+            - `alert` is a decimal number that determines how long Predator will delay before starting the next round when there is an active alert.
+            - `normal` is a decimal number that determines how long Predator will delay before starting the next round under normal circumstances.
+        - `clearing` is a boolean that determines whether or not Predator will clear the output screen between analysis rounds during real-time mode.
+        - `manual_trigger` is a boolean that determines if Predator will only capture images when the user manually triggers it by pressing enter.
+- `gps` contains settings related to GPS-based features.
+    - `enabled` is a boolean determines whether GPS features are enabled or disabled.
+    - `alpr_location_tagging` is a boolean that determines whether or not the current GPS location will be saved to the log file each time a plate is logged.
 - `image` contains settings related to image handling.
     - `camera` contains settings related to image capture.
         - `resoultion` determines the maximum resolution that images will be captured with, and is a string that takes the format of `[width]x[height]`.
@@ -176,91 +154,37 @@ Configuration values in this section are settings specific to real-time mode.
         - `startup_sound` is the sound played just after Predator finishes loading.
         - `notification_sound` is the sound played when a valid plate is detected in real-time mode, and the plate is not in an alert database.
         - `alert_sound` is the sound played when a valid plate is detected, and the plate is in an alert database.
-- `webhook`
-    - This setting is a string used to define a webhook that Predator will send a request to when it detects a license plate in real-time mode.
-    - This setting should either be left blank, or be set to a URL.
-    - Flags can be used to supply information to the webhook.
-        - Predator will replace `[L]` with the detected license plate.
-        - Predator will replace `[T]` with the current time as a Unix epoch timestamp.
-        - Predator will replace `[A]` with the alert status of the license plate (`true` or `false`).
-    - Examples:
-        - `http://localhost/app.php?plate=[L]&time=[T]&alert=[A]`
-        - `http://domain.tld/app/[L]`
-- `shape_alerts`
-    - This setting determines whether or not Predator will use large shapes printed to the console to indicate certain important events.
-    - When set to `true`, Predator will use things like large ASCII circles, squares, and triangles to indicate when a plate has been detected, when an alert has been triggered, and when a plate has been read, but failed validation.
-    - If you intend on using Predator in a vehicle, this setting can drastically reduce the time it takes for you to look at the console output in order to figure out what Predator is doing.
-- `save_real_time_object_recognition`
-    - This setting determines whether or not Predator will save all of the objects it recognizes to disk while running in real-time mode.
-    - When this is set to `false`, the objects recognized will only be printed to the console, and won't be saved to a file.
-- `speed_display_enabled`
-    - This configuration value is a boolean that determines whether or not the driver's current speed will be printed to the console during each processing cycle in real-time mode.
-    - For this configuration value to be active, `gps_enabled` needs to be enabled as well.
-
-
-### Real-time Mode Default Settings
-
-Settings in the 'default settings' section allow you to configure Predator to skip some or all of the preferences prompts that appear when launching Predator in real-time mode. By configuring all of the default settings, as well as the `auto_start_mode` setting described above in the "General" section, it's possible to get Predator to start 100% autonomously after it's been executed.
-
-- `default_alert_database`
-    - When this default setting isn't empty, Predator will use it's value as the default alert database file path, and will skip the 'alert database' prompt when running Predator in real-time mode.
-    - The 'alert database' preference specifies a file path to a plain text file containing a list of license plates that Predator should alert for.
-        - The text file should simply contain one license plate per line, and no other characters.
-    - Just like the standard prompt that appears when loading Predator, this setting also accepts URLs to alert databases hosted over a network.
-    - If you want to skip the 'alert database' prompt without supplying a database, simply set this variable to a single space.
-        - Example: `"default_alert_database": " "`
-- `default_save_license_plates_preference`
-    - When this default setting isn't empty, Predator will use it's value as the default license plate saving preference, and will skip the 'license plate saving preference' prompt when running Predator in real-time mode.
-    - The 'license plate saving' preference specifies whether or not Predator will write each of the license plates it detects to the root project directory.
-        - If you're running Predator in a headless configuration, this should almost certainly be turned on (set to `true`) so you can access the license plates detected at a later date.
-    - This should be set to either `true`, `false`, or be left blank.
-- `default_save_images_preference`
-    - When this default setting isn't empty, Predator will use it's value as the default image saving preference, and will skip the 'image saving preference' prompt when running Predator in real-time mode.
-    - The 'image saving' preference determines whether or not Predator will save every image it takes in real-time mode.
-        - This should typically be turned off (set to `false`), but it might be useful to turn it on (set to `true`) if you want Predator to operate like a time-lapse dashcam while running.
-    - This should be set to either `true`, `false`, or be left blank.
-- `default_realtime_object_recognition`
-    - When this default setting isn't empty, Predator will use it's value as the default real-time object recognition preference, and will skip the 'real-time object recognition' prompt when running Predator in real-time mode.
-    - This should be set to either `true`, `false`, or be left blank.
-
-
-### Real-time Mode Push Notification Settings
-
-All settings in this section are related to network-based push notifications via Gotify.
-
-- `push_notifications_enabled`
-    - This setting determines whether or not Predator will attempt to send push notifications using a Gotify server.
-    - This value is a boolean value, and should only ever be set to `true` or `false`
-- `gotify_server`
-    - This setting specifies the Gotify server that Predator will attempt to use. It should include the protocol and port number.
-    - This value must be configured if `push_notifications_enabled` is set to `true`
-    - Example:
-- `gotify_application_token`
-    - This setting specifies the Gotify application token that Predator will attempt to use to send notifications through the specified Gotify server.
-    - This value must be configured if `push_notifications_enabled` is set to `true`
-    - Example:
-        `AJrhgGs83mL22kZ`
-
-
-### Real-time Mode Status Lighting Settings
-
-In order to better integrate with an existing system, Predator can communicate with LEDs via GET requests to display basic information.
-
-- `status_lighting_enabled`
-    - This setting is simply a boolean value that determines whether or not Predator will attempt to make use of LED status lights
-    - If you don't have status lighting set up, then leave this configuration value set to `false` to prevent Predator from attempting to update non-existent status lights.
-- `status_lighting_base_url`
-    - This is the base part of the URL that Predator will send requests to in order to update the status lighting.
-    - By default, this setting is set to the default router IP address of the "WLED" lighting controller software. However, you should be able to modify it to fit any lighting controller software that supports GET network requests.
-    - This is that value that precedes the `status_lighting_values` entries explained below.
-- `status_lighting_values`
-    - These are individual values that will be appended to the `status_lighting_base_url` setting described above in order to form the URL that Predator will send a request to.
-    - This is where you specify what RGB colors Predator will use for each status indication.
-        - The "alert" status is used when Predator detects a license plate in an alert database.
-        - The "notice" status is used when Predator detects any valid license plate.
-        - The "normal" status is used when Predator is running, and hasn't detected any license plates in the past processing cycle.
-
-
+- `saving` contains settings related to information logging while operating in real-time mode.
+    - `license_plates` is a boolean that determines whether or not Predator will log the license plates it detects.
+    - `object_recognition` is a boolean that determines whether or not Predator will log the objects it detects when object recognition is enabled.
+    - `images` is a boolean that determines whether or not Predator will save every image it captures, instead of repeatedly overwriting a single image.
+- `push_notifications`
+    - `enabled`
+        - This setting determines whether or not Predator will attempt to send push notifications using a Gotify server.
+        - This value is a boolean value, and should only ever be set to `true` or `false`
+    - `server`
+        - This setting specifies the Gotify server that Predator will attempt to use. It should include the protocol and port number.
+        - This value must be configured if `push_notifications_enabled` is set to `true`
+        - Example:
+    - `token`
+        - This setting specifies the Gotify application token that Predator will attempt to use to send notifications through the specified Gotify server.
+        - This value must be configured if `push_notifications_enabled` is set to `true`
+        - Example:
+            `AJrhgGs83mL22kZ`
+- `status_lighting`
+    - `status_lighting_enabled`
+        - This setting is simply a boolean value that determines whether or not Predator will attempt to make use of LED status lights
+        - If you don't have status lighting set up, then leave this configuration value set to `false` to prevent Predator from attempting to update non-existent status lights.
+    - `status_lighting_base_url`
+        - This is the base part of the URL that Predator will send requests to in order to update the status lighting.
+        - By default, this setting is set to the default router IP address of the "WLED" lighting controller software. However, you should be able to modify it to fit any lighting controller software that supports GET network requests.
+        - This is that value that precedes the `status_lighting_values` entries explained below.
+    - `status_lighting_values`
+        - These are individual values that will be appended to the `status_lighting_base_url` setting described above in order to form the URL that Predator will send a request to.
+        - This is where you specify what RGB colors Predator will use for each status indication.
+            - The "alert" status is used when Predator detects a license plate in an alert database.
+            - The "notice" status is used when Predator detects any valid license plate.
+            - The "normal" status is used when Predator is running, and hasn't detected any license plates in the past processing cycle.
 
 
 

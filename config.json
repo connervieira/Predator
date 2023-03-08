@@ -1,25 +1,27 @@
 {
     "general": {
-        "alpr_engine": "phantom",
-        "alpr_guesses": 50,
+        "working_directory": "/home/cvieira/Downloads/predator",
+        "alpr": {
+            "engine": "phantom",
+            "guesses": 50,
+            "license_plate_format": ""
+        },
+        "alerts": {
+            "alerts_ignore_validation": true,
+            "databases": []
+        },
         "ascii_art_header": true,
         "custom_startup_message": "",
         "auto_start_mode": "",
-        "default_root": "",
         "silence_file_saving": true,
-        "disable_object_recognition": false,
-        "gps_enabled": false,
-        "speed_display_unit": "mph",
+        "object_recognition": {
+            "enabled": true
+        },
         "modes_enabled": {
             "management": true,
             "prerecorded": true,
             "realtime": true,
             "dashcam": true
-        },
-        "default_license_plate_format": "",
-        "alerts_ignore_validation": true,
-        "alert_databases": {
-            "license_plates": []
         }
     },
     "management": {
@@ -40,14 +42,30 @@
         "max_gpx_time_difference": 5.0
     },
     "realtime": {
-        "delay_on_alert": 10.0,
-        "output_level": 2,
-        "clear_between_rounds": true,
-        "delay_between_rounds": "1",
-        "print_invalid_plates": false,
-        "print_detected_plate_count": true,
-        "manual_trigger": false,
-        "alpr_location_tagging": true,
+        "interface": {
+            "display": {
+                "show_invalid_plates": false,
+                "detected_plate_count": true,
+                "shape_alerts": false,
+                "output_level": 2,
+                "speed_display": {
+                    "enabled": false,
+                    "unit": "mph"
+                }
+            },
+            "behavior": {
+                "delays": {
+                    "alert": 10.0,
+                    "normal": "1"
+                },
+                "clearing": true,
+                "manual_trigger": false
+            }
+        },
+        "gps": {
+            "enabled": false,
+            "alpr_location_tagging": true
+        },
         "image": {
             "camera": {
                 "resolution": "1920x1080",
@@ -68,7 +86,6 @@
                 }
             }
         },
-        "speed_display_enabled": false,
         "sounds": {
             "startup_sound": {
                 "path": "./assets/sounds/testnoise.mp3",
@@ -86,21 +103,24 @@
                 "delay": "2"
             }
         },
-        "webhook": "",
-        "shape_alerts": false,
-        "save_real_time_object_recognition": true,
-        "default_save_license_plates_preference": true,
-        "default_save_images_preference": false,
-        "default_realtime_object_recognition": false,
-        "push_notifications_enabled": false,
-        "gotify_server": "http://10.3.141.1:1522",
-        "gotify_application_token": "",
-        "status_lighting_enabled": false,
-        "status_lighting_base_url": "http://predatorwled.local/win&A=255",
-        "status_lighting_values": {
-            "alert": "[U]&R=255&G=0&B=0",
-            "warning": "[U]&R=255&G=128&B=0",
-            "normal": "[U]&R=0&G=255&B=0"
+        "saving": {
+            "license_plates": true,
+            "object_recognition": true,
+            "images": false
+        },
+        "push_notifications": {
+            "enabled": false,
+            "server": "http://10.3.141.1:1522",
+            "token": ""
+        },
+        "status_lighting": {
+            "enabled": false,
+            "base_url": "http://predatorwled.local/win&A=255",
+            "values": {
+                "alert": "[U]&R=255&G=0&B=0",
+                "warning": "[U]&R=255&G=128&B=0",
+                "normal": "[U]&R=0&G=255&B=0"
+            }
         }
     },
     "dashcam": {

@@ -306,5 +306,12 @@ This update refines Predator's functionality, and focuses its purpose back on li
 
 *Release date to be determined*
 
+- Removed webhook functionality, since this functionality is being replaced by Predator Fabric.
+- Dramatically changed the configuration layout.
 - Added `kill_plate` developer option.
-    - This option sets a plate that will cause Predator to immediately exit for debugging.
+    - This option sets a plate that will cause Predator to immediately exit for debugging purposes.
+- The normal delay and alert delay are now mutually exclusive, and only one is triggered each round, depending on whether there are one or more active alerts.
+- Timestamp parsing in pre-recorded mode is now more fault tolerant.
+- Dramatically changed 'preferences' system.
+    - Real-time mode and dash-cam mode no longer have run-time preferences, and only consider configuration values.
+    - Management mode and pre-recorded mode have modified run-time preferences, and place more emphasis on configuration values.
