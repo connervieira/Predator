@@ -26,10 +26,17 @@
         "disk_statistics": false
     },
     "prerecorded": {
-        "left_margin": "500",
-        "right_margin": "500",
-        "top_margin": "500",
-        "bottom_margin": "300",
+        "image": {
+            "processing": {
+                "cropping": {
+                    "enabled": false,
+                    "left_margin": 500,
+                    "right_margin": 500,
+                    "top_margin": 500,
+                    "bottom_margin": 300
+                }
+            }
+        },
         "max_gpx_time_difference": 5.0
     },
     "realtime": {
@@ -41,31 +48,43 @@
         "print_detected_plate_count": true,
         "manual_trigger": false,
         "alpr_location_tagging": true,
-        "camera_resolution": "1920x1080",
-        "real_time_cropping_enabled": false,
-        "real_time_left_margin": "100",
-        "real_time_right_margin": "100",
-        "real_time_top_margin": "300",
-        "real_time_bottom_margin": "300",
-        "real_time_image_rotation": "0",
-        "fswebcam_device": "/dev/video0",
-        "fswebcam_flags": "--set brightness=70%",
+        "image": {
+            "camera": {
+                "resolution": "1920x1080",
+                "device": "/dev/video0",
+                "arguments": "--set brightness=70%"
+            },
+            "processing": {
+                "cropping": {
+                    "enabled": false,
+                    "left_margin": 100,
+                    "right_margin": 100,
+                    "top_margin": 300,
+                    "bottom_margin": 300
+                },
+                "rotation": {
+                    "enabled": false,
+                    "angle": "0"
+                }
+            }
+        },
         "speed_display_enabled": false,
-        "audio_alerts": true,
-        "startup_sound": {
-            "path": "./assets/sounds/testnoise.mp3",
-            "repeat": "1",
-            "delay": "0.3"
-        },
-        "notification_sound": {
-            "path": "./assets/sounds/platedetected.mp3",
-            "repeat": "1",
-            "delay": "0.7"
-        },
-        "alert_sound": {
-            "path": "./assets/sounds/alerthit.mp3",
-            "repeat": "1",
-            "delay": "2"
+        "sounds": {
+            "startup_sound": {
+                "path": "./assets/sounds/testnoise.mp3",
+                "repeat": "1",
+                "delay": "0.3"
+            },
+            "notification_sound": {
+                "path": "./assets/sounds/platedetected.mp3",
+                "repeat": "1",
+                "delay": "0.7"
+            },
+            "alert_sound": {
+                "path": "./assets/sounds/alerthit.mp3",
+                "repeat": "1",
+                "delay": "2"
+            }
         },
         "webhook": "",
         "shape_alerts": false,

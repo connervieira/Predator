@@ -126,13 +126,6 @@ alerts_ignore_validation = config["general"]["alerts_ignore_validation"] # This 
 license_plate_alert_database_source = config["general"]["alert_databases"]["license_plates"] # This configuration value defines the file that Predator will load the alert list for license plates from.
 
 
-# ----- Pre-recorded mode configuration -----
-left_margin = config["prerecorded"]["left_margin"] # How many pixels will be cropped on the left side of the frame in pre-recorded mode.
-right_margin = config["prerecorded"]["right_margin"] # How many pixels will be cropped on the right side of the frame in pre-recorded mode.
-top_margin = config["prerecorded"]["top_margin"] # How many pixels will be cropped on the top of the frame in pre-recorded mode.
-bottom_margin = config["prerecorded"]["bottom_margin"] # How many pixels will be cropped on the bottom of the frame in pre-recorded mode.
-
-
 
 # ----- Real-time mode configuration -----
 realtime_output_level = int(config["realtime"]["output_level"]) # This setting determines how much information Predator shows the user while operating in real-time mode.
@@ -142,15 +135,9 @@ print_invalid_plates = config["realtime"]["print_invalid_plates"] # In real-time
 print_detected_plate_count = config["realtime"]["print_detected_plate_count"] # This setting determines whether or not Predator will print how many license plates it detects in each frame while operating in real-time mode.
 manual_trigger = config["realtime"]["manual_trigger"] # This setting determines whether or not Predator will wait to be manually triggered before taking an image.
 alpr_location_tagging = config["realtime"]["alpr_location_tagging"] # This setting determines whether or not detected license plates will be tagged with the current GPS location.
-camera_resolution = config["realtime"]["camera_resolution"] # This is the resolution you want to use when taking images using the connected camera. Under normal circumstances, this should be the maximum resoultion supported by your camera.
-real_time_cropping_enabled = config["realtime"]["real_time_cropping_enabled"] # This value determines whether or not each frame captured in real-time mode will be cropped.
-real_time_left_margin = config["realtime"]["real_time_left_margin"] # How many pixels will be cropped from the left side of the frame in real-time mode.
-real_time_right_margin = config["realtime"]["real_time_right_margin"] # How many pixels will be cropped from the right side of the frame in real-time mode.
-real_time_top_margin = config["realtime"]["real_time_top_margin"] # How many pixels will be cropped from the bottom side of the frame in real-time mode.
-real_time_bottom_margin = config["realtime"]["real_time_bottom_margin"] # How many pixels will be cropped from the top side of the frame in real-time mode.
-real_time_image_rotation = config["realtime"]["real_time_image_rotation"] # How many degrees clockwise the image will be rotated in real-time mode.
-fswebcam_device = config["realtime"]["fswebcam_device"] # This setting determines the video device that 'fswebcam' will use to take images in real-time mode.
-fswebcam_flags = config["realtime"]["fswebcam_flags"] # These are command flags that will be added to the end of the FSWebcam command. You can use these to customize how FSWebcam takes images in real-time mode based on your camera set up.
+
+fswebcam_device = config["realtime"]["fswebcam_device"] # This setting determines the video device that 'fswebcam' will use to take images in real-time mode. TODO: Update
+fswebcam_flags = config["realtime"]["fswebcam_flags"] # These are command flags that will be added to the end of the FSWebcam command. You can use these to customize how FSWebcam takes images in real-time mode based on your camera set up. TODO: Update
 webhook = config["realtime"]["webhook"] # This setting can be used to define a webhook that Predator will send a request to when it detects a license plate in real-time mode. See CONFIGURATION.md to learn more about how to use flags in this setting.
 shape_alerts = config["realtime"]["shape_alerts"] # This setting determines whether or not prominent text-based shapes will be displayed for various actions. This is useful in vehicle installations where you may want to see whether or not Predator detected a plate at a glance.
 save_real_time_object_recognition = config["realtime"]["save_real_time_object_recognition"] # This setting determines whether or not Predator will save the objects detected in real-time mode to a file. When this is turned off, object recognition data will only be printed to the console.
@@ -225,27 +212,27 @@ if (config["general"]["alpr_engine"] != "phantom" and config["general"]["alpr_en
 if (os.path.exists(crop_script_path) == False): # Check to see that the cropping script exists at the path specified by the user in the configuration.
     display_message("The 'crop_script_path' defined in the configuration section doesn't point to a valid file. Image cropping will be broken. Please make sure the 'crop_script_path' points to a valid file.", 3)
 
-if (int(left_margin) < 0 or int(right_margin) < 0 or int(bottom_margin) < 0 or int(top_margin) < 0): # Check to make sure that all of the pre-recorded mode cropping margins are positive numbers.
+if (config["prerecorded"]["image"]["processing"]["cropping"]["left_margin"] < 0 or config["prerecorded"]["image"]["processing"]["cropping"]["right_margin"] < 0 or config["prerecorded"]["image"]["processing"]["cropping"]["bottom_margin"] < 0 or config["prerecorded"]["image"]["processing"]["cropping"]["top_margin"] < 0): # Check to make sure that all of the pre-recorded mode cropping margins are positive numbers.
     display_message("One or more of the cropping margins for pre-recorded mode are below 0. This should never happen, and it's likely there's a configuration issue somewhere. Cropping margins have all been set to 0.", 3)
-    left_margin = "0"
-    right_margin = "0"
-    bottom_margin = "0"
-    top_margin = "0"
+    config["prerecorded"]["image"]["processing"]["cropping"]["left_margin"] = 0
+    config["prerecorded"]["image"]["processing"]["cropping"]["right_margin"] = 0
+    config["prerecorded"]["image"]["processing"]["cropping"]["bottom_margin"] = 0
+    config["prerecorded"]["image"]["processing"]["cropping"]["top_margin"] = 0
 
-if (int(real_time_left_margin) < 0 or int(real_time_right_margin) < 0 or int(real_time_bottom_margin) < 0 or int(real_time_top_margin) < 0): # Check to make sure that all of the real-time mode cropping margins are positive numbers.
+if (config["realtime"]["image"]["processing"]["cropping"]["left_margin"] < 0 or config["realtime"]["image"]["processing"]["cropping"]["right_margin"] < 0 or config["realtime"]["image"]["processing"]["cropping"]["bottom_margin"] < 0 or config["realtime"]["image"]["processing"]["cropping"]["top_margin"] < 0): # Check to make sure that all of the real-time mode cropping margins are positive numbers.
     display_message("One or more of the cropping margins for real-time mode are below 0. This should never happen, and it's likely there's a configuration issue somewhere. Cropping margins have all been set to 0.", 3)
-    real_time_left_margin = "0"
-    real_time_right_margin = "0"
-    real_time_bottom_margin = "0"
-    real_time_top_margin = "0"
+    config["realtime"]["image"]["processing"]["cropping"]["left_margin"] = 0
+    config["realtime"]["image"]["processing"]["cropping"]["right_margin"] = 0
+    config["realtime"]["image"]["processing"]["cropping"]["top_margin"] = 0
+    config["realtime"]["image"]["processing"]["cropping"]["bottom_margin"] = 0
 
 if (re.fullmatch("(\d\d\dx\d\d\d)", dashcam_resolution) == None and re.fullmatch("(\d\d\d\dx\d\d\d)", dashcam_resolution) == None and re.fullmatch("(\d\d\d\dx\d\d\d\d)", dashcam_resolution) == None): # Verify that the dashcam_resolution setting matches the format 000x000, 0000x000, or 0000x0000.
     display_message("The 'dashcam_resolution' specified in the real-time configuration section doesn't seem to align with the '0000x0000' format. It's possible there has been a typo. defaulting to '1280x720'", 3)
     dashcam_resolution = "1280x720"
 
-if (fswebcam_device == ""): # Check to make sure that a camera device has been specified in the real-time configuration section.
-    display_message("The 'fswebcam_device' specified in the real-time configuration section is blank. It's possible there has been a typo. Defaulting to '/dev/video0'", 3)
-    fswebcam_device = "/dev/video0"
+if (os.path.exists(config["realtime"]["image"]["camera"]["device"]) == False): # Check to make sure that a camera device points to a valid file.
+    display_message("The 'realtime>image>camera>device' configuration value does not point to a valid file. Defaulting to '/dev/video0'", 3)
+    config["realtime"]["image"]["camera"]["device"] = "/dev/video0"
 
 
 shared_realtime_dashcam_device = False
@@ -820,10 +807,11 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
 
 
     # Crop the individual frames to make license plate recognition more efficient and accurate.
-    print("Cropping individual frames...")
-    for frame in frames:
-        os.system(crop_script_path + " " + root + "/frames/" + frame + " " + left_margin + " " + right_margin + " " + top_margin + " " + bottom_margin)
-    print("Done.\n")
+    if (config["prerecorded"]["image"]["processing"]["cropping"]["enabled"] == True): # Check to see if cropping is enabled in pre-recorded mode.
+        print("Cropping individual frames...")
+        for frame in frames:
+            os.system(crop_script_path + " " + root + "/frames/" + frame + " " + str(config["prerecorded"]["image"]["processing"]["cropping"]["left_margin"]) + " " + str(config["prerecorded"]["image"]["processing"]["cropping"]["right_margin"]) + " " + str(config["prerecorded"]["image"]["processing"]["cropping"]["top_margin"]) + " " + str(config["prerecorded"]["image"]["processing"]["cropping"]["bottom_margin"]))
+        print("Done.\n")
 
 
 
@@ -1342,9 +1330,9 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
         if (realtime_output_level >= 3): # Only display this status message if the output level indicates to do so.
             print("Taking image...")
         if (save_images_preference == True): # Check to see whether or not the user wants to save all images captured by Predator.
-            fswebcam_command = "fswebcam --no-banner -r " + camera_resolution + " -d " + fswebcam_device + " --jpeg 100 " + fswebcam_flags + " " + root + "/realtime_image" + str(i) + ".jpg >/dev/null 2>&1" # Set up the FSWebcam capture command.
+            fswebcam_command = "fswebcam --no-banner -r " + config["realtime"]["image"]["camera"]["resolution"] + " -d " + fswebcam_device + " --jpeg 100 " + fswebcam_flags + " " + root + "/realtime_image" + str(i) + ".jpg >/dev/null 2>&1" # Set up the FSWebcam capture command.
         else:
-            fswebcam_command = "fswebcam --no-banner -r " + camera_resolution + " -d " + fswebcam_device + " --jpeg 100 " + fswebcam_flags + " " + root + "/realtime_image.jpg >/dev/null 2>&1" # Set up the FSWebcam capture command.
+            fswebcam_command = "fswebcam --no-banner -r " + config["realtime"]["image"]["camera"]["resolution"] + " -d " + fswebcam_device + " --jpeg 100 " + fswebcam_flags + " " + root + "/realtime_image.jpg >/dev/null 2>&1" # Set up the FSWebcam capture command.
 
         os.system(fswebcam_command) # Take a photo using FSWebcam, and save it to the root project folder specified by the user.
 
@@ -1356,27 +1344,28 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
 
 
         # If necessary, rotate the image.
-        if (str(real_time_image_rotation) != "0"): # Check to make sure that rotating the image is actually necessary so processing time isn't wasted if the user doesn't have the rotating setting configured.
-            if (realtime_output_level >= 3): # Only display this status message if the output level indicates to do so.
-                print("Rotating image...")
-            if (save_images_preference == True): # Check to see whether or not the user wants to save all images captured by Predator.
-                os.system("convert " + root + "/realtime_image" + str(i) + ".jpg -rotate " + real_time_image_rotation + " " + root + "/realtime_image" + str(i) + ".jpg") # Execute the command to rotate the image, based on the configuration.
-            else:
-                os.system("convert " + root + "/realtime_image.jpg -rotate " + real_time_image_rotation + " " + root + "/realtime_image.jpg") # Execute the command to rotate the image, based on the configuration.
-            if (realtime_output_level >= 3): # Only display this status message if the output level indicates to do so.
-                print("Done.\n----------")
+        if (config["realtime"]["image"]["processing"]["rotation"]["enabled"] == True): # Check to see if real-time image rotation is enabled.
+            if (str(config["realtime"]["image"]["processing"]["rotation"]["angle"]) != "0"): # Check to make sure that rotating the image is actually necessary so processing time isn't wasted if the user doesn't have the rotating setting configured.
+                if (realtime_output_level >= 3): # Only display this status message if the output level indicates to do so.
+                    print("Rotating image...")
+                if (save_images_preference == True): # Check to see whether or not the user wants to save all images captured by Predator.
+                    os.system("convert " + root + "/realtime_image" + str(i) + ".jpg -rotate " + config["realtime"]["image"]["processing"]["rotation"]["angle"] + " " + root + "/realtime_image" + str(i) + ".jpg") # Execute the command to rotate the image, based on the configuration.
+                else:
+                    os.system("convert " + root + "/realtime_image.jpg -rotate " + config["realtime"]["image"]["processing"]["rotation"]["angle"] + " " + root + "/realtime_image.jpg") # Execute the command to rotate the image, based on the configuration.
+                if (realtime_output_level >= 3): # Only display this status message if the output level indicates to do so.
+                    print("Done.\n----------")
 
 
 
 
         # If enabled, crop the frame down.
-        if (real_time_cropping_enabled == True): # Check to see if the user has enabled cropping in real-time mode.
+        if (config["realtime"]["image"]["processing"]["cropping"]["enabled"] == True): # Check to see if the user has enabled cropping in real-time mode.
             if (realtime_output_level >= 3): # Only display this status message if the output level indicates to do so.
                 print("Cropping frame...")
             if (save_images_preference == True): # Check to see whether or not the user wants to save all images captured by Predator.
-                os.system(crop_script_path + " " + root + "/realtime_image" + str(i) + ".jpg " + real_time_left_margin + " " + real_time_right_margin + " " + real_time_top_margin + " " + real_time_bottom_margin) # Execute the command to crop the image.
+                os.system(crop_script_path + " " + root + "/realtime_image" + str(i) + ".jpg " + str(config["realtime"]["image"]["processing"]["cropping"]["left_margin"]) + " " + str(config["realtime"]["image"]["processing"]["cropping"]["right_margin"]) + " " + str(config["realtime"]["image"]["processing"]["cropping"]["top_margin"]) + " " + str(config["realtime"]["image"]["processing"]["cropping"]["bottom_margin"])) # Execute the command to crop the image.
             else:
-                os.system(crop_script_path + " " + root + "/realtime_image.jpg " + real_time_left_margin + " " + real_time_right_margin + " " + real_time_top_margin + " " + real_time_bottom_margin) # Execute the command to crop the image.
+                os.system(crop_script_path + " " + root + "/realtime_image.jpg " + str(config["realtime"]["image"]["processing"]["cropping"]["left_margin"]) + " " + str(config["realtime"]["image"]["processing"]["cropping"]["right_margin"]) + " " + str(config["realtime"]["image"]["processing"]["cropping"]["top_margin"]) + " " + str(config["realtime"]["image"]["processing"]["cropping"]["bottom_margin"])) # Execute the command to crop the image.
             if (realtime_output_level >= 3): # Only display this status message if the output level indicates to do so.
                 print("Done.\n----------")
             
@@ -1639,6 +1628,18 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
 
         if (realtime_output_level >= 3 and save_license_plates_preference == True): # Only display this status message if the output level indicates to do so.
             print("Done.\n----------")
+
+
+        # TODO: Issue interface updates.
+        if (realtime_output_level >= 3 and save_license_plates_preference == True): # Only display this status message if the output level indicates to do so.
+            print("Issuing interface updates...")
+        # heartbeat() # Issue a status heartbeat.
+        # log_plates(alpr_results) # Update the list of recently detected license plates.
+        # log_alerts(active_alerts) # Update the list of active license plate alerts.
+        if (realtime_output_level >= 3 and save_license_plates_preference == True): # Only display this status message if the output level indicates to do so.
+            print("Done.\n----------")
+
+
 
         if (len(active_alerts) > 0): # Check to see if there are one or more active alerts.
             time.sleep(float(config["realtime"]["delay_on_alert"])) # Trigger delay on alert.
