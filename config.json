@@ -99,6 +99,7 @@
             "local_file": "",
             "remote_sources": []
         },
-        "offline": false
+        "offline": false,
+        "kill_plate": ""
     }
 }

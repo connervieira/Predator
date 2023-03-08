@@ -297,3 +297,14 @@ This update refines Predator's functionality, and focuses its purpose back on li
     - The back-end structure is more organized and simplified.
     - The configuration interface can now detect when an unrecognized configuration value is entered.
 - Added a check during loading to verify that the configuation file exists, and is valid.
+
+
+
+## Version 9.0
+
+### Name To Be Determined 
+
+*Release date to be determined*
+
+- Added `kill_plate` developer option.
+    - This option sets a plate that will cause Predator to immediately exit for debugging.

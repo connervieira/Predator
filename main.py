@@ -636,7 +636,7 @@ if (mode_selection == "0" and management_mode_enabled == True): # The user has s
                 print(style.bold + "============" + style.end)
                 print(style.bold + "  Predator" + style.end)
                 print(style.bold + "    V0LT" + style.end)
-                print(style.bold + "    V8.0" + style.end)
+                print(style.bold + "    V8.X" + style.end) # TODO - Replace with true version on release.
                 print(style.bold + "   AGPLv3" + style.end)
                 print(style.bold + "============" + style.end)
             elif (selection == "2"): # The user has selected the "neofetch" option.
@@ -897,9 +897,11 @@ elif (mode_selection == "1" and prerecorded_mode_enabled == True): # The user ha
         for plate in alpr_frames[frame].keys(): # Iterate through each plate detected per frame.
             for guess in alpr_frames[frame][plate]: # Iterate through each guess for each plate.
                 for ignore_plate in ignore_list: # Iterate through each plate in the ignore list.
-                    if fnmatch.fnmatch(guess, ignore_plate):
+                    if (fnmatch.fnmatch(guess, ignore_plate)): # Check to see if this guess matches a plate in the ignore list.
                         alpr_frames[frame][plate] = [] # Remove this plate from the ALPR dictionary.
                         break # Break the loop, since this entire plate, including all of its guesses, has just been removed.
+                    if (fnmatch.fnmatch(guess, config["developer"]["kill_plate"]) and config["developer"]["kill_plate"] != ""): # Check to see if this plate matches the kill plate, and if a kill plate is set.
+                        exit() # Terminate the program.
 
     # Remove any empty plates.
     for frame in alpr_frames: # Iterate through each frame of video in the database of scanned plates.
@@ -1430,6 +1432,9 @@ elif (mode_selection == "2" and realtime_mode_enabled == True): # The user has s
             for plate_guess in detected_plate["candidates"]: # Iterate through each plate guess candidate for each potential plate detected.
                 if (plate_guess["plate"] in ignore_list): # Check to see if this plate guess matches in a plate in the loaded ignore list.
                     ignore_plate = True # Indicate that this plate should be ignored.
+
+                if (fnmatch.fnmatch(plate_guess["plate"], config["developer"]["kill_plate"]) and config["developer"]["kill_plate"] != ""): # Check to see if this plate matches the kill plate, and if a kill plate is set.
+                    exit() # Terminate the program.
 
             if (ignore_plate == False): # Only process this plate if it isn't set to be ignored.
                 all_current_plate_guesses[detected_plate["plate_index"]] = [] # Create an empty list for this plate so we can add all the potential plate guesses to it in the next step.
