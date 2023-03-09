@@ -20,9 +20,11 @@ This is the installation process for Predator and all of it's dependencies. This
         - These packages are not necessary to handle information from GPX files, and are only required to interact with live GPS devices.
     - Optional, but necessary for object recognition: `pip3 install opencv-python cvlib tensorflow keras silence-tensorflow psutil`
         - These packages are optional, but are required to enable object recognition features.
+        - If you do not install these packages, make sure object recognition is disabled in the configuration.
         - These packages are not necessary for basic license plate recognition.
     - Optional, but necessary disk usage analysis: `pip3 install psutil`
         - This package is option, but enables the ability for Predator to view information regarding disk usage.
+        - If you do not install this package, make sure you disable disk statistics in the configuration.
 2. Install an ALPR engine.
     - Predator needs an ALPR engine to be able to process license plates. The two main options are Phantom ALPR and OpenALPR.
         - OpenALPR is the arguably industry standard for open source license plate recognition.
@@ -76,7 +78,7 @@ After installing Predator, you should do some quick configuration in order to ge
     - All configuration values are explained extensively in the [CONFIGURATION.md](CONFIGURATION.md) document.
     - Make changes to any of the configuration values to better fit your usage context.
     - This step is very open-ended. Depending on your situation, you may leave the configuration almost untouched, while other situations might involve intensive changes.
-3. Depending on the platform, Predator might not be able to locate the `config.json` file. If you encounter issues during the steps described in the "Usage" section, you may need to manually set Predator's directory. Under normal circumstances, this shouldn't be necessary.
+3. In rare cases, Predator might not be able to locate the `config.json` file. If you encounter issues during the steps described in the "Usage" section, you may need to manually set Predator's directory. Under normal circumstances, this shouldn't be necessary.
     - At the top of the all Python scripts, you should see a variable titled `predator_root_directory`. By default, a Python function is used to find the current directory of the script.
     - If you receive errors related to missing configuration files when trying to run Predator, try setting this variable to a static file path.
     - Example:
