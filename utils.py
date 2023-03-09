@@ -561,7 +561,7 @@ def start_dashcam(dashcam_devices, segment_length, resolution, framerate, direct
     iteration_counter = 0 # Set the iteration counter to 0 so that we can increment it for each recording device specified.
     
     for device in dashcam_devices: # Run through each camera device specified in the configuration, and launch an FFMPEG recording instance for it.
-        launch_command = ["ffmpeg", "-y", "-nostdin", "-loglevel", "error", "-f", "v4l2", "-framerate", framerate, "-video_size", resolution, "-input_format", "mjpeg", "-i",  dashcam_devices[device]] # Create the base of the dashcam process launch command.
+        launch_command = ["ffmpeg", "-y", "-nostdin", "-loglevel", "error", "-f", "v4l2", "-framerate", str(framerate), "-video_size", resolution, "-input_format", "mjpeg", "-i",  dashcam_devices[device]] # Create the base of the dashcam process launch command.
         if (segment_length > 0): # Only add command arguments for segment length if a segment length is set.
             for entry in ["-f","segment", "-segment_time", str(segment_length), "-reset_timestamps", "1"]: # Add the arguments for file segmentation to the launch command, one at a time.
                 launch_command.append(entry) # Add each argument.

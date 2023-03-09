@@ -12,18 +12,22 @@
             "allow_duplicate_alerts": true,
             "databases": ["https://v0lttech.com/predator/plates/test.json"]
         },
-        "ascii_art_header": true,
-        "custom_startup_message": "",
-        "auto_start_mode": "",
-        "silence_file_saving": true,
+        "display": {
+            "ascii_art_header": true,
+            "startup_message": "",
+            "silence_file_saving": true
+        },
         "object_recognition": {
             "enabled": true
         },
-        "modes_enabled": {
-            "management": true,
-            "prerecorded": true,
-            "realtime": true,
-            "dashcam": true
+        "modes": {
+            "auto_start": "",
+            "enabled": {
+                "management": true,
+                "prerecorded": true,
+                "realtime": true,
+                "dashcam": true
+            }
         }
     },
     "management": {
@@ -126,13 +130,15 @@
         }
     },
     "dashcam": {
-        "dashcam_resolution": "1920x1080",
-        "dashcam_frame_rate": "15",
-        "dashcam_device": {
-            "main": "/dev/video0"
+        "capture": {
+            "resolution": "1920x1080",
+            "frame_rate": 15,
+            "segment_length": 60,
+            "devices": {
+                "main": "/dev/video0"
+            }
         },
-        "dashcam_background_mode_realtime": false,
-        "segment_length": 60
+        "background_recording": false
     },
     "developer": {
         "ignore_list": {

@@ -33,37 +33,24 @@ This section of configuration values will effect Predator's general operation.
             - For example, if your alert database is in `/home/pi/Data/alerts.json`, and your root project directory is `/home/pi/Data/`, then then the alert database value should simply be set to `"alerts.json"`, not the the full file path.
         - If a particular entry in this list is a remote source, the remote source should be a complete URL.
             - For example, an entry might be set to `"https://website.tld/alerts.json"`.
-- `ascii_art_header`.
-    - This value is a boolean that determines whether or not Predator will display a large ASCII art banner on start up. When set to `false`, the ASCII art banner will be replaced with a small, normal text title.
-    - This setting may be useful to change in the event that Predator is being run on a device with a tiny display, where a large ASCII art header might cause formatting issues.
-- `custom_startup_message`
-    - This setting is a string used to set a custom start-up message that display after the initial Predator start-up header.
-    - By default, this is left blank, but you can use this to show a custom message to the user when Predator starts.
-- `auto_start_mode`
-    - This setting is a string determines which mode (if any) that Predator will automatically load into when being started.
-    - There are 4 possible values this can be set to, not including being left blank.
-        - When set to an empty string, Predator will prompt the user to select a mode each time it starts. This is the default.
-        - When set to "0", Predator will skip the 'mode' prompt, and automatically boot into management mode.
-        - When set to "1", Predator will skip the 'mode' prompt, and automatically boot into pre-recorded mode.
-        - When set to "2", Predator will skip the 'mode' prompt, and automatically boot into real-time mode.
-        - When set to "3", Predator will skip the 'mode' prompt, and automatically boot into dash-cam mode.
-    - It may be useful to change this setting in several different situations:
-        - If you only ever use the same mode when using Predator, setting this to your preferred mode can save time.
-        - When installing Predator in a vehicle, this setting can allow Predator to load without any user input.
-            - See the "default" settings later in this document for more information on auto-starting.
-- `silence_file_saving`
-    - This setting determines whether or not Predator will display informational messages about file saving.
-    - When this is set to `true`, Predator won't show information or notices when it saves information to disk.
-    - Under normal circumstances, this setting should be set to `false` in order to allow Predator to inform the user when it saves files, and whether or not errors were encountered.
-- `disable_object_recognition`
-    - This setting can be used to globally disable object recognition (Tensorflow and OpenCV).
-    - If you're on a platform that doesn't support OpenCV or Tensorflow, then you can set this to 'true' in order to prevent errors while using Predator.
-    - Under normal usage, this should be set to `false`, since this will allow Predator to use it's full functionality.
-- `modes_enabled`
-    - This setting determines whether or not each mode is activated in Predator.
-    - When the value for a particular mode is set to `false`, that mode's option will be hidden from the mode selection menu shown to the user when Predator starts, and the auto-start-mode command line arguments won't allow the user to boot Predator directly to that mode.
-    - Under normal circumstances, all of these settings should be left as 'true', in order to enable full functionality of Predator, but there may be certain situations in which is useful to block certain modes from starting.
-        - This setting is not intended to a be a security feature. It's completely trivial to bypass this setting by simply modifying the configuration file directly.
+- `display` contains settings related to what is displayed in the command line interface.
+    - `ascii_art_header` is a boolean that determines whether or not Predator will display a large ASCII art banner on start up.
+        - When set to `false`, the ASCII art banner will be replaced with a small, normal text title.
+        - This setting may be useful to change in the event that Predator is being run on a device with a tiny display, where a large ASCII art header might cause formatting issues.
+    - `startup_message` is a string used to set a custom start-up message that displays after the initial Predator start-up header.
+    - `silence_file_saving` is a boolean that determines whether or not Predator will display debugging messages when saving files.
+- `modes` contains settings related to Predator's operating modes.
+    - `auto_start` is a string that determines which mode (if any) Predator will automatically load into upon start-up.
+        - There are 4 possible values this can be set to, not including being left blank.
+            - When set to an empty string, Predator will prompt the user to select a mode each time it starts. This is the default.
+            - When set to `"0"`, Predator will skip the 'mode' prompt, and automatically boot into management mode.
+            - When set to `"1"`, Predator will skip the 'mode' prompt, and automatically boot into pre-recorded mode.
+            - When set to `"2"`, Predator will skip the 'mode' prompt, and automatically boot into real-time mode.
+            - When set to `"3"`, Predator will skip the 'mode' prompt, and automatically boot into dash-cam mode.
+    - `enabled` contains controls to enable and disable each operation mode of Predator.
+        - When the value for a particular mode is set to `false`, that mode's option will be hidden from the mode selection menu shown to the user when Predator starts, and the auto-start-mode command line arguments won't allow the user to boot Predator directly to that mode.
+        - Under normal circumstances, all of these settings should be left as 'true', in order to enable full functionality of Predator, but there may be certain situations in which is useful to block certain modes from starting.
+            - This setting is not intended to a be a security feature. It's completely trivial to bypass this setting by simply modifying the configuration file directly.
 
 
 ## Management Mode Configuration
@@ -195,31 +182,26 @@ Configuration values in this section are settings specific to real-time mode.
 
 ## Dash-cam Mode Configuration
 
-- `dashcam_resolution`
-    - This setting determines what resolution Predator will attmpt to record at.
-    - Be sure that your camera is capable of recording at resolution specified here. If you set an unsupported resolution, it's likely Predator will fail and not record anything.
-    - Example: `"dashcam_resolution": "1920x1080"`
-- `dashcam_frame_rate`
-    - This setting determines what frame rate Predator will attmpt to record at.
-    - Even though this setting is a number, it should be entered as a string with quotes around it. See the example below for more context.
-    - Be sure that your camera is capable of recording at the frame rate specified here. If you set an unsupported frame rate, it's likely Predator will fail and not record anything.
-    - If you enter a frame rate too slow for the encoder, it might automatically be sped to a higher frame rate.
-    - Example: `"dashcam_frame_rate": "30"`
-- `dashcam_device`
-    - This setting contains the camera devices Predator will attempt to use when recording video in dash-cam mode.
-    - Each entry under this setting should contain a device identifier/name, as well as a reference to the device itself.
-    - Example:
-        - `"main_camera": "/dev/video0"`
-        - `"secondary_camera": "/dev/video1"`
-    - The device name will be appended to any video file names in order to give the user a quick indication of which camera recorded each file.
-    - Note: While you can specify an infinite number of cameras here, be aware that Predator might not be able to record with all of them. Bottlenecks like processor speed, RAM, and USB controller capabilities can cause issues with high numbers of cameras. Be sure to test your configuration before you start using it formally.
-- `dashcam_background_mode_realtime`
-    - This setting determines whether Predator will automatically enabled background dashcam recording when starting in real-time mode.
-    - Note that Predator can only use each recording device for one task at a time, so if you run real-time mode with background recording enabled, you'll need to specify two different devices by changing `fswebcam_device` and `dashcam_device`.
-- `segment_length`
-    - This setting is an integer that determines the length of each dashcam video clip before a new segment is created, measured in seconds.
+- `capture` contains settings related to the capturing of dashcam video.
+    - `resolution` is a string that determines what resolution Predator will attmpt to record at, and takes the form of `"[width]x[height]"`
+        - Be sure that your camera is capable of recording at resolution specified here. If you set an unsupported resolution, it's likely Predator will fail and not record anything.
+        - Example: `"1920x1080"`
+    - `frame_rate` is an integer that determines what framerate the dashcam will attempt to record at.
+        - Be sure that your camera is capable of recording at the frame rate specified here. If you set an unsupported frame rate, it's likely Predator will fail and not record anything.
+        - If you enter a frame rate too slow for the encoder, it might automatically be sped to a higher frame rate.
+        - Example: `30`
+    - `segment_length` is an integer that determines the length of each dashcam video clip before a new segment is created, measured in seconds.
         - It should be noted that video segments are not guaranteed to exactly match the length set here.
-    - When this value is set to '0', recordings will not be separated into segments.
+        - When this value is set to `0`, recordings will not be separated into segments.
+    - `devices` is a list that contains the camera devices Predator will attempt to use when recording video in dash-cam mode.
+        - Each entry under this setting should contain a device identifier/name, as well as a reference to the device itself.
+        - Examples:
+            - `"main_camera": "/dev/video0"`
+            - `"secondary_camera": "/dev/video1"`
+        - The device name will be appended to any video file names in order to give the user a quick indication of which camera recorded each file.
+        - Note: While you can specify an infinite number of cameras here, be aware that Predator might not be able to record with all of them. Bottlenecks like processor speed, RAM, and USB controller capabilities can cause issues with high numbers of cameras. Be sure to test your configuration before you start using it formally.
+- `background_recording` is a boolean that determines whether dashcam video will be recorded in the background while using real-time mode.
+    - Note that Predator can only use each recording device for one task at a time, so if you run real-time mode with background recording enabled, you'll need to specify two different devices by changing `image>capture>device` and `dashcam>devices`.
 
 
 

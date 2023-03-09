@@ -308,13 +308,18 @@ This update refines Predator's functionality, and focuses its purpose back on li
 
 - Removed webhook functionality, since this functionality is being replaced by Predator Fabric.
 - Dramatically changed the configuration layout.
-- Added `kill_plate` developer option.
-    - This option sets a plate that will cause Predator to immediately exit for debugging purposes.
-- Added `allow_duplicate_alerts` configuration option.
+    - Configuration values are now much more organized.
+    - Configuration values are now reference directly through-out the program, rather than all being assigned to variables at start-up.
+    - Added several configuration value.
+        - Added `developer>kill_plate` configuration option.
+            - This option sets a plate that will cause Predator to immediately exit for debugging purposes.
+        - Added `general>alerts>allow_duplicate_alerts` configuration option.
 - The normal delay and alert delay are now mutually exclusive, and only one is triggered each round, depending on whether there are one or more active alerts.
-- Timestamp parsing in pre-recorded mode is now more fault tolerant.
+- Timestamp input parsing in pre-recorded mode is now more fault tolerant.
 - Dramatically changed 'preferences' system.
     - Real-time mode and dash-cam mode no longer have run-time preferences, and only consider configuration values.
     - Management mode and pre-recorded mode have modified run-time preferences, and place more emphasis on configuration values.
 - Updated license plate logging in real-time mode.
     - The license plate log file is now a JSON file, and contains more information than before, including license plate guesses.
+- Object recognition library importing has been improved.
+    - The configuration value to globally disable object recognition has been removed, and replaced with a single control that enables object recognition.
