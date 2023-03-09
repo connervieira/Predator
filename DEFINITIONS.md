@@ -14,8 +14,7 @@ ALPR stands for 'automated license plate reading', and is the practice of automa
 
 ### Mode
 
-Predator uses the term 'mode' to describe the various ways it can operate. Each of Predator's mode has unique functionality designed to be used in a specific situation.
-
+Predator uses the term 'mode' to describe the various ways it can operate. Each of Predator's modes have unique functionality designed to be used in a specific situation.
 
 ### Path
 
@@ -26,8 +25,8 @@ The term 'file path', 'directory path', or simply 'path' are used to refer to a 
     - Examples:
         - `/home/pi/Software/PredatorData/`
         - `/home/pi/Downloads/file.txt`
-- Project Directory Relative
-    - This type of path is defined relative to the current project directory.
+- Working Directory Relative
+    - This type of path is defined relative to the current working (project) directory.
     - This kind of file path is typically used to define files that will change each time Predator runs, including analysis videos and a export information.
     - For example, a file path defined relative to the root project directory as `data/file.txt`, when the current root project directory is `/home/pi/Downloads/`, will translate to a complete file path of `/home/pi/Downloads/data/file.txt`
 - Predator Directory Relative

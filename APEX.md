@@ -5,7 +5,7 @@ This document briefly explains Predator Apex, the paid hardware program for Pred
 
 ## Disclaimer
 
-Predator Apex is by no means a mass produced product, and is not intended to be a consumer device. Each Predator Apex model is hand assembled with extremely limited resources. Think of Predator Apex as a quick and easy way to get started with the Predator system, not as a commercial product. Predator Apex is great for tinkerers and tech enthusiasts who just want everything they need to get started, not for people who want a simple, plug-and-play experience.
+Predator Apex is by no means a mass produced product, and is not intended to be a consumer device. Each Predator Apex model is hand assembled. Think of Predator Apex as a quick and easy way to get started with the Predator system, not as a commercial product. Predator Apex is great for tinkerers and tech enthusiasts who just want everything they need to get started, not for people who want a simple, plug-and-play experience, like a traditional dashcam.
 
 
 ## Hardware

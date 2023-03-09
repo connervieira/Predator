@@ -5,7 +5,7 @@ This document contains a series of questions you may have concerning Predator.
 
 **What exactly is Predator?**
 
-In short, Predator is a utility designed primarily to be a vehicle-based camera system with a focus on license plate reading. Predator is also capable of general object recognition, and can identify objects like vehicles, traffic lights, pedestrians, and dozens of others.
+In short, Predator is a camera utility designed primarily to be a vehicle-based system with a focus on license plate reading. Predator is also capable of operating as a dashcam, and can run general object recognition, and can identify objects like vehicles, traffic lights, pedestrians, and dozens of others.
 
 
 **How do I install Predator?**
@@ -13,9 +13,14 @@ In short, Predator is a utility designed primarily to be a vehicle-based camera 
 For installation and setup instructions, check the [DOCUMENTATION.md](DOCUMENTATION.md) document.
 
 
+**What is Predator Apex?**
+
+Predator Apex is the paid hardware program behind the Predator software. Predator Apex uses the exact same, free and open source Predator software that everyone has access to. Predator Apex customers get one-on-one tech support and/or pre-built hardware devices.
+
+
 **I have a problem with Predator and I need help.**
 
-If you're encountering an issue with Predator, first ensure that you've followed all of the steps described in the [DOCUMENTATION.md](DOCUMENTATION.md) document for setting up Predator. If your issue persists, try to work out its source by checking individual potential points of failure. The majority of Predator issues can be traced back to one of it's dependencies not working properly. Check that the ALPR engine, FSWebcam, FFMPEG, and GPSD are all working properly. If you still can't resolve your issue, contact V0LT support using the information found at <https://v0lttech.com/contact.php>. From there, you can find various contact methods for V0LT, including instant messaging over Matrix, and email with optional PGP encryption.
+If you're encountering an issue with Predator, first ensure that you've followed all of the steps described in the [DOCUMENTATION.md](DOCUMENTATION.md) document for setting up Predator. If your issue persists, try to work out its source by checking individual potential points of failure. The majority of Predator issues can be traced back to one of it's dependencies not working properly. Check that the ALPR engine, FSWebcam, FFMPEG, and GPSD are all working properly. If you still can't resolve your issue, you can contact V0LT support using the information found at <https://v0lttech.com/contact.php>. From there, you can find various contact methods for V0LT, including instant messaging over Matrix, and email with optional PGP encryption.
 
 
 **How is Predator related to OpenALPR?**
@@ -57,20 +62,20 @@ For starters, Predator should never be used for security or safety critical task
 
 Predator is a fairly complex program, but below is a list of the general steps Predator takes when processing video, whether it be in real-time or a pre-recorded sample.
 
-1. Depending on the mode, Predator will either load a pre-recorded video, or connect to a camera and stream video that way.
-2. Predator then splits the video, regardless of its source, into individual frames at a regular interval.
+1. Depending on the mode, Predator will either load a pre-recorded video, or connect to a live camera to stream images.
+2. Predator then splits the video, regardless of its source, into individual frames at a semi-regular interval.
 3. Next, Predator crops each frame down based on its configuration in order to remove unnecessary data.
 4. Next, Predator's ALPR engine attempts to locate all potential plates.
 5. Next, Predator's ALPR engine attempts interpret the plates detected, and makes a guess as to their contents.
 6. After the ALPR engine finishes, Predator forms a list of the most likely plates guesses.
-7. Predator then uses various methods of validation to filter out plates that are unlikely to be correct.
+7. Predator then uses various methods of validation to filter out plate guesses that are unlikely to be correct.
 8. Finally, Predator removes plates it believes to be invalid, and creates a list of (hopefully) correctly detected plates.
-9. After this, Predator might save the plates to a database, send a push notification to a Gotify server, play an audio alert, any any number of other customizable actions.
+9. After this, Predator might save the plates to a local log file, send a push notification to a Gotify server, play an audio alert, any any number of other customizable actions.
 
 
 **How many cameras can Predator use at one time?**
 
-This is a bit of a complex question, but in short, as many as you want. More specifically, Predator will use as many cameras as your OS, USB controller, and processor allow. In practice, this means that Predator can usually run at least two USB cameras at once, even on low powered devices like the Raspberry Pi.
+This is a bit of a complex question, but in short, as many as you want. More specifically, Predator will use as many cameras as your OS, USB controller, and processor allow. In practice, this means that Predator can usually run at least two USB cameras at once, even on low powered devices like the Raspberry Pi, provided the cameras are connected to the correct USB ports.
 
 
 **Can I run multiple instances of Predator at the same time on a single device?**
