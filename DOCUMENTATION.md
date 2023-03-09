@@ -78,7 +78,7 @@ After installing Predator, you should do some quick configuration in order to ge
     - All configuration values are explained extensively in the [CONFIGURATION.md](CONFIGURATION.md) document.
     - Make changes to any of the configuration values to better fit your usage context.
     - This step is very open-ended. Depending on your situation, you may leave the configuration almost untouched, while other situations might involve intensive changes.
-3. In rare cases, Predator might not be able to locate the `config.json` file. If you encounter issues during the steps described in the "Usage" section, you may need to manually set Predator's directory. Under normal circumstances, this shouldn't be necessary.
+3. In rare cases, Predator might not be able to locate the `config.json` file. If you encounter issues during the steps described in the "Usage" section, you might need to manually set Predator's directory. Under normal circumstances, this shouldn't be necessary.
     - At the top of the all Python scripts, you should see a variable titled `predator_root_directory`. By default, a Python function is used to find the current directory of the script.
     - If you receive errors related to missing configuration files when trying to run Predator, try setting this variable to a static file path.
     - Example:
@@ -125,6 +125,7 @@ After configuring Predator, you can try it out for the first time!
             - Example: `/home/user/Downloads/MyProjectFolder`
     - Pre-recorded mode:
         - First, you'll be asked to set the working directory. Simply create an empty folder, then place your video(s) into it. Specify the absolute path to this folder here.
+            - Leave this option blank to use the default value.
             - Example: `/home/pi/Downloads/MyProjectFolder`
         - Next, you'll be asked to enter the file name(s) of the video(s) you want to analyze. Video(s) should be placed in the working directory you just specified. If you have multiple video files, separate their names with a comma and space. If you want to scan an entire directory, Use a `*` wildcard as the first character.
             - Example 1: `MyVideo.mp4`
@@ -132,16 +133,12 @@ After configuring Predator, you can try it out for the first time!
             - Example 3: `*.mp4`
         - Next, you'll be asked how many seconds you want to wait between frames for analysis. Since it would be inefficient to process every single frame of video, this value is used to only take frames every N seconds. You can think of this value as "only process a frame every N seconds of video".
             - Example: `2` will take a frame to process every 2 seconds of video. This would break up a 10 second video into 5 frames.
-            - If you leave this setting blank, Predator will default to 1 frame per second.
-        - Next, you'll be asked for a license plate format example. Filling out this value is highly recommended, since it will greatly reduce the number of incorrectly read plates. If this is left blank, no formatting validation will be used.
             - Leave this option blank to use the default value.
+        - Next, you'll be asked for a license plate format example. Filling out this value is highly recommended, since it will greatly reduce the number of incorrectly read plates. If this is left blank, no formatting validation will be used.
             - This value can be set to any alphanumeric string. For example, if all the plates in your state have 3 letters followed by 4 numbers, you could set this value to "AAA0000" or "ABC1234". Both values will work the exact same way. Predator only looks at the type of each character, not the character itself.
-            - For sake of simplicity, you can also just enter the license plate of another car in your state or region. Since Predator only looks to see whether a character is a number or letter, not the character itself, "EGY4011" will act identically to "AAA0000".
+                - For sake of simplicity, you can often just enter the license plate of another car in your state or region. Since Predator only looks to see whether a character is a number or letter, not the character itself, "EGY4011" will act identically to "AAA0000".
+            - Leave this option blank to use the default value.
             - Example: `AAA0000`
-        - Next, you'll be asked whether or not you want Predator to use object recognition to count objects in each frame.
-            - If you don't see this prompt, then it's likely that object recognition has been disabled in the configuration.
-            - This will slow down processing time, but might be useful in certain cases.
-            - Example: `y`
         - Next, you'll be asked for the time and date that the specified video recording started.
             - This preference takes the following format: YYYY-mm-dd HH:MM:SS
             - This preference is optional but will enabled the GPX file setting which grants the ability to correlate license plates to physical GPS locations.

@@ -663,14 +663,13 @@ elif (mode_selection == "1" and config["general"]["modes"]["enabled"]["prerecord
     working_directory_input = prompt("Working directory (Default " + config["general"]["working_directory"] + "): ", optional=True, input_type=str)
     if (working_directory_input == ""): # If the user leaves the 
         working_directory_input = config["general"]["working_directory"]
-
     while (os.path.exists(working_directory_input) == False): # Run forever until the user enters a working directory that exists.
         display_message("The specified working directory doesn't seem to exist.", 2)
         working_directory_input = prompt("Working directory (Default " + config["general"]["working_directory"] + "): ", optional=True, input_type=str)
-
     config["general"]["working_directory"] = working_directory_input
 
     video = prompt("Video file name(s): ", optional=False, input_type=str)
+
     framerate = prompt("Frame analysis interval (Default '1.0'): ", optional=True, input_type=float, default=1.0)
 
     license_plate_format_input = prompt("License plate format (Default '" + config["general"]["alpr"]["license_plate_format"] + "'): ", optional=True, input_type=str)
