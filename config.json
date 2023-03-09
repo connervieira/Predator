@@ -15,7 +15,8 @@
         "display": {
             "ascii_art_header": true,
             "startup_message": "",
-            "silence_file_saving": true
+            "silence_file_saving": true,
+            "debugging_output": true
         },
         "object_recognition": {
             "enabled": true
@@ -76,7 +77,8 @@
             "camera": {
                 "resolution": "1920x1080",
                 "device": "/dev/video0",
-                "arguments": "--set brightness=70%"
+                "arguments": "--set brightness=70%",
+                "file_name": "realtime_image"
             },
             "processing": {
                 "cropping": {
@@ -111,7 +113,7 @@
         },
         "saving": {
             "license_plates": "plate_history.json",
-            "object_recognition": true,
+            "object_recognition": "object_history.json",
             "images": false
         },
         "push_notifications": {

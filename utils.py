@@ -37,7 +37,42 @@ except:
     exit()
 
 
+
+# Define some styling information
+class style:
+    # Define colors
+    purple = '\033[95m'
+    cyan = '\033[96m'
+    blue = '\033[94m'
+    green = '\033[92m'
+    yellow = '\033[93m'
+    gray = '\033[1;37m'
+    red = '\033[91m'
+
+    # Define text decoration
+    bold = '\033[1m'
+    underline = '\033[4m'
+    italic = '\033[3m'
+    faint = '\033[2m'
+
+    # Define styling end marker
+    end = '\033[0m'
+
+
 import time # Required to add delays and handle dates/times
+
+# Define the function to print debugging information when the configuration specifies to do so.
+debugging_time_record = time.time() # This value holds the time that the previous debug message was displayed.
+def debug_message(message):
+    if (config["general"]["display"]["debugging_output"] == True): # Only print the message if the debugging output configuration value is set to true.
+        global debugging_time_record
+        time_since_last_message = (time.time()-debugging_time_record) # Calculate the time since the last debug message.
+        print(f"{style.italic}{style.faint}{time.time():.10f} ({time_since_last_message:.10f}) - {message}{style.end}") # Print the message.
+        debugging_time_record = time.time() # Record the current timestamp.
+
+
+
+
 import subprocess # Required for starting some shell commands
 import sys
 if (config["developer"]["offline"] == False): # Only import networking libraries if offline mode is turned off.
@@ -55,7 +90,9 @@ if (config["realtime"]["gps"]["enabled"] == True): # Only import the GPS librari
 
 # Define the function that will be used to clear the screen.
 def clear():
-    os.system("clear")
+    if (config["general"]["display"]["debugging_output"] == False): # Only clear the console if the debugging output configuration value is disabled.
+        os.system("clear")
+
 
 
 def is_json(string):
@@ -252,8 +289,7 @@ def display_message(message, level=1):
         error_log[time.time()] = message # Add this error message to the log file, using the current time as the key.
         save_to_file(error_file_location, json.dumps(error_log), True) # Save the modified error log to the disk as JSON data.
         print(style.red + "Error: " + message + style.end)
-        countdown(3)
-        #prompt(style.faint + "Press enter to continue..." + style.end)
+        prompt(style.faint + "Press enter to continue..." + style.end)
 
 
 
@@ -337,6 +373,7 @@ def prompt(message, optional=True, input_type=str, default=""):
 def play_sound(sound_id):
     sound_key = sound_id + "_sound"
     if (sound_key in config["realtime"]["sounds"]): # Check to make sure this sound ID actually exists in the configuration
+        debug_message("Playing '" + sound_id + "' sound")
         if (int(config["realtime"]["sounds"][sound_key]["repeat"]) > 0): # Check to see if the user has audio alerts enabled.
             for i in range(0, int(config["realtime"]["sounds"][sound_key]["repeat"])): # Repeat the sound several times, if the configuration says to.
                 os.system("mpg321 " + config["realtime"]["sounds"][sound_key]["path"] + " > /dev/null 2>&1 &") # Play the sound specified for this alert type in the configuration.
@@ -450,30 +487,6 @@ def display_shape(shape):
         print(style.end)
 
 
-# Define some styling information
-class style:
-    # Define colors
-    purple = '\033[95m'
-    cyan = '\033[96m'
-    blue = '\033[94m'
-    green = '\033[92m'
-    yellow = '\033[93m'
-    gray = '\033[1;37m'
-    red = '\033[91m'
-
-    # Define text decoration
-    bold = '\033[1m'
-    underline = '\033[4m'
-    italic = '\033[3m'
-    faint = '\033[2m'
-
-    # Define styling end marker
-    end = '\033[0m'
-
-
-
-
-
 
 
 
@@ -481,6 +494,7 @@ class style:
 
 # Define the function that will be used to get the current GPS coordinates.
 def get_gps_location(): # Placeholder that should be updated at a later date.
+    debug_message("Fetching current GPS location")
     if (config["realtime"]["gps"]["enabled"] == True): # Check to see if GPS is enabled.
         try: # Don't terminate the entire script if the GPS location fails to be aquired.
             gpsd.connect() # Connect to the GPS daemon.
@@ -606,6 +620,7 @@ def display_alerts(active_alerts):
 
 
 def load_alert_database(sources, project_directory):
+    debug_message("Loading license plate alert list")
     complete_alert_database = {} # Set the complete alert database to a placeholder dictionary.
     for source in sources: # Iterate through each source in the list of sources.
         if (validators.url(source)): # Check to see if the user supplied a URL as their alert database.

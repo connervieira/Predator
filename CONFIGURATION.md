@@ -11,6 +11,8 @@ This section of configuration values will effect Predator's general operation.
     - This value can be over-ridden using command line arguments.
     - In management mode and pre-recorded mode, this value serves as a default, but can be over-ridden by user input.
     - In real-time mode and dash-cam mode, this value will be automatically used without user input.
+- `interface_directory` specifies the directory that predator will store files used to share real-time information with external programs.
+    - This value is only used in real-time mode.
 - `alpr` contains settings related to license plate recognition.
     - `engine` is a string that determines what ALPR engine Predator will use.
         - This can be set to either `"openalpr"` or `"phantom"`.
@@ -38,7 +40,9 @@ This section of configuration values will effect Predator's general operation.
         - When set to `false`, the ASCII art banner will be replaced with a small, normal text title.
         - This setting may be useful to change in the event that Predator is being run on a device with a tiny display, where a large ASCII art header might cause formatting issues.
     - `startup_message` is a string used to set a custom start-up message that displays after the initial Predator start-up header.
-    - `silence_file_saving` is a boolean that determines whether or not Predator will display debugging messages when saving files.
+    - `silence_file_saving` is a boolean that determines whether or not Predator will display informational messages when saving files.
+    - `debugging_output` is a boolean that determines whether or not Predator will display debugging messages through-out normal operation.
+        - When this is set to `true`, console clearing is automatically disabled.
 - `modes` contains settings related to Predator's operating modes.
     - `auto_start` is a string that determines which mode (if any) Predator will automatically load into upon start-up.
         - There are 4 possible values this can be set to, not including being left blank.
@@ -119,6 +123,8 @@ Configuration values in this section are settings specific to real-time mode.
             - Example: `"/dev/video0"`
         - `arguments` specifies custom command line arguments that will be added to the FSWebcam command. This setting is entirely optional.
             - Example: `"--set brightness=100% -F 15 -S 5"`
+        - `file_name` is a string that specifies the file name that will be assigned to the captured image, not including the extension.
+            - Example: `"realtime_image"`
     - `processing` contains settings related to image processing.
         - `cropping` contains settings regarding image cropping.
             - `enabled` determines whether image cropping is enabled in real-time mode.
@@ -148,7 +154,10 @@ Configuration values in this section are settings specific to real-time mode.
         - This file is created in the working directory.
         - When this value is left as a blank string, license plate logging will be disabled.
         - Example: `"plate_history.json"`
-    - `object_recognition` is a boolean that determines whether or not Predator will log the objects it detects when object recognition is enabled.
+    - `object_recognition` is a string that determines the JSON file name will use to save the objects it detects in real-time mode.
+        - This file is created in the working directory.
+        - When this value is left as a blank string, object recognition logging will be disabled. However, this does not disable object recognition in itself, and detected objects will still be displayed in the console.
+        - Example: `"object_history.json"`
     - `images` is a boolean that determines whether or not Predator will save every image it captures, instead of repeatedly overwriting a single image.
 - `push_notifications`
     - `enabled`

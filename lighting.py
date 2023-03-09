@@ -2,7 +2,7 @@
 
 # Copyright (C) 2023 V0LT - Conner Vieira 
 
-# This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by# the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+# This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
 # This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
@@ -19,6 +19,7 @@ import os # Required to interact with certain operating system functions.
 import utils # Import the utils.py script.
 style = utils.style # Load the style from the utils script.
 clear = utils.clear # Load the screen clearing function from the utils script.
+debug_message = utils.debug_message # Load the debug message display function from the utils script.
 display_message = utils.display_message # Load the error message display function from the utils script.
 
 
@@ -36,6 +37,7 @@ except:
 
 
 def update_status_lighting(url_id):
+    debug_message("Updating status lighting")
     if (config["realtime"]["status_lighting"]["enabled"] == True): # Only update the status lighting if it is enabled in the configuration.
         status_lighting_update_url = str(config["realtime"]["status_lighting"]["values"][url_id]).replace("[U]", str(config["realtime"]["status_lighting"]["ase_url"])) # Prepare the URL where a request will be sent in order to update the status lighting.
         if (config["developer"]["offline"] == False): # Check to make sure offline mode is disabled before sending the network request to update the status lighting.
