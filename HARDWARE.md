@@ -51,7 +51,7 @@ As a general rule, these are the parts you'll need in a Predator device:
         - Without mounting hardware, your Predator device will be significantly harder to mount in your build.
 - Networking
     - Optional
-        - Predator is fully functional without being connected to a network. However, connecting to a network will allow Predator to download remote alert databases and submit detected plates to a webhook automatically.
+        - Predator is fully functional without being connected to a network. However, connecting to a network will allow Predator to download remote alert databases and use other optional features.
         - A typical installation will include a wireless adapter in order to allow Predator to download information from a wireless access point. However, a constant internet connection is unnecessary.
 - GPS
     - Optional
@@ -74,6 +74,7 @@ Each build in this section has a nick-name to keep it distinct from the other bu
     - Each device is very low power usage, so it should be easy to install using existing infrastructure in your car, building, or other system.
 - Disadvantages:
     - This hardware configuration severely struggles to successfully read license plates on fast moving vehicles due to the low shutter speed of the camera.
+    - This processing device also takes several seconds to detect each license plate.
 - Price Range: ~$100
 - Parts:
     - Camera: ELP-USB500W02M-SFV(5-50)
