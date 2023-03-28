@@ -13,6 +13,7 @@ This section of configuration values will effect Predator's general operation.
     - In real-time mode and dash-cam mode, this value will be automatically used without user input.
 - `interface_directory` specifies the directory that predator will store files used to share real-time information with external programs.
     - This value is only used in real-time mode.
+    - Setting this to a blank string will disable the interface directory.
 - `alpr` contains settings related to license plate recognition.
     - `engine` is a string that determines what ALPR engine Predator will use.
         - This can be set to either `"openalpr"` or `"phantom"`.
