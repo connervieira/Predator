@@ -169,24 +169,24 @@ def add_to_file(file_name, contents, silence=False):
 
 
 # Define the function used to handle the license plate interface file. This function is extremely similar to the `log_alerts()` function.
-plate_file_location = config["general"]["interface_directory"] + "/plates.json"
-if (os.path.exists(plate_file_location) == False): # If the plate log file doesn't exist, create it.
-    save_to_file(plate_file_location, "{}", True) # Save a blank placeholder dictionary to the plate log file.
+if (config["general"]["interface_directory"] != ""): # Check to see if the interface directory is enabled.
+    plate_file_location = config["general"]["interface_directory"] + "/plates.json"
+    if (os.path.exists(plate_file_location) == False): # If the plate log file doesn't exist, create it.
+        save_to_file(plate_file_location, "{}", True) # Save a blank placeholder dictionary to the plate log file.
 
-plate_file = open(plate_file_location, "r") # Open the plate log file for reading.
-plate_file_contents = plate_file.read() # Read the raw contents of the plate file as a string.
-plate_file.close() # Close the plate log file.
+    plate_file = open(plate_file_location, "r") # Open the plate log file for reading.
+    plate_file_contents = plate_file.read() # Read the raw contents of the plate file as a string.
+    plate_file.close() # Close the plate log file.
 
-if (is_json(plate_file_contents) == True): # If the plate file contains valid JSON data, then load it.
-    plate_log = json.loads(plate_file_contents) # Read and load the plate log from the file contents.
-else: # If the plate log file doesn't contain valid JSON data, then load a blank placeholder in it's place.
-    plate_log = json.loads("{}") # Load a blank placeholder dictionary.
+    if (is_json(plate_file_contents) == True): # If the plate file contains valid JSON data, then load it.
+        plate_log = json.loads(plate_file_contents) # Read and load the plate log from the file contents.
+    else: # If the plate log file doesn't contain valid JSON data, then load a blank placeholder in it's place.
+        plate_log = json.loads("{}") # Load a blank placeholder dictionary.
 
 def log_plates(detected_plates):
     global plate_log
 
     plate_log[time.time()] = detected_plates
-
 
     entries_to_remove = [] # Create a blank placeholder list to hold all of the entry keys that have expired and need to be removed.
 
@@ -203,18 +203,19 @@ def log_plates(detected_plates):
 
 
 # Define the function used to handle the alert interface file. This function is extremely similar to the `log_plates()` function.
-alert_file_location = config["general"]["interface_directory"] + "/alerts.json"
-if (os.path.exists(alert_file_location) == False): # If the alert log file doesn't exist, create it.
-    save_to_file(alert_file_location, "{}", True) # Save a blank placeholder dictionary to the alert log file.
+if (config["general"]["interface_directory"] != ""): # Check to see if the interface directory is enabled.
+    alert_file_location = config["general"]["interface_directory"] + "/alerts.json"
+    if (os.path.exists(alert_file_location) == False): # If the alert log file doesn't exist, create it.
+        save_to_file(alert_file_location, "{}", True) # Save a blank placeholder dictionary to the alert log file.
 
-alert_file = open(alert_file_location, "r") # Open the alert log file for reading.
-alert_file_contents = alert_file.read() # Read the raw contents of the alert file as a string.
-alert_file.close() # Close the alert log file.
+    alert_file = open(alert_file_location, "r") # Open the alert log file for reading.
+    alert_file_contents = alert_file.read() # Read the raw contents of the alert file as a string.
+    alert_file.close() # Close the alert log file.
 
-if (is_json(alert_file_contents) == True): # If the alert file contains valid JSON data, then load it.
-    alert_log = json.loads(alert_file_contents) # Read and load the alert log from the file contents.
-else: # If the alert log file doesn't contain valid JSON data, then load a blank placeholder in it's place.
-    alert_log = json.loads("{}") # Load a blank placeholder dictionary.
+    if (is_json(alert_file_contents) == True): # If the alert file contains valid JSON data, then load it.
+        alert_log = json.loads(alert_file_contents) # Read and load the alert log from the file contents.
+    else: # If the alert log file doesn't contain valid JSON data, then load a blank placeholder in it's place.
+        alert_log = json.loads("{}") # Load a blank placeholder dictionary.
 
 def log_alerts(active_alerts):
     global alert_log
@@ -238,18 +239,19 @@ def log_alerts(active_alerts):
 
 
 # Define the function used to handle system heartbeats, which allow external services to verify that the program is running.
-heartbeat_file_location = config["general"]["interface_directory"] + "/heartbeat.json"
-if (os.path.exists(heartbeat_file_location) == False): # If the heartbeat log file doesn't exist, create it.
-    save_to_file(heartbeat_file_location, "[]", True) # Save a blank placeholder list to the heartbeat log file.
+if (config["general"]["interface_directory"] != ""): # Check to see if the interface directory is enabled.
+    heartbeat_file_location = config["general"]["interface_directory"] + "/heartbeat.json"
+    if (os.path.exists(heartbeat_file_location) == False): # If the heartbeat log file doesn't exist, create it.
+        save_to_file(heartbeat_file_location, "[]", True) # Save a blank placeholder list to the heartbeat log file.
 
-heartbeat_file = open(heartbeat_file_location, "r") # Open the heartbeat log file for reading.
-heartbeat_file_contents = heartbeat_file.read() # Read the raw contents of the heartbeat file as a string.
-heartbeat_file.close() # Close the heartbeat log file.
+    heartbeat_file = open(heartbeat_file_location, "r") # Open the heartbeat log file for reading.
+    heartbeat_file_contents = heartbeat_file.read() # Read the raw contents of the heartbeat file as a string.
+    heartbeat_file.close() # Close the heartbeat log file.
 
-if (is_json(heartbeat_file_contents) == True): # If the heartbeat file contains valid JSON data, then load it.
-    heartbeat_log = json.loads(heartbeat_file_contents) # Read and load the heartbeat log from the file.
-else: # If the heartbeat file doesn't contain valid JSON data, then load a blank placeholder in it's place.
-    heartbeat_log = json.loads("[]") # Load a blank placeholder list.
+    if (is_json(heartbeat_file_contents) == True): # If the heartbeat file contains valid JSON data, then load it.
+        heartbeat_log = json.loads(heartbeat_file_contents) # Read and load the heartbeat log from the file.
+    else: # If the heartbeat file doesn't contain valid JSON data, then load a blank placeholder in it's place.
+        heartbeat_log = json.loads("[]") # Load a blank placeholder list.
 
 def heartbeat():
     global heartbeat_log
