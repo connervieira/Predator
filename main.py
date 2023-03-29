@@ -1610,7 +1610,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
 elif (mode_selection == "3" and config["general"]["modes"]["enabled"]["dashcam"] == True): # The user has set Predator to boot into dash-cam mode.
     debug_message("Started dash-cam mode")
     print("\nStarting dashcam recording at " + str(config["dashcam"]["capture"]["resolution"]) + "@" + str(config["dashcam"]["capture"]["frame_rate"]) + "fps") # Print information about the recording settings.
-    start_dashcam(config["dashcam"]["capture"]["devices"], int(config["dashcam"]["segment_length"]), config["dashcam"]["capture"]["resolution"], config["dashcam"]["capture"]["frame_rate"], config["general"]["working_directory"], False) # Start the dashcam recording process.
+    start_dashcam(config["dashcam"]["capture"]["devices"], int(config["dashcam"]["capture"]["segment_length"]), config["dashcam"]["capture"]["resolution"], config["dashcam"]["capture"]["frame_rate"], config["general"]["working_directory"], False) # Start the dashcam recording process.
 
 
 
