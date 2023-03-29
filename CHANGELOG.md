@@ -321,5 +321,7 @@ This update refines Predator's functionality, and focuses its purpose back on li
     - Management mode and pre-recorded mode have modified run-time preferences, and place more emphasis on configuration values.
 - Updated license plate logging in real-time mode.
     - The license plate log file is now a JSON file, and contains more information than before, including license plate guesses.
+- Added support for interface with external local services.
 - Object recognition library importing has been improved.
     - The configuration value to globally disable object recognition has been removed, and replaced with a single control that enables object recognition.
+- Fixed an issue where dashcam recording would cause a crash when displaying the process start message.
