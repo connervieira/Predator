@@ -1546,31 +1546,32 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
         # Save detected license plates to file.
         if (config["realtime"]["saving"]["license_plates"] != ""): # Check to see if license plate history saving is enabled.
             debug_message("Saving license plate history")
-            current_time = time.time() # Get the current timestamp.
+            if (len(all_current_plate_guesses) > 0): # Only save the license plate history for this round if 1 or more plates were detected.
+                current_time = time.time() # Get the current timestamp.
 
-            plate_log[current_time] = {} # Initialize an entry in the plate history log using the current time.
+                plate_log[current_time] = {} # Initialize an entry in the plate history log using the current time.
 
-            if (config["realtime"]["gps"]["alpr_location_tagging"] == True): # Check to see if the configuration value for geotagging license plate detections has been enabled.
-                if (config["realtime"]["gps"]["enabled"] == True): # Check to see if GPS functionality is enabled.
-                    current_location = get_gps_location() # Get the current location.
-                else:
-                    current_location = [0.0, 0.0] # Grab a placeholder for the current location, since GPS functionality is disabled.
+                if (config["realtime"]["gps"]["alpr_location_tagging"] == True): # Check to see if the configuration value for geotagging license plate detections has been enabled.
+                    if (config["realtime"]["gps"]["enabled"] == True): # Check to see if GPS functionality is enabled.
+                        current_location = get_gps_location() # Get the current location.
+                    else:
+                        current_location = [0.0, 0.0] # Grab a placeholder for the current location, since GPS functionality is disabled.
 
-                plate_log[current_time]["location"] = {"lat": current_location[0],"lon": current_location[1]} # Add the current location to the plate history log entry.
+                    plate_log[current_time]["location"] = {"lat": current_location[0],"lon": current_location[1]} # Add the current location to the plate history log entry.
 
-            plate_log[current_time]["plates"] = {}
+                plate_log[current_time]["plates"] = {}
 
-            for plate in all_current_plate_guesses: # Iterate though each plate detected this round.
-                plate_log[current_time]["plates"][plate] = {"alerts": [], "guesses": {}} # Initialize this plate in the plate log.
-                for guess in all_current_plate_guesses[plate]: # Iterate through each guess in this plate.
-                    if (guess in active_alerts): # Check to see if this guess matches one of the active alerts.
-                        plate_log[current_time]["plates"][plate]["alerts"].append(active_alerts[guess]["rule"]) # Add the rule that triggered the alert to a separate list.
-                    plate_log[current_time]["plates"][plate]["guesses"][guess] = all_current_plate_guesses[plate][guess] # Add this guess to the log, with its confidence level.
+                for plate in all_current_plate_guesses: # Iterate though each plate detected this round.
+                    plate_log[current_time]["plates"][plate] = {"alerts": [], "guesses": {}} # Initialize this plate in the plate log.
+                    for guess in all_current_plate_guesses[plate]: # Iterate through each guess in this plate.
+                        if (guess in active_alerts): # Check to see if this guess matches one of the active alerts.
+                            plate_log[current_time]["plates"][plate]["alerts"].append(active_alerts[guess]["rule"]) # Add the rule that triggered the alert to a separate list.
+                        plate_log[current_time]["plates"][plate]["guesses"][guess] = all_current_plate_guesses[plate][guess] # Add this guess to the log, with its confidence level.
 
 
-                plate_log[current_time]["plates"][plate]["alerts"] = list(dict.fromkeys(plate_log[current_time]["plates"][plate]["alerts"])) # De-duplicate the 'alerts' list for this plate.
+                    plate_log[current_time]["plates"][plate]["alerts"] = list(dict.fromkeys(plate_log[current_time]["plates"][plate]["alerts"])) # De-duplicate the 'alerts' list for this plate.
 
-            save_to_file(plate_log_file_location, json.dumps(plate_log), True) # Save the modified plate log to the disk as JSON data.
+                save_to_file(plate_log_file_location, json.dumps(plate_log), True) # Save the modified plate log to the disk as JSON data.
 
 
 
