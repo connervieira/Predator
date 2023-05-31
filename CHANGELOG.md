@@ -324,4 +324,6 @@ This update refines Predator's functionality, and focuses its purpose back on li
 - Added support for interface with external local services.
 - Object recognition library importing has been improved.
     - The configuration value to globally disable object recognition has been removed, and replaced with a single control that enables object recognition.
-- Fixed an issue where dashcam recording would cause a crash when displaying the process start message.
+- Improved dashcam recording.
+    - Fixed an issue where dashcam recording would cause a crash when displaying the process start message.
+    - Added support for OpenCV recording.

@@ -1,7 +1,7 @@
 {
     "general": {
-        "working_directory": "/home/cvieira/Downloads/predator",
-        "interface_directory": "/home/cvieira/Downloads/interface",
+        "working_directory": "/home/cvieira/Software/Support/Predator/Working/",
+        "interface_directory": "/home/cvieira/Software/Support/Predator/Interface/",
         "alpr": {
             "engine": "phantom",
             "guesses": 5,
@@ -10,7 +10,7 @@
         "alerts": {
             "alerts_ignore_validation": true,
             "allow_duplicate_alerts": true,
-            "databases": ["https://v0lttech.com/predator/plates/test.json"]
+            "databases": []
         },
         "display": {
             "ascii_art_header": true,
@@ -133,11 +133,23 @@
     },
     "dashcam": {
         "capture": {
-            "resolution": "1920x1080",
-            "frame_rate": 15,
-            "segment_length": 60,
-            "devices": {
-                "main": "/dev/video0"
+            "provider": "opencv",
+            "opencv": {
+                "resolution": {
+                    "width": 1280,
+                    "height": 720
+                },
+                "devices": {
+                    "main": 0
+                }
+            },
+            "ffmpeg": {
+                "resolution": "1920x1080",
+                "frame_rate": 15,
+                "segment_length": 60,
+                "devices": {
+                    "main": "/dev/video0"
+                }
             }
         },
         "background_recording": false

@@ -85,6 +85,9 @@ from xml.dom import minidom # Required for processing GPX data
 if (config["realtime"]["gps"]["enabled"] == True): # Only import the GPS libraries if GPS settings are enabled.
     from gps import * # Required to access GPS information.
     import gpsd
+if (config["dashcam"]["capture"]["provider"] == "opencv"): # Check to see if OpenCV is needed.
+    import cv2 # Import OpenCV
+    import threading
 
 
 
@@ -572,7 +575,59 @@ def closest_key(array, search_key): # This function returns the nearest timestam
 
 
 
-def start_dashcam(dashcam_devices, segment_length, resolution, framerate, directory, background=False): # This function starts dashcam recording on a given list of dashcam devices.
+
+dashcam_recording_active = False
+
+def start_opencv_recording(directory, device=0, width=1280, height=720):
+    global dashcam_recording_active
+    capture = cv2.VideoCapture(device) # Open the video stream.
+    capture.set(cv2.CAP_PROP_FRAME_WIDTH,width) # Set the video stream width.
+    capture.set(cv2.CAP_PROP_FRAME_HEIGHT,height) # Set the video stream height.
+
+    file = directory + "/predator_dashcam_" + str(int(time.time())) + "_" + str(device) + "_0.avi" # Determine the file path.
+    output = cv2.VideoWriter(file, cv2.VideoWriter_fourcc(*'XVID'), 20.0, (width,  height))
+
+    if not capture.isOpened():
+        print("Cannot open camera")
+        exit()
+
+    while dashcam_recording_active: # Only run while the dashcam recording flag is set to 'True'.
+        ret, frame = capture.read() # Capture a frame.
+        if not ret: # Check to see if the frame failed to be read.
+            print("Can't receive frame (stream end?). Exiting ...")
+            break
+
+        stamp_position = [10, height - 10]
+        stamp = str(round(time.time())) + "  " + "ABC1234" + "  " + "V0LT"
+        cv2.putText(frame, stamp, (stamp_position[0], stamp_position[1]), 2, 0.8, (255,255,255)) 
+
+        output.write(frame) # Save this frame to the video.
+
+    capture.release()
+    cv2.destroyAllWindows()
+
+
+
+def start_dashcam_opencv(dashcam_devices, video_width, video_height, directory, background=False): # This function starts dashcam recording on a given list of dashcam devices.
+    dashcam_process = [] # Create a placeholder list to store the dashcam processes.
+    iteration_counter = 0 # Set the iteration counter to 0 so that we can increment it for each recording device specified.
+    global dashcam_recording_active
+    dashcam_recording_active = True
+    
+    for device in dashcam_devices: # Run through each camera device specified in the configuration, and launch an FFMPEG recording instance for it.
+        dashcam_process.append(threading.Thread(target=start_opencv_recording, args=[directory, dashcam_devices[device], video_width, video_height], name="Dashcam" + str(iteration_counter)))
+        dashcam_process[iteration_counter].start()
+
+        iteration_counter = iteration_counter + 1 # Iterate the counter. This value will be used to create unique file names for each recorded video.
+        print("Started dashcam recording on " + str(dashcam_devices[device])) # Inform the user that recording was initiation for this camera device.
+
+    if (background == False): # If background recording is disabled, then prompt the user to press enter to halt recording.
+        prompt("Press enter to cancel recording...") # Wait for the user to press enter before continuing, since continuing will terminate recording.
+        dashcam_recording_active = False # All dashcam threads are watching this variable globally, and will terminate when it is changed to 'False'.
+        print("Dashcam recording halted.")
+
+
+def start_dashcam_ffmpeg(dashcam_devices, segment_length, resolution, framerate, directory, provider, background=False): # This function starts dashcam recording on a given list of dashcam devices.
     dashcam_process = [] # Create a placeholder list to store the dashcam processes.
     iteration_counter = 0 # Set the iteration counter to 0 so that we can increment it for each recording device specified.
     

@@ -193,23 +193,34 @@ Configuration values in this section are settings specific to real-time mode.
 ## Dash-cam Mode Configuration
 
 - `capture` contains settings related to the capturing of dashcam video.
-    - `resolution` is a string that determines what resolution Predator will attmpt to record at, and takes the form of `"[width]x[height]"`
-        - Be sure that your camera is capable of recording at resolution specified here. If you set an unsupported resolution, it's likely Predator will fail and not record anything.
-        - Example: `"1920x1080"`
-    - `frame_rate` is an integer that determines what framerate the dashcam will attempt to record at.
-        - Be sure that your camera is capable of recording at the frame rate specified here. If you set an unsupported frame rate, it's likely Predator will fail and not record anything.
-        - If you enter a frame rate too slow for the encoder, it might automatically be sped to a higher frame rate.
-        - Example: `30`
-    - `segment_length` is an integer that determines the length of each dashcam video clip before a new segment is created, measured in seconds.
-        - It should be noted that video segments are not guaranteed to exactly match the length set here.
-        - When this value is set to `0`, recordings will not be separated into segments.
-    - `devices` is a list that contains the camera devices Predator will attempt to use when recording video in dash-cam mode.
-        - Each entry under this setting should contain a device identifier/name, as well as a reference to the device itself.
-        - Examples:
-            - `"main_camera": "/dev/video0"`
-            - `"secondary_camera": "/dev/video1"`
-        - The device name will be appended to any video file names in order to give the user a quick indication of which camera recorded each file.
-        - Note: While you can specify an infinite number of cameras here, be aware that Predator might not be able to record with all of them. Bottlenecks like processor speed, RAM, and USB controller capabilities can cause issues with high numbers of cameras. Be sure to test your configuration before you start using it formally.
+    - `provider` determines which video back-end Predator will use. This can only be set to "ffmpeg" or "opencv".
+    - `opencv` contains settings that control how the OpenCV back-end records video. These settings are only considered when the `provider` value is set to "opencv".
+        - `resolution` sets the resolution of the video.
+            - `width` sets the width of the video, measured in pixels.
+            - `height` sets the height of the video, measured in pixels.
+        - `devices` is a list that contains the indexes of camera devices Predator will attempt to use when recording video in dash-cam mode.
+            - Each entry under this setting should contain a device identifier/name, as well as a reference to the device itself.
+            - Examples:
+                - `"main_camera": 0`
+                - `"secondary_camera": 1`
+    - `ffmpeg` contains settings that control how the FFMPEG back-end records video. These settings are only considered when the `provider` value is set to "ffmpeg".
+        - `resolution` is a string that determines what resolution Predator will attmpt to record at, and takes the form of `"[width]x[height]"`
+            - Be sure that your camera is capable of recording at resolution specified here. If you set an unsupported resolution, it's likely Predator will fail and not record anything.
+            - Example: `"1920x1080"`
+        - `frame_rate` is an integer that determines what framerate the dashcam will attempt to record at.
+            - Be sure that your camera is capable of recording at the frame rate specified here. If you set an unsupported frame rate, it's likely Predator will fail and not record anything.
+            - If you enter a frame rate too slow for the encoder, it might automatically be sped to a higher frame rate.
+            - Example: `30`
+        - `segment_length` is an integer that determines the length of each dashcam video clip before a new segment is created, measured in seconds.
+            - It should be noted that video segments are not guaranteed to exactly match the length set here.
+            - When this value is set to `0`, recordings will not be separated into segments.
+        - `devices` is a list that contains the camera devices Predator will attempt to use when recording video in dash-cam mode.
+            - Each entry under this setting should contain a device identifier/name, as well as a reference to the device itself.
+            - Examples:
+                - `"main_camera": "/dev/video0"`
+                - `"secondary_camera": "/dev/video1"`
+            - The device name will be appended to any video file names in order to give the user a quick indication of which camera recorded each file.
+            - Note: While you can specify an infinite number of cameras here, be aware that Predator might not be able to record with all of them. Bottlenecks like processor speed, RAM, and USB controller capabilities can cause issues with high numbers of cameras. Be sure to test your configuration before you start using it formally.
 - `background_recording` is a boolean that determines whether dashcam video will be recorded in the background while using real-time mode.
     - Note that Predator can only use each recording device for one task at a time, so if you run real-time mode with background recording enabled, you'll need to specify two different devices by changing `image>capture>device` and `dashcam>devices`.
 
