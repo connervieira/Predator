@@ -327,3 +327,4 @@ This update refines Predator's functionality, and focuses its purpose back on li
 - Improved dashcam recording.
     - Fixed an issue where dashcam recording would cause a crash when displaying the process start message.
     - Added support for OpenCV recording.
+- Entries are now only added to the license plate history log file if one or more license plates were detected.
