@@ -10,7 +10,7 @@
         "alerts": {
             "alerts_ignore_validation": true,
             "allow_duplicate_alerts": true,
-            "databases": []
+            "databases": ["https://v0lttech.com/predator/plates/emergency.json"]
         },
         "display": {
             "ascii_art_header": true,
