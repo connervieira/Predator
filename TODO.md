@@ -62,6 +62,7 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Add the ability to update lists in the configuration from management mode.
 - [X] Add configuration value for the number of guesses the ALPR engine should make in pre-recorded mode.
 - [X] Organize configuration.
+- [ ] Add support for multiple license plate formats.
 
 
 # Hypothetical
