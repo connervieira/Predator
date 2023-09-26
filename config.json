@@ -5,7 +5,7 @@
         "alpr": {
             "engine": "phantom",
             "guesses": 5,
-            "license_plate_format": ""
+            "license_plate_format": [""]
         },
         "alerts": {
             "alerts_ignore_validation": true,

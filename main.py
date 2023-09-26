@@ -686,10 +686,12 @@ elif (mode_selection == "1" and config["general"]["modes"]["enabled"]["prerecord
 
     framerate = prompt("Frame analysis interval (Default '1.0'): ", optional=True, input_type=float, default=1.0)
 
-    license_plate_format_input = prompt("License plate format (Default '" + config["general"]["alpr"]["license_plate_format"] + "'): ", optional=True, input_type=str)
+    current_formats = ', '.join(config["general"]["alpr"]["license_plate_format"])
+    license_plate_format_input = prompt(f"License plate format, separated by commas (Default '{current_formats}'): ", optional=True, input_type=str)
     if (license_plate_format_input == ""): # If the user leaves the license plate format input blank, then use the default.
-        license_plate_format_input = config["general"]["alpr"]["license_plate_format"]
-    config["general"]["alpr"]["license_plate_format"] = license_plate_format_input
+        license_plate_format_input = current_formats
+    # Convert and store the input string as a list of formats
+    config["general"]["alpr"]["license_plate_format"] = [format.strip() for format in license_plate_format_input.split(',')]
 
     video_start_time = prompt("Video starting time (YYYY-mm-dd HH:MM:SS): ", optional=True, input_type=str) # Ask the user when the video recording started so we can correlate it's frames to a GPX file.
     if (video_start_time != ""):
@@ -863,7 +865,7 @@ elif (mode_selection == "1" and config["general"]["modes"]["enabled"]["prerecord
         validated_alpr_frames[frame] = {} # Set the validated license plate recognition information for this frame to an empty list as a placeholder.
         for plate in alpr_frames[frame].keys(): # Iterate through each plate detected per frame.
             for guess in alpr_frames[frame][plate]: # Iterate through each guess for each plate.
-                if (validate_plate(guess, config["general"]["alpr"]["license_plate_format"]) == True or config["general"]["alpr"]["license_plate_format"] == ""): # Check to see if this plate passes validation.
+                if any(validate_plate(guess, format_template) for format_template in config["general"]["alpr"]["license_plate_format"]) or "" in config["general"]["alpr"]["license_plate_format"]: # Check to see if this plate passes validation.
                     if (plate not in validated_alpr_frames[frame]): # Check to see if this plate hasn't been added to the validated information yet.
                         validated_alpr_frames[frame][plate] = [] # Add the plate to the validated information as a blank placeholder list.
                     validated_alpr_frames[frame][plate].append(guess) # Since this plate guess failed the validation test, delete it from the list of guesses.
@@ -1438,7 +1440,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
 
                 else: # If the user did supply a license plate format, then check all of the results against the formatting example.
                     for plate_guess in all_current_plate_guesses[individual_detected_plate]: # Iterate through each plate and grab the first plate that matches the plate formatting guidelines as the 'detected plate'.
-                        if (validate_plate(plate_guess, config["general"]["alpr"]["license_plate_format"])): # Check to see whether or not the plate passes the validation based on the format specified by the user.
+                        if any([validate_plate(plate_guess, format_template) for format_template in config["general"]["alpr"]["license_plate_format"]]): # Check to see whether or not the plate passes the validation based on the format specified by the user.
                             detected_plate = plate_guess # Grab the validated plate as the 'detected plate'.
                             successfully_found_plate = True # The plate was successfully validated, so indicate that a plate was successfully found this round.
                             if (config["realtime"]["interface"]["display"]["show_invalid_plates"] == True): # Only print the validated plate if the configuration says to do so.
