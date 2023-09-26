@@ -19,12 +19,12 @@ This section of configuration values will effect Predator's general operation.
         - This can be set to either `"openalpr"` or `"phantom"`.
     - `guesses` is an integer that determines how many guesses the ALPR engine will make when analyzing a plate.
         - The higher this number is, the more likely Predator is to guess a plate incorrectly. The lower this number is, the less likely Predator will be to find a valid guess at all.
-    - `license_plate_format` is a string that provides Predator with an example of how license plates in your region should be formatted.
-        - For example, license plates in the state of Ohio generally follow the pattern of 3 letters followed by 4 numbers. In Ohio, this preference might be set to `AAA0000` to filter out plate guesses that don't match the most common formatting pattern.
+    - `license_plate_format` is a list of strings that provide Predator with examples of how license plates in your region should be formatted.
+        - For example, license plates in the state of Ohio generally follow the pattern of 3 letters followed by 4 numbers. In Ohio, this preference might contain `"AAA0000"` to filter out plate guesses that don't match the most common formatting pattern.
         - This preference only considers the type of each character, not the character itself.
             - In other words, `AAA0000` and `ABC1234` will function identically.
             - This also means you can simply enter any given plate from a car located in the region you're scanning in to have a reasonably good chance at matching your region's formatting guidelines for license plates.
-        - Leaving this blank will disable license plate format validation.
+        - Leaving this as an empty list disable license plate format validation.
 - `alerts` contains settings related to license plate alerting.
     - `alerts_ignore_validation` is a boolean determines whether alerts will respect or ignore the plate validation format.
         - When this is set to `true`, if a plate fails the validation test, but matches an alert database plate, the alert will be displayed anyway.
