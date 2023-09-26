@@ -56,13 +56,14 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Add more fault tolerance to user input prompt function.
 - [X] Add support for multiple plates in pre-recorded mode.
 - [X] Make sound playing more organized.
-- [X] Made real-time alert handling more efficient.
+- [X] Make real-time alert handling more efficient.
 - [X] Add alerts to pre-recorded mode.
 - [X] Add support for multiple alert databases.
 - [X] Add the ability to update lists in the configuration from management mode.
 - [X] Add configuration value for the number of guesses the ALPR engine should make in pre-recorded mode.
 - [X] Organize configuration.
-- [ ] Add support for multiple license plate formats.
+- [X] Add support for multiple license plate formats.
+- [ ] Test updated license plate validation in real-time mode.
 
 
 # Hypothetical
