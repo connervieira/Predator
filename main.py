@@ -141,7 +141,7 @@ if (config["general"]["display"]["ascii_art_header"] == True): # Check to see wh
     print("                            COMPUTER VISION SYSTEM")
     if (config["general"]["display"]["startup_message"] != ""): # Only display the line for the custom message if the user has defined one.
         print("")
-        print(config["general"]["interface"]["display"]["startup_message"]) # Show the user's custom defined start-up message.
+        print(config["general"]["display"]["startup_message"]) # Show the user's custom defined start-up message.
     print(style.end)
 else: # If the user his disabled the large ASCII art header, then show a simple title header with minimal styling.
     print(style.red + style.bold + "PREDATOR" + style.end)
@@ -727,10 +727,6 @@ elif (mode_selection == "1" and config["general"]["modes"]["enabled"]["prerecord
     for video in videos: # Iterate through each video specified by the user.
         if (os.path.exists(config["general"]["working_directory"] + "/" + video) == False): # Check to see if each video file name supplied by the user actually exists in the working directory.
             display_message("The video file " + str(video) + " entered doesn't seem to exist in the working directory. Predator will almost certainly fail.", 3) # Inform the user that this video file couldn't be found.
-
-
-    if (len(config["general"]["alpr"]["license_plate_format"]) > 12): # Check to see if the license plate template supplied by the user abnormally long.
-        display_message("The license plate template supplied is abnormally long. Processing can continue, but it's likely something has gone wrong.", 3)
 
 
 
@@ -1415,7 +1411,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
                     print("Objects identified: " + objects_identified)
                 export_data = str(round(time.time())) + "," + objects_identified + "\n" # Add the timestamp to the export data, followed by the object's detected, followed by a line break to prepare for the next entry to be added later.
                 if (config["realtime"]["saving"]["object_recognition"] != ""): # Check to see if Predator is configured to save recognized objects to disk.
-                    add_to_file(config["general"]["working_directory"] + "/" + config["realtime"]["saving"]["object_recognition"], export_data, config["general"]["interface"]["display"]["silence_file_saving"]) # Add the export data to the end of the file and write it to disk.
+                    add_to_file(config["general"]["working_directory"] + "/" + config["realtime"]["saving"]["object_recognition"], export_data, config["general"]["display"]["silence_file_saving"]) # Add the export data to the end of the file and write it to disk.
                 
             if (config["realtime"]["interface"]["display"]["output_level"] >= 3): # Only display this status message if the output level indicates to do so.
                 print("Done\n----------")
@@ -1434,7 +1430,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
                 successfully_found_plate = False # Reset the 'sucessfully_found_plate` variable to 'False'. This will be changed back if a valid plate is detected.
 
                 # Run validation according to the configuration on the plate(s) detected.
-                if (config["general"]["alpr"]["license_plate_format"] == ""): # If the user didn't supply a license plate format, then skip license plate validation.
+                if (len(config["general"]["alpr"]["license_plate_format"]) == 0): # If the user didn't supply a license plate format, then skip license plate validation.
                     detected_plate = str(list(all_current_plate_guesses[individual_detected_plate].keys())[1]) # Grab the most likely detected plate as the 'detected plate'.
                     successfully_found_plate = True # Plate validation wasn't needed, so the fact that a plate existed at all means a valid plate was detected. Indicate that a plate was successfully found this round.
 

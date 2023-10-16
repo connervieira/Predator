@@ -5,7 +5,7 @@
         "alpr": {
             "engine": "phantom",
             "guesses": 5,
-            "license_plate_format": [""]
+            "license_plate_format": ["AAA0000"]
         },
         "alerts": {
             "alerts_ignore_validation": true,
@@ -51,7 +51,7 @@
     "realtime": {
         "interface": {
             "display": {
-                "show_invalid_plates": false,
+                "show_invalid_plates": true,
                 "detected_plate_count": true,
                 "shape_alerts": false,
                 "output_level": 2,
