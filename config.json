@@ -3,11 +3,12 @@
         "working_directory": "/home/cvieira/Software/Support/Predator/Working/",
         "interface_directory": "/home/cvieira/Software/Support/Predator/Interface/",
         "alpr": {
-            "engine": "openalpr",
+            "engine": "phantom",
             "validation": {
-                "guesses": 5,
+                "guesses": 15,
+                "confidence": 80,
                 "license_plate_format": ["AAA0000"],
-                "best_effort": true
+                "best_effort": false
             }
         },
         "alerts": {
@@ -65,7 +66,7 @@
             "behavior": {
                 "delays": {
                     "alert": 5,
-                    "normal": 0.5
+                    "normal": 1
                 },
                 "clearing": true,
                 "manual_trigger": false

@@ -340,3 +340,4 @@ This update refines Predator's functionality, and focuses its purpose back on li
 - Simplified the configuration.
     - Removed the `detected_plate_count` configuration value from the real-time display section.
         - The number of plates detected is now always displayed in the console output.
+- Added configuration value to set a minimum required confidence level for ALPR results.

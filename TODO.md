@@ -64,3 +64,4 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Organize configuration.
 - [X] Add support for multiple license plate formats.
 - [X] Test updated license plate validation in real-time mode.
+- [ ] Add Phantom alert handling to updated ALPR stream.

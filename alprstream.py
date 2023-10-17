@@ -57,6 +57,8 @@ def alpr_stream_maintainer(): # This function runs an endless loop that maintain
         for message in stream_file_contents: # Iterate through each line in the loaded stream file contents.
             if (is_json(message) == True):
                 message = json.loads(message) # Parse each line into JSON.
+                if ("error" in message): # Check to see if there were errors while executing the ALPR process. This will only work for alerts issued by Phantom, not OpenALPR.
+                    display_message("Phantom ALPR encountered an error: " + message["error"], level=3) # Display the ALPR error.
                 for plate in message["results"]: # Iterate through each license plate in this line.
                     queued_plate_reads.append(plate) # Add each license plate to the license plate queue.
             else:

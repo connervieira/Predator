@@ -857,10 +857,11 @@ elif (mode_selection == "1" and config["general"]["modes"]["enabled"]["prerecord
         validated_alpr_frames[frame] = {} # Set the validated license plate recognition information for this frame to an empty list as a placeholder.
         for plate in alpr_frames[frame].keys(): # Iterate through each plate detected per frame.
             for guess in alpr_frames[frame][plate]: # Iterate through each guess for each plate.
-                if any(validate_plate(guess, format_template) for format_template in config["general"]["alpr"]["validation"]["license_plate_format"]) or "" in config["general"]["alpr"]["validation"]["license_plate_format"]: # Check to see if this plate passes validation.
-                    if (plate not in validated_alpr_frames[frame]): # Check to see if this plate hasn't been added to the validated information yet.
-                        validated_alpr_frames[frame][plate] = [] # Add the plate to the validated information as a blank placeholder list.
-                    validated_alpr_frames[frame][plate].append(guess) # Since this plate guess failed the validation test, delete it from the list of guesses.
+                if (all_current_plate_guesses[individual_detected_plate][plate_guess] >= float(config["general"]["alpr"]["validation"]["confidence"])): # Check to make sure this plate's confidence is higher than the minimum threshold set in the configuration.
+                    if any(validate_plate(guess, format_template) for format_template in config["general"]["alpr"]["validation"]["license_plate_format"]) or "" in config["general"]["alpr"]["validation"]["license_plate_format"]: # Check to see if this plate passes validation.
+                        if (plate not in validated_alpr_frames[frame]): # Check to see if this plate hasn't been added to the validated information yet.
+                            validated_alpr_frames[frame][plate] = [] # Add the plate to the validated information as a blank placeholder list.
+                        validated_alpr_frames[frame][plate].append(guess) # Since this plate guess failed the validation test, delete it from the list of guesses.
 
     print("Done.\n")
 
@@ -1286,7 +1287,6 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
                 all_current_plate_guesses[detected_plate["candidates"][0]["plate"]] = {} # Create an empty dictionary for this plate so we can add all the potential plate guesses to it in the next step.
 
                 for plate_guess in detected_plate["candidates"]: # Iterate through each plate guess candidate for each potential plate detected.
-                    #all_current_plate_guesses[detected_plate["plate_index"]][plate_guess["plate"]] = plate_guess["confidence"] # Add the current plate guess candidate to the list of plate guesses.
                     all_current_plate_guesses[detected_plate["candidates"][0]["plate"]][plate_guess["plate"]] = plate_guess["confidence"] # Add the current plate guess candidate to the list of plate guesses.
 
         if (config["realtime"]["interface"]["display"]["output_level"] >= 3): # Only display this status message if the output level indicates to do so.
@@ -1315,15 +1315,16 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
                     if (config["realtime"]["interface"]["display"]["show_validation"] == True): # Only print the validated plate if the configuration says to do so.
                         print ("    Plate guesses:")
                     for plate_guess in all_current_plate_guesses[individual_detected_plate]: # Iterate through each plate and grab the first plate that matches the plate formatting guidelines as the 'detected plate'.
-                        if any([validate_plate(plate_guess, format_template) for format_template in config["general"]["alpr"]["validation"]["license_plate_format"]]): # Check to see whether or not the plate passes the validation based on the format specified by the user.
-                            detected_plate = plate_guess # Grab the validated plate as the 'detected plate'.
-                            successfully_found_plate = True # The plate was successfully validated, so indicate that a plate was successfully found this round.
-                            if (config["realtime"]["interface"]["display"]["show_validation"] == True): # Only print the validated plate if the configuration says to do so.
-                                print("        ", style.green + plate_guess + style.end) # Print the valid plate in green.
-                            break
-                        else: # This particular plate guess is invalid, since it didn't align with the user-supplied formatting guidelines.
-                            if (config["realtime"]["interface"]["display"]["show_validation"] == True): # Only print the invalid plate if the configuration says to do so.
-                                print("        ", style.red + plate_guess + style.end) # Print the invalid plate in red.
+                        if (all_current_plate_guesses[individual_detected_plate][plate_guess] >= float(config["general"]["alpr"]["validation"]["confidence"])): # Check to make sure this plate's confidence is higher than the minimum threshold set in the configuration.
+                            if any([validate_plate(plate_guess, format_template) for format_template in config["general"]["alpr"]["validation"]["license_plate_format"]]): # Check to see whether or not the plate passes the validation based on the format specified by the user.
+                                detected_plate = plate_guess # Grab the validated plate as the 'detected plate'.
+                                successfully_found_plate = True # The plate was successfully validated, so indicate that a plate was successfully found this round.
+                                if (config["realtime"]["interface"]["display"]["show_validation"] == True): # Only print the validated plate if the configuration says to do so.
+                                    print("        ", style.green + plate_guess + style.end) # Print the valid plate in green.
+                                break
+                            else: # This particular plate guess is invalid, since it didn't align with the user-supplied formatting guidelines.
+                                if (config["realtime"]["interface"]["display"]["show_validation"] == True): # Only print the invalid plate if the configuration says to do so.
+                                    print("        ", style.red + plate_guess + style.end) # Print the invalid plate in red.
 
 
 
@@ -1371,8 +1372,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
             print("Displaying detected license plates...")
 
         if (config["realtime"]["interface"]["display"]["output_level"] >= 2): # Only display this status message if the output level indicates to do so.
-            if (len(new_plates_detected) > 0):
-                print("Plates detected: ", len(new_plates_detected))
+            print("Plates detected: ", len(new_plates_detected)) # Display the number of license plates detected this round.
             for plate in new_plates_detected:
                 play_sound("notification")
                 print("    Detected plate: " + plate) # Print the detected plate.
