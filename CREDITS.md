@@ -33,13 +33,6 @@ ImageMagick is one of the most popular command-line image manipulating tools, an
 <https://imagemagick.org/index.php>
 
 
-### FSWebcam
-
-FSWebcam is a simple utility designed to make interacting with external cameras as easy as possible. FSWebcam is the utility Predator uses to access connected cameras in real-time mode.
-
-<http://www.sanslogic.co.uk/fswebcam/>
-
-
 ### GPSD
 
 GPSD is a Linux utility designed to allow programs to interact with GPS devices plugged into a system. Predator uses GPSD to get the current location, speed, and other information.
