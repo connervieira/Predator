@@ -302,7 +302,7 @@ This update refines Predator's functionality, and focuses its purpose back on li
 
 ## Version 9.0
 
-### Name To Be Determined 
+### Performance Update
 
 *Release date to be determined*
 
@@ -327,6 +327,16 @@ This update refines Predator's functionality, and focuses its purpose back on li
 - Improved dashcam recording.
     - Fixed an issue where dashcam recording would cause a crash when displaying the process start message.
     - Added support for OpenCV recording.
-- Entries are now only added to the license plate history log file if one or more license plates were detected.
 - Added support for multiple license plate validation formats.
-- Fixed an issue where Predator would reference a non-existent configuration value when object recognition was enabled in real-time mode.
+- Overhauled real-time mode.
+    - Entries are now only added to the license plate history log file if one or more license plates were detected.
+    - Real-time mode now streams constant video from the configured camera, rather than capturing discrete still frames.
+        - This dramatically improves the likelihood of plate detection, especially under challenging conditions.
+    - Removed several features to accomodate constant ALPR video streaming.
+        - Removed image post-processing.
+        - Removed image saving.
+        - Removed real-time object recognition.
+    - Refined the real-time mode interface to better accomodate multiple plates being displayed at once.
+- Simplified the configuration.
+    - Removed the `detected_plate_count` configuration value from the real-time display section.
+        - The number of plates detected is now always displayed in the console output.

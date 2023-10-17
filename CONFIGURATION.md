@@ -17,19 +17,24 @@ This section of configuration values will effect Predator's general operation.
 - `alpr` contains settings related to license plate recognition.
     - `engine` is a string that determines what ALPR engine Predator will use.
         - This can be set to either `"openalpr"` or `"phantom"`.
-    - `guesses` is an integer that determines how many guesses the ALPR engine will make when analyzing a plate.
-        - The higher this number is, the more likely Predator is to guess a plate incorrectly. The lower this number is, the less likely Predator will be to find a valid guess at all.
-    - `license_plate_format` is a list of strings that provide Predator with examples of how license plates in your region should be formatted.
-        - For example, license plates in the state of Ohio generally follow the pattern of 3 letters followed by 4 numbers. In Ohio, this preference might contain `"AAA0000"` to filter out plate guesses that don't match the most common formatting pattern.
-        - This preference only considers the type of each character, not the character itself.
-            - In other words, `AAA0000` and `ABC1234` will function identically.
-            - This also means you can simply enter any given plate from a car located in the region you're scanning in to have a reasonably good chance at matching your region's formatting guidelines for license plates.
-        - Leaving this as an empty list disable license plate format validation.
+    - `validation` contains settings for validating license plate candidates/guesses.
+        - `guesses` is an integer that determines how many guesses the ALPR engine will make when analyzing a plate.
+            - The higher this number is, the more likely Predator is to guess a plate incorrectly. The lower this number is, the less likely Predator will be to find a valid guess at all.
+        - `license_plate_format` is a list of strings that provide Predator with examples of how license plates in your region should be formatted.
+            - For example, license plates in the state of Ohio generally follow the pattern of 3 letters followed by 4 numbers. In Ohio, this preference might contain `"AAA0000"` to filter out plate guesses that don't match the most common formatting pattern.
+            - This preference only considers the type of each character, not the character itself.
+                - In other words, `AAA0000` and `ABC1234` will function identically.
+                - This also means you can simply enter any given plate from a car located in the region you're scanning in to have a reasonably good chance at matching your region's formatting guidelines for license plates.
+            - Leaving this as an empty list disable license plate format validation.
+        - `best_effort` is a boolean that determines whether Predator will accept the most confident guess when none of the guesses match the license plate validation format(s).
+            - When set to `true`, Predator will not completely discard license plate detections that don't have any guesses aligning with the license plate validation format(s), and will instead simply accept the best guess for plates that would otherwise be considered invalid.
+            - When set to `false`, Predator will discard plates that don't have any valid guesses, based on the validation format(s).
+            - This setting does not override `general>alerts>alerts_ignore_validation`, and can be set to `false` without interferring with license plate hotlist alerts.
 - `alerts` contains settings related to license plate alerting.
-    - `alerts_ignore_validation` is a boolean determines whether alerts will respect or ignore the plate validation format.
+    - `alerts_ignore_validation` is a boolean that determines whether alerts will respect or ignore the plate validation format.
         - When this is set to `true`, if a plate fails the validation test, but matches an alert database plate, the alert will be displayed anyway.
         - When set to `false`, only plates that have passed the validation test will be checked against the alert database.
-    - `allow_duplicate_alerts` is a boolean determines whether a single license plate can trigger multiple alert rules.
+    - `allow_duplicate_alerts` is a boolean that determines whether a single license plate can trigger multiple alert rules.
         - Setting this to `true` will cause Predator to check all guesses against all alert rules. This can lead to situations where alert rules with wildcards cause a single license plate to alert repeatedly, for each of its guesses.
     - `databases` is a list that contains strings, with each string pointing to either a local or remote license plate hot-list.
         - If a particular entry in this list is a file, the file path should be relative to the working directory.
@@ -44,6 +49,9 @@ This section of configuration values will effect Predator's general operation.
     - `silence_file_saving` is a boolean that determines whether or not Predator will display informational messages when saving files.
     - `debugging_output` is a boolean that determines whether or not Predator will display debugging messages through-out normal operation.
         - When this is set to `true`, console clearing is automatically disabled.
+- `object_recognition` contains settings related to Predator's object recogntion capabilities.
+    - `enabled` is a boolean that determines whether or not object recognition is enabled globally.
+        - Setting this to `false` removes Predator's dependency on Tensorflow and OpenCV.
 - `modes` contains settings related to Predator's operating modes.
     - `auto_start` is a string that determines which mode (if any) Predator will automatically load into upon start-up.
         - There are 4 possible values this can be set to, not including being left blank.
@@ -91,8 +99,8 @@ Configuration values in this section are settings specific to real-time mode.
 
 - `interface` contains settings related to the command line interface.
     - `display` contains settings related to what information is displayed.
-        - `show_invalid_plates` is a boolean that determines whether or not Predator will print every guess it makes as to the contents of a license plates, even if those guesses are invalidated by the license plate format sample.
-        - `detected_plate_count` is a boolean that determines whether or not Predator will show how many plates were detected each frame while operating in real-time mode.
+        - `show_validation` is a boolean that determines whether or not Predator will print every guess it makes as to the contents of a license plates, even if those guesses are invalidated by the license plate format sample.
+            - This setting doesn't change anything practically, but makes it easier to understand how Predator is filtering invalid license plate guesses.
         - `shape_alerts` is a boolean that determines whether or not large ASCII shapes will be printed to the console to indicate certain important events at a glance.
         - `output_level` is an integer that determines how verbose Predator's console output will be.
             - This setting only has 3 different options.
@@ -118,24 +126,8 @@ Configuration values in this section are settings specific to real-time mode.
     - `alpr_location_tagging` is a boolean that determines whether or not the current GPS location will be saved to the log file each time a plate is logged.
 - `image` contains settings related to image handling.
     - `camera` contains settings related to image capture.
-        - `resoultion` determines the maximum resolution that images will be captured with, and is a string that takes the format of `[width]x[height]`.
-            - Example: `"1920x1080"`
         - `device` specifies the camera device that will be used to capture images.
             - Example: `"/dev/video0"`
-        - `arguments` specifies custom command line arguments that will be added to the FSWebcam command. This setting is entirely optional.
-            - Example: `"--set brightness=100% -F 15 -S 5"`
-        - `file_name` is a string that specifies the file name that will be assigned to the captured image, not including the extension.
-            - Example: `"realtime_image"`
-    - `processing` contains settings related to image processing.
-        - `cropping` contains settings regarding image cropping.
-            - `enabled` determines whether image cropping is enabled in real-time mode.
-            - `left_margin` determines how many pixels will be cropped off of the left side of the frame.
-            - `right_margin` determines how many pixels will be cropped off of the right side of the frame.
-            - `bottom_margin` determines how many pixels will be cropped off of the bottom of the frame.
-            - `top_margin` determines how many pixels will be cropped off of the top of the frame.
-        - `rotation` contains settings regarding image cropping.
-            - `enabled` determines whether image rotation is enabled in real-time mode.
-            - `angle` determines the number of degrees clockwise that the image will be rotated.
 - `sounds` contains the sound effects that Predator can play when certain events occur.
     - Each entry in this section has 3 attributes.
         - The `path` value should be set to the file path of the audio file you want to play.
@@ -155,11 +147,6 @@ Configuration values in this section are settings specific to real-time mode.
         - This file is created in the working directory.
         - When this value is left as a blank string, license plate logging will be disabled.
         - Example: `"plate_history.json"`
-    - `object_recognition` is a string that determines the JSON file name will use to save the objects it detects in real-time mode.
-        - This file is created in the working directory.
-        - When this value is left as a blank string, object recognition logging will be disabled. However, this does not disable object recognition in itself, and detected objects will still be displayed in the console.
-        - Example: `"object_history.json"`
-    - `images` is a boolean that determines whether or not Predator will save every image it captures, instead of repeatedly overwriting a single image.
 - `push_notifications`
     - `enabled`
         - This setting determines whether or not Predator will attempt to send push notifications using a Gotify server.

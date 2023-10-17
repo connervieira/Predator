@@ -69,6 +69,9 @@ heartbeat = utils.heartbeat # Load the function to issue heartbeats to the inter
 log_plates = utils.log_plates # Load the function to issue ALPR results to the interface directory.
 log_alerts = utils.log_alerts # Load the function to issue active alerts to the interface directory.
 
+import alprstream
+
+
 
 
 if (config["developer"]["offline"] == False): # Only import networking libraries if offline mode is turned off.
@@ -172,13 +175,6 @@ if (config["prerecorded"]["image"]["processing"]["cropping"]["left_margin"] < 0 
     config["prerecorded"]["image"]["processing"]["cropping"]["right_margin"] = 0
     config["prerecorded"]["image"]["processing"]["cropping"]["bottom_margin"] = 0
     config["prerecorded"]["image"]["processing"]["cropping"]["top_margin"] = 0
-
-if (config["realtime"]["image"]["processing"]["cropping"]["left_margin"] < 0 or config["realtime"]["image"]["processing"]["cropping"]["right_margin"] < 0 or config["realtime"]["image"]["processing"]["cropping"]["bottom_margin"] < 0 or config["realtime"]["image"]["processing"]["cropping"]["top_margin"] < 0): # Check to make sure that all of the real-time mode cropping margins are positive numbers.
-    display_message("One or more of the cropping margins for real-time mode are below 0. This should never happen, and it's likely there's a configuration issue somewhere. Cropping margins have all been set to 0.", 3)
-    config["realtime"]["image"]["processing"]["cropping"]["left_margin"] = 0
-    config["realtime"]["image"]["processing"]["cropping"]["right_margin"] = 0
-    config["realtime"]["image"]["processing"]["cropping"]["top_margin"] = 0
-    config["realtime"]["image"]["processing"]["cropping"]["bottom_margin"] = 0
 
 if (re.fullmatch("(\d\d\dx\d\d\d)", config["dashcam"]["capture"]["ffmpeg"]["resolution"]) == None and re.fullmatch("(\d\d\d\dx\d\d\d)", config["dashcam"]["capture"]["ffmpeg"]["resolution"]) == None and re.fullmatch("(\d\d\d\dx\d\d\d\d)", config["dashcam"]["capture"]["ffmpeg"]["resolution"]) == None): # Verify that the dashcam resolution setting matches the format 000x000, 0000x000, or 0000x0000.
     display_message("The 'dashcam>capture>ffmpeg>resolution' specified in the real-time configuration section doesn't seem to align with the '0000x0000' format. It's possible there has been a typo. efaulting to '1280x720'", 3)
@@ -686,12 +682,12 @@ elif (mode_selection == "1" and config["general"]["modes"]["enabled"]["prerecord
 
     framerate = prompt("Frame analysis interval (Default '1.0'): ", optional=True, input_type=float, default=1.0)
 
-    current_formats = ', '.join(config["general"]["alpr"]["license_plate_format"])
+    current_formats = ', '.join(config["general"]["alpr"]["validation"]["license_plate_format"])
     license_plate_format_input = prompt(f"License plate format, separated by commas (Default '{current_formats}'): ", optional=True, input_type=str)
     if (license_plate_format_input == ""): # If the user leaves the license plate format input blank, then use the default.
         license_plate_format_input = current_formats
     # Convert and store the input string as a list of formats
-    config["general"]["alpr"]["license_plate_format"] = [format.strip() for format in license_plate_format_input.split(',')]
+    config["general"]["alpr"]["validation"]["license_plate_format"] = [format.strip() for format in license_plate_format_input.split(',')]
 
     video_start_time = prompt("Video starting time (YYYY-mm-dd HH:MM:SS): ", optional=True, input_type=str) # Ask the user when the video recording started so we can correlate it's frames to a GPX file.
     if (video_start_time != ""):
@@ -861,7 +857,7 @@ elif (mode_selection == "1" and config["general"]["modes"]["enabled"]["prerecord
         validated_alpr_frames[frame] = {} # Set the validated license plate recognition information for this frame to an empty list as a placeholder.
         for plate in alpr_frames[frame].keys(): # Iterate through each plate detected per frame.
             for guess in alpr_frames[frame][plate]: # Iterate through each guess for each plate.
-                if any(validate_plate(guess, format_template) for format_template in config["general"]["alpr"]["license_plate_format"]) or "" in config["general"]["alpr"]["license_plate_format"]: # Check to see if this plate passes validation.
+                if any(validate_plate(guess, format_template) for format_template in config["general"]["alpr"]["validation"]["license_plate_format"]) or "" in config["general"]["alpr"]["validation"]["license_plate_format"]: # Check to see if this plate passes validation.
                     if (plate not in validated_alpr_frames[frame]): # Check to see if this plate hasn't been added to the validated information yet.
                         validated_alpr_frames[frame][plate] = [] # Add the plate to the validated information as a blank placeholder list.
                     validated_alpr_frames[frame][plate].append(guess) # Since this plate guess failed the validation test, delete it from the list of guesses.
@@ -1235,6 +1231,10 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
     alert_database = load_alert_database(config["general"]["alerts"]["databases"], config["general"]["working_directory"])
 
 
+    
+    alprstream.start_alpr_stream() # Start the ALPR stream.
+
+
     detected_license_plates = [] # Create an empty list that will hold each license plate detected by Predator during this session.
 
     frames_captured = 0 # Set the number of frames captured to 0 so we can increment it by one each time Predator analyzes a frame.
@@ -1255,101 +1255,18 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
 
 
 
-
-
-        if (config["realtime"]["interface"]["behavior"]["manual_trigger"] == True): # If the manual trigger configuration value is enabled, then wait for the user to press enter before continuing.
-            debug_message("Waiting for manual trigger")
-            prompt("Press enter to trigger image capture...", optional=True, input_type=str, default="")
-
-
-
-        # Take an image using the camera device specified in the configuration.
-        debug_message("Capturing image")
-        if (config["realtime"]["interface"]["display"]["output_level"] >= 3): # Only display this status message if the output level indicates to do so.
-            print("Taking image...")
-        if (config["realtime"]["saving"]["images"] == True): # Check to see whether or not the user wants to save all images captured by Predator.
-            fswebcam_command = "fswebcam --no-banner -r " + config["realtime"]["image"]["camera"]["resolution"] + " -d " + config["realtime"]["image"]["camera"]["device"] + " --jpeg 100 " + config["realtime"]["image"]["camera"]["arguments"] + " " + config["general"]["working_directory"] + "/" + config["realtime"]["image"]["camera"]["file_name"] + str(frames_captured) + ".jpg >/dev/null 2>&1" # Set up the FSWebcam capture command.
-        else:
-            fswebcam_command = "fswebcam --no-banner -r " + config["realtime"]["image"]["camera"]["resolution"] + " -d " + config["realtime"]["image"]["camera"]["device"] + " --jpeg 100 " + config["realtime"]["image"]["camera"]["arguments"] + " " + config["general"]["working_directory"] + "/" + config["realtime"]["image"]["camera"]["file_name"] + ".jpg >/dev/null 2>&1" # Set up the FSWebcam capture command.
-
-        os.system(fswebcam_command) # Take a photo using FSWebcam, and save it to the working directory.
-
-        if (config["realtime"]["interface"]["display"]["output_level"] >= 3): # Only display this status message if the output level indicates to do so.
-            print("Done.\n----------")
-
-
-
-
-
-        # If necessary, rotate the image.
-        if (config["realtime"]["image"]["processing"]["rotation"]["enabled"] == True): # Check to see if real-time image rotation is enabled.
-            debug_message("Rotating image")
-            if (str(config["realtime"]["image"]["processing"]["rotation"]["angle"]) != "0"): # Check to make sure that rotating the image is actually necessary so processing time isn't wasted if the user doesn't have the rotating setting configured.
-                if (config["realtime"]["interface"]["display"]["output_level"] >= 3): # Only display this status message if the output level indicates to do so.
-                    print("Rotating image...")
-                if (config["realtime"]["saving"]["images"] == True): # Check to see whether or not the user wants to save all images captured by Predator.
-                    os.system("convert " + config["general"]["working_directory"] + "/" + config["realtime"]["image"]["camera"]["file_name"] + str(frames_captured) + ".jpg -rotate " + config["realtime"]["image"]["processing"]["rotation"]["angle"] + " " + config["general"]["working_directory"] + "/" + config["realtime"]["image"]["camera"]["file_name"] + str(i) + ".jpg") # Execute the command to rotate the image, based on the configuration.
-                else:
-                    os.system("convert " + config["general"]["working_directory"] + "/" + config["realtime"]["image"]["camera"]["file_name"] + ".jpg -rotate " + config["realtime"]["image"]["processing"]["rotation"]["angle"] + " " + config["general"]["working_directory"] + "/" + config["realtime"]["image"]["camera"]["file_name"] + ".jpg") # Execute the command to rotate the image, based on the configuration.
-                if (config["realtime"]["interface"]["display"]["output_level"] >= 3): # Only display this status message if the output level indicates to do so.
-                    print("Done.\n----------")
-
-
-
-
-        # If enabled, crop the frame down.
-        if (config["realtime"]["image"]["processing"]["cropping"]["enabled"] == True): # Check to see if the user has enabled cropping in real-time mode.
-            debug_message("Cropping image")
-            if (config["realtime"]["interface"]["display"]["output_level"] >= 3): # Only display this status message if the output level indicates to do so.
-                print("Cropping frame...")
-            if (config["realtime"]["saving"]["images"] == True): # Check to see whether or not the user wants to save all images captured by Predator.
-                os.system(crop_script_path + " " + config["general"]["working_directory"] + "/" + config["realtime"]["image"]["camera"]["file_name"] + str(frames_captured) + ".jpg " + str(config["realtime"]["image"]["processing"]["cropping"]["left_margin"]) + " " + str(config["realtime"]["image"]["processing"]["cropping"]["right_margin"]) + " " + str(config["realtime"]["image"]["processing"]["cropping"]["top_margin"]) + " " + str(config["realtime"]["image"]["processing"]["cropping"]["bottom_margin"])) # Execute the command to crop the image.
-            else:
-                os.system(crop_script_path + " " + config["general"]["working_directory"] + "/" + config["realtime"]["image"]["camera"]["file_name"] + ".jpg " + str(config["realtime"]["image"]["processing"]["cropping"]["left_margin"]) + " " + str(config["realtime"]["image"]["processing"]["cropping"]["right_margin"]) + " " + str(config["realtime"]["image"]["processing"]["cropping"]["top_margin"]) + " " + str(config["realtime"]["image"]["processing"]["cropping"]["bottom_margin"])) # Execute the command to crop the image.
-            if (config["realtime"]["interface"]["display"]["output_level"] >= 3): # Only display this status message if the output level indicates to do so.
-                print("Done.\n----------")
-            
-
-
-
-
-        # Run license plate analysis on the captured frame.
-        debug_message("Running ALPR")
-        if (config["realtime"]["interface"]["display"]["output_level"] >= 3): # Only display this status message if the output level indicates to do so.
-            print("Running license plate recognition...")
-        time.sleep(0.2) # Sleep to give the user time to quit Predator if they want to.
-        if (config["realtime"]["saving"]["images"] == True): # Check to see whether or not the user wants to save all images captured by Predator.
-            if (config["general"]["alpr"]["engine"] == "phantom"): # Check to see if the configuration indicates that the Phantom ALPR engine should be used.
-                analysis_command = "alpr -n " + str(config["general"]["alpr"]["guesses"])  + " '" + config["general"]["working_directory"] + "/" + config["realtime"]["image"]["camera"]["file_name"] + str(frames_captured) + ".jpg'" # Prepare the analysis command so we can run it next.
-            elif (config["general"]["alpr"]["engine"] == "openalpr"): # Check to see if the configuration indicates that the OpenALPR engine should be used.
-                analysis_command = "alpr -j -n " + str(config["general"]["alpr"]["guesses"]) + " '" + config["general"]["working_directory"] + "/" + config["realtime"]["image"]["camera"]["file_name"] + str(frames_captured) + ".jpg'" # Prepare the analysis command so we can run it next.
-            else:
-                display_message("The configured ALPR engine is not recognized.", 3)
-        else:
-            if (config["general"]["alpr"]["engine"] == "phantom"): # Check to see if the configuration indicates that the Phantom ALPR engine should be used.
-                analysis_command = "alpr -n " + str(config["general"]["alpr"]["guesses"]) + " '" + config["general"]["working_directory"] + "/" + config["realtime"]["image"]["camera"]["file_name"] + ".jpg'" # Prepare the analysis command so we can run it next.
-            elif (config["general"]["alpr"]["engine"] == "openalpr"): # Check to see if the configuration indicates that the OpenALPR engine should be used.
-                analysis_command = "alpr -j -n " + str(config["general"]["alpr"]["guesses"]) + " '" + config["general"]["working_directory"] + "/" + config["realtime"]["image"]["camera"]["file_name"] + ".jpg'" # Prepare the analysis command so we can run it next.
-            else:
-                display_message("The configured ALPR engine is not recognized.", 3)
-
-        frames_captured = frames_captured + 1 # Increment the counter for this cycle so we can count how many images we've analyzed during this session.
         new_plates_detected = [] # This variable will be used to determine whether or not a plate was detected this round. If no plate is detected, this will remain blank. If a plate is detected, it will change to be that plate. This is used to determine whether or not the database of detected plates needs to updated.
 
-        raw_reading_output = str(os.popen(analysis_command).read()) # Run the ALPR command, and save it's output to reading_output.
-
-        try: # Run the JSON interpret command inside a 'try' block so the entire program doesn't fatally crash if the JSON data is malformed.
-            reading_output = json.loads(raw_reading_output) # Convert the JSON string from the command output to actual JSON data that Python can manipulate.
-        except:
-            reading_output = json.loads('{"version":0,"data_type":"alpr_results","epoch_time":0,"img_width":1920,"img_height":1080,"processing_time_ms":0,"regions_of_interest":[{"x":0,"y":0,"width":1920,"height":1080}],"results":[]}') # Use a blank placeholder for the ALPR reading output, since the actual reading output was malformed.
-            display_message("The JSON data returned by the ALPR process is malformed. This likely means there's a problem with the ALPR library.", 3)
-
-        if (config["general"]["alpr"]["engine"] == "phantom"): # Check to see if the configured ALPR engine is Phantom ALPR.
-            if ("error" in raw_reading_output): # Check to see if there were errors reported by Phantom ALPR.
-                print("Phantom ALPR encountered an error: " + reading_output["error"]) # Display the ALPR error.
-                reading_output["results"] = [] # Set the results of the reading output to a blank placeholder list.
+        # Reset the status lighting to normal before processing the license plate data from ALPR.
+        if (config["realtime"]["status_lighting"]["enabled"] == True): # Check to see if status lighting alerts are enabled in the Predator configuration.
+            update_status_lighting("normal") # Run the function to update the status lighting.
 
 
+
+        # Fetch the lastest plates in the queue from the ALPR stream.
+        debug_message("Fetching ALPR results")
+        reading_output = {}
+        reading_output["results"] = alprstream.alpr_get_queued_plates() 
 
 
 
@@ -1372,50 +1289,8 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
                     #all_current_plate_guesses[detected_plate["plate_index"]][plate_guess["plate"]] = plate_guess["confidence"] # Add the current plate guess candidate to the list of plate guesses.
                     all_current_plate_guesses[detected_plate["candidates"][0]["plate"]][plate_guess["plate"]] = plate_guess["confidence"] # Add the current plate guess candidate to the list of plate guesses.
 
-        if (config["realtime"]["interface"]["display"]["detected_plate_count"] == True): # Only print the number of plates detected this round if it's enabled in the configuration.
-            print("Plates Detected: " + str(len(all_current_plate_guesses))) # Show the number of plates detected this round.
-
         if (config["realtime"]["interface"]["display"]["output_level"] >= 3): # Only display this status message if the output level indicates to do so.
             print("Done\n----------")
-
-
-
-
-
-
-        # Reset the status lighting to normal before processing the license plate data from ALPR.
-        if (config["realtime"]["status_lighting"]["enabled"] == True): # Check to see if status lighting alerts are enabled in the Predator configuration.
-            update_status_lighting("normal") # Run the function to update the status lighting.
-
-
-
-
-
-
-        # If enabled, run object recognition on the captured frame.
-        if (config["general"]["object_recognition"]["enabled"] == True):
-            debug_message("Running object recognition")
-            if (config["realtime"]["interface"]["display"]["output_level"] >= 3): # Only display this status message if the output level indicates to do so.
-                print("Running object recognition...")
-            object_count = {} # Create an empty dictionary that will hold each frame and the object recognition counts.
-            if (config["realtime"]["saving"]["images"] == True): # Check to see whether or not the user wants to save all images captured by Predator.
-                frame_path = config["general"]["working_directory"] + "/" + config["realtime"]["image"]["camera"]["file_name"] + str(frames_captured) + ".jpg" # Set the file path of the current frame.
-            else:
-                frame_path = config["general"]["working_directory"] + "/" + config["realtime"]["image"]["camera"]["file_name"] + ".jpg" # Set the file path of the current frame.
-
-            image = cv2.imread(frame_path) # Load the frame.
-            object_recognition_bounding_box, object_recognition_labels, object_recognition_confidence = cv.detect_common_objects(image) # Anaylze the image.
-            objects_identified = str(object_recognition_labels) # Convert the list of objects identified into a plain string.
-            if (objects_identified != "[]"): # Check to see that there were actually identified objects.
-                if (config["realtime"]["interface"]["display"]["output_level"] >= 2): # Only display this status message if the output level indicates to do so.
-                    print("Objects identified: " + objects_identified)
-                export_data = str(round(time.time())) + "," + objects_identified + "\n" # Add the timestamp to the export data, followed by the object's detected, followed by a line break to prepare for the next entry to be added later.
-                if (config["realtime"]["saving"]["object_recognition"] != ""): # Check to see if Predator is configured to save recognized objects to disk.
-                    add_to_file(config["general"]["working_directory"] + "/" + config["realtime"]["saving"]["object_recognition"], export_data, config["general"]["display"]["silence_file_saving"]) # Add the export data to the end of the file and write it to disk.
-                
-            if (config["realtime"]["interface"]["display"]["output_level"] >= 3): # Only display this status message if the output level indicates to do so.
-                print("Done\n----------")
-
 
 
 
@@ -1425,26 +1300,30 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
         debug_message("Processing ALPR results")
         if (config["realtime"]["interface"]["display"]["output_level"] >= 3): # Only display this status message if the output level indicates to do so.
             print("Processing license plate recognition data...")
+        if (config["realtime"]["interface"]["display"]["show_validation"] == True): # Only print the validated plate if the configuration says to do so.
+            print("Plates detected: " + str(len(all_current_plate_guesses))) # Show the number of plates detected this round.
         if (len(all_current_plate_guesses) > 0): # Check to see if at least one license plate was actually detected.
             for individual_detected_plate in all_current_plate_guesses: # Iterate through each individual plate detected in the image frame.
                 successfully_found_plate = False # Reset the 'sucessfully_found_plate` variable to 'False'. This will be changed back if a valid plate is detected.
 
                 # Run validation according to the configuration on the plate(s) detected.
-                if (len(config["general"]["alpr"]["license_plate_format"]) == 0): # If the user didn't supply a license plate format, then skip license plate validation.
+                if (len(config["general"]["alpr"]["validation"]["license_plate_format"]) == 0): # If the user didn't supply a license plate format, then skip license plate validation.
                     detected_plate = str(list(all_current_plate_guesses[individual_detected_plate].keys())[1]) # Grab the most likely detected plate as the 'detected plate'.
                     successfully_found_plate = True # Plate validation wasn't needed, so the fact that a plate existed at all means a valid plate was detected. Indicate that a plate was successfully found this round.
 
                 else: # If the user did supply a license plate format, then check all of the results against the formatting example.
+                    if (config["realtime"]["interface"]["display"]["show_validation"] == True): # Only print the validated plate if the configuration says to do so.
+                        print ("    Plate guesses:")
                     for plate_guess in all_current_plate_guesses[individual_detected_plate]: # Iterate through each plate and grab the first plate that matches the plate formatting guidelines as the 'detected plate'.
-                        if any([validate_plate(plate_guess, format_template) for format_template in config["general"]["alpr"]["license_plate_format"]]): # Check to see whether or not the plate passes the validation based on the format specified by the user.
+                        if any([validate_plate(plate_guess, format_template) for format_template in config["general"]["alpr"]["validation"]["license_plate_format"]]): # Check to see whether or not the plate passes the validation based on the format specified by the user.
                             detected_plate = plate_guess # Grab the validated plate as the 'detected plate'.
                             successfully_found_plate = True # The plate was successfully validated, so indicate that a plate was successfully found this round.
-                            if (config["realtime"]["interface"]["display"]["show_invalid_plates"] == True): # Only print the validated plate if the configuration says to do so.
-                                print(style.green + plate_guess + style.end) # Print the valid plate in green.
+                            if (config["realtime"]["interface"]["display"]["show_validation"] == True): # Only print the validated plate if the configuration says to do so.
+                                print("        ", style.green + plate_guess + style.end) # Print the valid plate in green.
                             break
                         else: # This particular plate guess is invalid, since it didn't align with the user-supplied formatting guidelines.
-                            if (config["realtime"]["interface"]["display"]["show_invalid_plates"] == True): # Only print the invalid plate if the configuration says to do so.
-                                print(style.red + plate_guess + style.end) # Print the invalid plate in red.
+                            if (config["realtime"]["interface"]["display"]["show_validation"] == True): # Only print the invalid plate if the configuration says to do so.
+                                print("        ", style.red + plate_guess + style.end) # Print the invalid plate in red.
 
 
 
@@ -1453,10 +1332,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
                 if (successfully_found_plate == True): # Check to see if a valid plate was detected this round after the validation process ran.
                     detected_license_plates.append(detected_plate) # Save the most likely license plate ID to the detected_license_plates complete list.
                     new_plates_detected.append(detected_plate) # Save the most likely license plate ID to this round's new_plates_detected list.
-                    if (config["realtime"]["interface"]["display"]["output_level"] >= 2): # Only display this status message if the output level indicates to do so.
-                        print("Detected Plate: " + detected_plate) # Print the detected plate.
 
-                    play_sound("notification")
 
                     if (config["realtime"]["push_notifications"]["enabled"] == True): # Check to see if the user has Gotify notifications enabled.
                         debug_message("Issuing detection push notification")
@@ -1471,8 +1347,8 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
 
 
                 elif (successfully_found_plate == False): # A plate was found, but none of the guesses matched the formatting guidelines provided by the user.
-                    if (config["realtime"]["interface"]["display"]["output_level"] >= 2): # Only display this status message if the output level indicates to do so.
-                        print("A plate was found, but none of the guesses matched the supplied plate format.\n----------")
+                    if (config["general"]["alpr"]["validation"]["best_effort"] == True): # Check to see if 'best effort' validation is enabled.
+                        new_plates_detected.append(next(iter(all_current_plate_guesses[individual_detected_plate]))) # Add the most likely guess for this plate to the list of detected license plates.
 
                     if (config["realtime"]["interface"]["display"]["shape_alerts"] == True): # Check to see if the user has enabled shape notifications.
                         display_shape("circle") # Display an ASCII circle in the output.
@@ -1488,6 +1364,18 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
 
 
 
+
+
+        debug_message("Displaying detected plates")
+        if (config["realtime"]["interface"]["display"]["output_level"] >= 3): # Only display this status message if the output level indicates to do so.
+            print("Displaying detected license plates...")
+
+        if (config["realtime"]["interface"]["display"]["output_level"] >= 2): # Only display this status message if the output level indicates to do so.
+            if (len(new_plates_detected) > 0):
+                print("Plates detected: ", len(new_plates_detected))
+            for plate in new_plates_detected:
+                play_sound("notification")
+                print("    Detected plate: " + plate) # Print the detected plate.
 
 
 

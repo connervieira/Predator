@@ -38,33 +38,29 @@ This is the installation process for Predator and all of it's dependencies. This
     - Predator uses FFMPEG to process videos.
     - If you don't install FFMPEG, Predator will encounter errors while operating in modes that require video processing.
     - You can install FFMPEG using the following command on a Debian based Linux machine: `sudo apt-get install ffmpeg`
-4. Optionally, install FSWebcam (Highly Recommended)
-    - Predator uses FSWebcam to access connected cameras.
-    - If you don't install FSWebcam, Predator will encounter errors while operating in modes that require accessing USB cameras.
-    - You can install FSWebcam using the following command on a Debian based Linux machine: `sudo apt-get install fswebcam`
-5. Optionally, install ImageMagick (Highly Recommended)
+4. Optionally, install ImageMagick (Highly Recommended)
     - Predator uses ImageMagick to manipulate still frames of video.
     - If you don't install ImageMagick, Predator will encounter errors while operating in modes that require image processing.
     - You can learn about the ImageMagick installation process at <https://imagemagick.org/script/download.php>
-6. Optionally, install MPG321 (Recommended)
+5. Optionally, install MPG321 (Recommended)
     - Predator requires MPG321 in order to play audio effects for alerts.
     - If you don't install MPG321, Predator will encounter errors when audio alerts are enabled in the configuration.
     - You can install MPG321 using the following command on a Debian based Linux machine: `sudo apt-get install mpg321`
-7. Optionally, install GPSD (Recommended)
+6. Optionally, install GPSD (Recommended)
     - GPSD is required for Predator to receive GPS data.
     - If you don't install GPSD, Predator will encounter errors when GPS features are enabled in the configuration.
     - You can install GPSD using this command on a Debian based Linux machine: `sudo apt-get install gpsd gpsd-clients`
     - It may also be necessary to start GPSD. You can test to see if GPSD is working properly using the `cgps` command.
-8. Optionally, install remote access software.
+7. Optionally, install remote access software.
     - If you're installing Predator on a Raspberry Pi, you may find it useful to install a program like [RaspAP](https://github.com/RaspAP/raspap-webgui) (or similar program) in order to remotely manage your Predator instance, and eliminate the need for a full keyboard and display.
     - Predator works entirely via command line, meaning any set up that enables SSH access to the host will allow for remote management of Predator.
     - If you already have an access point installed in the same area as Predator, you can simply connect Predator to it, and use SSH on a separate device to access the instance remotely.
-9. Download Predator.
-    - Predator can be downloaded either from the V0LT website, or from it's GitHub page. The download straight from the V0LT website is recommended for sake of stability and completeness, but you're free to use GitHub as well if you're OK with using a less stable version of Predator.
+8. Download Predator.
+    - Predator can be downloaded either from the V0LT website, or from it's GitHub page. The download straight from the V0LT website is recommended for sake of stability and completeness, but you're free to use GitHub as well if you're OK with using an unstable and potentially broken version of Predator.
     - V0LT website: <https://v0lttech.com/predator.php>
     - GitHub page: <https://github.com/connervieira/Predator>
         - `git clone https://github.com/connervieira/Predator`
-10. Extract Predator
+9. Extract Predator
     - After downloading Predator, regardless of where you get it from, extract it from the compressed archive (if necessary), and place it somewhere on your filesystem.
 
 
@@ -112,7 +108,7 @@ After configuring Predator, you can try it out for the first time!
             - You can use this mode to analyze dash-cam video, whether it be from a generic dash-cam or from Predator running in dash-cam mode.
         - Real-time mode (Mode 2)
             - In this mode, Predator will use a connected camera to detect license plates in real-time.
-            - In real-time mode, Predator will repeatedly take still frames to analyze, and will not record video.
+            - In real-time mode, Predator will stream video from a connected camera directly.
         - Dash-cam mode (Mode 3)
             - In this mode, Predator will operate like a dash-cam, and simply record video without analyzing it.
             - This mode can be used to record video to be used analyzed with pre-recorded mode later.
@@ -168,13 +164,10 @@ After configuring Predator, you can try it out for the first time!
         - Real-time mode
             - While in real-time mode, Predator will run in an endless loop until quit by holding `Ctrl + C` for a few seconds.
                 - Since Predator launches some of it's processes in different threads, pressing `Ctrl + C` a single time might not kill the entire Predator system.
-            - When a license plate is detected, Predator will display it on screen.
-                - Depending on the preferences, Predator might also display a large ASCII shape to make it easier to see important information at a glance.
-                - Depending on the preferences, Predator might play an audio sound indicating the type of plate detected.
-                - Depending on the preferences, Predator might submit the license plate detected to a push notification service.
-                - Depending on the preferences for the session, Predator might also save images taken and the license plates detected.
-                    - Images taken will be saved as `realtime_imageN.jpg` in the working directory. If saving images is turned on, 'N' with the sequential image number. Otherwise, the N will be removed.
-                    - Detected license plates will be saved to disk in the working directory, provided license plate saving is enabled in the configuration.
+            - When one or more license plates are detected, Predator will display it on screen, provided that it is configured to do so.
+                - Depending on the configuration, Predator might also display a large ASCII shape to make it easier to see important information at a glance.
+                - Depending on the configuration, Predator might play an audio sound indicating the type of plate detected.
+                - Depending on the configuration, Predator might submit the license plate detected to a push notification service.
                 - If a plate detected is in the alert database specified during the preferences stage earlier, it will show a prominent alert message in the console output.
         - Dash-cam mode
             - In dash-cam mode, Predator will record video indefinitely until disk space runs out, the return key is pressed, or the Predator process is terminated.

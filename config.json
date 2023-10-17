@@ -4,19 +4,22 @@
         "interface_directory": "/home/cvieira/Software/Support/Predator/Interface/",
         "alpr": {
             "engine": "phantom",
-            "guesses": 5,
-            "license_plate_format": ["AAA0000"]
+            "validation": {
+                "guesses": 5,
+                "license_plate_format": ["AAA0000"],
+                "best_effort": true
+            }
         },
         "alerts": {
             "alerts_ignore_validation": true,
-            "allow_duplicate_alerts": true,
+            "allow_duplicate_alerts": false,
             "databases": ["https://v0lttech.com/predator/plates/emergency.json"]
         },
         "display": {
             "ascii_art_header": true,
             "startup_message": "",
             "silence_file_saving": true,
-            "debugging_output": true
+            "debugging_output": false
         },
         "object_recognition": {
             "enabled": true
@@ -51,8 +54,7 @@
     "realtime": {
         "interface": {
             "display": {
-                "show_invalid_plates": true,
-                "detected_plate_count": true,
+                "show_validation": false,
                 "shape_alerts": false,
                 "output_level": 2,
                 "speed_display": {
@@ -62,8 +64,8 @@
             },
             "behavior": {
                 "delays": {
-                    "alert": 10.0,
-                    "normal": "1"
+                    "alert": 5,
+                    "normal": 2
                 },
                 "clearing": true,
                 "manual_trigger": false
@@ -75,23 +77,7 @@
         },
         "image": {
             "camera": {
-                "resolution": "1920x1080",
-                "device": "/dev/video0",
-                "arguments": "--set brightness=70%",
-                "file_name": "realtime_image"
-            },
-            "processing": {
-                "cropping": {
-                    "enabled": false,
-                    "left_margin": 100,
-                    "right_margin": 100,
-                    "top_margin": 300,
-                    "bottom_margin": 300
-                },
-                "rotation": {
-                    "enabled": false,
-                    "angle": "0"
-                }
+                "device": "/dev/video0"
             }
         },
         "sounds": {
@@ -108,13 +94,11 @@
             "alert_sound": {
                 "path": "./assets/sounds/alerthit.mp3",
                 "repeat": "1",
-                "delay": "2"
+                "delay": "2.5"
             }
         },
         "saving": {
-            "license_plates": "plate_history.json",
-            "object_recognition": "object_history.json",
-            "images": false
+            "license_plates": "plate_history.json"
         },
         "push_notifications": {
             "enabled": false,

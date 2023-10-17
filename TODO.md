@@ -63,11 +63,4 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Add configuration value for the number of guesses the ALPR engine should make in pre-recorded mode.
 - [X] Organize configuration.
 - [X] Add support for multiple license plate formats.
-- [ ] Test updated license plate validation in real-time mode.
-
-
-# Hypothetical
-
-These are features that may require more in-depth changes, and are purely hypothetical.
-
-- [ ] A GUI front-end in addition to the existing command line interface.
+- [X] Test updated license plate validation in real-time mode.
