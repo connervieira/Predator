@@ -65,7 +65,7 @@
             "behavior": {
                 "delays": {
                     "alert": 5,
-                    "normal": 2
+                    "normal": 0.5
                 },
                 "clearing": true,
                 "manual_trigger": false
