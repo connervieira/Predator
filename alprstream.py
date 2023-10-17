@@ -21,6 +21,7 @@ except:
 
 import utils
 style = utils.style # Load style information from the utils script.
+is_json = utils.is_json # Load the function to check if a given string is valid JSON.
 debug_message  = utils.debug_message # Load the debug message function from the utils script.
 clear = utils.clear # Load the screen clearing function from the utils script.
 prompt = utils.prompt # Load the user input prompt function from the utils script.
@@ -54,9 +55,13 @@ def alpr_stream_maintainer(): # This function runs an endless loop that maintain
         save_to_file(alpr_stream_file_location, "", True) # Erase the contents of the ALPR stream file.
 
         for message in stream_file_contents: # Iterate through each line in the loaded stream file contents.
-            message = json.loads(message) # Parse each line into JSON.
-            for plate in message["results"]: # Iterate through each license plate in this line.
-                queued_plate_reads.append(plate) # Add each license plate to the license plate queue.
+            if (is_json(message) == True):
+                message = json.loads(message) # Parse each line into JSON.
+                for plate in message["results"]: # Iterate through each license plate in this line.
+                    queued_plate_reads.append(plate) # Add each license plate to the license plate queue.
+            else:
+                display_message("The information returned by the ALPR engine is not valid JSON. Maybe you've specified the wrong ALPR engine in the configuration?", level=3)
+
 
 def start_alpr_stream(): # This function starts the ALPR stream threads.
     debug_message("Opening ALPR message stream")

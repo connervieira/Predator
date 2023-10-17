@@ -3,7 +3,7 @@
         "working_directory": "/home/cvieira/Software/Support/Predator/Working/",
         "interface_directory": "/home/cvieira/Software/Support/Predator/Interface/",
         "alpr": {
-            "engine": "phantom",
+            "engine": "openalpr",
             "validation": {
                 "guesses": 5,
                 "license_plate_format": ["AAA0000"],
@@ -22,7 +22,7 @@
             "debugging_output": false
         },
         "object_recognition": {
-            "enabled": true
+            "enabled": false
         },
         "modes": {
             "auto_start": "",
