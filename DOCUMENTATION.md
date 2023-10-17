@@ -18,7 +18,7 @@ This is the installation process for Predator and all of it's dependencies. This
     - Optional, but necessary for GPS functions: `pip3 install gps geopy gpsd-py3`
         - These packages are optional, but are required to enable live GPS features.
         - These packages are not necessary to handle information from GPX files, and are only required to interact with live GPS devices.
-    - Optional, but necessary for object recognition: `pip3 install opencv-python cvlib tensorflow keras silence-tensorflow psutil`
+    - Optional, but necessary for object recognition: `pip3 install opencv-python cvlib tensorflow keras silence-tensorflow`
         - These packages are optional, but are required to enable object recognition features.
         - If you do not install these packages, make sure object recognition is disabled in the configuration.
         - These packages are not necessary for basic license plate recognition.
