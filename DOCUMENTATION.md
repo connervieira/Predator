@@ -27,11 +27,11 @@ This is the installation process for Predator and all of it's dependencies. This
         - If you do not install this package, make sure you disable disk statistics in the configuration.
 2. Install an ALPR engine.
     - Predator needs an ALPR engine to be able to process license plates. The two main options are Phantom ALPR and OpenALPR.
-        - OpenALPR is the arguably industry standard for open source license plate recognition.
-            - If you already have OpenALPR installed, and don't want to replace it, you can use it with Predator.
         - Phantom ALPR is a modified version of OpenALPR designed specifically for Predator. Phantom ALPR offers more in-depth integration, and is more fault tolerant.
             - If you want the best experience with Predator, and conflicts aren't a concern, Phantom ALPR is a great option.
             - You can download Phantom at <https://v0lttech.com/phantom.php>
+        - OpenALPR is the arguably industry standard for open source license plate recognition, and is widely used.
+            - If you already have OpenALPR installed, and don't want to replace it, you can use it with Predator.
     -  You can learn more about the installation process for each program in their respective documentation.
     - After installing, you should be able to run the ALPR engine of your choice using the `alpr` command. If not, Predator won't be able to run the ALPR process, and will fail to analyze license plates.
 3. Optionally, install FFMPEG (Highly Recommended)
@@ -74,11 +74,6 @@ After installing Predator, you should do some quick configuration in order to ge
     - All configuration values are explained extensively in the [CONFIGURATION.md](CONFIGURATION.md) document.
     - Make changes to any of the configuration values to better fit your usage context.
     - This step is very open-ended. Depending on your situation, you may leave the configuration almost untouched, while other situations might involve intensive changes.
-3. In rare cases, Predator might not be able to locate the `config.json` file. If you encounter issues during the steps described in the "Usage" section, you might need to manually set Predator's directory. Under normal circumstances, this shouldn't be necessary.
-    - At the top of the all Python scripts, you should see a variable titled `predator_root_directory`. By default, a Python function is used to find the current directory of the script.
-    - If you receive errors related to missing configuration files when trying to run Predator, try setting this variable to a static file path.
-    - Example:
-        - `predator_root_directory = "/home/user/Predator/"`
 
 
 ## Usage

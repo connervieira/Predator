@@ -28,7 +28,7 @@ This section of configuration values will effect Predator's general operation.
             - This preference only considers the type of each character, not the character itself.
                 - In other words, `AAA0000` and `ABC1234` will function identically.
                 - This also means you can simply enter any given plate from a car located in the region you're scanning in to have a reasonably good chance at matching your region's formatting guidelines for license plates.
-            - Leaving this as an empty list disable license plate format validation.
+            - Leaving this as an empty list (a list with a length of 0) will disable license plate format validation.
         - `best_effort` is a boolean that determines whether Predator will accept the most confident guess when none of the guesses are considered valid by the validation rules.
             - This setting can override both the license plate validation format, as well as the minimum confidence threshold.
             - When set to `false`, Predator will discard plates that don't have any valid guesses.
@@ -73,9 +73,8 @@ This section of configuration values will effect Predator's general operation.
 
 Configuration values in this section are settings specific to management mode.
 
-- `disk_statistics`
-    - This configuration value is a boolean that enables and disables the disk statistics feature of management mode.
-    - Setting this to `false` disables disk statistics, and eliminates the need for the 'psutil' Python package.
+- `disk_statistics` is a boolean that enables and disables the disk statistics feature of management mode.
+    - Setting this to `false` disables disk statistics, and eliminates the need for the 'psutil' Python package to be installed.
 
 
 
@@ -102,7 +101,7 @@ Configuration values in this section are settings specific to real-time mode.
 
 - `interface` contains settings related to the command line interface.
     - `display` contains settings related to what information is displayed.
-        - `show_validation` is a boolean that determines whether or not Predator will print every guess it makes as to the contents of a license plates, even if those guesses are invalidated by the license plate format sample.
+        - `show_validation` is a boolean that determines whether or not Predator will print every guess it makes as to the contents of a license plates until it reaches a valid guess.
             - This setting doesn't change anything practically, but makes it easier to understand how Predator is filtering invalid license plate guesses.
         - `shape_alerts` is a boolean that determines whether or not large ASCII shapes will be printed to the console to indicate certain important events at a glance.
         - `output_level` is an integer that determines how verbose Predator's console output will be.
@@ -150,23 +149,14 @@ Configuration values in this section are settings specific to real-time mode.
         - This file is created in the working directory.
         - When this value is left as a blank string, license plate logging will be disabled.
         - Example: `"plate_history.json"`
-- `push_notifications`
-    - `enabled`
-        - This setting determines whether or not Predator will attempt to send push notifications using a Gotify server.
-        - This value is a boolean value, and should only ever be set to `true` or `false`
-    - `server`
-        - This setting specifies the Gotify server that Predator will attempt to use. It should include the protocol and port number.
-        - This value must be configured if `push_notifications_enabled` is set to `true`
-        - Example:
-    - `token`
-        - This setting specifies the Gotify application token that Predator will attempt to use to send notifications through the specified Gotify server.
-        - This value must be configured if `push_notifications_enabled` is set to `true`
-        - Example:
-            `AJrhgGs83mL22kZ`
-- `status_lighting`
-    - `status_lighting_enabled`
-        - This setting is simply a boolean value that determines whether or not Predator will attempt to make use of LED status lights
-        - If you don't have status lighting set up, then leave this configuration value set to `false` to prevent Predator from attempting to update non-existent status lights.
+- `push_notifications` contains settings related to Gotify push notifications.
+    - `enabled` is a boolean value that determines whether push notifications are enabled.
+    - `server` is a string that specifies the Gotify server that Predator will attempt to use. It should include the protocol and port number.
+        - Example: `"http://server.tld:8032"`
+    - `token` is a string that specifies the Gotify application token that Predator will attempt to use to send notifications through the specified Gotify server.
+        - Example: `"AJrhgGs83mL22kZ"`
+- `status_lighting` contains settings for configuring Predator's status light interfacing capabilities.
+    - `status_lighting_enabled` is a boolean value that determines whether or not Predator will attempt to make use of LED status lights
     - `status_lighting_base_url`
         - This is the base part of the URL that Predator will send requests to in order to update the status lighting.
         - By default, this setting is set to the default router IP address of the "WLED" lighting controller software. However, you should be able to modify it to fit any lighting controller software that supports GET network requests.
@@ -183,7 +173,7 @@ Configuration values in this section are settings specific to real-time mode.
 ## Dash-cam Mode Configuration
 
 - `capture` contains settings related to the capturing of dashcam video.
-    - `provider` determines which video back-end Predator will use. This can only be set to "ffmpeg" or "opencv".
+    - `provider` determines which video back-end Predator will use. This can only be set to `"ffmpeg"` or `"opencv"`.
     - `opencv` contains settings that control how the OpenCV back-end records video. These settings are only considered when the `provider` value is set to "opencv".
         - `resolution` sets the resolution of the video.
             - `width` sets the width of the video, measured in pixels.
@@ -220,20 +210,17 @@ Configuration values in this section are settings specific to real-time mode.
 
 ## Developer Configuration
 
-- `ignore_list`
-    - `enabled`
-        - This setting determines whether custom ignore lists are enabled or disabled.
+- `ignore_list` contains settings for configuring a list of license plates that Predator will ignore.
+    - `enabled` is a boolean that determines whether custom ignore lists are enabled or disabled.
         - This does not disable any hard-coded remote ignore lists services that may be in place from the system administrator. To completely disable remote ignore lists, set the `offline` configuration value to `true`.
-    - `local_file`
-        - This setting specifies the absolute path to a local file to be used as an ignore list.
+    - `local_file` is a string that specifies the absolute path to a local file to be used as an ignore list.
         - If you don't want to use a local ignore list file, this value can be left blank to disable it.
     - `remote_sources`
         - This setting defines a list of custom remote hosts that Predator will attempt to fetch ignore lists from.
-- `offline`
-    - This is a boolean that controls whether Predator is forced to run offline. When set to true, all network functions are disabled, even if Predator is connected to the internet.
+        - These sources will be disabled if the `offline` developer configuration value is enabled.
+- `offline` is a boolean that controls whether Predator is forced to run offline. When set to true, all network functions are disabled, even if Predator is connected to the internet.
     - To be clear, this setting does not need to be changed if you want to run Predator offline. If no internet connection is available, Predator will automatically adjust accordingly.
-    - Enabling this will break functionality that depends on network features, even if it doesn't require an internet connection. Notably, push notifications and status lighting will be disabled.
-- `kill_plate`
-    - This is a string that specifies a plate that will cause Predator to immediately exit, when read.
-    - This can be used for debug purposes, when Predator is hard-installed, and the hardware can't easily be accessed.
-    - During normal circumstances, this should be set to a a blank string in order to disabled the kill plate feature.
+    - Enabling this will break any functionality that depends on network features, even LAN based features that don't require an internet connection. Notably, push notifications and status lighting will be disabled.
+- `kill_plate` is a string that specifies a plate that will cause Predator to immediately exit, when detected.
+    - This can be used for debugging purposes, when Predator is hard-installed, and the hardware can't easily be accessed.
+    - During normal circumstances, this should be set to a a blank string in order to disable the kill plate feature.
