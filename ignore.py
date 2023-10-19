@@ -11,13 +11,11 @@
 
 
 
-# This library is responsible to handling 'ignore lists', which allows administrators to define a list of license plates that should be ignored.
+# This library is responsible for handling 'ignore lists', which allow administrators to define a list of license plates that should be ignored.
 
-# Ignore lists might be used to prevent common vehicles from being logged in order to keep logs organized, or to prevent privacy-concerned visitors from having their license plate processed.
+# Ignore lists might be used to prevent common vehicles from being recorded in order to keep logs organized, or to prevent privacy-concerned visitors from having their license plate processed.
 
-# License plates in the ignore list are still processed locally, but won't be sent to an external service.
-
-# Ignore lists can be enabled and disabled in the configuration.
+# Custom ignore lists can be enabled and disabled in the configuration.
 
 
 import os # Required to interact with certain operating system functions.
@@ -71,7 +69,7 @@ def fetch_ignore_list():
                 display_message("The local ignore list file does not exist. The local ignore list is effectively disabled.", 3)
 
 
-    remote_ignore_sources = ["https://v0lttech.com/predator/ignorelist/serve.php?key=public"] # This holds a list of hard-coded remote sources that ignore lists will be fetched from. This allows administrators to automatically issue ignore lists from an external services. Administrators can create ignore lists without needing to manually modify the local ignore list for all their devices. Remote sources don't receive any telemetry from Predator, only a simple JSON list is fetched. Custom remote sources from the configuration are added in the next steps.
+    remote_ignore_sources = ["https://v0lttech.com/predator/ignorelist/serve.php?key=public"] # This holds a list of hard-coded remote sources that ignore lists will be fetched from. Developers who want to deploy Predator to devices can add remote sources for ignore lists here to make them easier to manage. This allows administrators to automatically issue ignore lists from an external services. Administrators can maintain ignore lists without needing to manually modify the local ignore list for all their devices. Remote sources don't receive any telemetry from Predator, only a simple JSON list is fetched. Custom remote sources from the configuration are added in the next steps.
 
     if (config["developer"]["ignore_list"]["enabled"] == True): # Only add custom remote sources if custom ignore lists are enabled in the configuration
         for source in config["developer"]["ignore_list"]["remote_sources"]: # Iterate through each source in the list of remote ignore list sources.
