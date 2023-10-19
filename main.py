@@ -177,7 +177,7 @@ if (config["prerecorded"]["image"]["processing"]["cropping"]["left_margin"] < 0 
     config["prerecorded"]["image"]["processing"]["cropping"]["top_margin"] = 0
 
 if (re.fullmatch("(\d\d\dx\d\d\d)", config["dashcam"]["capture"]["ffmpeg"]["resolution"]) == None and re.fullmatch("(\d\d\d\dx\d\d\d)", config["dashcam"]["capture"]["ffmpeg"]["resolution"]) == None and re.fullmatch("(\d\d\d\dx\d\d\d\d)", config["dashcam"]["capture"]["ffmpeg"]["resolution"]) == None): # Verify that the dashcam resolution setting matches the format 000x000, 0000x000, or 0000x0000.
-    display_message("The 'dashcam>capture>ffmpeg>resolution' specified in the real-time configuration section doesn't seem to align with the '0000x0000' format. It's possible there has been a typo. efaulting to '1280x720'", 3)
+    display_message("The 'dashcam>capture>ffmpeg>resolution' specified in the dashcam configuration section doesn't seem to align with the '0000x0000' format. It's possible there has been a typo. efaulting to '1280x720'", 3)
     config["dashcam"]["capture"]["ffmpeg"]["resolution"] = "1280x720"
 
 if (os.path.exists(config["realtime"]["image"]["camera"]["device"]) == False): # Check to make sure that a camera device points to a valid file.
@@ -309,8 +309,6 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                 copy_prerecorded_license_plate_analysis_data = False
                 copy_prerecorded_object_recognition_data = False
                 copy_prerecorded_license_plate_location_data = False
-                copy_realtime_images = False
-                copy_realtime_object_recognition_data  = False
                 copy_realtime_license_plate_recognition_data = False
                 copy_dashcam_video = False
 
@@ -348,18 +346,10 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                         print("P5. [ ] License plate location data files")
                     print("")
                     print("===== Real-time Mode =====")
-                    if (copy_realtime_images == True):
-                        print("R1. [X] Captured images")
-                    else:
-                        print("R1. [ ] Captured images")
-                    if (copy_realtime_object_recognition_data == True):
-                        print("R2. [X] Object recognition data files")
-                    else:
-                        print("R2. [ ] Object recognition data files")
                     if (copy_realtime_license_plate_recognition_data == True):
-                        print("R3. [X] License plate recognition data files")
+                        print("R1. [X] License plate recognition data files")
                     else:
-                        print("R3. [ ] License plate recognition data files")
+                        print("R1. [ ] License plate recognition data files")
                     print("")
                     print("===== Dash-cam Mode =====")
                     if (copy_dashcam_video == True):
@@ -388,10 +378,6 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                     elif (selection.lower() == "p5"):
                         copy_prerecorded_license_plate_location_data = not copy_prerecorded_license_plate_location_data
                     elif (selection.lower() == "r1"):
-                        copy_realtime_images = not copy_realtime_images
-                    elif (selection.lower() == "r2"):
-                        copy_realtime_object_recognition_data = not copy_realtime_object_recognition_data
-                    elif (selection.lower() == "r3"):
                         copy_realtime_license_plate_recognition_data = not copy_realtime_license_plate_recognition_data
                     elif (selection.lower() == "d1"):
                         copy_dashcam_video = not copy_dashcam_video
@@ -417,10 +403,6 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                     os.system("cp " + config["general"]["working_directory"] + "/pre_recorded_object_detection_export.* " + copy_destination)
                 if (copy_prerecorded_license_plate_location_data):
                     os.system("cp " + config["general"]["working_directory"] + "/pre_recorded_location_data_export.* " + copy_destination)
-                if (copy_realtime_images):
-                    os.system("cp " + config["general"]["working_directory"] + "/" + config["realtime"]["image"]["camera"]["file_name"] + "* " + copy_destination)
-                if (copy_realtime_object_recognition_data):
-                    os.system("cp " + config["general"]["working_directory"] + "/" + config["realtime"]["saving"]["object_recognition"] + "* " + copy_destination)
                 if (copy_realtime_license_plate_recognition_data):
                     os.system("cp " + config["general"]["working_directory"] + "/real_time_plates* " + copy_destination)
                 if (copy_dashcam_video):
@@ -438,8 +420,6 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                 delete_prerecorded_license_plate_analysis_data = False
                 delete_prerecorded_object_recognition_data = False
                 delete_prerecorded_license_plate_location_data = False
-                delete_realtime_images = False
-                delete_realtime_object_recognition_data  = False
                 delete_realtime_license_plate_recognition_data = False
                 delete_dashcam_video = False
 
@@ -477,18 +457,10 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                         print("P5. [ ] License plate location data files")
                     print("")
                     print("===== Real-time Mode =====")
-                    if (delete_realtime_images == True):
-                        print("R1. [X] Captured images")
-                    else:
-                        print("R1. [ ] Captured images")
-                    if (delete_realtime_object_recognition_data == True):
-                        print("R2. [X] Object recognition data files")
-                    else:
-                        print("R2. [ ] Object recognition data files")
                     if (delete_realtime_license_plate_recognition_data == True):
-                        print("R3. [X] License plate recognition data files")
+                        print("R1. [X] License plate recognition data files")
                     else:
-                        print("R3. [ ] License plate recognition data files")
+                        print("R1. [ ] License plate recognition data files")
                     print("")
                     print("===== Dash-cam Mode =====")
                     if (delete_dashcam_video == True):
@@ -516,10 +488,6 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                     elif (selection.lower() == "p5"):
                         delete_prerecorded_license_plate_location_data = not delete_prerecorded_license_plate_location_data
                     elif (selection.lower() == "r1"):
-                        delete_realtime_images = not delete_realtime_images
-                    elif (selection.lower() == "r2"):
-                        delete_realtime_object_recognition_data = not delete_realtime_object_recognition_data
-                    elif (selection.lower() == "r3"):
                         delete_realtime_license_plate_recognition_data = not delete_realtime_license_plate_recognition_data
                     elif (selection.lower() == "d1"):
                         delete_dashcam_video = not delete_dashcam_video
@@ -542,10 +510,6 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                         os.system("rm " + config["general"]["working_directory"] + "/pre_recorded_object_detection_export.*")
                     if (delete_prerecorded_license_plate_location_data):
                         os.system("rm " + config["general"]["working_directory"] + "/pre_recorded_location_data_export.*")
-                    if (delete_realtime_images):
-                        os.system("rm " + config["general"]["working_directory"] + "/" + config["realtime"]["image"]["camera"]["file_name"] + "*")
-                    if (delete_realtime_object_recognition_data):
-                        os.system("rm " + config["general"]["working_directory"] + "/" + config["realtime"]["saving"]["object_recognition"] + "*")
                     if (delete_realtime_license_plate_recognition_data):
                         os.system("rm " + config["general"]["working_directory"] + "/real_time_plates*")
                     if (delete_dashcam_video):
