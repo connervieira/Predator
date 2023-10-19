@@ -306,19 +306,24 @@ This update refines Predator's functionality, and focuses its purpose back on li
 
 *Release date to be determined*
 
+This update makes several changes to Predator that dramatically improve its processing performance.
+
 - Removed webhook functionality, since this functionality is being replaced by Predator Fabric.
 - Dramatically changed the configuration layout.
     - Configuration values are now much more organized.
-    - Configuration values are now reference directly through-out the program, rather than all being assigned to variables at start-up.
-    - Added several configuration value.
+    - Configuration values are now referenced directly through-out the program, rather than all being assigned to variables at start-up.
+    - Removed the `detected_plate_count` configuration value from the real-time display section.
+        - The number of plates detected is now always displayed in the console output.
+    - Dramatically changed 'preferences' system.
+        - Real-time mode and dash-cam mode no longer have run-time preferences, and only consider configuration values.
+        - Management mode and pre-recorded mode have modified run-time preferences, and place more emphasis on configuration values.
+    - Added several configuration values.
         - Added `developer>kill_plate` configuration option.
             - This option sets a plate that will cause Predator to immediately exit for debugging purposes.
         - Added `general>alerts>allow_duplicate_alerts` configuration option.
+        - Added `general>alpr>validation>confidence` configuration value to set a minimum required confidence level for ALPR results.
 - The normal delay and alert delay are now mutually exclusive, and only one is triggered each round, depending on whether there are one or more active alerts.
 - Timestamp input parsing in pre-recorded mode is now more fault tolerant.
-- Dramatically changed 'preferences' system.
-    - Real-time mode and dash-cam mode no longer have run-time preferences, and only consider configuration values.
-    - Management mode and pre-recorded mode have modified run-time preferences, and place more emphasis on configuration values.
 - Updated license plate logging in real-time mode.
     - The license plate log file is now a JSON file, and contains more information than before, including license plate guesses.
 - Added support for interfacing with external local services.
@@ -326,7 +331,7 @@ This update refines Predator's functionality, and focuses its purpose back on li
     - The configuration value to globally disable object recognition has been removed, and replaced with a single control that enables object recognition.
 - Improved dashcam recording.
     - Fixed an issue where dashcam recording would cause a crash when displaying the process start message.
-    - Added support for OpenCV recording.
+    - Added support for OpenCV recording alongside the existing FFMPEG back-end.
 - Added support for multiple license plate validation formats.
 - Overhauled real-time mode.
     - Entries are now only added to the license plate history log file if one or more license plates were detected.
@@ -337,8 +342,4 @@ This update refines Predator's functionality, and focuses its purpose back on li
         - Removed image saving.
         - Removed real-time object recognition.
     - Refined the real-time mode interface to better accomodate multiple plates being displayed at once.
-- Simplified the configuration.
-    - Removed the `detected_plate_count` configuration value from the real-time display section.
-        - The number of plates detected is now always displayed in the console output.
-- Added configuration value to set a minimum required confidence level for ALPR results.
 - Added multi-threaded debug messsage support.
