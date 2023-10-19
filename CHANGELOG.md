@@ -321,7 +321,7 @@ This update refines Predator's functionality, and focuses its purpose back on li
     - Management mode and pre-recorded mode have modified run-time preferences, and place more emphasis on configuration values.
 - Updated license plate logging in real-time mode.
     - The license plate log file is now a JSON file, and contains more information than before, including license plate guesses.
-- Added support for interface with external local services.
+- Added support for interfacing with external local services.
 - Object recognition library importing has been improved.
     - The configuration value to globally disable object recognition has been removed, and replaced with a single control that enables object recognition.
 - Improved dashcam recording.
@@ -341,3 +341,4 @@ This update refines Predator's functionality, and focuses its purpose back on li
     - Removed the `detected_plate_count` configuration value from the real-time display section.
         - The number of plates detected is now always displayed in the console output.
 - Added configuration value to set a minimum required confidence level for ALPR results.
+- Added multi-threaded debug messsage support.

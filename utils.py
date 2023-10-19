@@ -62,13 +62,16 @@ class style:
 import time # Required to add delays and handle dates/times
 
 # Define the function to print debugging information when the configuration specifies to do so.
-debugging_time_record = time.time() # This value holds the time that the previous debug message was displayed.
-def debug_message(message):
+debugging_time_record = {}
+debugging_time_record["Main"] = time.time() # This value holds the time that the previous debug message in the main thread was displayed.
+debugging_time_record["ALPRStreamMaintainer"] = time.time() # This value holds the time that the previous debug message in the ALPR stream maintainer thread was displayed.
+debugging_time_record["ALPRStream"] = time.time() # This value holds the time that the previous debug message in the ALPR stream thread was displayed.
+def debug_message(message, thread="Main"):
     if (config["general"]["display"]["debugging_output"] == True): # Only print the message if the debugging output configuration value is set to true.
         global debugging_time_record
-        time_since_last_message = (time.time()-debugging_time_record) # Calculate the time since the last debug message.
-        print(f"{style.italic}{style.faint}{time.time():.10f} ({time_since_last_message:.10f}) - {message}{style.end}") # Print the message.
-        debugging_time_record = time.time() # Record the current timestamp.
+        time_since_last_message = (time.time()-debugging_time_record[thread]) # Calculate the time since the last debug message.
+        print(f"{style.italic}{style.faint}{time.time():.10f} ({time_since_last_message:.10f} - {thread}) - {message}{style.end}") # Print the message.
+        debugging_time_record[thread] = time.time() # Record the current timestamp.
 
 
 
@@ -88,6 +91,12 @@ if (config["realtime"]["gps"]["enabled"] == True): # Only import the GPS librari
 if (config["dashcam"]["capture"]["provider"] == "opencv"): # Check to see if OpenCV is needed.
     import cv2 # Import OpenCV
     import threading
+
+
+
+if (config["general"]["interface_directory"] != ""): # Check to see if the interface directory is enabled.
+    if (os.path.exists(config["general"]["interface_directory"]) == False): # Check to see if the interface directory is missing.
+        os.makedirs(config["general"]["interface_directory"]) # Attempt to create the interface directory.
 
 
 
@@ -645,9 +654,7 @@ def start_dashcam_ffmpeg(dashcam_devices, segment_length, resolution, framerate,
         print("Started dashcam recording on " + str(dashcam_devices[device])) # Inform the user that recording was initiation for this camera device.
 
 
-
     if (background == False): # If background recording is disabled, then prompt the user to press enter to halt recording.
-
         prompt("Press enter to cancel recording...") # Wait for the user to press enter before continuing, since continuing will terminate recording.
         iteration_counter = 0 # Set the iteration counter to 0 so that we can increment it for each recording device specified.
 
@@ -658,6 +665,7 @@ def start_dashcam_ffmpeg(dashcam_devices, segment_length, resolution, framerate,
         print("Dashcam recording halted.")
 
 
+# This function is used to display a list of provided license plate alerts.
 def display_alerts(active_alerts):
     for alert in active_alerts: # Iterate through each active alert.
         # Display an alert that is starkly different from the rest of the console output.
@@ -675,7 +683,7 @@ def display_alerts(active_alerts):
 
 
 
-
+# This function compiles the provided list of sources into a single complete alert dictionary.
 def load_alert_database(sources, project_directory):
     debug_message("Loading license plate alert list")
     complete_alert_database = {} # Set the complete alert database to a placeholder dictionary.
@@ -717,17 +725,15 @@ def load_alert_database(sources, project_directory):
 
 
 
-
-# This function will be used to process GPX files into a Python dictionary.
+# This function is used to parse GPX files into a Python dictionary.
 def process_gpx(gpx_file):
-    gpx_file = open(gpx_file, 'r') # Open the GPX document.
-
-    xmldoc = minidom.parse(gpx_file) # Load the full XML GPX document.
+    gpx_file = open(gpx_file, 'r') # Open the GPX fule.
+    xmldoc = minidom.parse(gpx_file) # Read the full XML GPX document.
 
     track = xmldoc.getElementsByTagName('trkpt') # Get all of the location information from the GPX document.
     timing = xmldoc.getElementsByTagName('time') # Get all of the timing information from the GPX document.
 
-    gpx_data = {} 
+    gpx_data = {} # This is a dictionary that will hold each location point, where the key is time.
 
     for i in range(0, len(timing)): # Iterate through each point in the GPX file.
         point_lat = track[i].getAttribute('lat') # Get the latitude for this point.
@@ -740,6 +746,3 @@ def process_gpx(gpx_file):
 
 
     return gpx_data
-
-
-

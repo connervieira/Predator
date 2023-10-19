@@ -48,6 +48,7 @@ def alpr_stream():
 def alpr_stream_maintainer(): # This function runs an endless loop that maintains
     global queued_plate_reads
     while True:
+        debug_message("Starting ALPR stream maintainence cycle", thread="ALPRStreamMaintainer")
         time.sleep(0.3) # Delay for a short period of time before each loop so that the ALPR stream has time to output some results.
         stream_file = open(alpr_stream_file_location) # Open the ALPR stream file.
         stream_file_contents = stream_file.readlines() # Read the stream file line by line.
@@ -66,7 +67,8 @@ def alpr_stream_maintainer(): # This function runs an endless loop that maintain
 
 
 def start_alpr_stream(): # This function starts the ALPR stream threads.
-    debug_message("Opening ALPR message stream")
+    debug_message("Starting ALPR stream ", thread="ALPRStream")
+    save_to_file(alpr_stream_file_location, "", True) # Erase the contents of the ALPR stream file.
     alpr_stream_thread = threading.Thread(target=alpr_stream, name="ALPRStream") # Initialize the ALPR stream thread.
     alpr_stream_thread.start() # Start the ALPR stream thread.
     alpr_stream_maintainer_thread = threading.Thread(target=alpr_stream_maintainer, name="ALPRStreamMaintainer") # Initialize the ALPR stream maintainer thread.
