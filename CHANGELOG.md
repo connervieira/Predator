@@ -343,3 +343,4 @@ This update makes several changes to Predator that dramatically improve its proc
         - Removed real-time object recognition.
     - Refined the real-time mode interface to better accomodate multiple plates being displayed at once.
 - Added multi-threaded debug messsage support.
+- Expanded management mode capabilties to allow for setting deeper nested configuration values.

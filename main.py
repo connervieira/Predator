@@ -631,6 +631,58 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                                         else:
                                             print("                '" + style.italic + str(section) + style.end + "': '" + str(config[selection1][selection2][selection3][section]) + "'") # If the entry is not a dictionary (meaning it's an actual configuration value), display it in italics.
                                     selection4 = prompt("=============== Selection (Tier 4): ", optional=False, input_type=str)
+                                    if (selection4 in config[selection1][selection2][selection3]): # Check to make sure the section entered by the user actually exists in the configuration database.
+                                        if (type(config[selection1][selection2][selection3][selection4]) is dict): # Check to make sure the current selection is a dictionary before trying to iterate through it.
+                                            for section in config[selection1][selection2][selection3][selection4]: # Iterate through each fourth-level section of the configuration database, and display them all to the user.
+                                                if (type(config[selection1][selection2][selection3][selection4][section]) is dict): # Check to see if the current section we're iterating over is a dictionary.
+                                                    print("                    '" + style.bold + str(section) + style.end + "'") # If the entry is a dictionary, display it in bold.
+                                                else:
+                                                    print("                    '" + style.italic + str(section) + style.end + "': '" + str(config[selection1][selection2][selection3][selection4][section]) + "'") # If the entry is not a dictionary (meaning it's an actual configuration value), display it in italics.
+                                            selection5 = prompt("=================== Selection (Tier 5): ", optional=False, input_type=str)
+                                            if (selection5 in config[selection1][selection2][selection3][selection4]): # Check to make sure the section entered by the user actually exists in the configuration database.
+                                                if (type(config[selection1][selection2][selection3][selection4][selection5]) is dict): # Check to make sure the current selection is a dictionary before trying to iterate through it.
+                                                    for section in config[selection1][selection2][selection3][selection4][selection5]: # Iterate through each fifth-level section of the configuration database, and display them all to the user.
+                                                        if (type(config[selection1][selection2][selection3][selection4][selection5][section]) is dict): # Check to see if the current section we're iterating over is a dictionary.
+                                                            print("                        '" + style.bold + str(section) + style.end + "'") # If the entry is a dictionary, display it in bold.
+                                                        else:
+                                                            print("                        '" + style.italic + str(section) + style.end + "': '" + str(config[selection1][selection2][selection3][selection4][selection5][section]) + "'") # If the entry is not a dictionary (meaning it's an actual configuration value), display it in italics.
+                                                    selection6 = prompt("======================= Selection (Tier 6): ", optional=False, input_type=str)
+                                                    if (selection6 in config[selection1][selection2][selection3][selection4][selection5]): # Check to make sure the section entered by the user actually exists in the configuration database.
+                                                        if (type(config[selection1][selection2][selection3][selection4][selection5][selection6]) is dict): # Check to make sure the current selection is a dictionary before trying to iterate through it.
+                                                            for section in config[selection1][selection2][selection3][selection4][selection5][selection6]: # Iterate through each sixth-level section of the configuration database, and display them all to the user.
+                                                                if (type(config[selection1][selection2][selection3][selection4][selection5][selection6][section]) is dict): # Check to see if the current section we're iterating over is a dictionary.
+                                                                    print("                            '" + style.bold + str(section) + style.end + "'") # If the entry is a dictionary, display it in bold.
+                                                                else:
+                                                                    print("                            '" + style.italic + str(section) + style.end + "': '" + str(config[selection1][selection2][selection3][selection4][selection5][selection6][section]) + "'") # If the entry is not a dictionary (meaning it's an actual configuration value), display it in italics.
+                                                            selection7 = prompt("=========================== Selection (Tier 7): ", optional=False, input_type=str)
+                                                            if (selection7 in config[selection1][selection2][selection3][selection4][selection5][selection6]): # Check to make sure the section entered by the user actually exists in the configuration database.
+                                                                if (type(config[selection1][selection2][selection3][selection4][selection5][selection6][selection7]) is dict): # Check to make sure the current selection is a dictionary before trying to iterate through it.
+                                                                    for section in config[selection1][selection2][selection3][selection4][selection5][selection6][selection7]: # Iterate through each sixth-level section of the configuration database, and display them all to the user.
+                                                                        if (type(config[selection1][selection2][selection3][selection4][selection5][selection6][selection7][section]) is dict): # Check to see if the current section we're iterating over is a dictionary.
+                                                                            print("                                '" + style.bold + str(section) + style.end + "'") # If the entry is a dictionary, display it in bold.
+                                                                        else:
+                                                                            print("                                '" + style.italic + str(section) + style.end + "': '" + str(config[selection1][selection2][selection3][selection4][selection5][selection6][selection7][section]) + "'") # If the entry is not a dictionary (meaning it's an actual configuration value), display it in italics.
+                                                                    selection8 = prompt("=============================== Selection (Tier 8): ", optional=False, input_type=str)
+                                                                else: # If the current selection isn't a dictionary, assume that it's an configuration entry. (Tier 7)
+                                                                    print("                Current Value: " + str(config[selection1][selection2][selection3][selection4][selection5][selection6][selection7]))
+                                                                    config[selection1][selection2][selection3][selection4][selection5][selection6][selection7] = prompt("                New Value (" + str(type(config[selection1][selection2][selection3][selection4][selection5][selection6][selection7])) + "): ", optional=True, input_type=type(config[selection1][selection2][selection3][selection4][selection5][selection6][selection7]), default="")
+                                                            elif (selection7 != ""):
+                                                                display_message("Unknown configuration entry selected.", 3)
+                                                        else: # If the current selection isn't a dictionary, assume that it's an configuration entry. (Tier 6)
+                                                            print("                Current Value: " + str(config[selection1][selection2][selection3][selection4][selection5][selection6]))
+                                                            config[selection1][selection2][selection3][selection4][selection5][selection6] = prompt("                New Value (" + str(type(config[selection1][selection2][selection3][selection4][selection5][selection6])) + "): ", optional=True, input_type=type(config[selection1][selection2][selection3][selection4][selection5][selection6]), default="")
+                                                    elif (selection6 != ""):
+                                                        display_message("Unknown configuration entry selected.", 3)
+                                                else: # If the current selection isn't a dictionary, assume that it's an configuration entry. (Tier 5)
+                                                    print("                Current Value: " + str(config[selection1][selection2][selection3][selection4][selection5]))
+                                                    config[selection1][selection2][selection3][selection4][selection5] = prompt("                New Value (" + str(type(config[selection1][selection2][selection3][selection4][selection5])) + "): ", optional=True, input_type=type(config[selection1][selection2][selection3][selection4][selection5]), default="")
+                                            elif (selection5 != ""):
+                                                display_message("Unknown configuration entry selected.", 3)
+                                        else: # If the current selection isn't a dictionary, assume that it's an configuration entry. (Tier 4)
+                                            print("                Current Value: " + str(config[selection1][selection2][selection3][selection4]))
+                                            config[selection1][selection2][selection3][selection4] = prompt("                New Value (" + str(type(config[selection1][selection2][selection3][selection4])) + "): ", optional=True, input_type=type(config[selection1][selection2][selection3][selection4]), default="")
+                                    elif (selection4 != ""):
+                                        display_message("Unknown configuration entry selected.", 3)
                                 else: # If the current selection isn't a dictionary, assume that it's an configuration entry. (Tier 3)
                                     print("                Current Value: " + str(config[selection1][selection2][selection3]))
                                     config[selection1][selection2][selection3] = prompt("                New Value (" + str(type(config[selection1][selection2][selection3])) + "): ", optional=True, input_type=type(config[selection1][selection2][selection3]), default="")

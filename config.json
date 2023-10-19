@@ -7,14 +7,18 @@
             "validation": {
                 "guesses": 15,
                 "confidence": 80,
-                "license_plate_format": ["AAA0000"],
+                "license_plate_format": [
+                    "AAA0000"
+                ],
                 "best_effort": false
             }
         },
         "alerts": {
             "alerts_ignore_validation": true,
             "allow_duplicate_alerts": false,
-            "databases": ["https://v0lttech.com/predator/plates/emergency.json"]
+            "databases": [
+                "https://v0lttech.com/predator/plates/emergency.json"
+            ]
         },
         "display": {
             "ascii_art_header": true,
@@ -26,7 +30,7 @@
             "enabled": false
         },
         "modes": {
-            "auto_start": "",
+            "auto_start": "0",
             "enabled": {
                 "management": true,
                 "prerecorded": true,

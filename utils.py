@@ -374,7 +374,7 @@ def prompt(message, optional=True, input_type=str, default=""):
 
     elif (input_type == list):
         user_input = user_input.split(",") # Convert the user's input into a list.
-        user_input = [element.strip() for element in user_input]
+        user_input = [element.strip() for element in user_input] # Strip any leading or trailing white space on each element in the list.
 
     return user_input
 
