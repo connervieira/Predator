@@ -63,7 +63,9 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Add configuration value for the number of guesses the ALPR engine should make in pre-recorded mode.
 - [X] Organize configuration.
 - [X] Add support for multiple license plate formats.
-- [X] Test updated license plate validation in real-time mode.
+    - [X] Test updated license plate validation in pre-recorded mode.
+    - [X] Test updated license plate validation in real-time mode.
 - [X] Add Phantom alert handling to updated ALPR stream.
 - [ ] Complete OpenCV dashcam recording.
-- [ ] Improve the efficiency of GPS location requests when many requests are made in quick succession.
+- [X] Improve the efficiency of GPS location requests when many requests are made in quick succession.
+    - [ ] Test that improved GPS location querying behaves as expected.
