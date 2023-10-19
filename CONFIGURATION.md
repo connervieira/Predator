@@ -183,6 +183,9 @@ Configuration values in this section are settings specific to real-time mode.
             - Examples:
                 - `"main_camera": 0`
                 - `"secondary_camera": 1`
+        - `stamps` contains several configurable stamps that can be overlayed on the video recording.
+            - `license_plate` is intended to display the license plate of the vehicle Predator is installed in, but is capable of holding any short string.
+            - `message` is intended to display a customizable short message.
     - `ffmpeg` contains settings that control how the FFMPEG back-end records video. These settings are only considered when the `provider` value is set to "ffmpeg".
         - `resolution` is a string that determines what resolution Predator will attmpt to record at, and takes the form of `"[width]x[height]"`
             - Be sure that your camera is capable of recording at resolution specified here. If you set an unsupported resolution, it's likely Predator will fail and not record anything.

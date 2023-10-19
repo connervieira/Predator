@@ -126,6 +126,10 @@
                 },
                 "devices": {
                     "main": 0
+                },
+                "stamps": {
+                    "license_plate": "AAA0000",
+                    "message": "V0LT"
                 }
             },
             "ffmpeg": {

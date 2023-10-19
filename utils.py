@@ -603,12 +603,12 @@ def start_opencv_recording(directory, device=0, width=1280, height=720):
     while dashcam_recording_active: # Only run while the dashcam recording flag is set to 'True'.
         ret, frame = capture.read() # Capture a frame.
         if not ret: # Check to see if the frame failed to be read.
-            print("Can't receive frame (stream end?). Exiting ...")
+            print("Can't receive frame. Exiting ...")
             break
 
-        stamp_position = [10, height - 10]
-        stamp = str(round(time.time())) + "  " + "ABC1234" + "  " + "V0LT"
-        cv2.putText(frame, stamp, (stamp_position[0], stamp_position[1]), 2, 0.8, (255,255,255)) 
+        stamp_position = [10, height - 10] # Determine where the main overlay stamp should be positioned in the video stream.
+        stamp = str(round(time.time())) + "  " + config["dashcam"]["capture"]["opencv"]["stamps"]["license_plate"] + "  " + config["dashcam"]["capture"]["opencv"]["stamps"]["message"] # Set up the overlay stamp.
+        cv2.putText(frame, stamp, (stamp_position[0], stamp_position[1]), 2, 0.8, (255,255,255)) # Add the overlay stamp to the video stream.
 
         output.write(frame) # Save this frame to the video.
 
