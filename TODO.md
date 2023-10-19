@@ -66,3 +66,4 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Test updated license plate validation in real-time mode.
 - [X] Add Phantom alert handling to updated ALPR stream.
 - [ ] Complete OpenCV dashcam recording.
+- [ ] Improve the efficiency of GPS location requests when many requests are made in quick succession.

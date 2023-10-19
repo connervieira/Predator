@@ -606,9 +606,22 @@ def start_opencv_recording(directory, device=0, width=1280, height=720):
             print("Can't receive frame. Exiting ...")
             break
 
-        stamp_position = [10, height - 10] # Determine where the main overlay stamp should be positioned in the video stream.
-        stamp = str(round(time.time())) + "  " + config["dashcam"]["capture"]["opencv"]["stamps"]["license_plate"] + "  " + config["dashcam"]["capture"]["opencv"]["stamps"]["message"] # Set up the overlay stamp.
-        cv2.putText(frame, stamp, (stamp_position[0], stamp_position[1]), 2, 0.8, (255,255,255)) # Add the overlay stamp to the video stream.
+        main_stamp_position = [10, height - 10] # Determine where the main overlay stamp should be positioned in the video stream.
+        main_stamp = str(round(time.time())) + "  " + config["dashcam"]["capture"]["opencv"]["stamps"]["main"]["message_1"] + "  " + config["dashcam"]["capture"]["opencv"]["stamps"]["main"]["message_2"] # Set up the overlay stamp.
+
+        gps_stamp_position = [10, 30] # Determine where the GPS overlay stamp should be positioned in the video stream.
+        gps_stamp = "" # Set the GPS to a blank placeholder. Elements will be added to this in the next steps.
+        current_location = get_gps_location() # Get the current location.
+        if (config["dashcam"]["capture"]["opencv"]["stamps"]["gps"]["location"]["enabled"] == True): # Check to see if the GPS location stamp is enabled.
+            gps_stamp = gps_stamp + "(" + str(current_location[0]) + ", " + str(current_location[1]) + ")  " # Add the current coordinates to the GPS stamp.
+        if (config["dashcam"]["capture"]["opencv"]["stamps"]["gps"]["altitude"]["enabled"] == True): # Check to see if the GPS altitude stamp is enabled.
+            gps_stamp = gps_stamp + str(current_location[3]) + "m  " # Add the current altitude to the GPS stamp.
+        if (config["dashcam"]["capture"]["opencv"]["stamps"]["gps"]["speed"]["enabled"] == True): # Check to see if the GPS speed stamp is enabled.
+            gps_stamp = gps_stamp + str(current_location[2]) + "m/s  " # Add the current speed to the GPS stamp.
+
+        # Add the stamps to the video stream.
+        cv2.putText(frame, main_stamp, (main_stamp_position[0], main_stamp_position[1]), 2, 0.8, (255,255,255)) # Add the main overlay stamp to the video stream.
+        cv2.putText(frame, gps_stamp, (gps_stamp_position[0], gps_stamp_position[1]), 2, 0.8, (255,255,255)) # Add the GPS overlay stamp to the video stream.
 
         output.write(frame) # Save this frame to the video.
 

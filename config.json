@@ -128,8 +128,21 @@
                     "main": 0
                 },
                 "stamps": {
-                    "license_plate": "AAA0000",
-                    "message": "V0LT"
+                    "main": {
+                        "message_1": "AAA0000",
+                        "message_2": "V0LT"
+                    },
+                    "gps": {
+                        "location": {
+                            "enabled": true
+                        },
+                        "altitude": {
+                            "enabled": true
+                        },
+                        "speed": {
+                            "enabled": true
+                        }
+                    }
                 }
             },
             "ffmpeg": {
