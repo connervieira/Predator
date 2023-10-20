@@ -509,7 +509,7 @@ def display_shape(shape):
 # Define the function that will be used to get the current GPS coordinates.
 last_gps_request = {} # This is a placeholder that will store information regarding the last GPS request.
 last_gps_request["time"] = 0 # This is a placeholder that will hold the time that the last GPS request was made.
-last_gps_request["data"] = [] # This is a placeholder that will hold the data from the last GPS request.
+last_gps_request["data"] = [0,0,0,0,0,0] # This is a placeholder that will hold the data from the last GPS request.
 def get_gps_location(): # Placeholder that should be updated at a later date.
     global last_gps_request
     debug_message("Fetching current GPS location")
