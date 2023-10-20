@@ -122,7 +122,6 @@ Configuration values in this section are settings specific to real-time mode.
             - `alert` is a decimal number that determines how long Predator will delay before starting the next round when there is an active alert.
             - `normal` is a decimal number that determines how long Predator will delay before starting the next round under normal circumstances.
         - `clearing` is a boolean that determines whether or not Predator will clear the output screen between analysis rounds during real-time mode.
-        - `manual_trigger` is a boolean that determines if Predator will only capture images when the user manually triggers it by pressing enter.
 - `gps` contains settings related to GPS-based features.
     - `enabled` is a boolean determines whether GPS features are enabled or disabled.
     - `alpr_location_tagging` is a boolean that determines whether or not the current GPS location will be saved to the log file each time a plate is logged.

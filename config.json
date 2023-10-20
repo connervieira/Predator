@@ -10,21 +10,19 @@
                 "license_plate_format": [
                     "AAA0000"
                 ],
-                "best_effort": false
+                "best_effort": true
             }
         },
         "alerts": {
             "alerts_ignore_validation": true,
             "allow_duplicate_alerts": false,
-            "databases": [
-                "https://v0lttech.com/predator/plates/emergency.json"
-            ]
+            "databases": []
         },
         "display": {
             "ascii_art_header": true,
             "startup_message": "",
             "silence_file_saving": true,
-            "debugging_output": true
+            "debugging_output": false
         },
         "object_recognition": {
             "enabled": false
@@ -72,8 +70,7 @@
                     "alert": 5,
                     "normal": 1
                 },
-                "clearing": true,
-                "manual_trigger": false
+                "clearing": true
             }
         },
         "gps": {
