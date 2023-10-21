@@ -180,8 +180,9 @@ if (re.fullmatch("(\d\d\dx\d\d\d)", config["dashcam"]["capture"]["ffmpeg"]["reso
     display_message("The 'dashcam>capture>ffmpeg>resolution' specified in the dashcam configuration section doesn't seem to align with the '0000x0000' format. It's possible there has been a typo. efaulting to '1280x720'", 3)
     config["dashcam"]["capture"]["ffmpeg"]["resolution"] = "1280x720"
 
-if (os.path.exists(config["realtime"]["image"]["camera"]["device"]) == False): # Check to make sure that a camera device points to a valid file.
-    display_message("The 'realtime>image>camera>device' configuration value does not point to a valid file.", 3)
+for device in config["realtime"]["image"]["camera"]["devices"]: # Iterate through each video device specified in the configuration.
+    if (os.path.exists(config["realtime"]["image"]["camera"]["devices"][device]) == False): # Check to make sure that a camera device points to a valid file.
+        display_message("The 'realtime>image>camera>devices>" + device + "' configuration value does not point to a valid file.", 3)
 
 
 shared_realtime_dashcam_device = False

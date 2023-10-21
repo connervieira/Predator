@@ -28,7 +28,7 @@
             "enabled": false
         },
         "modes": {
-            "auto_start": "0",
+            "auto_start": "",
             "enabled": {
                 "management": true,
                 "prerecorded": true,
@@ -61,7 +61,7 @@
                 "shape_alerts": false,
                 "output_level": 2,
                 "speed_display": {
-                    "enabled": false,
+                    "enabled": true,
                     "unit": "mph"
                 }
             },
@@ -79,7 +79,10 @@
         },
         "image": {
             "camera": {
-                "device": "/dev/video0"
+                "devices": {
+                    "main": "/dev/video0",
+                    "secondary": "/dev/video2"
+                }
             }
         },
         "sounds": {
@@ -126,7 +129,7 @@
                     "height": 720
                 },
                 "devices": {
-                    "main": 0
+                    "main": 2
                 },
                 "stamps": {
                     "main": {

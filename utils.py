@@ -66,6 +66,17 @@ debugging_time_record = {}
 debugging_time_record["Main"] = time.time() # This value holds the time that the previous debug message in the main thread was displayed.
 debugging_time_record["ALPRStreamMaintainer"] = time.time() # This value holds the time that the previous debug message in the ALPR stream maintainer thread was displayed.
 debugging_time_record["ALPRStream"] = time.time() # This value holds the time that the previous debug message in the ALPR stream thread was displayed.
+debugging_time_record["ALPRStream0"] = time.time() # This value holds the time that the previous debug message in the ALPR stream thread was displayed.
+debugging_time_record["ALPRStream1"] = time.time() # This value holds the time that the previous debug message in the ALPR stream thread was displayed.
+debugging_time_record["ALPRStream2"] = time.time() # This value holds the time that the previous debug message in the ALPR stream thread was displayed.
+debugging_time_record["ALPRStream3"] = time.time() # This value holds the time that the previous debug message in the ALPR stream thread was displayed.
+debugging_time_record["ALPRStream4"] = time.time() # This value holds the time that the previous debug message in the ALPR stream thread was displayed.
+debugging_time_record["ALPRStream5"] = time.time() # This value holds the time that the previous debug message in the ALPR stream thread was displayed.
+debugging_time_record["ALPRStream6"] = time.time() # This value holds the time that the previous debug message in the ALPR stream thread was displayed.
+debugging_time_record["ALPRStream7"] = time.time() # This value holds the time that the previous debug message in the ALPR stream thread was displayed.
+debugging_time_record["ALPRStream8"] = time.time() # This value holds the time that the previous debug message in the ALPR stream thread was displayed.
+debugging_time_record["ALPRStream9"] = time.time() # This value holds the time that the previous debug message in the ALPR stream thread was displayed.
+debugging_time_record["ALPRStream10"] = time.time() # This value holds the time that the previous debug message in the ALPR stream thread was displayed.
 def debug_message(message, thread="Main"):
     if (config["general"]["display"]["debugging_output"] == True): # Only print the message if the debugging output configuration value is set to true.
         global debugging_time_record
@@ -124,6 +135,10 @@ def countdown(timer):
         time.sleep(1) # Wait for 1 second.
 
 
+
+# This function can be called from within threads to exit Predator.
+def trigger_exit():
+    exit()
 
 
 
