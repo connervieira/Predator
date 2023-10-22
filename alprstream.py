@@ -64,14 +64,15 @@ def alpr_stream_maintainer(): # This function runs an endless loop that maintain
                 for plate in message["results"]: # Iterate through each license plate in this line.
                     queued_plate_reads.append(plate) # Add each license plate to the license plate queue.
             else:
-                display_message("The information returned by the ALPR engine is not valid JSON. Maybe you've specified the wrong ALPR engine in the configuration?", level=3)
+                display_message("The information returned by the ALPR engine is not valid JSON. Maybe you've specified the wrong ALPR engine in the configuration?", 3)
 
 
 def start_alpr_stream(): # This function starts the ALPR stream threads.
     debug_message("Starting ALPR stream ", thread="ALPRStream")
     save_to_file(alpr_stream_file_location, "", True) # Erase the contents of the ALPR stream file.
-    alpr_stream_count = 0
+    alpr_stream_count = 0 # This will keep track of the number of ALPR streams running.
     alpr_stream_threads = {} # This is a dictionary that will hold the ALPR sub-threads.
+    os.popen("killall alpr") # Kill any ALPR processes that are running in the background in case they weren't terminated properly the last time Predator was run.
     for device in config["realtime"]["image"]["camera"]["devices"]: # Iterate through each device in the configuration.
         debug_message("Starting ALPR stream " + str(alpr_stream_count), thread="ALPRStreamMaintainer")
         print (device)

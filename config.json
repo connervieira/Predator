@@ -82,8 +82,7 @@
         "image": {
             "camera": {
                 "devices": {
-                    "main": "/dev/video0",
-                    "secondary": "/dev/video2"
+                    "primary": "/dev/video2"
                 }
             }
         },

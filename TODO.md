@@ -69,6 +69,6 @@ These are the features actively planned for Predator and are likely to be added 
 - [ ] Complete OpenCV dashcam recording.
 - [X] Improve the efficiency of GPS location requests when many requests are made in quick succession.
     - [ ] Test that improved GPS location querying behaves as expected.
-- [ ] Kill the ALPR process every time Predator starts to ensure there are no unexpected background threads.
+- [X] Kill the ALPR process every time Predator starts to ensure there are no unexpected background threads.
 - [ ] Re-implement object recogntion to real-time mode using the new back-end.
 - [ ] Re-implement image saving in real-time mode using the new-backend.
