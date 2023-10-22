@@ -27,7 +27,7 @@
             "debugging_output": false
         },
         "object_recognition": {
-            "enabled": false
+            "enabled": true
         },
         "modes": {
             "auto_start": "",
@@ -74,6 +74,10 @@
                 },
                 "clearing": true
             }
+        },
+        "object_recognition": {
+            "enabled": true,
+            "video_still_path": "/dev/shm/phantom-webcam.jpg"
         },
         "gps": {
             "enabled": false,
