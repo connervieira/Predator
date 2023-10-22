@@ -122,6 +122,11 @@ Configuration values in this section are settings specific to real-time mode.
             - `alert` is a decimal number that determines how long Predator will delay before starting the next round when there is an active alert.
             - `normal` is a decimal number that determines how long Predator will delay before starting the next round under normal circumstances.
         - `clearing` is a boolean that determines whether or not Predator will clear the output screen between analysis rounds during real-time mode.
+- `object_recognition` contains settings related to object recognition in real-time mode.
+    - `enabled` is a boolean value that enables and disables object recognition in real-time mode.
+        - This setting does not override the `general>object_recognition>enabled` setting.
+    - `video_still_path` is an absolute file-path to the image Predator should run object recognition on.
+        - By default, Phantom stores video stills from the capture device stream to `/dev/shm/phantom-webcam.jpg`, so that is where this setting should point to in most cases.
 - `gps` contains settings related to GPS-based features.
     - `enabled` is a boolean determines whether GPS features are enabled or disabled.
     - `alpr_location_tagging` is a boolean that determines whether or not the current GPS location will be saved to the log file each time a plate is logged.

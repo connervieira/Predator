@@ -70,5 +70,5 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Improve the efficiency of GPS location requests when many requests are made in quick succession.
     - [ ] Test that improved GPS location querying behaves as expected.
 - [X] Kill the ALPR process every time Predator starts to ensure there are no unexpected background threads.
-- [ ] Re-implement object recogntion to real-time mode using the new back-end.
-- [ ] Re-implement image saving in real-time mode using the new-backend.
+- [X] Re-implement object recogntion to real-time mode using the new back-end.
+    [ ] Verify object recognition functionality.

@@ -783,7 +783,7 @@ elif (mode_selection == "1" and config["general"]["modes"]["enabled"]["prerecord
 
 
 
-    # If enabled, count how many vehicles are in each frame.
+    # If enabled, count how many objects are in each frame.
     if (config["general"]["object_recognition"]["enabled"] == True):
         debug_message("Running object recognition")
         print("Running object recognition...")
@@ -1309,6 +1309,27 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
         if (config["realtime"]["interface"]["display"]["output_level"] >= 3): # Only display this status message if the output level indicates to do so.
             print("Done\n----------")
 
+
+
+
+        # If enabled, run object recognition on the captured frame.
+        if (config["general"]["object_recognition"]["enabled"] == True and config["realtime"]["object_recognition"]["enabled"] == True): # Check to make sure real-time object recognition is enabled.
+            debug_message("Running object recognition")
+            if (config["realtime"]["interface"]["display"]["output_level"] >= 3): # Only display this status message if the output level indicates to do so.
+                print("Running object recognition...")
+
+            image = cv2.imread(config["realtime"]["object_recognition"]["enabled"]) # Load the frame.
+            object_recognition_bounding_box, object_recognition_labels, object_recognition_confidence = cv.detect_common_objects(image) # Anaylze the image.
+            objects_identified = str(object_recognition_labels) # Convert the list of objects identified into a plain string.
+            if (objects_identified != "[]"): # Check to see that there were actually identified objects.
+                if (config["realtime"]["interface"]["display"]["output_level"] >= 2): # Only display this status message if the output level indicates to do so.
+                    print("Objects identified: " + objects_identified)
+                export_data = str(round(time.time()*10)/10) + "," + objects_identified + "\n" # Add the timestamp to the export data, followed by the object's detected, followed by a line break to prepare for the next entry to be added later.
+                if (save_real_time_object_recognition == True): # Check to make sure the user has configured Predator to save recognized objects to disk.
+                    add_to_file(root + "/real_time_object_detection.csv", export_data, silence_file_saving) # Add the export data to the end of the file and write it to disk.
+                
+            if (config["realtime"]["interface"]["display"]["output_level"] >= 3): # Only display this status message if the output level indicates to do so.
+                print("Done\n----------")
 
 
 
