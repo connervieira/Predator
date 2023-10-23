@@ -10,7 +10,7 @@
                 "license_plate_format": [
                     "AAA0000"
                 ],
-                "best_effort": true
+                "best_effort": false
             }
         },
         "alerts": {

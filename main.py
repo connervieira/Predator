@@ -1318,7 +1318,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
             if (config["realtime"]["interface"]["display"]["output_level"] >= 3): # Only display this status message if the output level indicates to do so.
                 print("Running object recognition...")
 
-            if (os.path.exists(video_still_path) == True):
+            if (os.path.exists(config["realtime"]["object_recognition"]["video_still_path"]) == True): # Check to see if the video still image file exists.
                 image = cv2.imread(config["realtime"]["object_recognition"]["video_still_path"]) # Load the frame.
                 object_recognition_bounding_box, object_recognition_labels, object_recognition_confidence = cv.detect_common_objects(image) # Anaylze the image.
                 objects_identified = str(object_recognition_labels) # Convert the list of objects identified into a plain string.
@@ -1328,6 +1328,8 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
                     export_data = str(round(time.time()*10)/10) + "," + objects_identified + "\n" # Add the timestamp to the export data, followed by the object's detected, followed by a line break to prepare for the next entry to be added later.
                     if (save_real_time_object_recognition == True): # Check to make sure the user has configured Predator to save recognized objects to disk.
                         add_to_file(root + "/real_time_object_detection.csv", export_data, silence_file_saving) # Add the export data to the end of the file and write it to disk.
+            else:
+                display_message("Object recognition could not be completed since the video still image file does not exist.",2)
                     
                 if (config["realtime"]["interface"]["display"]["output_level"] >= 3): # Only display this status message if the output level indicates to do so.
                     print("Done\n----------")
