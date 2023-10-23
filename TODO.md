@@ -67,7 +67,8 @@ These are the features actively planned for Predator and are likely to be added 
     - [X] Test updated license plate validation in real-time mode.
 - [X] Add Phantom alert handling to updated ALPR stream.
     - [ ] Display prominent alerts of the ALPR process fails.
-- [ ] Complete OpenCV dashcam recording.
+- [X] Complete OpenCV dashcam recording.
+    - [ ] Test OpenCV dashcam recording.
 - [X] Improve the efficiency of GPS location requests when many requests are made in quick succession.
     - [ ] Test that improved GPS location querying behaves as expected.
 - [X] Kill the ALPR process every time Predator starts to ensure there are no unexpected background threads.
