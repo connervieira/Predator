@@ -26,6 +26,7 @@ debug_message  = utils.debug_message # Load the debug message function from the 
 clear = utils.clear # Load the screen clearing function from the utils script.
 prompt = utils.prompt # Load the user input prompt function from the utils script.
 save_to_file = utils.save_to_file # Load the user input prompt function from the utils script.
+display_message = utils.display_message # Load the display message function from the utils script.
 
 import subprocess
 import threading
@@ -48,6 +49,7 @@ def alpr_stream(device):
 
 def alpr_stream_maintainer(): # This function runs an endless loop that maintains
     global queued_plate_reads
+    last_message_received = time.time() # This variable holds the time that the last ALPR message was received.
     while True:
         debug_message("Starting ALPR stream maintainence cycle", thread="ALPRStreamMaintainer")
         time.sleep(0.3) # Delay for a short period of time before each loop so that the ALPR stream has time to output some results.
@@ -58,13 +60,17 @@ def alpr_stream_maintainer(): # This function runs an endless loop that maintain
 
         for message in stream_file_contents: # Iterate through each line in the loaded stream file contents.
             if (is_json(message) == True):
+                last_message_received = time.time() # Update the last message received time to the current time.
                 message = json.loads(message) # Parse each line into JSON.
                 if ("error" in message): # Check to see if there were errors while executing the ALPR process. This will only work for alerts issued by Phantom, not OpenALPR.
-                    display_message("Phantom ALPR encountered an error: " + message["error"], level=3) # Display the ALPR error.
+                    display_message("Phantom ALPR encountered an error: " + message["error"], 2) # Display the ALPR error.
                 for plate in message["results"]: # Iterate through each license plate in this line.
                     queued_plate_reads.append(plate) # Add each license plate to the license plate queue.
             else:
-                display_message("The information returned by the ALPR engine is not valid JSON. Maybe you've specified the wrong ALPR engine in the configuration?", 3)
+                display_message("The information returned by the ALPR engine is not valid JSON. Maybe you've specified the wrong ALPR engine in the configuration?", 2)
+
+        if (time.time() - last_message_received > 3): # Check to see if a certain number of seconds have passed without receiving any messages from the ALPR process.
+            display_message("The ALPR stream hasn't received any ALPR messages in several seconds. The ALPR process may not be running.", 2)
 
 
 def start_alpr_stream(): # This function starts the ALPR stream threads.
@@ -73,6 +79,7 @@ def start_alpr_stream(): # This function starts the ALPR stream threads.
     alpr_stream_count = 0 # This will keep track of the number of ALPR streams running.
     alpr_stream_threads = {} # This is a dictionary that will hold the ALPR sub-threads.
     os.popen("killall alpr") # Kill any ALPR processes that are running in the background in case they weren't terminated properly the last time Predator was run.
+    time.sleep(1) # Wait for 1 second before launching the new ALPR processes.
     for device in config["realtime"]["image"]["camera"]["devices"]: # Iterate through each device in the configuration.
         debug_message("Starting ALPR stream " + str(alpr_stream_count), thread="ALPRStreamMaintainer")
         print (device)

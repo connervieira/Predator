@@ -27,7 +27,7 @@
             "debugging_output": false
         },
         "object_recognition": {
-            "enabled": true
+            "enabled": false
         },
         "modes": {
             "auto_start": "",
@@ -86,7 +86,7 @@
         "image": {
             "camera": {
                 "devices": {
-                    "primary": "/dev/video2"
+                    "primary": "/dev/video0"
                 }
             }
         },
