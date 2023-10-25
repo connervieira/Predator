@@ -68,9 +68,10 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Add Phantom alert handling to updated ALPR stream.
     - [X] Display prominent alerts if the ALPR process fails.
 - [X] Complete OpenCV dashcam recording.
-    - [ ] Test OpenCV dashcam recording.
+    - [X] Test OpenCV dashcam recording.
+    - [ ] Add rounding to OpenCV GPS overlays.
 - [X] Improve the efficiency of GPS location requests when many requests are made in quick succession.
-    - [ ] Test that improved GPS location querying behaves as expected.
+    - [X] Test that improved GPS location querying behaves as expected.
 - [X] Kill the ALPR process every time Predator starts to ensure there are no unexpected background threads.
 - [X] Re-implement object recogntion to real-time mode using the new back-end.
-    [ ] Verify object recognition functionality.
+    [X] Verify object recognition functionality.

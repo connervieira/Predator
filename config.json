@@ -24,7 +24,7 @@
             "ascii_art_header": true,
             "startup_message": "",
             "silence_file_saving": true,
-            "debugging_output": false
+            "debugging_output": true
         },
         "object_recognition": {
             "enabled": false
@@ -77,10 +77,11 @@
         },
         "object_recognition": {
             "enabled": true,
+            "log_file": "object_recognition_log.csv",
             "video_still_path": "/dev/shm/phantom-webcam.jpg"
         },
         "gps": {
-            "enabled": false,
+            "enabled": true,
             "alpr_location_tagging": true
         },
         "image": {

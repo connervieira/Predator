@@ -125,6 +125,10 @@ Configuration values in this section are settings specific to real-time mode.
 - `object_recognition` contains settings related to object recognition in real-time mode.
     - `enabled` is a boolean value that enables and disables object recognition in real-time mode.
         - This setting does not override the `general>object_recognition>enabled` setting.
+    - `log_file` is an optional string value that specifies a CSV file name where objects detected via object recognition will be logged.
+        - This file is placed inside the Predator working directory.
+        - Leave this value blank to disable logging detected objects to disk.
+        - Example: `"object_recognition_log.csv"`
     - `video_still_path` is an absolute file-path to the image Predator should run object recognition on.
         - By default, Phantom stores video stills from the capture device stream to `/dev/shm/phantom-webcam.jpg`, so that is where this setting should point to in most cases.
 - `gps` contains settings related to GPS-based features.

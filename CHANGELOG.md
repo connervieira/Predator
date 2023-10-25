@@ -340,8 +340,10 @@ This update makes several changes to Predator that dramatically improve its proc
     - Removed several features to accomodate constant ALPR video streaming.
         - Removed image post-processing.
         - Removed image saving.
-        - Removed real-time object recognition.
     - Refined the real-time mode interface to better accomodate multiple plates being displayed at once.
     - Added support for multiple video capture devices in real-time mode.
+- Re-implemented object recognition to support updated ALPR processing back-end.
+    - Re-organized the real-time object recognition configuration section.
+        - A custom file name for logging detected objects can now be configured.
 - Added multi-threaded debug messsage support.
 - Expanded management mode capabilties to allow for setting deeper nested configuration values.

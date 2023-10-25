@@ -311,6 +311,7 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                 copy_prerecorded_object_recognition_data = False
                 copy_prerecorded_license_plate_location_data = False
                 copy_realtime_license_plate_recognition_data = False
+                copy_realtime_object_recognition_data = False
                 copy_dashcam_video = False
 
                 while True: # Run the "copy files" selection menu on a loop forever until the user is finished selecting files.
@@ -351,6 +352,10 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                         print("R1. [X] License plate recognition data files")
                     else:
                         print("R1. [ ] License plate recognition data files")
+                    if (copy_realtime_object_recognition_data == True):
+                        print("R2. [X] Object recognition data files")
+                    else:
+                        print("R2. [ ] Object recognition data files")
                     print("")
                     print("===== Dash-cam Mode =====")
                     if (copy_dashcam_video == True):
@@ -380,6 +385,8 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                         copy_prerecorded_license_plate_location_data = not copy_prerecorded_license_plate_location_data
                     elif (selection.lower() == "r1"):
                         copy_realtime_license_plate_recognition_data = not copy_realtime_license_plate_recognition_data
+                    elif (selection.lower() == "r2"):
+                        copy_realtime_object_recognition_data = not copy_realtime_object_recognition_data
                     elif (selection.lower() == "d1"):
                         copy_dashcam_video = not copy_dashcam_video
                 
@@ -406,6 +413,8 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                     os.system("cp " + config["general"]["working_directory"] + "/pre_recorded_location_data_export.* " + copy_destination)
                 if (copy_realtime_license_plate_recognition_data):
                     os.system("cp " + config["general"]["working_directory"] + "/real_time_plates* " + copy_destination)
+                if (copy_realtime_object_recognition_data):
+                    os.system("cp '" + config["general"]["working_directory"] + "/" + config["realtime"]["object_recognition"]["log_file"] + "' " + copy_destination)
                 if (copy_dashcam_video):
                     os.system("cp " + config["general"]["working_directory"] + "/predator_dashcam* " + copy_destination)
 
@@ -422,6 +431,7 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                 delete_prerecorded_object_recognition_data = False
                 delete_prerecorded_license_plate_location_data = False
                 delete_realtime_license_plate_recognition_data = False
+                delete_realtime_object_recognition_data = False
                 delete_dashcam_video = False
 
                 while True: # Run the "delete files" selection menu on a loop forever until the user is finished selecting files.
@@ -462,6 +472,10 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                         print("R1. [X] License plate recognition data files")
                     else:
                         print("R1. [ ] License plate recognition data files")
+                    if (delete_realtime_object_recognition_data == True):
+                        print("R2. [X] Object recognition data files")
+                    else:
+                        print("R2. [ ] Object recognition data files")
                     print("")
                     print("===== Dash-cam Mode =====")
                     if (delete_dashcam_video == True):
@@ -490,6 +504,8 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                         delete_prerecorded_license_plate_location_data = not delete_prerecorded_license_plate_location_data
                     elif (selection.lower() == "r1"):
                         delete_realtime_license_plate_recognition_data = not delete_realtime_license_plate_recognition_data
+                    elif (selection.lower() == "r2"):
+                        delete_realtime_object_recognition_data = not delete_realtime_object_recognition_data
                     elif (selection.lower() == "d1"):
                         delete_dashcam_video = not delete_dashcam_video
 
@@ -513,6 +529,8 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                         os.system("rm " + config["general"]["working_directory"] + "/pre_recorded_location_data_export.*")
                     if (delete_realtime_license_plate_recognition_data):
                         os.system("rm " + config["general"]["working_directory"] + "/real_time_plates*")
+                    if (delete_realtime_object_recognition_data):
+                        os.system("rm " + config["general"]["working_directory"] + "/" + config["realtime"]["object_recognition"]["log_file"])
                     if (delete_dashcam_video):
                         os.system("rm " + config["general"]["working_directory"] + "/predator_dashcam*")
                     clear()
@@ -881,9 +899,6 @@ elif (mode_selection == "1" and config["general"]["modes"]["enabled"]["prerecord
                         validated_alpr_frames[frame][plate].append(guess) # Since this plate guess failed the validation test, delete it from the list of guesses.
 
     print("Done.\n")
-
-
-
 
 
 
@@ -1326,8 +1341,8 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
                     if (config["realtime"]["interface"]["display"]["output_level"] >= 2): # Only display this status message if the output level indicates to do so.
                         print("Objects identified: " + objects_identified)
                     export_data = str(round(time.time()*10)/10) + "," + objects_identified + "\n" # Add the timestamp to the export data, followed by the object's detected, followed by a line break to prepare for the next entry to be added later.
-                    if (save_real_time_object_recognition == True): # Check to make sure the user has configured Predator to save recognized objects to disk.
-                        add_to_file(root + "/real_time_object_detection.csv", export_data, silence_file_saving) # Add the export data to the end of the file and write it to disk.
+                    if (len(config["realtime"]["object_recognition"]["log_file"]) > 0): # Check to see if the user has configured Predator to save recognized objects to disk.
+                        add_to_file(config["general"]["working_directory"] + "/" + str(config["realtime"]["object_recognition"]["log_file"]), export_data, config["general"]["display"]["silence_file_saving"]) # Add the export data to the end of the file and write it to disk.
             else:
                 display_message("Object recognition could not be completed since the video still image file does not exist.",2)
                     
