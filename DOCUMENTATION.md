@@ -1,13 +1,25 @@
 # Documentation
 
-This document contains the information you need to know to set up and use Predator
+This document contains the information you need to know to set up and use Predator.
 
 ### Note
 
-For further clarification on the terms used in this document, see DEFINITIONS.md.
+For further clarification on the terms used in this document, see [DEFINITIONS.md](DEFINITIONS.md).
+
+
 
 
 ## Installation
+
+### Quick Install Guide
+
+If you're already familiar with Predator, and you just want a quick set-up guide, you can use the following steps to set everything up. However, if you're new to Predator, or you don't yet understand how it works, it is highly recommended that you use the follow installation instructions below instead.
+
+1. Install Python packages: `pip3 install validators requests gps geopy gpsd-py3 opencv-python cvlib tensorflow keras silence-tensorflow psutil`
+2. Install Linux packages: `sudo apt-get install ffmpeg mpg321 gpsd gpsd-clients imagemagick`
+
+
+### Full Install Guide
 
 This is the installation process for Predator and all of it's dependencies. This process is written assuming you're running a distribution of GNU/Linux, but it's theoretically possible to get Predator to function on MacOS as well.
 
@@ -41,6 +53,7 @@ This is the installation process for Predator and all of it's dependencies. This
 4. Optionally, install ImageMagick (Highly Recommended)
     - Predator uses ImageMagick to manipulate still frames of video.
     - If you don't install ImageMagick, Predator will encounter errors while operating in modes that require image processing.
+    - You can install ImageMagick using the following command on a Debian based Linux machine: `sudo apt-get install imagemagick`
     - You can learn about the ImageMagick installation process at <https://imagemagick.org/script/download.php>
 5. Optionally, install MPG321 (Recommended)
     - Predator requires MPG321 in order to play audio effects for alerts.

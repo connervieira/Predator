@@ -141,14 +141,14 @@ if (config["general"]["display"]["ascii_art_header"] == True): # Check to see wh
     print("| $$      | $$  | $$| $$$$$$$$| $$$$$$$/| $$  | $$   | $$  |  $$$$$$/| $$  | $$")
     print("|__/      |__/  |__/|________/|_______/ |__/  |__/   |__/   \______/ |__/  |__/" + style.end + style.bold)
     print("")
-    print("                            COMPUTER VISION SYSTEM")
+    print("                                 COMPUTER VISION")
     if (config["general"]["display"]["startup_message"] != ""): # Only display the line for the custom message if the user has defined one.
         print("")
         print(config["general"]["display"]["startup_message"]) # Show the user's custom defined start-up message.
     print(style.end)
 else: # If the user his disabled the large ASCII art header, then show a simple title header with minimal styling.
     print(style.red + style.bold + "PREDATOR" + style.end)
-    print(style.bold + "Computer Vision System" + style.end + "\n")
+    print(style.bold + "Computer Vision" + style.end + "\n")
     if (config["general"]["display"]["startup_message"]!= ""): # Only display the line for the custom message if the user has defined one.
         print(config["general"]["display"]["startup_message"]) # Show the user's custom defined start-up message.
 
@@ -1542,8 +1542,6 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
             time.sleep(float(config["realtime"]["interface"]["behavior"]["delays"]["alert"])) # Trigger a delay based on the fact that there is at least one active alert.
         else:
             time.sleep(float(config["realtime"]["interface"]["behavior"]["delays"]["normal"])) # Trigger a normal delay.
-
-
 
 
 

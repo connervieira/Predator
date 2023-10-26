@@ -306,7 +306,7 @@ This update refines Predator's functionality, and focuses its purpose back on li
 
 *Release date to be determined*
 
-This update makes several changes to Predator that dramatically improve its processing performance.
+This update makes several changes to Predator that dramatically improve its processing performance and stability.
 
 - Removed webhook functionality, since this functionality is being replaced by Predator Fabric.
 - Dramatically changed the configuration layout.
@@ -329,6 +329,7 @@ This update makes several changes to Predator that dramatically improve its proc
 - Improved dashcam recording.
     - Fixed an issue where dashcam recording would cause a crash when displaying the process start message.
     - Added support for OpenCV recording alongside the existing FFMPEG back-end.
+        - OpenCV dashcam recording supports overlay stamps for the current time, location, speed, altitude, and other data.
 - Added support for multiple license plate validation formats.
 - Overhauled real-time mode.
     - Entries are now only added to the license plate history log file if one or more license plates were detected.
@@ -346,3 +347,4 @@ This update makes several changes to Predator that dramatically improve its proc
         - A custom file name for logging detected objects can now be configured.
 - Added multi-threaded debug messsage support.
 - Expanded management mode capabilties to allow for setting deeper nested configuration values.
+- Slightly modified the start-up title.

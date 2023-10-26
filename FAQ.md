@@ -25,7 +25,7 @@ If you're encountering an issue with Predator, first ensure that you've followed
 
 **How is Predator related to OpenALPR?**
 
-Predator's primary ALPR engine, Phantom, is heavily based on OpenALPR. Predator can also be configured to be directly compatible with OpenALPR.
+Predator's intended ALPR engine, Phantom, is heavily based on OpenALPR. Predator can also be configured to use OpenALPR directly as its ALPR back-end.
 
 
 **Who is Predator designed for?**
