@@ -5,12 +5,15 @@
 An offline, privacy centric license plate recognition platform.
 
 ![Predator header](./assets/images/branding/PredatorHeaderLight.svg)
-[Download](https://v0lttech.com/predator.php)
 
 
 ## Disclaimer
 
 While Predator is designed to be stable and reliable, you should not depend on it for safety or security critical tasks. See the [SECURITY.md](SECURITY.md) document for more information.
+
+
+## Download
+Downloads for stable releases of Predator can be found [here](https://v0lttech.com/predator.php).
 
 
 ## Description
