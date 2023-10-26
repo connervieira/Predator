@@ -140,6 +140,15 @@
                 },
                 "stamps": {
                     "main": {
+                        "unix_time": {
+                            "enabled": false
+                        },
+                        "date": {
+                            "enabled": true
+                        },
+                        "time": {
+                            "enabled": true
+                        },
                         "message_1": "AAA0000",
                         "message_2": "V0LT PREDATOR"
                     },

@@ -632,7 +632,14 @@ def start_opencv_recording(directory, device=0, width=1280, height=720):
             break
 
         main_stamp_position = [10, height - 10] # Determine where the main overlay stamp should be positioned in the video stream.
-        main_stamp = str(round(time.time())) + "  " + config["dashcam"]["capture"]["opencv"]["stamps"]["main"]["message_1"] + "  " + config["dashcam"]["capture"]["opencv"]["stamps"]["main"]["message_2"] # Set up the overlay stamp.
+        main_stamp = ""
+        if (config["dashcam"]["capture"]["opencv"]["stamps"]["main"]["unix_time"]["enabled"] == True): # Check to see if the Unix epoch time stamp is enabled.
+            main_stamp = main_stamp + str(round(time.time())) # Add the current Unix epoch time to the main stamp.
+        if (config["dashcam"]["capture"]["opencv"]["stamps"]["main"]["date"]["enabled"] == True): # Check to see if the date stamp is enabled.
+            main_stamp = main_stamp + "" # TODO: Add the date to the main stamp.
+        if (config["dashcam"]["capture"]["opencv"]["stamps"]["main"]["time"]["enabled"] == True): # Check to see if the time stamp is enabled.
+            main_stamp = main_stamp + "" # TODO: Add the current time to the main stamp.
+        main_stamp = (round(time.time())) + "  " + config["dashcam"]["capture"]["opencv"]["stamps"]["main"]["message_1"] + "  " + config["dashcam"]["capture"]["opencv"]["stamps"]["main"]["message_2"] # Add the customizable messages to the overlay stamp.
 
         gps_stamp_position = [10, 30] # Determine where the GPS overlay stamp should be positioned in the video stream.
         gps_stamp = "" # Set the GPS to a blank placeholder. Elements will be added to this in the next steps.

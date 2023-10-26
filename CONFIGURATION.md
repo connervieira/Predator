@@ -198,8 +198,21 @@ Configuration values in this section are settings specific to real-time mode.
                 - `"secondary_camera": 1`
         - `stamps` contains several configurable stamps that can be overlayed on the video recording.
             - `main`
+                - `unix_time` contains settings for configuring Predator showing the number of seconds since the Unix epoch in the video overlay stamp.
+                    - `enabled` is a boolean value that determines whether the Unix timestamp will be displayed at all.
+                - `date` contains settings for configuring the date video overlay stamp.
+                    - `enabled` is a boolean value that determines whether Predator will show the current date in the video overlay stamp.
+                - `time` contains settings for configuring the time video overlay stamp.
+                    - `enabled` is a boolean value that determines whether Predator will show the current time in the video overlay stamp.
                 - `message_1` is a string that is intended to display a short custom message. This is often set to the license plate of the car Predator is installed in.
                 - `message_2` is a string that is intended to display a short custom message. This is often set to "Predator", or another name identifying the system the dashcam is running on.
+            - `gps`
+                - `location` contains settings for configuring the GPS coordinate overlay stamp.
+                    - `enabled` is a boolean value that determines whether Predator will include the current location in the GPS overlay stamp.
+                - `altitude` contains settings for configuring the GPS altitude overlay stamp.
+                    - `enabled` is a boolean value that determines whether Predator will include the current altitude in the GPS overlay stamp.
+                - `speed` contains settings for configuring the GPS speed overlay stamp.
+                    - `enabled` is a boolean value that determines whether Predator will include the current speed in the GPS overlay stamp.
     - `ffmpeg` contains settings that control how the FFMPEG back-end records video. These settings are only considered when the `provider` value is set to "ffmpeg".
         - `resolution` is a string that determines what resolution Predator will attmpt to record at, and takes the form of `"[width]x[height]"`
             - Be sure that your camera is capable of recording at resolution specified here. If you set an unsupported resolution, it's likely Predator will fail and not record anything.
