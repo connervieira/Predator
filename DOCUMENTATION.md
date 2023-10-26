@@ -7,8 +7,6 @@ This document contains the information you need to know to set up and use Predat
 For further clarification on the terms used in this document, see [DEFINITIONS.md](DEFINITIONS.md).
 
 
-
-
 ## Installation
 
 ### Quick Install Guide
@@ -18,10 +16,9 @@ If you're already familiar with Predator, and you just want a quick set-up guide
 1. Install Python packages: `pip3 install validators requests gps geopy gpsd-py3 opencv-python cvlib tensorflow keras silence-tensorflow psutil`
 2. Install Linux packages: `sudo apt-get install ffmpeg mpg321 gpsd gpsd-clients imagemagick`
 
-
 ### Full Install Guide
 
-This is the installation process for Predator and all of it's dependencies. This process is written assuming you're running a distribution of GNU/Linux, but it's theoretically possible to get Predator to function on MacOS as well.
+This is the installation process for Predator and all of it's dependencies. This process is written assuming you're running a distribution of GNU/Linux, but it's possible to get Predator to function on MacOS as well.
 
 1. Install the necessary Python packages.
     - Highly recommended: `pip3 install validators requests`
@@ -71,8 +68,6 @@ This is the installation process for Predator and all of it's dependencies. This
 8. Download Predator.
     - Predator can be downloaded either from the V0LT website, or from it's GitHub page. The download straight from the V0LT website is recommended for sake of stability and completeness, but you're free to use GitHub as well if you're OK with using an unstable and potentially broken version of Predator.
     - V0LT website: <https://v0lttech.com/predator.php>
-    - GitHub page: <https://github.com/connervieira/Predator>
-        - `git clone https://github.com/connervieira/Predator`
 9. Extract Predator
     - After downloading Predator, regardless of where you get it from, extract it from the compressed archive (if necessary), and place it somewhere on your filesystem.
 
@@ -173,10 +168,10 @@ After configuring Predator, you can try it out for the first time!
             - While in real-time mode, Predator will run in an endless loop until quit by holding `Ctrl + C` for a few seconds.
                 - Since Predator launches some of it's processes in different threads, pressing `Ctrl + C` a single time might not kill the entire Predator system.
             - When one or more license plates are detected, Predator will display it on screen, provided that it is configured to do so.
-                - Depending on the configuration, Predator might also display a large ASCII shape to make it easier to see important information at a glance.
+                - Depending on the configuration, Predator might also display a large text shape to make it easier to see important information at a glance.
                 - Depending on the configuration, Predator might play an audio sound indicating the type of plate detected.
                 - Depending on the configuration, Predator might submit the license plate detected to a push notification service.
-                - If a plate detected is in the alert database specified during the preferences stage earlier, it will show a prominent alert message in the console output.
+                - If a plate detected is in one of the alert databases, it will show a prominent alert message in the console output.
         - Dash-cam mode
             - In dash-cam mode, Predator will record video indefinitely until disk space runs out, the return key is pressed, or the Predator process is terminated.
             - Predator will not detect license plates in this mode. However, you can use video recorded in this mode with pre-recorded mode in order to scan for license plates at a later date.

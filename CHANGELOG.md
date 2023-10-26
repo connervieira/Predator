@@ -304,7 +304,7 @@ This update refines Predator's functionality, and focuses its purpose back on li
 
 ### Performance Update
 
-*Release date to be determined*
+October 26th, 2023
 
 This update makes several changes to Predator that dramatically improve its processing performance and stability.
 
