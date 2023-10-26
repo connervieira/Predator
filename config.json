@@ -24,7 +24,7 @@
             "ascii_art_header": true,
             "startup_message": "",
             "silence_file_saving": true,
-            "debugging_output": true
+            "debugging_output": false
         },
         "object_recognition": {
             "enabled": false
@@ -134,13 +134,14 @@
                     "width": 1280,
                     "height": 720
                 },
+                "framerate": 9.6,
                 "devices": {
-                    "main": 2
+                    "main": 0
                 },
                 "stamps": {
                     "main": {
                         "message_1": "AAA0000",
-                        "message_2": "V0LT"
+                        "message_2": "V0LT PREDATOR"
                     },
                     "gps": {
                         "location": {

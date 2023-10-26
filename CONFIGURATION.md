@@ -186,6 +186,11 @@ Configuration values in this section are settings specific to real-time mode.
         - `resolution` sets the resolution of the video.
             - `width` sets the width of the video, measured in pixels.
             - `height` sets the height of the video, measured in pixels.
+        - `framerate` is a decimal number determines the playback frame-rate of the video file.
+            - This value does not determine the frame-rate of video capture, but rather the frame-rate that the saved video file will play back at.
+            - To estimate the frame-rate of your capture device, use the `tools/opencv_capture_benchmark.py` script.
+                - This script can be configured using the variables on the first few lines of the file.
+                - Run the script and wait several seconds for the benchmark to complete. The calculated frame-rate will be printed at the end of the test.
         - `devices` is a list that contains the indexes of camera devices Predator will attempt to use when recording video in dash-cam mode.
             - Each entry under this setting should contain a device identifier/name, as well as a reference to the device itself.
             - Examples:
@@ -199,7 +204,7 @@ Configuration values in this section are settings specific to real-time mode.
         - `resolution` is a string that determines what resolution Predator will attmpt to record at, and takes the form of `"[width]x[height]"`
             - Be sure that your camera is capable of recording at resolution specified here. If you set an unsupported resolution, it's likely Predator will fail and not record anything.
             - Example: `"1920x1080"`
-        - `frame_rate` is an integer that determines what framerate the dashcam will attempt to record at.
+        - `frame_rate` is an integer that determines what frame-rate the dashcam will attempt to record at.
             - Be sure that your camera is capable of recording at the frame rate specified here. If you set an unsupported frame rate, it's likely Predator will fail and not record anything.
             - If you enter a frame rate too slow for the encoder, it might automatically be sped to a higher frame rate.
             - Example: `30`

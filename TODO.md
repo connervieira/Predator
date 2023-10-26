@@ -69,7 +69,7 @@ These are the features actively planned for Predator and are likely to be added 
     - [X] Display prominent alerts if the ALPR process fails.
 - [X] Complete OpenCV dashcam recording.
     - [X] Test OpenCV dashcam recording.
-    - [ ] Add rounding to OpenCV GPS overlays.
+    - [X] Add rounding to OpenCV GPS overlays.
 - [X] Improve the efficiency of GPS location requests when many requests are made in quick succession.
     - [X] Test that improved GPS location querying behaves as expected.
 - [X] Kill the ALPR process every time Predator starts to ensure there are no unexpected background threads.

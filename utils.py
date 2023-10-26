@@ -619,7 +619,7 @@ def start_opencv_recording(directory, device=0, width=1280, height=720):
     capture.set(cv2.CAP_PROP_FRAME_HEIGHT,height) # Set the video stream height.
 
     file = directory + "/predator_dashcam_" + str(int(time.time())) + "_" + str(device) + "_0.avi" # Determine the file path.
-    output = cv2.VideoWriter(file, cv2.VideoWriter_fourcc(*'XVID'), 20.0, (width,  height))
+    output = cv2.VideoWriter(file, cv2.VideoWriter_fourcc(*'XVID'), float(config["dashcam"]["capture"]["opencv"]["framerate"]), (width,  height))
 
     if not capture.isOpened():
         print("Cannot open camera")
@@ -628,7 +628,7 @@ def start_opencv_recording(directory, device=0, width=1280, height=720):
     while dashcam_recording_active: # Only run while the dashcam recording flag is set to 'True'.
         ret, frame = capture.read() # Capture a frame.
         if not ret: # Check to see if the frame failed to be read.
-            print("Can't receive frame. Exiting ...")
+            print("Can't receive frame")
             break
 
         main_stamp_position = [10, height - 10] # Determine where the main overlay stamp should be positioned in the video stream.
@@ -638,11 +638,11 @@ def start_opencv_recording(directory, device=0, width=1280, height=720):
         gps_stamp = "" # Set the GPS to a blank placeholder. Elements will be added to this in the next steps.
         current_location = get_gps_location() # Get the current location.
         if (config["dashcam"]["capture"]["opencv"]["stamps"]["gps"]["location"]["enabled"] == True): # Check to see if the GPS location stamp is enabled.
-            gps_stamp = gps_stamp + "(" + str(current_location[0]) + ", " + str(current_location[1]) + ")  " # Add the current coordinates to the GPS stamp.
+            gps_stamp = gps_stamp + "(" + str(round(current_location[0]*100000)/100000) + ", " + str(round(current_location[1]*100000)/100000) + ")  " # Add the current coordinates to the GPS stamp.
         if (config["dashcam"]["capture"]["opencv"]["stamps"]["gps"]["altitude"]["enabled"] == True): # Check to see if the GPS altitude stamp is enabled.
-            gps_stamp = gps_stamp + str(current_location[3]) + "m  " # Add the current altitude to the GPS stamp.
+            gps_stamp = gps_stamp + str(round(current_location[3])) + "m  " # Add the current altitude to the GPS stamp.
         if (config["dashcam"]["capture"]["opencv"]["stamps"]["gps"]["speed"]["enabled"] == True): # Check to see if the GPS speed stamp is enabled.
-            gps_stamp = gps_stamp + str(current_location[2]) + "m/s  " # Add the current speed to the GPS stamp.
+            gps_stamp = gps_stamp + str(round(current_location[2]*10)/10) + "m/s  " # Add the current speed to the GPS stamp.
 
         # Add the stamps to the video stream.
         cv2.putText(frame, main_stamp, (main_stamp_position[0], main_stamp_position[1]), 2, 0.8, (255,255,255)) # Add the main overlay stamp to the video stream.
