@@ -322,13 +322,10 @@ This update makes several changes to Predator that dramatically improve its proc
             - This option sets a plate that will cause Predator to immediately exit for debugging purposes.
         - Added `general>alerts>allow_duplicate_alerts` configuration option.
         - Added `general>alpr>validation>confidence` configuration value to set a minimum required confidence level for ALPR results.
+        - The configuration value to globally disable object recognition has been removed, and replaced with a single control that enables object recognition.
 - The normal delay and alert delay are now mutually exclusive, and only one is triggered each round, depending on whether there are one or more active alerts.
 - Timestamp input parsing in pre-recorded mode is now more fault tolerant.
-- Updated license plate logging in real-time mode.
-    - The license plate log file is now a JSON file, and contains more information than before, including license plate guesses.
 - Added support for interfacing with external local services.
-- Object recognition library importing has been improved.
-    - The configuration value to globally disable object recognition has been removed, and replaced with a single control that enables object recognition.
 - Improved dashcam recording.
     - Fixed an issue where dashcam recording would cause a crash when displaying the process start message.
     - Added support for OpenCV recording alongside the existing FFMPEG back-end.
@@ -337,11 +334,13 @@ This update makes several changes to Predator that dramatically improve its proc
     - Entries are now only added to the license plate history log file if one or more license plates were detected.
     - Real-time mode now streams constant video from the configured camera, rather than capturing discrete still frames.
         - This dramatically improves the likelihood of plate detection, especially under challenging conditions.
-    - Removed several features to accomodate constant ALPR video streaming.
+    - Real-time mode now supports multiple video capture devices at once.
+    - Removed some features to accomodate the new ALPR back-end.
         - Removed image post-processing.
         - Removed image saving.
     - Refined the real-time mode interface to better accomodate multiple plates being displayed at once.
-    - Added support for multiple video capture devices in real-time mode.
+    - License plate analysis now takes place in a separate thread from the rest of the Predator.
+    - The license plate log file is now a JSON file, and contains more information than before, including license plate guesses.
 - Re-implemented object recognition to support updated ALPR processing back-end.
     - Re-organized the real-time object recognition configuration section.
         - A custom file name for logging detected objects can now be configured.
