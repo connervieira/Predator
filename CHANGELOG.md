@@ -348,3 +348,11 @@ This update makes several changes to Predator that dramatically improve its proc
 - Added multi-threaded debug messsage support.
 - Expanded management mode capabilties to allow for setting deeper nested configuration values.
 - Slightly modified the start-up title.
+
+
+
+## Version *TBD*
+
+*Release date to be determined*
+
+- Added the ability to set the units for speed in the OpenCV GPS dashcam video overlay stamp.

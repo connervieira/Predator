@@ -562,9 +562,11 @@ def convert_speed(speed, unit="mph"): # This function is used to convert speeds 
     elif (unit == "fps"): # Convert the speed to feet per second.
         speed = speed * 3.28084
     else: # If an invalid unit was supplied, then simply return a speed of zero.
-        speed = 0
+        debug_message("An invalid unit for speed conversion was supplied. The speed could not be converted to the desired format.", 2) # Display a notice that the speed could not be converted.
+        speed = 0 # Set the converted speed to 0 as a placeholder.
 
-    return speed # Return the convert speed.
+
+    return speed # Return the converted speed.
 
 
 
@@ -649,7 +651,7 @@ def start_opencv_recording(directory, device=0, width=1280, height=720):
         if (config["dashcam"]["capture"]["opencv"]["stamps"]["gps"]["altitude"]["enabled"] == True): # Check to see if the GPS altitude stamp is enabled.
             gps_stamp = gps_stamp + str(round(current_location[3])) + "m  " # Add the current altitude to the GPS stamp.
         if (config["dashcam"]["capture"]["opencv"]["stamps"]["gps"]["speed"]["enabled"] == True): # Check to see if the GPS speed stamp is enabled.
-            gps_stamp = gps_stamp + str(round(current_location[2]*10)/10) + "m/s  " # Add the current speed to the GPS stamp.
+            gps_stamp = gps_stamp + str(round(convert_speed(current_location[2],config["dashcam"]["capture"]["opencv"]["stamps"]["gps"]["speed"]["unit"])*10)/10) + config["dashcam"]["capture"]["opencv"]["stamps"]["gps"]["speed"]["unit"] + "  " # Add the current speed to the GPS stamp.
 
         # Add the stamps to the video stream.
         cv2.putText(frame, main_stamp, (main_stamp_position[0], main_stamp_position[1]), 2, 0.8, (255,255,255)) # Add the main overlay stamp to the video stream.

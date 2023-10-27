@@ -160,7 +160,8 @@
                             "enabled": true
                         },
                         "speed": {
-                            "enabled": true
+                            "enabled": true,
+                            "unit": "mph"
                         }
                     }
                 }

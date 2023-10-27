@@ -213,6 +213,13 @@ Configuration values in this section are settings specific to real-time mode.
                     - `enabled` is a boolean value that determines whether Predator will include the current altitude in the GPS overlay stamp.
                 - `speed` contains settings for configuring the GPS speed overlay stamp.
                     - `enabled` is a boolean value that determines whether Predator will include the current speed in the GPS overlay stamp.
+                    - `unit` is a string that determines what unit of speed Predator will use for the speed overlay stamp.
+                        - This value can only be set to one of the following values:
+                            - `"mph"` for miles-per-hour
+                            - `"kph"` for kilometers-per-hour
+                            - `"mps"` for meters-per-second
+                            - `"fps"` for feet-per-second
+                            - `"knot"` for knots
     - `ffmpeg` contains settings that control how the FFMPEG back-end records video. These settings are only considered when the `provider` value is set to "ffmpeg".
         - `resolution` is a string that determines what resolution Predator will attmpt to record at, and takes the form of `"[width]x[height]"`
             - Be sure that your camera is capable of recording at resolution specified here. If you set an unsupported resolution, it's likely Predator will fail and not record anything.
