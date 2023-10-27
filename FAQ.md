@@ -5,7 +5,7 @@ This document contains a series of questions you may have concerning Predator.
 
 **What exactly is Predator?**
 
-In short, Predator is a camera utility designed primarily to be a vehicle-based system with a focus on license plate reading. Predator is also capable of operating as a dashcam, and can run general object recognition to identify objects like vehicles, traffic lights, and pedestrians.
+In short, Predator is a camera utility designed primarily to be a vehicle-based system with a focus on automatic license plate recognition. Predator is also capable of operating as a dashcam, and can run general object recognition to identify objects like vehicles, traffic lights, and pedestrians.
 
 
 **How do I install Predator?**
@@ -13,14 +13,19 @@ In short, Predator is a camera utility designed primarily to be a vehicle-based 
 For installation and setup instructions, check the [DOCUMENTATION.md](DOCUMENTATION.md) document.
 
 
+**Who is Predator designed for?**
+
+Predator is designed for hobbyists and tech enthusiasts who want to experiment with ALPR without the need for expensive software and specialized equipment. It's for people who want to tinker and experiment with computer vision technology in a powerful and easy way.
+
+
 **What is Predator Apex?**
 
-Predator Apex is the paid hardware program behind the Predator software. Predator Apex uses the exact same, free and open source Predator software that everyone has access to. Predator Apex customers get one-on-one tech support and/or pre-built hardware devices.
+Predator Apex is the paid support program behind the Predator software. Predator Apex uses the exact same, free and open source Predator software that everyone else has access to. Predator Apex customers get one-on-one tech support and/or pre-built hardware devices. This service is available both to commercial customers and individual users. To learn more, you can contact V0LT using th information found at <https://v0lttech.com/contact.php>
 
 
 **I have a problem with Predator and I need help.**
 
-If you're encountering an issue with Predator, first ensure that you've followed all of the steps described in the [DOCUMENTATION.md](DOCUMENTATION.md) document for setting up Predator. If your issue persists, try to work out its source by checking individual potential points of failure. The majority of Predator issues can be traced back to one of it's dependencies not working properly. Check that the ALPR engine, FFMPEG, and GPSD are all working properly. If you still can't resolve your issue, you can contact V0LT support using the information found at <https://v0lttech.com/contact.php>.
+If you're encountering an issue with Predator, first ensure that you've followed all of the steps described in the [DOCUMENTATION.md](DOCUMENTATION.md). If your issue persists, try to work out its source by checking individual potential points of failure. The majority of Predator issues can be traced back to one of it's dependencies not working properly. Check that the ALPR engine, FFMPEG, and GPSD are all working properly. If you still can't resolve your issue, you can contact V0LT support using the information found at <https://v0lttech.com/contact.php>.
 
 
 **How is Predator related to OpenALPR?**
@@ -28,14 +33,9 @@ If you're encountering an issue with Predator, first ensure that you've followed
 Predator's intended ALPR engine, Phantom, is heavily based on OpenALPR. Predator can also be configured to use OpenALPR directly as its ALPR back-end.
 
 
-**Who is Predator designed for?**
-
-Predator is designed for hobbyists and tech enthusiasts who want to experiment with ALPR without the need for expensive software and specialized equipment. It's for those who want to log everyone who enters their driveway, and for those who want alerts when their friends and family arrive at their house. It's for people who want to tinker and experiment with computer vision technology in a powerful and easy way.
-
-
 **Who is Predator not designed for?**
 
-Predator is not designed for those who want to collect massive amounts of information on individuals. It's not for governments and law enforcement agencies looking to log the movements of civilians. It's not for companies who want to track how often certain people visit their business. For sake of privacy, Predator actively avoids features designed for mass-surveillance.
+Predator is not designed for those who want to collect massive amounts of information on individuals. It's not for governments and law enforcement agencies looking to log the movements of civilians. It's not for companies who want to track how often certain people visit their business. For sake of privacy, Predator actively avoids features designed for mass-surveillance, and focuses on targeted, private alerts.
 
 
 **How much does Predator cost?**
