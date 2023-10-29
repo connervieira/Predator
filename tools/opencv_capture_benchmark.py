@@ -1,4 +1,4 @@
-device = 0 # This determines the video capture device that will be used for the benchmark.
+device = 2 # This determines the video capture device that will be used for the benchmark.
 resolution = [1280, 720] # This determines the resolution that will be used for the video capture device.
 frames = 240 # This determines how many frames will be captured for the benchmark.
 
@@ -6,7 +6,7 @@ frames = 240 # This determines how many frames will be captured for the benchmar
 import cv2
 import time
 
-capture = cv2.VideoCapture(0); # Open the video capture device.
+capture = cv2.VideoCapture(device); # Open the video capture device.
 
 capture.set(cv2.CAP_PROP_FRAME_WIDTH,resolution[0]) # Set the video stream width.
 capture.set(cv2.CAP_PROP_FRAME_HEIGHT,resolution[1]) # Set the video stream height.
