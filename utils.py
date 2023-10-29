@@ -653,9 +653,13 @@ def start_opencv_recording(directory, device=0, width=1280, height=720):
         if (config["dashcam"]["capture"]["opencv"]["stamps"]["gps"]["speed"]["enabled"] == True): # Check to see if the GPS speed stamp is enabled.
             gps_stamp = gps_stamp + str(round(convert_speed(current_location[2],config["dashcam"]["capture"]["opencv"]["stamps"]["gps"]["speed"]["unit"])*10)/10) + config["dashcam"]["capture"]["opencv"]["stamps"]["gps"]["speed"]["unit"] + "  " # Add the current speed to the GPS stamp.
 
+        # Determine the font color of the stamps from the configuration.
+        main_stamp_color = config["dashcam"]["capture"]["opencv"]["stamps"]["main"]["color"]
+        gps_stamp_color = config["dashcam"]["capture"]["opencv"]["stamps"]["gps"]["color"]
+
         # Add the stamps to the video stream.
-        cv2.putText(frame, main_stamp, (main_stamp_position[0], main_stamp_position[1]), 2, 0.8, (255,255,255)) # Add the main overlay stamp to the video stream.
-        cv2.putText(frame, gps_stamp, (gps_stamp_position[0], gps_stamp_position[1]), 2, 0.8, (255,255,255)) # Add the GPS overlay stamp to the video stream.
+        cv2.putText(frame, main_stamp, (main_stamp_position[0], main_stamp_position[1]), 2, 0.8, (main_stamp_color[2], main_stamp_color[1], main_stamp_color[0])) # Add the main overlay stamp to the video stream.
+        cv2.putText(frame, gps_stamp, (gps_stamp_position[0], gps_stamp_position[1]), 2, 0.8, (gps_stamp_color[2], gps_stamp_color[1], gps_stamp_color[0])) # Add the GPS overlay stamp to the video stream.
 
         output.write(frame) # Save this frame to the video.
 

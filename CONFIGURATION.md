@@ -198,6 +198,8 @@ Configuration values in this section are settings specific to real-time mode.
                 - `"secondary_camera": 1`
         - `stamps` contains several configurable stamps that can be overlayed on the video recording.
             - `main`
+                - `color` is a list of three values between 0 and 255 that determines the font cover of the overlay stamp.
+                    - The first value represents red, the second value represents green, and the third value represents blue.
                 - `unix_time` contains settings for configuring Predator showing the number of seconds since the Unix epoch in the video overlay stamp.
                     - `enabled` is a boolean value that determines whether the Unix timestamp will be displayed at all.
                 - `date` contains settings for configuring the date video overlay stamp.
@@ -207,6 +209,8 @@ Configuration values in this section are settings specific to real-time mode.
                 - `message_1` is a string that is intended to display a short custom message. This is often set to the license plate of the car Predator is installed in.
                 - `message_2` is a string that is intended to display a short custom message. This is often set to "Predator", or another name identifying the system the dashcam is running on.
             - `gps`
+                - `color` is a list of three values between 0 and 255 that determines the font cover of the overlay stamp.
+                    - The first value represents red, the second value represents green, and the third value represents blue.
                 - `location` contains settings for configuring the GPS coordinate overlay stamp.
                     - `enabled` is a boolean value that determines whether Predator will include the current location in the GPS overlay stamp.
                 - `altitude` contains settings for configuring the GPS altitude overlay stamp.

@@ -140,6 +140,7 @@
                 },
                 "stamps": {
                     "main": {
+                        "color": [255, 255, 255],
                         "unix_time": {
                             "enabled": false
                         },
@@ -150,9 +151,10 @@
                             "enabled": true
                         },
                         "message_1": "AAA0000",
-                        "message_2": "V0LT PREDATOR"
+                        "message_2": "PREDATOR"
                     },
                     "gps": {
+                        "color": [0, 0, 0],
                         "location": {
                             "enabled": true
                         },
