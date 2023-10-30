@@ -691,7 +691,7 @@ def start_dashcam_opencv(dashcam_devices, video_width, video_height, directory, 
         dashcam_process.append(threading.Thread(target=start_opencv_recording, args=[directory, dashcam_devices[device], video_width, video_height], name="Dashcam" + str(iteration_counter)))
         dashcam_process[iteration_counter].start()
 
-        iteration_counter = iteration_counter + 1 # Iterate the counter. This value will be used to create unique file names for each recorded video.
+        iteration_counter += 1 # Iterate the counter. This value will be used to create unique file names for each recorded video.
         print("Started dashcam recording on " + str(dashcam_devices[device])) # Inform the user that recording was initiation for this camera device.
 
     if (background == False): # If background recording is disabled, then prompt the user to press enter to halt recording.
@@ -714,7 +714,7 @@ def start_dashcam_ffmpeg(dashcam_devices, segment_length, resolution, framerate,
 
         dashcam_process.append(subprocess.Popen(launch_command, shell=False)) # Execute the launch command, and add the process to the list of dashcam processes.
 
-        iteration_counter = iteration_counter + 1 # Iterate the counter. This value will be used to create unique file names for each recorded video.
+        iteration_counter+=1 # Iterate the counter. This value will be used to create unique file names for each recorded video.
         print("Started dashcam recording on " + str(dashcam_devices[device])) # Inform the user that recording was initiation for this camera device.
 
 
@@ -724,7 +724,7 @@ def start_dashcam_ffmpeg(dashcam_devices, segment_length, resolution, framerate,
 
         for device in dashcam_devices: # Run a loop once for every camera device specified for dashcam recording.
             dashcam_process[iteration_counter].terminate() # Terminate the FFMPEG process for this iteration.
-            iteration_counter = iteration_counter + 1 # Iterate the counter.
+            iteration_counter+=1 # Iterate the counter.
 
         print("Dashcam recording halted.")
 

@@ -774,7 +774,7 @@ elif (mode_selection == "1" and config["general"]["modes"]["enabled"]["prerecord
         os.system("rm -r " + config["general"]["working_directory"] + "/frames") # Remove the frames directory.
 
     for video in videos: # Iterate through each video specified by the user.
-        video_counter = video_counter + 1 # Increment the video counter by 1.
+        video_counter+=1 # Increment the video counter by 1.
         frame_split_command = "mkdir " + config["general"]["working_directory"] + "/frames; ffmpeg -i " + config["general"]["working_directory"] + "/" + video + " -r " + str(1/framerate) + " " + config["general"]["working_directory"] + "/frames/video" + str(video_counter) + "output%04d.png -loglevel quiet" # Set up the FFMPEG command that will be used to split each video into individual frames.
         os.system(frame_split_command) # Execute the FFMPEG command to split the video into individual frames.
      
@@ -814,7 +814,7 @@ elif (mode_selection == "1" and config["general"]["modes"]["enabled"]["prerecord
             object_recognition_bounding_box, object_recognition_labels, object_recognition_confidence = cv.detect_common_objects(image) # Anaylze the image.
             for object_recognized in object_recognition_labels: # Iterate through each object recognized.
                 if (object_recognized in object_count[frame]):
-                    object_count[frame][object_recognized] = object_count[frame][object_recognized] + 1
+                    object_count[frame][object_recognized]+=1
                 else:
                     object_count[frame][object_recognized] = 1
 
@@ -851,7 +851,7 @@ elif (mode_selection == "1" and config["general"]["modes"]["enabled"]["prerecord
             all_current_plate_guesses[plate_index] = [] # Create an empty list for this plate so we can add all the potential plate guesses to it in the next step.
             for plate_guess in detected_plate["candidates"]: # Iterate through each plate guess candidate for each potential plate detected.
                 all_current_plate_guesses[plate_index].append(plate_guess["plate"]) # Add the current plate guess candidate to the list of plate guesses.
-            plate_index = plate_index + 1 # Increment the plate index counter.
+            plate_index+=1 # Increment the plate index counter.
 
         if (len(all_current_plate_guesses) > 0): # Only add license plate data to the current frame if data actually exists to add in the first place.
             #alpr_frames[frame] = all_current_plate_guesses[0] # Collect the information for only the first plate detected by ALPR.
@@ -958,7 +958,7 @@ elif (mode_selection == "1" and config["general"]["modes"]["enabled"]["prerecord
         decoded_gpx_data = process_gpx(config["general"]["working_directory"] + "/" + gpx_file) # Decode the data from the GPX file.
         iteration = 0 # Set the iteration counter to 0 so we can add one to it each frame we iterate through.
         for element in alpr_frames: # Iterate through each frame.
-            iteration = iteration + 1 # Add one to the iteration counter.
+            iteration+=1 # Add one to the iteration counter.
             frame_timestamp = video_start_time + (iteration * framerate) # Calculate the timestamp of this frame.
 
             if (frame_timestamp in decoded_gpx_data): # Check to see if the exact timestamp for this frame exists in the GPX data.
