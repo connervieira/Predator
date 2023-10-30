@@ -127,6 +127,10 @@
         }
     },
     "dashcam": {
+        "saving": {
+            "directory": "saved_dashcam",
+            "trigger": "dashcam_lock_trigger"
+        },
         "capture": {
             "provider": "opencv",
             "opencv": {

@@ -616,12 +616,16 @@ dashcam_recording_active = False
 
 def start_opencv_recording(directory, device=0, width=1280, height=720):
     global dashcam_recording_active
+
+    if (os.path.isdir(config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"]) == False): # Check to see if the saved dashcam video folder needs to be created.
+        os.system("mkdir '" + os.path.isdir(config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"] + "'") # Create the saved dashcam video directory.
+
     capture = cv2.VideoCapture(device) # Open the video stream.
     capture.set(cv2.CAP_PROP_FRAME_WIDTH,width) # Set the video stream width.
     capture.set(cv2.CAP_PROP_FRAME_HEIGHT,height) # Set the video stream height.
 
-    segment_number = 0
-    segment_start_time = time.time()
+    segment_number = 0 # This variable keeps track of the segment number, and will be incremented each time a new segment is started.
+    segment_start_time = time.time() # This variable keeps track of when the current segment was started. It will be reset each time a new segment is started.
 
     file = directory + "/predator_dashcam_" + str(round(time.time())) + "_" + str(device) + "_" + str(segment_number) + ".avi" # Determine the file path.
     output = cv2.VideoWriter(file, cv2.VideoWriter_fourcc(*'XVID'), float(config["dashcam"]["capture"]["opencv"]["framerate"]), (width,  height))
