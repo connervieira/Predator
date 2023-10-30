@@ -191,6 +191,7 @@ Configuration values in this section are settings specific to real-time mode.
             - To estimate the frame-rate of your capture device, use the `tools/opencv_capture_benchmark.py` script.
                 - This script can be configured using the variables on the first few lines of the file.
                 - Run the script and wait several seconds for the benchmark to complete. The calculated frame-rate will be printed at the end of the test.
+        - `segment_length` is a number that sets how many seconds long each video segment will be before another segment is created.
         - `devices` is a list that contains the indexes of camera devices Predator will attempt to use when recording video in dash-cam mode.
             - Each entry under this setting should contain a device identifier/name, as well as a reference to the device itself.
             - Examples:

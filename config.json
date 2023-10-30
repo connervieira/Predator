@@ -135,6 +135,7 @@
                     "height": 720
                 },
                 "framerate": 9.6,
+                "segment_length": 60,
                 "devices": {
                     "main": 0
                 },

@@ -620,7 +620,10 @@ def start_opencv_recording(directory, device=0, width=1280, height=720):
     capture.set(cv2.CAP_PROP_FRAME_WIDTH,width) # Set the video stream width.
     capture.set(cv2.CAP_PROP_FRAME_HEIGHT,height) # Set the video stream height.
 
-    file = directory + "/predator_dashcam_" + str(int(time.time())) + "_" + str(device) + "_0.avi" # Determine the file path.
+    segment_number = 0
+    segment_start_time = time.time()
+
+    file = directory + "/predator_dashcam_" + str(round(time.time())) + "_" + str(device) + "_" + str(segment_number) + ".avi" # Determine the file path.
     output = cv2.VideoWriter(file, cv2.VideoWriter_fourcc(*'XVID'), float(config["dashcam"]["capture"]["opencv"]["framerate"]), (width,  height))
 
     if not capture.isOpened():
@@ -628,6 +631,12 @@ def start_opencv_recording(directory, device=0, width=1280, height=720):
         exit()
 
     while dashcam_recording_active: # Only run while the dashcam recording flag is set to 'True'.
+        if (time.time()-segment_start_time > config["dashcam"]["capture"]["opencv"]["segment_length"]): # Check to see if this segment has exceeded the segment length time.
+            segment_number+=1 # Increment the segment counter.
+            file = directory + "/predator_dashcam_" + str(round(time.time())) + "_" + str(device) + "_" + str(segment_number) + ".avi" # Update the file path.
+            output = cv2.VideoWriter(file, cv2.VideoWriter_fourcc(*'XVID'), float(config["dashcam"]["capture"]["opencv"]["framerate"]), (width,  height)) # Update the video output.
+            segment_start_time = time.time() # Update the segment start time.
+
         ret, frame = capture.read() # Capture a frame.
         if not ret: # Check to see if the frame failed to be read.
             print("Can't receive frame")
