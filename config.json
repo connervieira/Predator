@@ -109,7 +109,11 @@
             }
         },
         "saving": {
-            "license_plates": "plate_history.json"
+            "license_plates": {
+                "enabled": true,
+                "file": "plate_history.json",
+                "save_guesses": false
+            }
         },
         "push_notifications": {
             "enabled": false,

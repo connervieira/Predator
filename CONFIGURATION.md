@@ -153,10 +153,13 @@ Configuration values in this section are settings specific to real-time mode.
         - `notification_sound` is the sound played when a valid plate is detected in real-time mode, and the plate is not in an alert database.
         - `alert_sound` is the sound played when a valid plate is detected, and the plate is in an alert database.
 - `saving` contains settings related to information logging while operating in real-time mode.
-    - `license_plates` is a string that determines the JSON file name will use to save the license plates it detects in real-time mode.
-        - This file is created in the working directory.
-        - When this value is left as a blank string, license plate logging will be disabled.
-        - Example: `"plate_history.json"`
+    - `license_plates` contains settings related to saving detected license plates.
+        - `enabled` is a boolean value that determines whether license plate saving is enabled.
+        - `file` is a string that determines the JSON file name will use to save the license plates it detects in real-time mode.
+            - This file is created in the working directory.
+            - Example: `"plate_history.json"`
+        - `save_guesses` determines whether or not Predator will save all guesses for each license plate to the license plate log file.
+            - When set to `false`, only the top guess will be logged. All other guesses will not be saved.
 - `push_notifications` contains settings related to Gotify push notifications.
     - `enabled` is a boolean value that determines whether push notifications are enabled.
     - `server` is a string that specifies the Gotify server that Predator will attempt to use. It should include the protocol and port number.

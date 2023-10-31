@@ -1234,9 +1234,9 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
 
 
     # Load the license plate history file.
-    if (config["realtime"]["saving"]["license_plates"] != ""): # Check to see if the license plate logging file name is not empty. If the file name is empty, then license plate logging will be disabled.
+    if (config["realtime"]["saving"]["license_plates"]["enabled"] == True: # Check to see if the license plate logging file name is not empty. If the file name is empty, then license plate logging will be disabled.
         debug_message("Loading license plate history")
-        plate_log_file_location = config["general"]["working_directory"] + "/" + config["realtime"]["saving"]["license_plates"]
+        plate_log_file_location = config["general"]["working_directory"] + "/" + config["realtime"]["saving"]["license_plates"]["file"]
         if (os.path.exists(plate_log_file_location) == False): # If the plate log file doesn't exist, create it.
             save_to_file(plate_log_file_location, "{}", True) # Save a blank placeholder dictionary to the plate log file.
 
@@ -1490,7 +1490,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
 
 
         # Save detected license plates to file.
-        if (config["realtime"]["saving"]["license_plates"] != ""): # Check to see if license plate history saving is enabled.
+        if (config["realtime"]["saving"]["license_plates"] == True): # Check to see if license plate history saving is enabled.
             debug_message("Saving license plate history")
             if (len(all_current_plate_guesses) > 0): # Only save the license plate history for this round if 1 or more plates were detected.
                 current_time = time.time() # Get the current timestamp.
@@ -1508,6 +1508,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
                 plate_log[current_time]["plates"] = {}
 
                 for plate in all_current_plate_guesses: # Iterate though each plate detected this round.
+                    # TODO: Add configuration to disable saving all guesses.
                     plate_log[current_time]["plates"][plate] = {"alerts": [], "guesses": {}} # Initialize this plate in the plate log.
                     for guess in all_current_plate_guesses[plate]: # Iterate through each guess in this plate.
                         if (guess in active_alerts): # Check to see if this guess matches one of the active alerts.
@@ -1531,7 +1532,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
             heartbeat() # Issue a status heartbeat.
             log_plates(all_current_plate_guesses) # Update the list of recently detected license plates.
             log_alerts(active_alerts) # Update the list of active alerts.
-            if (config["realtime"]["interface"]["display"]["output_level"] >= 3 and config["realtime"]["saving"]["license_plates"] == True): # Only display this status message if the output level indicates to do so.
+            if (config["realtime"]["interface"]["display"]["output_level"] >= 3): # Only display this status message if the output level indicates to do so.
                 print("Done.\n----------")
 
 
