@@ -9,3 +9,4 @@ These are the features actively planned for Predator and are likely to be added 
 
 - [ ] Refine debug message function.
 - [ ] Add dashcam video saving.
+- [ ] Move object recognition logging configuration to the `saving` section.
