@@ -1234,7 +1234,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
 
 
     # Load the license plate history file.
-    if (config["realtime"]["saving"]["license_plates"]["enabled"] == True: # Check to see if the license plate logging file name is not empty. If the file name is empty, then license plate logging will be disabled.
+    if (config["realtime"]["saving"]["license_plates"]["enabled"] == True): # Check to see if the license plate logging file name is not empty. If the file name is empty, then license plate logging will be disabled.
         debug_message("Loading license plate history")
         plate_log_file_location = config["general"]["working_directory"] + "/" + config["realtime"]["saving"]["license_plates"]["file"]
         if (os.path.exists(plate_log_file_location) == False): # If the plate log file doesn't exist, create it.

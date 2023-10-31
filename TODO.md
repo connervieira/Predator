@@ -8,5 +8,6 @@ This document quickly explains features that may be added to Predator in the fut
 These are the features actively planned for Predator and are likely to be added within the near future.
 
 - [ ] Refine debug message function.
-- [ ] Add dashcam video saving.
+- [X] Add dashcam video saving.
 - [ ] Move object recognition logging configuration to the `saving` section.
+- [ ] Create documentation for interfacing with Predator.
