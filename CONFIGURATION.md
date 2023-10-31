@@ -183,6 +183,12 @@ Configuration values in this section are settings specific to real-time mode.
 
 ## Dash-cam Mode Configuration
 
+- `saving` contains settings related to "locking" dashcam video during important events.
+    - `directory` is a string that sets the name of the directory where Predator will store locked dashcam video segments.
+        - This directory is placed into the working directory.
+        - Example: `"saved_dashcam_video"`
+    - `trigger` is the name of a file inside the interface directory that will trigger Predator to save the current dashcam segment.
+        - To trigger a save, create this file in the interface directory. Predator will save the video and remove the trigger file.
 - `capture` contains settings related to the capturing of dashcam video.
     - `provider` determines which video back-end Predator will use. This can only be set to `"ffmpeg"` or `"opencv"`.
     - `opencv` contains settings that control how the OpenCV back-end records video. These settings are only considered when the `provider` value is set to "opencv".
