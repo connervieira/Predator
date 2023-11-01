@@ -125,10 +125,6 @@ Configuration values in this section are settings specific to real-time mode.
 - `object_recognition` contains settings related to object recognition in real-time mode.
     - `enabled` is a boolean value that enables and disables object recognition in real-time mode.
         - This setting does not override the `general>object_recognition>enabled` setting.
-    - `log_file` is an optional string value that specifies a CSV file name where objects detected via object recognition will be logged.
-        - This file is placed inside the Predator working directory.
-        - Leave this value blank to disable logging detected objects to disk.
-        - Example: `"object_recognition_log.csv"`
     - `video_still_path` is an absolute file-path to the image Predator should run object recognition on.
         - By default, Phantom stores video stills from the capture device stream to `/dev/shm/phantom-webcam.jpg`, so that is where this setting should point to in most cases.
 - `gps` contains settings related to GPS-based features.
@@ -155,11 +151,16 @@ Configuration values in this section are settings specific to real-time mode.
 - `saving` contains settings related to information logging while operating in real-time mode.
     - `license_plates` contains settings related to saving detected license plates.
         - `enabled` is a boolean value that determines whether license plate saving is enabled.
-        - `file` is a string that determines the JSON file name will use to save the license plates it detects in real-time mode.
+        - `file` is a string that determines the JSON file name Predator will use to save the license plates it detects in real-time mode.
             - This file is created in the working directory.
             - Example: `"plate_history.json"`
         - `save_guesses` determines whether or not Predator will save all guesses for each license plate to the license plate log file.
             - When set to `false`, only the top guess will be logged. All other guesses will not be saved.
+    - `object_recognition` contains settings related to saving detected objects.
+        - `enabled` is a boolean value that determines whether object recognition saving is enabled.
+        - `file` is a string that determines the CSV file name Predator will use to save the objects it detects in real-time mode.
+            - This file is created in the working directory.
+            - Example: `"object_recognition_log.csv"`
 - `push_notifications` contains settings related to Gotify push notifications.
     - `enabled` is a boolean value that determines whether push notifications are enabled.
     - `server` is a string that specifies the Gotify server that Predator will attempt to use. It should include the protocol and port number.

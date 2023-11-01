@@ -414,7 +414,7 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                 if (copy_realtime_license_plate_recognition_data):
                     os.system("cp " + config["general"]["working_directory"] + "/real_time_plates* " + copy_destination)
                 if (copy_realtime_object_recognition_data):
-                    os.system("cp '" + config["general"]["working_directory"] + "/" + config["realtime"]["object_recognition"]["log_file"] + "' " + copy_destination)
+                    os.system("cp '" + config["general"]["working_directory"] + "/" + config["realtime"]["saving"]["object_recognition"]["file"] + "' " + copy_destination)
                 if (copy_dashcam_video):
                     os.system("cp " + config["general"]["working_directory"] + "/predator_dashcam* " + copy_destination)
 
@@ -530,7 +530,7 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                     if (delete_realtime_license_plate_recognition_data):
                         os.system("rm " + config["general"]["working_directory"] + "/real_time_plates*")
                     if (delete_realtime_object_recognition_data):
-                        os.system("rm " + config["general"]["working_directory"] + "/" + config["realtime"]["object_recognition"]["log_file"])
+                        os.system("rm " + config["general"]["working_directory"] + "/" + config["realtime"]["saving"]["object_recognition"]["file"])
                     if (delete_dashcam_video):
                         os.system("rm " + config["general"]["working_directory"] + "/predator_dashcam*")
                     clear()
@@ -1341,8 +1341,8 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
                     if (config["realtime"]["interface"]["display"]["output_level"] >= 2): # Only display this status message if the output level indicates to do so.
                         print("Objects identified: " + objects_identified)
                     export_data = str(round(time.time()*10)/10) + "," + objects_identified + "\n" # Add the timestamp to the export data, followed by the object's detected, followed by a line break to prepare for the next entry to be added later.
-                    if (len(config["realtime"]["object_recognition"]["log_file"]) > 0): # Check to see if the user has configured Predator to save recognized objects to disk.
-                        add_to_file(config["general"]["working_directory"] + "/" + str(config["realtime"]["object_recognition"]["log_file"]), export_data, config["general"]["display"]["silence_file_saving"]) # Add the export data to the end of the file and write it to disk.
+                    if (config["realtime"]["saving"]["object_recognition"]["enabled"] == True): # Check to see if the user has configured Predator to save recognized objects to disk.
+                        add_to_file(config["general"]["working_directory"] + "/" + str(config["realtime"]["saving"]["object_recognition"]["file"]), export_data, config["general"]["display"]["silence_file_saving"]) # Add the export data to the end of the file and write it to disk.
             else:
                 display_message("Object recognition could not be completed since the video still image file does not exist.",2)
                     
