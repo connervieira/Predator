@@ -40,7 +40,7 @@ queued_plate_reads = []
 
 
 def alpr_stream(device):
-    debug_message("Starting ALPR stream")
+    debug_message("Starting ALPR stream", thread="ALPRStream"+str(device))
     if (config["general"]["alpr"]["engine"] == "phantom"): # Check to see if the configure ALPR engine is Phantom.
         alpr_command = "alpr -n " + str(config["general"]["alpr"]["validation"]["guesses"]) + " " + config["realtime"]["image"]["camera"]["devices"][device] + " >> " + alpr_stream_file_location # Set up the Phantom ALPR command.
     if (config["general"]["alpr"]["engine"] == "openalpr"): # Check to see if the configure ALPR engine is OpenALPR.
@@ -49,9 +49,9 @@ def alpr_stream(device):
 
 def alpr_stream_maintainer(): # This function runs an endless loop that maintains
     global queued_plate_reads
-    last_message_received = time.time() # This variable holds the time that the last ALPR message was received.
+    last_message_received = time.time() + 5 # This variable holds the time that the last ALPR message was received. Initialize it to a time a few seconds into the future to allow the ALPR process extra time to start before a warning is displayed.
     while True:
-        debug_message("Starting ALPR stream maintainence cycle", thread="ALPRStreamMaintainer")
+        debug_message("Starting ALPR stream maintainance cycle", thread="ALPRStreamMaintainer")
         time.sleep(0.3) # Delay for a short period of time before each loop so that the ALPR stream has time to output some results.
         stream_file = open(alpr_stream_file_location) # Open the ALPR stream file.
         stream_file_contents = stream_file.readlines() # Read the stream file line by line.
@@ -74,7 +74,6 @@ def alpr_stream_maintainer(): # This function runs an endless loop that maintain
 
 
 def start_alpr_stream(): # This function starts the ALPR stream threads.
-    debug_message("Starting ALPR stream ", thread="ALPRStream")
     save_to_file(alpr_stream_file_location, "", True) # Erase the contents of the ALPR stream file.
     alpr_stream_count = 0 # This will keep track of the number of ALPR streams running.
     alpr_stream_threads = {} # This is a dictionary that will hold the ALPR sub-threads.
@@ -82,8 +81,7 @@ def start_alpr_stream(): # This function starts the ALPR stream threads.
     time.sleep(1) # Wait for 1 second before launching the new ALPR processes.
     for device in config["realtime"]["image"]["camera"]["devices"]: # Iterate through each device in the configuration.
         debug_message("Starting ALPR stream " + str(alpr_stream_count), thread="ALPRStreamMaintainer")
-        print (device)
-        alpr_stream_threads[alpr_stream_count] = threading.Thread(target=alpr_stream, args=([device]), name="ALPRStream" + str(alpr_stream_count)) # Initialize the ALPR stream thread.
+        alpr_stream_threads[alpr_stream_count] = threading.Thread(target=alpr_stream, args=([device]), name="ALPRStream" + str(device)) # Initialize the ALPR stream thread.
         alpr_stream_threads[alpr_stream_count].start() # Start the ALPR stream thread.
         alpr_stream_count = alpr_stream_count + 1
     alpr_stream_maintainer_thread = threading.Thread(target=alpr_stream_maintainer, name="ALPRStreamMaintainer") # Initialize the ALPR stream maintainer thread.

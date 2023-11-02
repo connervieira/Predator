@@ -24,7 +24,7 @@
             "ascii_art_header": true,
             "startup_message": "",
             "silence_file_saving": true,
-            "debugging_output": false
+            "debugging_output": true
         },
         "object_recognition": {
             "enabled": false

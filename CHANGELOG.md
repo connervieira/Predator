@@ -353,6 +353,8 @@ This update makes several changes to Predator that dramatically improve its proc
 
 ## Version *TBD*
 
+### *Update Name TBD*
+
 *Release date to be determined*
 
 - Refined OpenCV dashcam recording.
@@ -361,3 +363,5 @@ This update makes several changes to Predator that dramatically improve its proc
     - Added customizable video segmentation.
     - Added dashcam video segment saving.
         - Dashcam video saving can be triggered to copy the current video segment to a different location on disk.
+- Fixed a typo in a debug message inside `alpr_stream_maintainer()`.
+- Improved debug message handling when multiple threads are running concurrently.
