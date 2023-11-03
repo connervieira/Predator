@@ -59,7 +59,7 @@
     "realtime": {
         "interface": {
             "display": {
-                "show_validation": false,
+                "show_validation": true,
                 "shape_alerts": false,
                 "output_level": 2,
                 "speed_display": {

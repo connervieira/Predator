@@ -1490,8 +1490,9 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
 
 
         # Save detected license plates to file.
-        if (config["realtime"]["saving"]["license_plates"] == True): # Check to see if license plate history saving is enabled.
+        if (config["realtime"]["saving"]["license_plates"]["enabled"] == True): # Check to see if license plate history saving is enabled.
             debug_message("Saving license plate history")
+
             if (len(all_current_plate_guesses) > 0): # Only save the license plate history for this round if 1 or more plates were detected.
                 current_time = time.time() # Get the current timestamp.
 
@@ -1507,17 +1508,22 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
 
                 plate_log[current_time]["plates"] = {}
 
+
                 for plate in all_current_plate_guesses: # Iterate though each plate detected this round.
-                    # TODO: Add configuration to disable saving all guesses.
-                    plate_log[current_time]["plates"][plate] = {"alerts": [], "guesses": {}} # Initialize this plate in the plate log.
+                    if (config["realtime"]["saving"]["license_plates"]["save_guesses"] == True): # Only initialize the plate's guesses to the log if Predator is configured to do so.
+                        plate_log[current_time]["plates"][plate] = {"alerts": [], "guesses": {}} # Initialize this plate in the plate log.
+                    else:
+                        plate_log[current_time]["plates"][plate] = {"alerts": []} # Initialize this plate in the plate log.
                     for guess in all_current_plate_guesses[plate]: # Iterate through each guess in this plate.
                         if (guess in active_alerts): # Check to see if this guess matches one of the active alerts.
                             plate_log[current_time]["plates"][plate]["alerts"].append(active_alerts[guess]["rule"]) # Add the rule that triggered the alert to a separate list.
-                        plate_log[current_time]["plates"][plate]["guesses"][guess] = all_current_plate_guesses[plate][guess] # Add this guess to the log, with its confidence level.
+                        if (config["realtime"]["saving"]["license_plates"]["save_guesses"] == True): # Only add this guess to the log if Predator is configured to do so.
+                            plate_log[current_time]["plates"][plate]["guesses"][guess] = all_current_plate_guesses[plate][guess] # Add this guess to the log, with its confidence level.
 
 
                     plate_log[current_time]["plates"][plate]["alerts"] = list(dict.fromkeys(plate_log[current_time]["plates"][plate]["alerts"])) # De-duplicate the 'alerts' list for this plate.
 
+                print(plate_log)
                 save_to_file(plate_log_file_location, json.dumps(plate_log), True) # Save the modified plate log to the disk as JSON data.
 
 
