@@ -33,6 +33,7 @@ This section of configuration values will effect Predator's general operation.
             - This setting can override both the license plate validation format, as well as the minimum confidence threshold.
             - When set to `false`, Predator will discard plates that don't have any valid guesses.
             - This setting does not override `general>alerts>alerts_ignore_validation`, and can be set to `false` without interferring with license plate hotlist alerts.
+            - This value does not effect which license plates are logged to disk as configured in the `realtime>saving` configuration section.
 - `alerts` contains settings related to license plate alerting.
     - `alerts_ignore_validation` is a boolean that determines whether alerts will respect or ignore the plate validation format.
         - When this is set to `true`, if a plate fails the validation test, but matches an alert database plate, the alert will be displayed anyway.
