@@ -24,7 +24,7 @@
             "ascii_art_header": true,
             "startup_message": "",
             "silence_file_saving": true,
-            "debugging_output": true
+            "debugging_output": false
         },
         "object_recognition": {
             "enabled": false
@@ -40,7 +40,7 @@
         }
     },
     "management": {
-        "disk_statistics": false
+        "disk_statistics": true
     },
     "prerecorded": {
         "image": {

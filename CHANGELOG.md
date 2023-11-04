@@ -368,3 +368,5 @@ This update makes several changes to Predator that dramatically improve its proc
 - Added a configuration value to disable the logging of all license plate guesses alongside the top guess.
 - Fixed some broken references to configuration values.
 - Both errors and warnings are now logged to the error log file in the interface directory, instead of just errors.
+- Fixed an issue where information displayed in management mode would not wait for user input before clearing the screen.
+- Prompts that ask the user to press enter to coninue are now displayed in a faint font.
