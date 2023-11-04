@@ -213,3 +213,8 @@ After you've gotten Predator working, you may want to use some of it's debugging
         3. Resolve unnecessary delays.
             - After finding sources of delay, you may want to research their causes and attempt to resolve them.
             - In this example, the loading process for the ignore lists might be taking longer than expected because Predator doesn't have a reliable internet connection to download ignore lists from remote sources.
+
+
+## Integration
+
+Predator has several features that allow external programs to interface with it. To learn more about how to interface with Predator from external programs, see the [INTEGRATION.md](INTEGRATION.md) document.
