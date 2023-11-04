@@ -366,3 +366,5 @@ This update makes several changes to Predator that dramatically improve its proc
 - Fixed a typo in a debug message inside `alpr_stream_maintainer()`.
 - Improved debug message handling when multiple threads are running concurrently.
 - Added a configuration value to disable the logging of all license plate guesses alongside the top guess.
+- Fixed some broken references to configuration values.
+- Both errors and warnings are now logged to the error log file in the interface directory, instead of just errors.
