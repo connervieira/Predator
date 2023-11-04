@@ -62,7 +62,7 @@
                 "show_validation": true,
                 "shape_alerts": false,
                 "output_level": 2,
-                "speed_display": {
+                "speed": {
                     "enabled": true,
                     "unit": "mph"
                 }

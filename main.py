@@ -96,7 +96,6 @@ if (config["developer"]["offline"] == True): # If offline mode is enabled, then 
     config["realtime"]["push_notifications"]["enabled"] = False
     config["realtime"]["push_notifications"]["server"] = "" # This is redundant, since 'realtime>push_notifications>enabled' is disabled, but it serves as a backup.
     config["realtime"]["status_lighting"]["enabled"] = False
-    config["realtime"]["status_lighting"]["base_url"] = "" # This is redundant, since 'realtime>status_lighting>enabled' is disabled, but it serves as a backup.
     config["developer"]["remote_sources"] = []
 
 
@@ -1280,7 +1279,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
             clear()
 
 
-        if (config["realtime"]["interface"]["display"]["speed_display"]["enabled"] == True and config["realtime"]["gps"]["enabled"] == True): # Display the current speed based on GPS, if enabled in the configuration.
+        if (config["realtime"]["interface"]["display"]["speed"]["enabled"] == True and config["realtime"]["gps"]["enabled"] == True): # Display the current speed based on GPS, if enabled in the configuration.
             current_location = get_gps_location() # Get the current location.
             current_speed = convert_speed(float(current_location[2]), config["realtime"]["interface"]["display"]["speed"]["unit"]) # Convert the speed data from the GPS into the units specified by the configuration.
             print("Current speed: " + str(current_speed) + " " + str(speed_display_unit)) # Print the current speed to the console.
