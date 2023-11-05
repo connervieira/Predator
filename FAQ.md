@@ -33,6 +33,11 @@ If you're encountering an issue with Predator, first ensure that you've followed
 Predator's intended ALPR engine, Phantom, is heavily based on OpenALPR. Predator can also be configured to use OpenALPR directly as its ALPR back-end.
 
 
+**What advantages does Phantom have as an ALPR back-end over OpenALPR?**
+
+Using Phantom as the ALPR back-end over OpenALPR is recommended for a few reasons. Phantom returns much more computer-friendly errors, meaning Predator can more reliably detect when the ALPR engine encounters problems, and can provide more actionable solutions. Additionally, Phantom's "video transparency" allows other processes to access images captured by the ALPR process. This allows Predator to run object recognition using the same camera used by the ALPR process.
+
+
 **Who is Predator not designed for?**
 
 Predator is not designed for those who want to collect massive amounts of information on individuals. It's not for governments and law enforcement agencies looking to log the movements of civilians. It's not for companies who want to track how often certain people visit their business. For sake of privacy, Predator actively avoids features designed for mass-surveillance, and focuses on targeted, private alerts.
