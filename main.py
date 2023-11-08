@@ -1524,7 +1524,6 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
 
                     plate_log[current_time]["plates"][plate]["alerts"] = list(dict.fromkeys(plate_log[current_time]["plates"][plate]["alerts"])) # De-duplicate the 'alerts' list for this plate.
 
-                print(plate_log)
                 save_to_file(plate_log_file_location, json.dumps(plate_log), True) # Save the modified plate log to the disk as JSON data.
 
 
