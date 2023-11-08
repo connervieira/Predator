@@ -61,14 +61,20 @@ Example file contents:
 
 ### Errors
 
-Every time an error is encountered and displayed on screen, and identical error message is added to the `errors.json` file. This file contains a JSON dictionary, where each error uses the time it occurred as a key. The contents of this file are not automatically cleared.
+Every time an error is encountered and displayed on screen, and identical error message is added to the `errors.json` file. This file contains a JSON dictionary, where each error uses the time it occurred as a key. The contents of this file are not automatically cleared. The message is stored under the "msg" field in the JSON dictionary. The "type" field will be a string set to either "error" or "warn", depending on the type of message.
 
 Example file contents:
 
 ```JSON
 {
-    "1677890942.18778": "The local ignore list file does not exist. The local ignore list is disabled.",
-    "1677890942.217734": "Invalid configuration option: ['config>developer>ignore_list>local_file']"
+    "1677890942.18778": {
+        "msg": "The local ignore list file does not exist. The local ignore list is disabled.",
+        "type": "error"
+    },
+    "1677890942.217734": {
+        "msg": "Invalid configuration option: ['config>developer>ignore_list>local_file']",
+        "type": "error"
+    }
 }
 ```
 

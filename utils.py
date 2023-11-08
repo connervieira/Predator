@@ -304,11 +304,11 @@ def display_message(message, level=1):
     if (level == 1): # Display the message as a plain message.
         print(message)
     elif (level == 2): # Display the message as a warning.
-        error_log[time.time()] = message # Add this message to the log file, using the current time as the key.
+        error_log[time.time()] = {"msg": message, "type": "warn"} # Add this message to the log file, using the current time as the key.
         save_to_file(error_file_location, json.dumps(error_log), True) # Save the modified error log to the disk as JSON data.
         print(style.yellow + "Warning: " + message + style.end)
     elif (level == 3): # Display the message as an error.
-        error_log[time.time()] = message # Add this error message to the log file, using the current time as the key.
+        error_log[time.time()] = {"msg": message, "type": "error"} # Add this message to the log file, using the current time as the key.
         save_to_file(error_file_location, json.dumps(error_log), True) # Save the modified error log to the disk as JSON data.
         print(style.red + "Error: " + message + style.end)
         prompt(style.faint + "Press enter to continue..." + style.end)

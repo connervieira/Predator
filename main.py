@@ -165,8 +165,11 @@ config["general"]["alpr"]["engine"] = config["general"]["alpr"]["engine"].lower(
 if (config["general"]["alpr"]["engine"] != "phantom" and config["general"]["alpr"]["engine"] != "openalpr"): # Check to see if the configured ALPR engine is invalid.
     display_message("The configured ALPR engine is invalid. Please select either 'phantom' or 'openalpr' in the configuration.", 3)
 
-if (os.path.exists(crop_script_path) == False): # Check to see that the cropping script exists at the path specified by the user in the configuration.
-    display_message("The 'crop_script_path' defined in the configuration section doesn't point to a valid file. Image cropping will be broken. Please make sure the 'crop_script_path' points to a valid file.", 3)
+if (os.path.isdir(config["general"]["working_directory"]) == False): # Check to see if the configured working directory is missing.
+    display_message("The 'general>working_directory' configuration value does not point to an existing directory.", 3)
+
+if (os.path.isdir(config["general"]["interface_directory"]) == False): # Check to see if the configured interface directory is missing.
+    display_message("The 'general>interface_directory' configuration value does not point to an existing directory.", 3)
 
 if (config["prerecorded"]["image"]["processing"]["cropping"]["left_margin"] < 0 or config["prerecorded"]["image"]["processing"]["cropping"]["right_margin"] < 0 or config["prerecorded"]["image"]["processing"]["cropping"]["bottom_margin"] < 0 or config["prerecorded"]["image"]["processing"]["cropping"]["top_margin"] < 0): # Check to make sure that all of the pre-recorded mode cropping margins are positive numbers.
     display_message("One or more of the cropping margins for pre-recorded mode are below 0. This should never happen, and it's likely there's a configuration issue somewhere. Cropping margins have all been set to 0.", 3)
@@ -1357,9 +1360,9 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
         debug_message("Processing ALPR results")
         if (config["realtime"]["interface"]["display"]["output_level"] >= 3): # Only display this status message if the output level indicates to do so.
             print("Processing license plate recognition data...")
-        if (config["realtime"]["interface"]["display"]["show_validation"] == True): # Only print the validated plate if the configuration says to do so.
-            print("Plates detected: " + str(len(all_current_plate_guesses))) # Show the number of plates detected this round.
-        if (len(all_current_plate_guesses) > 0): # Check to see if at least one license plate was actually detected.
+        if (len(all_current_plate_guesses) > 0): # Check to see if at least one license plate was detected.
+            if (config["realtime"]["interface"]["display"]["show_validation"] == True): # Only print the validated plate if the configuration says to do so.
+                print("Plates detected: " + str(len(all_current_plate_guesses))) # Show the number of plates detected this round.
             for individual_detected_plate in all_current_plate_guesses: # Iterate through each individual plate detected in the image frame.
                 successfully_found_plate = False # Reset the 'sucessfully_found_plate` variable to 'False'. This will be changed back if a valid plate is detected.
 
@@ -1429,7 +1432,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
             print("Displaying detected license plates...")
 
         if (config["realtime"]["interface"]["display"]["output_level"] >= 2): # Only display this status message if the output level indicates to do so.
-            print("Plates detected: ", len(new_plates_detected)) # Display the number of license plates detected this round.
+            print("Plates detected: " + str(len(new_plates_detected))) # Display the number of license plates detected this round.
             for plate in new_plates_detected:
                 play_sound("notification")
                 print("    Detected plate: " + plate) # Print the detected plate.
@@ -1563,6 +1566,7 @@ elif (mode_selection == "3" and config["general"]["modes"]["enabled"]["dashcam"]
     if (config["dashcam"]["capture"]["provider"] == "ffmpeg"): # Check to see if the configured video back-end is FFMPEG.
         print("\nStarting dashcam recording at " + str(config["dashcam"]["capture"]["ffmpeg"]["resolution"]) + "@" + str(config["dashcam"]["capture"]["ffmpeg"]["frame_rate"]) + "fps") # Print information about the recording settings.
         start_dashcam_ffmpeg(config["dashcam"]["capture"]["ffmpeg"]["devices"], int(config["dashcam"]["capture"]["ffmpeg"]["segment_length"]), config["dashcam"]["capture"]["ffmpeg"]["resolution"], config["dashcam"]["capture"]["ffmpeg"]["frame_rate"], config["general"]["working_directory"], False) # Start the dashcam recording process.
+
     elif (config["dashcam"]["capture"]["provider"] == "opencv"): # Check to see if the configured video back-end is OpenCV.
         print("\nStarting dashcam recording at " + str(config["dashcam"]["capture"]["opencv"]["resolution"]["width"]) + "x" + str(config["dashcam"]["capture"]["opencv"]["resolution"]["height"]) + "@" + str(config["dashcam"]["capture"]["ffmpeg"]["frame_rate"]) + "fps") # Print information about the recording settings.
         start_dashcam_opencv(config["dashcam"]["capture"]["opencv"]["devices"], int(config["dashcam"]["capture"]["opencv"]["resolution"]["width"]), config["dashcam"]["capture"]["opencv"]["resolution"]["height"], config["general"]["working_directory"], False) # Start the dashcam recording process.
