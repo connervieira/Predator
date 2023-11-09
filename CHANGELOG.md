@@ -351,7 +351,7 @@ This update makes several changes to Predator that dramatically improve its proc
 
 
 
-## Version *TBD*
+## Version 10.0
 
 ### *Update Name TBD*
 
@@ -372,3 +372,6 @@ This update makes several changes to Predator that dramatically improve its proc
 - Fixed an issue where information displayed in management mode would not wait for user input before clearing the screen.
 - Prompts that ask the user to press enter to coninue are now displayed in a faint font.
 - Made the 'plates detected' count display in real-time mode more consistent.
+- Added additional configuration error checking.
+- The option to view files in the working directory in management mode now shows all files, including those inside sub-directories.
+- Created a dedicated function to wait for user input before continuing.

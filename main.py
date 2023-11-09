@@ -299,10 +299,10 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
             selection = prompt("    Selection: ", optional=False, input_type=str)
 
             if (selection == "0"): # The user has selected to return back to the previous menu.
-                pass # Do nothing, and just finish this loop.
+                continue # Do nothing, and just finish this loop.
             elif (selection == "1"): # The user has selected the "view files" option.
-                os.system("ls -1 " + config["general"]["working_directory"]) # Run the 'ls' command in the working directory.
-                prompt(style.faint + "\nPress enter to continue..." + style.end, optional=True, input_type=str, default="") # Wait for the user to press enter before repeating the menu loop.
+                os.system("find " + config["general"]["working_directory"]) # Run the 'find' command in the working directory.
+                utils.wait_for_input()
             elif (selection == "2"): # The user has selected the "copy files" option.
 
                 # Reset all of the file selections to un-selected.
@@ -558,7 +558,7 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                 print("    " + style.faint + "4. Disk Usage" + style.end) # Display the disk usage option in a faint style to indicate that it is disabled.
             selection = prompt("    Selection: ", optional=False, input_type=str)
             if (selection == "0"): # The user has selected to return back to the previous menu.
-                pass # Do nothing, and just finish this loop.
+                continue # Do nothing, and just finish this loop.
             elif (selection == "1"): # The user has selected the "about" option.
                 clear()
                 print(style.bold + "============" + style.end)
@@ -581,7 +581,7 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
             else: # The user has selected an invalid option in the information menu.
                 display_message("Invalid selection.", 2)
 
-            prompt(style.faint + "\nPress enter to continue..." + style.end, optional=True, input_type=str, default="") # Wait for the user to press enter before repeating the menu loop.
+            utils.wait_for_input()
             
 
 
@@ -984,8 +984,7 @@ elif (mode_selection == "1" and config["general"]["modes"]["enabled"]["prerecord
     # Analysis has been completed. Next, the user will choose what to do with the analysis data.
 
 
-    debug_message("Waiting for user input")
-    prompt(style.faint + "\nPress enter to continue..." + style.end, optional=True, input_type=str, default="") # Wait for the user to press enter before repeating the menu loop.
+    utils.wait_for_input()
 
     debug_message("Starting menu loop")
     while True: # Run the pre-recorded mode menu in a loop forever until the user exits.
@@ -1108,7 +1107,7 @@ elif (mode_selection == "1" and config["general"]["modes"]["enabled"]["prerecord
                 else:
                     display_message("Invalid selection.", 2)
 
-            prompt(style.faint + "\nPress enter to continue..." + style.end, optional=True, input_type=str, default="") # Wait for the user to press enter before repeating the menu loop.
+            utils.wait_for_input()
 
 
         elif (selection == "2"): # The user has selected to manage object recognition data.
@@ -1157,7 +1156,7 @@ elif (mode_selection == "1" and config["general"]["modes"]["enabled"]["prerecord
             else: # The user has selected the object recognition data management menu, but object recognition has been disabled.
                 display_message("Object recognition has been disabled. There is no object recogntion data to manage.", 2)
 
-            prompt(style.faint + "\nPress enter to continue..." + style.end, optional=True, input_type=str, default="") # Wait for the user to press enter before repeating the menu loop.
+            utils.wait_for_input()
 
 
         elif (selection == "3"): # The user has selected to manage GPX location information.
@@ -1208,7 +1207,7 @@ elif (mode_selection == "1" and config["general"]["modes"]["enabled"]["prerecord
             else:
                 display_message("GPX processing has been disabled since a GPX file wasn't provided. There is no GPX location data to manage.", 2)
 
-            prompt(style.faint + "\nPress enter to continue..." + style.end, optional=True, input_type=str, default="") # Wait for the user to press enter before repeating the menu loop.
+            utils.wait_for_input()
 
 
         elif (selection == "4"): # If the user selects option 4 on the main menu, then show the statstics for this session.
@@ -1216,12 +1215,12 @@ elif (mode_selection == "1" and config["general"]["modes"]["enabled"]["prerecord
             print("    Plates found: " + str(len(plates_detected))) # Show how many unique plates were detected.
             print("    Videos analyzed: " + str(len(videos))) # Show how many videos were analyzed.
             print("    Alerts detected: " + str(len(active_alerts))) # Show how many videos were analyzed.
-            prompt(style.faint + "\nPress enter to continue..." + style.end, optional=True, input_type=str, default="") # Wait for the user to press enter before repeating the menu loop.
+            utils.wait_for_input()
 
 
         else: # If the user selects an unrecognized option on the main menu for pre-recorded mode, then show a warning.
             display_message("Invalid selection.", 2)
-            prompt(style.faint + "\nPress enter to continue..." + style.end, optional=True, input_type=str, default="") # Wait for the user to press enter before repeating the menu loop.
+            utils.wait_for_input()
 
 
 

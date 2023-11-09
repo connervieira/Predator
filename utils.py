@@ -807,3 +807,10 @@ def process_gpx(gpx_file):
 
 
     return gpx_data
+
+
+
+# This function simply waits for the user to press enter before continuing.
+def wait_for_input():
+    debug_message("Waiting for user input")
+    prompt(style.faint + "\nPress enter to continue..." + style.end, optional=True, input_type=str, default="") # Wait for the user to press enter before repeating the menu loop.

@@ -30,7 +30,7 @@
             "enabled": false
         },
         "modes": {
-            "auto_start": "",
+            "auto_start": "0",
             "enabled": {
                 "management": true,
                 "prerecorded": true,
@@ -153,7 +153,11 @@
                 },
                 "stamps": {
                     "main": {
-                        "color": [255, 255, 255],
+                        "color": [
+                            255,
+                            255,
+                            255
+                        ],
                         "unix_time": {
                             "enabled": false
                         },
@@ -167,7 +171,11 @@
                         "message_2": "PREDATOR"
                     },
                     "gps": {
-                        "color": [0, 0, 0],
+                        "color": [
+                            0,
+                            0,
+                            0
+                        ],
                         "location": {
                             "enabled": true
                         },
