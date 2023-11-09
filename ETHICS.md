@@ -14,7 +14,7 @@ The practice of automated license plate recognition (ALPR) is a very delicate su
 
 Predator provides the ability to alert the user when it detects a license plate in an alert hotlist. These alerts can be used by users to configure alerts when they pass family members on the road, drive by a famous car, or any number of other fun scenarios. However, this feature can also be used in more serious situations, like in the case of AMBER alert plate detection.
 
-For sake of conveinence and unity, V0LT occasionally provides optional network based license plate alert hotlists to aid users who want to help their communities catch dangerous criminals. That being said, V0LT has extremely strict policies on what license plates are posted to this list.
+For sake of conveinence, V0LT occasionally provides optional network based license plate alert hotlists to aid users who want to help their communities catch dangerous criminals. That being said, V0LT has extremely strict policies on what license plates are posted to this list.
 
 Alerts may be published for the following situations:
 
@@ -22,12 +22,12 @@ Alerts may be published for the following situations:
 2. A violent criminal was last seen in a particular vehicle.
 3. An AMBER alert published by law enforcement contained a license plate.
 
-In order to protect privacy, alerts are not published for the following situations:
+Generally speaking, in order to protect privacy, alerts are not published for the following situations:
 
 1. Vehicles involved in non-violent crimes.
 2. Vehicles that witnessed a crime.
 3. Vehicles that may have been involved in violent crimes, but not recently.
-4. Missing person cases without concrete evidence to suggest abduction or other violence.
+4. Missing person cases without sufficient evidence to suggest abduction or other violence.
 
 ## Privacy
 
