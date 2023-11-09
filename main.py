@@ -512,7 +512,7 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                         delete_dashcam_video = not delete_dashcam_video
 
                 if (delete_management_custom):
-                    delete_custom_file_name = prompt("Please specify the name of the additional file you'd like to delete from the current project folder: ")
+                    delete_custom_file_name = prompt("Please specify the name of the additional file you'd like to delete from the current working directory: ")
 
                 # Delete the files as per the user's inputs, after confirming the deletion process.
                 if (prompt("Are you sure you want to delete the selected files permanently? (y/n): ").lower() == "y"):
