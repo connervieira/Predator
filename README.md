@@ -13,7 +13,13 @@ While Predator is designed to be stable and reliable, you should not depend on i
 
 
 ## Download
+
 Downloads for stable releases of Predator can be found [here](https://v0lttech.com/predator.php).
+
+
+## Documentation
+
+Installation, set-up, and usage documentation can be found in the [DOCUMENTATION.md](DOCUMENTATION.md) file.
 
 
 ## Description
