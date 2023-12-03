@@ -529,10 +529,12 @@ def get_gps_location(): # Placeholder that should be updated at a later date.
                 last_gps_request["time"] = time.time() # Record the current time as the last time the GPS was queried.
                 last_gps_request["data"] = [gps_data_packet.position()[0], gps_data_packet.position()[1], gps_data_packet.speed(), gps_data_packet.altitude(), gps_data_packet.movement()["track"], gps_data_packet.sats] # Record the current information as the last GPS query response.
                 
+                debug_message("Returning live GPS data")
                 return gps_data_packet.position()[0], gps_data_packet.position()[1], gps_data_packet.speed(), gps_data_packet.altitude(), gps_data_packet.movement()["track"], gps_data_packet.sats # Return GPS information.
             except: # If the current location can't be established, then return placeholder location data.
                 return 0.0000, -0.0000, 0.0, 0.0, 0.0, 0 # Return a default placeholder location.
         else: # Otherwise, the last GPS request was made too recently, so simply return the last GPS query response instead of submitting a new one to save time.
+            debug_message("Returning cached GPS data")
             return last_gps_request["data"][0], last_gps_request["data"][1], last_gps_request["data"][2], last_gps_request["data"][3], last_gps_request["data"][4], last_gps_request["data"][5]
     else: # If GPS is disabled, then this function should never be called, but return a placeholder position regardless.
         return 0.0000, 0.0000, 0.0, 0.0, 0.0, 0 # Return a default placeholder location.
