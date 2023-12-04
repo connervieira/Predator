@@ -271,7 +271,11 @@ if (config["general"]["interface_directory"] != ""): # Check to see if the inter
     else: # If the heartbeat file doesn't contain valid JSON data, then load a blank placeholder in it's place.
         heartbeat_log = json.loads("[]") # Load a blank placeholder list.
 
-def heartbeat():
+def heartbeat(): # This is the function that is called to issue a heartbeat.
+    heartbeat_thread = Thread(target=issue_heartbeat)
+    hearbeat_thread.start()
+
+def issue_heartbeat(): # This is the function that actually issues a heartbeat.
     global heartbeat_log
     heartbeat_log.append(time.time()) # Add this pulse to the heartbeat log file, using the current time as the key.
     heartbeat_log = heartbeat_log[-10:] # Trim the list to only contain the last entries.
@@ -631,6 +635,7 @@ def start_opencv_recording(directory, device=0, width=1280, height=720):
         exit()
 
     while dashcam_recording_active: # Only run while the dashcam recording flag is set to 'True'.
+        heartbeat() # Issue a status heartbeat.
         if (os.path.exists(config["general"]["interface_directory"] + "/" + config["dashcam"]["saving"]["trigger"])): # Check to see if the trigger file exists.
             time.sleep(0.3) # Wait for a short period of time so that other dashcam recording threads have time to detect the trigger file.
             os.system("cp '" + last_file + "' '" + config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"] + "'") # Copy the last dashcam video segment to the saved folder.
