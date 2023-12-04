@@ -615,13 +615,15 @@ def closest_key(array, search_key): # This function returns the nearest timestam
 dashcam_recording_active = False
 
 
-def start_opencv_recording(directory, device=0, width=1280, height=720):
+def start_opencv_recording(directory, device="main", width=1280, height=720):
     global dashcam_recording_active
+
+    device_id = config["dashcam"]["capture"]["opencv"]["devices"][device]
 
     if (os.path.isdir(config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"]) == False): # Check to see if the saved dashcam video folder needs to be created.
         os.system("mkdir '" + config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"] + "'") # Create the saved dashcam video directory.
 
-    capture = cv2.VideoCapture(device) # Open the video stream.
+    capture = cv2.VideoCapture(device_id) # Open the video stream.
     capture.set(cv2.CAP_PROP_FRAME_WIDTH,width) # Set the video stream width.
     capture.set(cv2.CAP_PROP_FRAME_HEIGHT,height) # Set the video stream height.
 
@@ -698,7 +700,7 @@ def start_dashcam_opencv(dashcam_devices, video_width, video_height, directory, 
     dashcam_recording_active = True
     
     for device in dashcam_devices: # Run through each camera device specified in the configuration, and launch an FFMPEG recording instance for it.
-        dashcam_process.append(threading.Thread(target=start_opencv_recording, args=[directory, dashcam_devices[device], video_width, video_height], name="Dashcam" + str(iteration_counter)))
+        dashcam_process.append(threading.Thread(target=start_opencv_recording, args=[directory, device, video_width, video_height], name="Dashcam" + str(iteration_counter)))
         dashcam_process[iteration_counter].start()
 
         iteration_counter += 1 # Iterate the counter. This value will be used to create unique file names for each recorded video.
