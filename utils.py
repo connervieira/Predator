@@ -609,6 +609,7 @@ def closest_key(array, search_key): # This function returns the nearest timestam
 
 dashcam_recording_active = False
 
+
 def start_opencv_recording(directory, device=0, width=1280, height=720):
     global dashcam_recording_active
 
@@ -622,7 +623,7 @@ def start_opencv_recording(directory, device=0, width=1280, height=720):
     segment_number = 0 # This variable keeps track of the segment number, and will be incremented each time a new segment is started.
     segment_start_time = time.time() # This variable keeps track of when the current segment was started. It will be reset each time a new segment is started.
 
-    file = directory + "/predator_dashcam_" + str(round(time.time())) + "_" + str(device) + "_" + str(segment_number) + ".avi" # Determine the file path.
+    file = directory + "/predator_dashcam_" + str(round(time.time())) + "_" + str(device) + "_" + str(segment_number) + ".avi" # Determine the initial file path.
     output = cv2.VideoWriter(file, cv2.VideoWriter_fourcc(*'XVID'), float(config["dashcam"]["capture"]["opencv"]["framerate"]), (width,  height))
 
     if not capture.isOpened():
@@ -632,10 +633,12 @@ def start_opencv_recording(directory, device=0, width=1280, height=720):
     while dashcam_recording_active: # Only run while the dashcam recording flag is set to 'True'.
         if (os.path.exists(config["general"]["interface_directory"] + "/" + config["dashcam"]["saving"]["trigger"])): # Check to see if the trigger file exists.
             time.sleep(0.3) # Wait for a short period of time so that other dashcam recording threads have time to detect the trigger file.
+            os.system("cp '" + last_file + "' '" + config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"] + "'") # Copy the last dashcam video segment to the saved folder.
             os.system("cp '" + file + "' '" + config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"] + "'") # Copy the current dashcam video segment to the saved folder.
             os.system("rm '" + config["general"]["interface_directory"] + "/" + config["dashcam"]["saving"]["trigger"] + "'") # Remove the dashcam lock trigger file.
         if (time.time()-segment_start_time > config["dashcam"]["capture"]["opencv"]["segment_length"]): # Check to see if this segment has exceeded the segment length time.
             segment_number+=1 # Increment the segment counter.
+            last_file = file # Record the file name of the current segment before updating it.
             file = directory + "/predator_dashcam_" + str(round(time.time())) + "_" + str(device) + "_" + str(segment_number) + ".avi" # Update the file path.
             output = cv2.VideoWriter(file, cv2.VideoWriter_fourcc(*'XVID'), float(config["dashcam"]["capture"]["opencv"]["framerate"]), (width,  height)) # Update the video output.
             segment_start_time = time.time() # Update the segment start time.
@@ -798,7 +801,8 @@ def process_gpx(gpx_file):
 
     gpx_data = {} # This is a dictionary that will hold each location point, where the key is time.
 
-    for i in range(0, len(timing)): # Iterate through each point in the GPX file.
+    for i in range(0, len(timing)):
+     # Iterate through each point in the GPX file.
         point_lat = track[i].getAttribute('lat') # Get the latitude for this point.
         point_lon = track[i].getAttribute('lon') # Get the longitude for this point.
         point_time = str(timing[i].toxml().replace("<time>", "").replace("</time>", "").replace("Z", "").replace("T", " ")) # Get the time for this point in human readable text format.
@@ -809,10 +813,3 @@ def process_gpx(gpx_file):
 
 
     return gpx_data
-
-
-
-# This function simply waits for the user to press enter before continuing.
-def wait_for_input():
-    debug_message("Waiting for user input")
-    prompt(style.faint + "\nPress enter to continue..." + style.end, optional=True, input_type=str, default="") # Wait for the user to press enter before repeating the menu loop.

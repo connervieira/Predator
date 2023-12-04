@@ -362,7 +362,8 @@ This update makes several changes to Predator that dramatically improve its proc
     - Made the font color of the video overlay stamps configurable.
     - Added customizable video segmentation.
     - Added dashcam video segment saving.
-        - Dashcam video saving can be triggered to copy the current video segment to a different location on disk.
+        - Dashcam video saving can be triggered to copy the current and last video segment to a different location on disk.
+    - Fixed an issue where the FFMPEG frame rate would be displayed on start up even when OpenCV dashcam recording was selected.
 - Fixed a typo in a debug message inside `alpr_stream_maintainer()`.
 - Improved debug message handling when multiple threads are running concurrently.
 - Added a configuration value to disable the logging of all license plate guesses alongside the top guess.
