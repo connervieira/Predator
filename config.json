@@ -1,7 +1,7 @@
 {
     "general": {
         "working_directory": "/home/cvieira/Software/Support/Predator/Working/",
-        "interface_directory": "/home/cvieira/Software/Support/Predator/Interface/",
+        "interface_directory": "/dev/shm/PredatorInterface/",
         "alpr": {
             "engine": "phantom",
             "validation": {
