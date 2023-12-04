@@ -54,7 +54,7 @@
                 }
             }
         },
-        "max_gpx_time_difference": 5.0
+        "max_gpx_time_difference": 5
     },
     "realtime": {
         "interface": {
@@ -147,7 +147,7 @@
                     "height": 720
                 },
                 "framerate": 9.6,
-                "segment_length": 60,
+                "segment_length": 30,
                 "devices": {
                     "main": 0
                 },

@@ -634,8 +634,8 @@ def start_opencv_recording(directory, device="main", width=1280, height=720):
     last_file = "" # Initialize the path of the last file to just be a blank string.
     output = cv2.VideoWriter(file, cv2.VideoWriter_fourcc(*'XVID'), float(config["dashcam"]["capture"]["opencv"]["framerate"]), (width,  height))
 
-    if not capture.isOpened():
-        print("Cannot open camera")
+    if (capture is None or not capture.isOpened()):
+        display_message("Failed to start dashcam video capture using '" + device  + "' device. Verify that this device is associated with a valid identifier.", 3)
         exit()
 
     while dashcam_recording_active: # Only run while the dashcam recording flag is set to 'True'.
@@ -656,6 +656,7 @@ def start_opencv_recording(directory, device="main", width=1280, height=720):
         ret, frame = capture.read() # Capture a frame.
         if not ret: # Check to see if the frame failed to be read.
             print("Can't receive frame")
+            display_message("Failed to receive video frame from '" + device  + "' device. It is possible this device was disconnected.", 3)
             break
 
         main_stamp_position = [10, height - 10] # Determine where the main overlay stamp should be positioned in the video stream.
