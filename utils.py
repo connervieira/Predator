@@ -92,13 +92,14 @@ if (config["realtime"]["gps"]["enabled"] == True): # Only import the GPS librari
     import gpsd
 if (config["dashcam"]["capture"]["provider"] == "opencv"): # Check to see if OpenCV is needed.
     import cv2 # Import OpenCV
-    import threading
+import threading
 
 
 
 if (config["general"]["interface_directory"] != ""): # Check to see if the interface directory is enabled.
     if (os.path.exists(config["general"]["interface_directory"]) == False): # Check to see if the interface directory is missing.
         os.makedirs(config["general"]["interface_directory"]) # Attempt to create the interface directory.
+        os.system("chmod 777 " + config["general"]["interface_directory"]) # Make the interface directory accessible to all users and processes.
 
 
 
@@ -272,8 +273,8 @@ if (config["general"]["interface_directory"] != ""): # Check to see if the inter
         heartbeat_log = json.loads("[]") # Load a blank placeholder list.
 
 def heartbeat(): # This is the function that is called to issue a heartbeat.
-    heartbeat_thread = Thread(target=issue_heartbeat)
-    hearbeat_thread.start()
+    heartbeat_thread = threading.Thread(target=issue_heartbeat)
+    heartbeat_thread.start()
 
 def issue_heartbeat(): # This is the function that actually issues a heartbeat.
     global heartbeat_log
@@ -628,6 +629,7 @@ def start_opencv_recording(directory, device=0, width=1280, height=720):
     segment_start_time = time.time() # This variable keeps track of when the current segment was started. It will be reset each time a new segment is started.
 
     file = directory + "/predator_dashcam_" + str(round(time.time())) + "_" + str(device) + "_" + str(segment_number) + ".avi" # Determine the initial file path.
+    last_file = "" # Initialize the path of the last file to just be a blank string.
     output = cv2.VideoWriter(file, cv2.VideoWriter_fourcc(*'XVID'), float(config["dashcam"]["capture"]["opencv"]["framerate"]), (width,  height))
 
     if not capture.isOpened():
@@ -638,9 +640,10 @@ def start_opencv_recording(directory, device=0, width=1280, height=720):
         heartbeat() # Issue a status heartbeat.
         if (os.path.exists(config["general"]["interface_directory"] + "/" + config["dashcam"]["saving"]["trigger"])): # Check to see if the trigger file exists.
             time.sleep(0.3) # Wait for a short period of time so that other dashcam recording threads have time to detect the trigger file.
-            os.system("cp '" + last_file + "' '" + config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"] + "'") # Copy the last dashcam video segment to the saved folder.
             os.system("cp '" + file + "' '" + config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"] + "'") # Copy the current dashcam video segment to the saved folder.
-            os.system("rm '" + config["general"]["interface_directory"] + "/" + config["dashcam"]["saving"]["trigger"] + "'") # Remove the dashcam lock trigger file.
+            if (last_file != ""): # Check to see if there is a "last file" to copy.
+                os.system("cp '" + last_file + "' '" + config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"] + "'") # Copy the last dashcam video segment to the saved folder.
+            os.system("rm -rf '" + config["general"]["interface_directory"] + "/" + config["dashcam"]["saving"]["trigger"] + "'") # Remove the dashcam lock trigger file.
         if (time.time()-segment_start_time > config["dashcam"]["capture"]["opencv"]["segment_length"]): # Check to see if this segment has exceeded the segment length time.
             segment_number+=1 # Increment the segment counter.
             last_file = file # Record the file name of the current segment before updating it.

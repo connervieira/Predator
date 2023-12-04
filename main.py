@@ -40,6 +40,7 @@ import sys # Required to read command line arguments.
 import re # Required to use Regex.
 import datetime # Required for converting between timestamps and human readable date/time information.
 import fnmatch # Required to use wildcards to check strings.
+import threading # Required to make use of multi-threading.
 
 
 
@@ -98,6 +99,8 @@ if (config["developer"]["offline"] == True): # If offline mode is enabled, then 
     config["realtime"]["status_lighting"]["enabled"] = False
     config["developer"]["remote_sources"] = []
 
+
+heartbeat() # Issue an initial heartbeat at start-up.
 
 
 if (config["general"]["object_recognition"]["enabled"] == True): # Check to see whether object recognition (Tensorflow/OpenCV) is enabled.
