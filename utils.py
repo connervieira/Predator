@@ -621,7 +621,7 @@ def start_opencv_recording(directory, device="main", width=1280, height=720):
     device_id = config["dashcam"]["capture"]["opencv"]["devices"][device]
 
     if (os.path.isdir(config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"]) == False): # Check to see if the saved dashcam video folder needs to be created.
-        os.system("mkdir '" + config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"] + "'") # Create the saved dashcam video directory.
+        os.system("mkdir -p '" + config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"] + "'") # Create the saved dashcam video directory.
 
     capture = cv2.VideoCapture(device_id) # Open the video stream.
     capture.set(cv2.CAP_PROP_FRAME_WIDTH,width) # Set the video stream width.
@@ -641,10 +641,15 @@ def start_opencv_recording(directory, device="main", width=1280, height=720):
     while dashcam_recording_active: # Only run while the dashcam recording flag is set to 'True'.
         heartbeat() # Issue a status heartbeat.
         if (os.path.exists(config["general"]["interface_directory"] + "/" + config["dashcam"]["saving"]["trigger"])): # Check to see if the trigger file exists.
+            if (os.path.isdir(config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"]) == False): # Check to see if the saved dashcam video folder needs to be created.
+                os.system("mkdir -p '" + config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"] + "'") # Create the saved dashcam video directory.
             time.sleep(0.3) # Wait for a short period of time so that other dashcam recording threads have time to detect the trigger file.
-            os.system("cp '" + file + "' '" + config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"] + "'") # Copy the current dashcam video segment to the saved folder.
-            if (last_file != ""): # Check to see if there is a "last file" to copy.
-                os.system("cp '" + last_file + "' '" + config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"] + "'") # Copy the last dashcam video segment to the saved folder.
+            if (os.path.isdir(config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"])): # Check to see if the dashcam saving directory exists.
+                os.system("cp '" + file + "' '" + config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"] + "'") # Copy the current dashcam video segment to the saved folder.
+                if (last_file != ""): # Check to see if there is a "last file" to copy.
+                    os.system("cp '" + last_file + "' '" + config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"] + "'") # Copy the last dashcam video segment to the saved folder.
+            else:
+                display_message("The dashcam saving directory does not exist, and could not be created. The dashcam video could not be locked.", 2)
             os.system("rm -rf '" + config["general"]["interface_directory"] + "/" + config["dashcam"]["saving"]["trigger"] + "'") # Remove the dashcam lock trigger file.
         if (time.time()-segment_start_time > config["dashcam"]["capture"]["opencv"]["segment_length"]): # Check to see if this segment has exceeded the segment length time.
             segment_number+=1 # Increment the segment counter.
