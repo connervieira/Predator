@@ -191,9 +191,17 @@ Configuration values in this section are settings specific to real-time mode.
         - Example: `"saved_dashcam_video"`
     - `trigger` is the name of a file inside the interface directory that will trigger Predator to save the current and previous dashcam segments.
         - To trigger a save, create this file in the interface directory. Predator will save the video then automatically remove the trigger file.
+        - This functionality is only present with the OpenCV recording back-end, not the FFMPEG back-end.
+    - `unsaved_history_length` is a positive integer that determines how many unsaved videos Predator will keep.
+        - Once this limit is reached, older unsaved videos will be progressively removed to stay under the threshold.
+        - This value should be set to a number greater than 2.
+            - Values less than 2 are likely to cause unexpected behavior, especially when saving videos with the trigger file.
+        - This setting has no impact on videos that have been saved using the trigger file explained previously.
+        - This functionality is only present with the OpenCV recording back-end, not the FFMPEG back-end.
 - `capture` contains settings related to the capturing of dashcam video.
     - `provider` determines which video back-end Predator will use. This can only be set to `"ffmpeg"` or `"opencv"`.
         - To enable full dashcam functionality, the OpenCV dashcam back-end is recommended.
+            - The FFMPEG doesn't support various features, including text overlays, segment saving via the trigger file, or automatic video clearing.
     - `opencv` contains settings that control how the OpenCV back-end records video. These settings are only considered when the `provider` value is set to "opencv".
         - `resolution` sets the resolution of the video.
             - `width` sets the width of the video, measured in pixels.

@@ -365,6 +365,8 @@ This update makes several changes to Predator that dramatically improve its proc
         - Dashcam video saving can be triggered to copy the current and last video segment to a different location on disk.
     - Fixed an issue where the FFMPEG frame rate would be displayed on start up even when OpenCV dashcam recording was selected.
     - OpenCV dashcam segments now include the name of the capture device, rather than the ID number.
+    - Added the ability to configure Predator to automatically delete unsaved dashcam videos after a certain number of videos have been captured.
+        - This is useful to prevent Predator from completely filling the available storage space.
 - Fixed a typo in a debug message inside `alpr_stream_maintainer()`.
 - Improved debug message handling when multiple threads are running concurrently.
 - Added a configuration value to disable the logging of all license plate guesses alongside the top guess.

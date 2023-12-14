@@ -306,8 +306,10 @@ else: # If the error file doesn't contain valid JSON data, then load a blank pla
     error_log = json.loads("{}") # Load a blank placeholder dictionary.
 
 def display_message(message, level=1):
-    if (level == 1): # Display the message as a plain message.
-        print(message)
+    if (level == 1): # Display the message as a notice.
+        error_log[time.time()] = {"msg": message, "type": "notice"} # Add this message to the log file, using the current time as the key.
+        save_to_file(error_file_location, json.dumps(error_log), True) # Save the modified error log to the disk as JSON data.
+        print("Notice: " + message)
     elif (level == 2): # Display the message as a warning.
         error_log[time.time()] = {"msg": message, "type": "warn"} # Add this message to the log file, using the current time as the key.
         save_to_file(error_file_location, json.dumps(error_log), True) # Save the modified error log to the disk as JSON data.
@@ -650,13 +652,28 @@ def start_opencv_recording(directory, device="main", width=1280, height=720):
                     os.system("cp '" + last_file + "' '" + config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"] + "'") # Copy the last dashcam video segment to the saved folder.
             else:
                 display_message("The dashcam saving directory does not exist, and could not be created. The dashcam video could not be locked.", 2)
+            display_message("Saved the current dashcam segment.", 1)
             os.system("rm -rf '" + config["general"]["interface_directory"] + "/" + config["dashcam"]["saving"]["trigger"] + "'") # Remove the dashcam lock trigger file.
+            if (os.path.exists(config["general"]["interface_directory"] + "/" + config["dashcam"]["saving"]["trigger"])): # Check to see if the trigger file exists even after it should have been removed.
+                display_message("Unable to remove.", 3)
+
         if (time.time()-segment_start_time > config["dashcam"]["capture"]["opencv"]["segment_length"]): # Check to see if this segment has exceeded the segment length time.
+            # Handle the start of a new segment.
             segment_number+=1 # Increment the segment counter.
             last_file = file # Record the file name of the current segment before updating it.
             file = directory + "/predator_dashcam_" + str(round(time.time())) + "_" + str(device) + "_" + str(segment_number) + ".avi" # Update the file path.
             output = cv2.VideoWriter(file, cv2.VideoWriter_fourcc(*'XVID'), float(config["dashcam"]["capture"]["opencv"]["framerate"]), (width,  height)) # Update the video output.
             segment_start_time = time.time() # Update the segment start time.
+
+            # Handle the deletion of any expired dashcam videos.
+            dashcam_files_list_command = "ls " + config["general"]["working_directory"] + " | grep predator_dashcam" # Set up the command to get a list of all unsaved dashcam videos in the working directory.
+            dashcam_files = str(os.popen(dashcam_files_list_command).read())[:-1].splitlines() # Run the command, and record the raw output string.
+            dashcam_files = sorted(dashcam_files) # Sort the dashcam files alphabetically to get them in chronological order.
+            if (len(dashcam_files) > int(config["dashcam"]["saving"]["unsaved_history_length"])): # Check to see if the current number of dashcam segments in the working directory is higher than the configured history length.
+                videos_to_delete = dashcam_files[0:len(dashcam_files) - int(config["dashcam"]["saving"]["unsaved_history_length"])] # Create a list of all of the videos that need to be deleted.
+                for video in videos_to_delete: # Iterate through each video that needs to be deleted.
+                    os.system("timeout 5 rm '" + config["general"]["working_directory"] + "/" + video + "'") # Delete the dashcam segment.
+
 
         ret, frame = capture.read() # Capture a frame.
         if not ret: # Check to see if the frame failed to be read.

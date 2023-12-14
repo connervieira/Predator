@@ -61,7 +61,7 @@ Example file contents:
 
 ### Errors
 
-Every time an error is encountered and displayed on screen, and identical error message is added to the `errors.json` file. This file contains a JSON dictionary, where each error uses the time it occurred as a key. The contents of this file are not automatically cleared. The message is stored under the "msg" field in the JSON dictionary. The "type" field will be a string set to either "error" or "warn", depending on the type of message.
+Every time an error is encountered and displayed on screen, and identical error message is added to the `errors.json` file. This file contains a JSON dictionary, where each error uses the time it occurred as a key. The contents of this file are not automatically cleared. The message is stored under the "msg" field in the JSON dictionary. The "type" field will be a string set to "error", "warn", or "notice", depending on the type of message.
 
 Example file contents:
 

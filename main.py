@@ -199,6 +199,18 @@ if (shared_realtime_dashcam_device == True):
     display_message("The 'dashcam>background_recording' setting is turned on, but the same recording device has been specified in 'dashcam>capture>ffmpeg>devices' and 'realtime>image>camera>device'. Predator can't use the same device for two different tasks. Background dash-cam recording in real-time mode has been disabled.", 3)
 
 
+if (int(config["dashcam"]["saving"]["unsaved_history_length"]) != float(config["dashcam"]["saving"]["unsaved_history_length"])): # Check to see if the dashcam unsaved history length is not a whole number.
+    display_message("The 'dashcam>saving>unsaved_history_length' setting doesn't appear to be an integer. This value has been rounded to the nearest whole number.", 3)
+    config["dashcam"]["saving"]["unsaved_history_length"] = round(float(config["dashcam"]["saving"]["unsaved_history_length"])) # Found the dashcam history length off to a whole number.
+elif (type(config["dashcam"]["saving"]["unsaved_history_length"]) != int): # Check to see if the dashcam history length is not an integer.
+    display_message("The 'dashcam>saving>unsaved_history_length' setting doesn't appear to be an integer, but it is a whole number. Make sure this configuration value does not have a decimal point.", 2)
+if (int(config["dashcam"]["saving"]["unsaved_history_length"]) < 0): # Check to see if the dashcam history length is a negative number.
+    display_message("The 'dashcam>saving>unsaved_history_length' setting appears to be a negative number. This value has been defaulted to 0, which is likely to cause unexpected behavior.", 3)
+    config["dashcam"]["saving"]["unsaved_history_length"] = 0 # Default the dashcam history length to 0, even though this is likely to cause unexpected behavior.
+elif (int(config["dashcam"]["saving"]["unsaved_history_length"]) < 2): # Check to see if the dashcam history length is less than 2.
+    display_message("The 'dashcam>saving>unsaved_history_length' setting appears to be a number that is less than 2. This is likely to cause unexpected behavior.", 2)
+
+
 if (config["realtime"]["push_notifications"]["enabled"] == True): # Check to see if the user has Gotify notifications turned on in the configuration.
     if (config["realtime"]["push_notifications"]["server"] == "" or config["realtime"]["push_notifications"]["server"] == None): # Check to see if the gotify server configuration value has been left blank
         display_message("The 'realtime>push_notifications>enabled' setting is turned on, but the 'realtime>push_notifications>server' hasn't been set. Push notifications have been disabled.", 3)
