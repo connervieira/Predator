@@ -208,8 +208,7 @@ Configuration values in this section are settings specific to real-time mode.
             - `height` sets the height of the video, measured in pixels.
         - `framerate` is a decimal number determines the playback frame-rate of the video file.
             - This value does not determine the frame-rate of video capture, but rather the frame-rate that the saved video file will play back at.
-            - To estimate the frame-rate of your capture device, use the `tools/opencv_capture_benchmark.py` script.
-                - This script can be configured using the variables on the first few lines of the file.
+            - To estimate the frame-rate of your capture device, use the `tools/framerate_benchmark.py` script.
                 - Run the script and wait several seconds for the benchmark to complete. The calculated frame-rate will be printed at the end of the test.
         - `segment_length` is a number that sets how many seconds long each video segment will be before another segment is created.
         - `devices` is a list that contains the indexes of camera devices Predator will attempt to use when recording video in dash-cam mode.
