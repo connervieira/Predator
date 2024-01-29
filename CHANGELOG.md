@@ -379,3 +379,8 @@ This update makes several changes to Predator that dramatically improve its proc
 - Added additional configuration error checking.
 - The option to view files in the working directory in management mode now shows all files, including those inside sub-directories.
 - Created a dedicated function to wait for user input before continuing.
+- The debug message showing that Predator is fetching the current GPS location is now only displayed when a request is made to GPSD.
+- Simplified the OpenCV FPS benchmark tool.
+    - The script has been re-named to `framerate_benchmark.py` for clarify.
+    - The script now uses the information from `config.json`, instead of being configured by manually changing variables at the top of the script.
+    - The script is now able to benchmark multiple cameras in one run.
