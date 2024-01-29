@@ -152,6 +152,13 @@
                 "devices": {
                     "main": 0
                 },
+                "parked": {
+                    "conditions": {
+                        "speed": 2,
+                        "time": 10
+                    },
+                    "sensitivity": 0.05
+                },
                 "stamps": {
                     "main": {
                         "color": [

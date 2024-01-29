@@ -216,6 +216,13 @@ Configuration values in this section are settings specific to real-time mode.
             - Examples:
                 - `"main_camera": 0`
                 - `"secondary_camera": 1`
+        - `parked` contains settings to configure the dashcam's parking behavior.
+            - `conditions` contains settings that determine when Predator will consider the vehicle to be parked.
+                - `speed` is the speed at which Predator will consider the vehicle to be stopped, measured in meters per second.
+                - `time` is the length of time, in seconds, that the vehicle needs to be below the speed threshold for Predator to consider the vehicle to be parked.
+                    - This value should be long enough that Predator doesn't consider the vehicle to be parked while at red lights or in traffic, but short enough that parking mode will be activated within a reasonable amount of time of the vehicle being parked.
+            - `sensitivity` determines the fraction of the screen that motion needs to cover to trigger recording, ranging from 0 to 1.
+                - For example, a value of `0.05` would require that motion cover 5% of the entire field of view of the camera in order to activate recording.
         - `stamps` contains several configurable stamps that can be overlayed on the video recording.
             - `main`
                 - `color` is a list of three values between 0 and 255 that determines the font cover of the overlay stamp.

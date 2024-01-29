@@ -527,9 +527,9 @@ last_gps_request["time"] = 0 # This is a placeholder that will hold the time tha
 last_gps_request["data"] = [0,0,0,0,0,0] # This is a placeholder that will hold the data from the last GPS request.
 def get_gps_location(): # Placeholder that should be updated at a later date.
     global last_gps_request
-    debug_message("Fetching current GPS location")
     if (config["realtime"]["gps"]["enabled"] == True): # Check to see if GPS is enabled.
         if (time.time()-last_gps_request["time"] > 1): # Check to see if a sufficient amount of time has passed since the last time the GPS was queried before making a new request.
+            debug_message("Fetching current GPS location")
             try: # Don't terminate the entire script if the GPS location fails to be aquired.
                 gpsd.connect() # Connect to the GPS daemon.
                 gps_data_packet = gpsd.get_current() # Query the GPS for the most recent information.
@@ -615,10 +615,12 @@ def closest_key(array, search_key): # This function returns the nearest timestam
 
 
 dashcam_recording_active = False
-
+parked = False
 
 def start_opencv_recording(directory, device="main", width=1280, height=720):
     global dashcam_recording_active
+    global parked
+
 
     device_id = config["dashcam"]["capture"]["opencv"]["devices"][device]
 
@@ -719,6 +721,7 @@ def start_opencv_recording(directory, device="main", width=1280, height=720):
 def start_dashcam_opencv(dashcam_devices, video_width, video_height, directory, background=False): # This function starts dashcam recording on a given list of dashcam devices.
     dashcam_process = [] # Create a placeholder list to store the dashcam processes.
     iteration_counter = 0 # Set the iteration counter to 0 so that we can increment it for each recording device specified.
+    global parked
     global dashcam_recording_active
     dashcam_recording_active = True
     
@@ -730,9 +733,22 @@ def start_dashcam_opencv(dashcam_devices, video_width, video_height, directory, 
         print("Started dashcam recording on " + str(dashcam_devices[device])) # Inform the user that recording was initiation for this camera device.
 
     if (background == False): # If background recording is disabled, then prompt the user to press enter to halt recording.
-        prompt("Press enter to cancel recording...") # Wait for the user to press enter before continuing, since continuing will terminate recording.
-        dashcam_recording_active = False # All dashcam threads are watching this variable globally, and will terminate when it is changed to 'False'.
-        print("Dashcam recording halted.")
+        try:
+            print("Press Ctrl+C to stop dashcam recording...") # Wait for the user to press enter before continuing, since continuing will terminate recording.
+            last_moved_time = time.time() # This value holds the Unix timestamp of the last time the vehicle exceeded the parking speed threshold.
+            while True:
+                current_location = get_gps_location() # Get the current GPS location.
+                if (current_location[2] > config["dashcam"]["capture"]["opencv"]["parked"]["conditions"]["speed"]): # Check to see if the current speed exceeds the parked speed threshold.
+                    last_moved_time = time.time()
+                if (time.time() - last_moved_time > config["dashcam"]["capture"]["opencv"]["parked"]["conditions"]["time"]): # Check to see if the amount of time the vehicle has been stopped exceeds the time threshold to enable parked mode.
+                    parked = True
+                else:
+                    parked = False
+                
+                time.sleep(1)
+        except:
+            dashcam_recording_active = False # All dashcam threads are watching this variable globally, and will terminate when it is changed to 'False'.
+            print("Dashcam recording halted.")
 
 
 def start_dashcam_ffmpeg(dashcam_devices, segment_length, resolution, framerate, directory, provider, background=False): # This function starts dashcam recording on a given list of dashcam devices.
