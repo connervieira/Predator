@@ -32,7 +32,7 @@ This section of configuration values will effect Predator's general operation.
         - `best_effort` is a boolean that determines whether Predator will accept the most confident guess when none of the guesses are considered valid by the validation rules.
             - This setting can override both the license plate validation format, as well as the minimum confidence threshold.
             - When set to `false`, Predator will discard plates that don't have any valid guesses.
-            - This setting does not override `general>alerts>alerts_ignore_validation`, and can be set to `false` without interferring with license plate hotlist alerts.
+            - This setting does not override `general>alerts>alerts_ignore_validation`, and can be set to `false` without interfering with license plate hot-list alerts.
             - This value does not effect which license plates are logged to disk as configured in the `realtime>saving` configuration section.
 - `alerts` contains settings related to license plate alerts.
     - `alerts_ignore_validation` is a boolean that determines whether alerts will respect or ignore the plate validation format.
@@ -53,7 +53,7 @@ This section of configuration values will effect Predator's general operation.
     - `silence_file_saving` is a boolean that determines whether or not Predator will display informational messages when saving files.
     - `debugging_output` is a boolean that determines whether or not Predator will display debugging messages through-out normal operation.
         - When this is set to `true`, console clearing is automatically disabled.
-- `object_recognition` contains settings related to Predator's object recogntion capabilities.
+- `object_recognition` contains settings related to Predator's object recognition capabilities.
     - `enabled` is a boolean that determines whether or not object recognition is enabled globally.
         - Setting this to `false` removes Predator's dependency on Tensorflow.
 - `modes` contains settings related to Predator's operating modes.
@@ -224,7 +224,7 @@ Configuration values in this section are settings specific to real-time mode.
             - Lower values make Predator more sensitive to motion, since less motion is required to trigger recording.
             - You can use the `tools/motion_detect_test.py` script to test this setting to find the best value for your use case.
         - `timeout` determines the length of time, in seconds, after motion is detected, that Predator will record video while parked.
-- `stamps` contains several configurable stamps that can be overlayed on the video recording.
+- `stamps` contains several configurable stamps that can be overlaid on the video recording.
     - `main` contains configuration values for the main stamp shown at the bottom of the frame.
         - `color` is a list of three values between 0 and 255 that determines the font cover of the overlay stamp.
             - The first value represents red, the second value represents green, and the third value represents blue.

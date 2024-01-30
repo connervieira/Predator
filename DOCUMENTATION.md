@@ -65,7 +65,7 @@ This is the installation process for Predator and all of its dependencies. This 
 7. Optionally, install FSWebcam.
     - FSWebcam is a command line utility that captures still images from a connected video capture device.
     - Predator does not use or otherwise depend on FSWebcam, but it can be a helpful tool to verify camera functionality outside of Predator.
-    - You can install FSWebcam on a debign based Linux machine using this command: `sudo apt-get install fswebcam`
+    - You can install FSWebcam on a design based Linux machine using this command: `sudo apt-get install fswebcam`
 8. Optionally, install remote access software.
     - If you're installing Predator on a Raspberry Pi, you may find it useful to install a program like [RaspAP](https://github.com/RaspAP/raspap-webgui) (or similar program) in order to remotely manage your Predator instance, and eliminate the need for a full keyboard and display.
     - Predator works entirely via command line, meaning any set up that enables SSH access to the host will allow for remote management of Predator.
@@ -74,7 +74,7 @@ This is the installation process for Predator and all of its dependencies. This 
     - Predator can be downloaded either from the V0LT website, or from its GitHub page. The download straight from the V0LT website is recommended for sake of stability and completeness, but you're free to use GitHub as well if you're OK with using an unstable and potentially broken version of Predator.
     - V0LT website: <https://v0lttech.com/predator.php>
 10. Extract Predator
-    - After downloading Predator, regardless of where you get it from, extract it from the compressed archive (if necessary), and place it somewhere on your filesystem.
+    - After downloading Predator, regardless of where you get it from, extract it from the compressed archive (if necessary), and place it somewhere on your file-system.
 
 
 ## Configuration

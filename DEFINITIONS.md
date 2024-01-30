@@ -25,7 +25,7 @@ Predator uses the term 'mode' to describe the various ways it can operate. Each 
 The terms 'file path', 'directory path', or simply 'path' are used to refer to a location on a computer's file system. Predator uses 3 terms to refer to file paths, as defined here.
 
 - Absolute
-    - An "absolute" file path refers to a direct path on the file system, starting from the root of the filesystem.
+    - An "absolute" file path refers to a direct path on the file system, starting from the root of the file-system.
     - Examples:
         - `/home/pi/Software/PredatorData/`
         - `/home/pi/Downloads/file.txt`

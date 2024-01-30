@@ -72,7 +72,7 @@ By design, Predator doesn't require specialized hardware to run. While higher re
 
 ### Easy
 
-While being technically mindedly will certainly help, Predator doesn't require professional installation or setup to function. As long as you're reasonably experienced with the Linux command line, setting up Predator should be a piece of cake.
+While being technically minded will certainly help, Predator doesn't require professional installation or setup to function. As long as you're reasonably experienced with the Linux command line, setting up Predator should be a piece of cake.
 
 ### Private
 
