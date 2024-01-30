@@ -50,7 +50,6 @@ This section of configuration values will effect Predator's general operation.
         - When set to `false`, the ASCII art banner will be replaced with a small, normal text title.
         - This setting may be useful to change in the event that Predator is being run on a device with a tiny display, where a large ASCII art header might cause formatting issues.
     - `startup_message` is a string used to set a custom start-up message that displays after the initial Predator start-up header.
-    - `silence_file_saving` is a boolean that determines whether or not Predator will display informational messages when saving files.
     - `debugging_output` is a boolean that determines whether or not Predator will display debugging messages through-out normal operation.
         - When this is set to `true`, console clearing is automatically disabled.
 - `object_recognition` contains settings related to Predator's object recognition capabilities.

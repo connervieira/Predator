@@ -130,20 +130,15 @@ def trigger_exit():
 
 
 # Define the function that will be used to save files for exported data.
-def save_to_file(file_name, contents, silence=False):
+def save_to_file(file_name, contents):
     fh = None
     success = False
     try:
         fh = open(file_name, 'w')
         fh.write(contents)
         success = True   
-        if (silence == False):
-            print("Successfully saved at " + file_name + ".")
     except IOError as e:
         success = False
-        if (silence == False):
-            print(e)
-            print("Failed to save!")
     finally:
         try:
             if fh:
@@ -155,20 +150,15 @@ def save_to_file(file_name, contents, silence=False):
 
 
 # Define the fuction that will be used to add to the end of a file.
-def add_to_file(file_name, contents, silence=False):
+def add_to_file(file_name, contents):
     fh = None
     success = False
     try:
         fh = open(file_name, 'a')
         fh.write(contents)
         success = True
-        if (silence == False):
-            print("Successfully saved at " + file_name + ".")
     except IOError as e:
         success = False
-        if (silence == False):
-            print(e)
-            print("Failed to save!")
     finally:
         try:
             if fh:
@@ -201,7 +191,6 @@ def log_plates(detected_plates):
     global plate_log
 
     plate_log[time.time()] = detected_plates
-
     entries_to_remove = [] # Create a blank placeholder list to hold all of the entry keys that have expired and need to be removed.
 
     for entry in plate_log.keys(): # Iterate through each entry in the plate history.
@@ -235,8 +224,6 @@ def log_alerts(active_alerts):
     global alert_log
 
     alert_log[time.time()] = active_alerts
-
-
     entries_to_remove = [] # Create a blank placeholder list to hold all of the entry keys that have expired and need to be removed.
 
     for entry in alert_log.keys(): # Iterate through each entry in the alert history.
@@ -251,8 +238,7 @@ def log_alerts(active_alerts):
 
 
 
-
-# Define the function used to handle system heartbeats, which allow external services to verify that the program is running.
+# Define the function used to handle system heartbeats, which allow external services to verify that Predator is running.
 if (config["general"]["interface_directory"] != ""): # Check to see if the interface directory is enabled.
     heartbeat_file_location = config["general"]["interface_directory"] + "/heartbeat.json"
     if (os.path.exists(heartbeat_file_location) == False): # If the heartbeat log file doesn't exist, create it.
@@ -276,10 +262,6 @@ def issue_heartbeat(): # This is the function that actually issues a heartbeat.
     heartbeat_log.append(time.time()) # Add this pulse to the heartbeat log file, using the current time as the key.
     heartbeat_log = heartbeat_log[-10:] # Trim the list to only contain the last entries.
     save_to_file(heartbeat_file_location, json.dumps(heartbeat_log), True) # Save the modified heartbeat log to the disk as JSON data.
-
-
-
-
 
 
 
@@ -318,22 +300,11 @@ def display_message(message, level=1):
 
 
 
-
-# Define the function to check if a variable is a number.
-def is_number(value):
-    try:
-        float(value)
-        return True
-    except ValueError:
-        return False
-
-
-
 # Define the function used to prompt the user for input.
 def prompt(message, optional=True, input_type=str, default=""):
     user_input = input(message)
 
-    if (optional == True and user_input == ""): # If the this input is optional, and the user didn't enter anything, then simply return a blank string.
+    if (optional == True and user_input == ""): # If the this input is optional, and the user left the input blank, then simply return the default value.
         if (input_type == str):
             return default
         elif (input_type == int):
@@ -341,8 +312,8 @@ def prompt(message, optional=True, input_type=str, default=""):
         elif (input_type == float):
             return float(default)
         elif (input_type == bool):
-            if (type(default) != bool):
-                return False
+            if (type(default) != bool): # Check to see if the default is not a boolean value.
+                return False # Default to returning `false`.
             else:
                 return default
         elif (input_type == list):
@@ -355,7 +326,6 @@ def prompt(message, optional=True, input_type=str, default=""):
         while (user_input == ""): # Repeated take the user's input until something is entered.
             display_message("This input is not optional.", 2)
             user_input = input(message)
-
 
     if (input_type == str):
         return str(user_input)
@@ -391,9 +361,6 @@ def prompt(message, optional=True, input_type=str, default=""):
 
 
 
-
-
-
 def play_sound(sound_id):
     sound_key = sound_id + "_sound"
     if (sound_key in config["realtime"]["sounds"]): # Check to make sure this sound ID actually exists in the configuration
@@ -407,8 +374,7 @@ def play_sound(sound_id):
 
 
 
-
-
+# This function validates a license plate given a template.
 def validate_plate(plate, template):
     plate_valid = True # By default, the plate is valid, until we find a character that doesn't align.
 
@@ -520,7 +486,7 @@ def display_shape(shape):
 last_gps_request = {} # This is a placeholder that will store information regarding the last GPS request.
 last_gps_request["time"] = 0 # This is a placeholder that will hold the time that the last GPS request was made.
 last_gps_request["data"] = [0,0,0,0,0,0] # This is a placeholder that will hold the data from the last GPS request.
-def get_gps_location(): # Placeholder that should be updated at a later date.
+def get_gps_location():
     global last_gps_request
     if (config["realtime"]["gps"]["enabled"] == True): # Check to see if GPS is enabled.
         if (time.time()-last_gps_request["time"] > 1): # Check to see if a sufficient amount of time has passed since the last time the GPS was queried before making a new request.
@@ -544,8 +510,8 @@ def get_gps_location(): # Placeholder that should be updated at a later date.
 
 
 
-
-def convert_speed(speed, unit="mph"): # This function is used to convert speeds from meters per second, to other units.
+# This function is used to convert speeds from meters per second, to other units.
+def convert_speed(speed, unit="mph"):
     unit = unit.lower() # Convert the unit to all lowercase in order to make it easier to work with and remove inconsistencies in configuration setups.
 
     if (unit == "kph"): # Convert the speed to kilometers per hour.
@@ -568,8 +534,8 @@ def convert_speed(speed, unit="mph"): # This function is used to convert speeds 
 
 
 
-
-def display_number(display_number="0"): # This function is used to display a number as a large ASCII character.
+# This function is used to display a number as a large ASCII character.
+def display_number(display_number="0"):
     numbers = {} # Create a placeholder dictionary for all numbers.
     numbers["."] = ["    ", "    ", "    ", "    ", "    ", "    ", " ## ", " ## "] # Define each line in the ASCII art for zero.
     numbers["0"] = [" $$$$$$\\  ", "$$$ __$$\\ ", "$$$$\\ $$ |", "$$\\$$\\$$ |", "$$ \\$$$$ |", "$$ |\\$$$ |", "\\$$$$$$  /", " \\______/ "] # Define each line in the ASCII art for zero.
@@ -597,7 +563,9 @@ def display_number(display_number="0"): # This function is used to display a num
 
 
 
-def closest_key(array, search_key): # This function returns the nearest timestamp key in dictionary to a given timestamp.
+
+# This function returns the nearest timestamp key in dictionary to a given timestamp.
+def closest_key(array, search_key):
     current_best = [0, time.time()]
     for key in array: # Iterate through each timestamp in the given dictionary.
         difference = abs(float(search_key) - float(key)) # Calculate the difference in time between the given timestamp, and this timestamp.
@@ -671,16 +639,15 @@ def load_alert_database(sources, project_directory):
 
 # This function is used to parse GPX files into a Python dictionary.
 def process_gpx(gpx_file):
-    gpx_file = open(gpx_file, 'r') # Open the GPX fule.
+    gpx_file = open(gpx_file, 'r') # Open the GPX file.
     xmldoc = minidom.parse(gpx_file) # Read the full XML GPX document.
 
     track = xmldoc.getElementsByTagName('trkpt') # Get all of the location information from the GPX document.
     timing = xmldoc.getElementsByTagName('time') # Get all of the timing information from the GPX document.
 
-    gpx_data = {} # This is a dictionary that will hold each location point, where the key is time.
+    gpx_data = {} # This is a dictionary that will hold each location point, where the key is a timestamp.
 
-    for i in range(0, len(timing)):
-     # Iterate through each point in the GPX file.
+    for i in range(0, len(timing)): # Iterate through each point in the GPX file.
         point_lat = track[i].getAttribute('lat') # Get the latitude for this point.
         point_lon = track[i].getAttribute('lon') # Get the longitude for this point.
         point_time = str(timing[i].toxml().replace("<time>", "").replace("</time>", "").replace("Z", "").replace("T", " ")) # Get the time for this point in human readable text format.

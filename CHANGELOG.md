@@ -399,3 +399,5 @@ This update overhauls Predator's dashcam functionality and adds various features
 - The option to view files in the working directory in management mode now shows all files, including those inside sub-directories.
 - Created a dedicated function to wait for user input before continuing.
 - The debug message showing that Predator is fetching the current GPS location is now only displayed when a request is made to GPSD.
+- Removed the the `general>display>silence_file_saving` configuration value.
+    - File saving is now always silenced unless an error is encountered.

@@ -50,43 +50,31 @@ Dash-cam mode allows Predator to record video without running any analysis or co
 
 ## General Features
 
-### Lightweight
+### Completely Private
 
-The Predator interface uses very little resources, allowing the majority of your processing power to remain available for license plate recognition, object detection, and database analysis.
+Since Predator is open source, self hosted, offline, and self contained, you can rest assured that it's completely private, and it doesn't collect any of the information you provide it.
 
-### Offline
+### Offline Capable
 
 Predator works entirely offline, and never needs to connect to the internet to function. All internet based functionality is entirely optional and non-critical to normal operation.
-
-### Free
-
-Predator is completely free to use, and contains absolutely no advertising or data mining of any kind.
 
 ### Open Source
 
 Predator is free and open source from top to bottom, and is free software, meaning you can make changes and distribute them to others freely.
 
-### Generic
+### Generic Hardware
 
 By design, Predator doesn't require specialized hardware to run. While higher resolution cameras will obviously yield better results, any video format supported by FFMPEG will work with Predator.
 
-### Easy
+### Easy Setup
 
 While being technically minded will certainly help, Predator doesn't require professional installation or setup to function. As long as you're reasonably experienced with the Linux command line, setting up Predator should be a piece of cake.
 
-### Private
-
-Since Predator is open source, self hosted, offline, and self contained, you can rest assured that it's completely private, and it doesn't collect any of the information you provide it.
-
-### Multipurpose
-
-Predator is deliberately designed to be multipurpose. It can operate both as an analysis tool for pre-recorded video, as well as a real-time monitoring program. Predator can even act as a standalone dashcam when license plate reading is not needed.
-
-### Customizable
+### Highly Customizable
 
 Predator is extremely customizable, making it easy to fit into any use case. Whether you want an intelligence security camera, or a powerful dashcam device, Predator can be adjusted to fit your needs.
 
-### Mobile
+### Mobile Ready
 
 Predator is designed to support low-energy-usage hardware such that it can be easily installed in a vehicle. A single USB port is enough to power an entire Predator system.
 
@@ -94,17 +82,17 @@ Predator is designed to support low-energy-usage hardware such that it can be ea
 
 Predator supports GPX files to allow for correlating license plates detected in pre-recorded video to their physical coordinates. This makes information gathered from analyzing long streams of dashcam video much more useful and effective.
 
-### Alerts
+### Customizable Alerts
 
 Predator supports customizable real-time alerts, allowing the user to be notified when a license plate matching one on a list is detected through audible sound alerts, visual cues, and push notifications!
 
-### Safe
+### Distraction Free
 
 Predator is designed to be safe, regardless of the installation context. It's easy to configure Predator to completely hands (and eyes) free, ensuring that you don't have to look away from the road when Predator runs in a mobile context.
 
-### Dashcam
+### Full Dashcam
 
-Predator comes with a dash-cam mode, allowing for customizable real-time recording without processing license plates. Dash-cam videos can later be processed by Predator in pre-recorded mode. Predator's dash-cam mode allows for multi-channel recording, provided the hardware supports it, making it easy to simultaneously record multiple angles using multiple cameras.
+Predator comes with a fully featured dash-cam mode, allowing for customizable real-time recording without processing license plates. Dash-cam videos can later be processed by Predator in pre-recorded mode. Predator's dash-cam mode allows for multi-channel recording, provided the hardware supports it, making it easy to simultaneously record multiple angles using multiple cameras.
 
 ### Headless Ready
 
@@ -114,13 +102,21 @@ While Predator comes with a straight forward interface, it can be fully configur
 
 In addition to license plate scanning, Predator also supports general object recognition. It can collect a list of common objects and save them to a file, making it easy to find important events.
 
-### Documented
+### Well Documented
 
 Predator's extreme customizability can be a bit overwhelming to new users. For this reason, Predator is extensively documented, and comes bundled with step-by-step guides on how to download it, install it, configure it, and run it.
 
-### Dependable
+### Dependable Alerts
 
-While it shouldn't be trusted with safety critical tasks, Predator is designed to be extremely dependable regardless. When configured appropriately, steps are taken to decrease the likelihood that Predator will fail to alert to a true positive due minor mistakes in the analysis.
+While it shouldn't be fully relied upon for safety critical tasks, Predator is designed to be extremely dependable regardless. When configured appropriately, steps are taken to decrease the likelihood that Predator will fail to alert to a true positive due mistakes in the analysis.
+
+### Adaptive Framerate
+
+Predator automatically adapts to changing lighting conditions in both real-time and dashcam mode by allowing the frame-rate to change dynamically over time. Predator automatically detects frame-rate changes, and updates the playback speed of saved video files accordingly.
+
+### Parking Mode
+
+Predator supports automatic parking dashcam functionality, where recording stops when the vehicle is parked, until motion is detected. This allows Predator to run continuously while only capturing important events on video.
 
 
 ## Screenshots

@@ -121,10 +121,6 @@ update_status_lighting = lighting.update_status_lighting # Load the status light
 
 
 
-crop_script_path = predator_root_directory + "/crop_image" # Path to the cropping script in the Predator directory.
-
-
-
 
 
 
@@ -803,6 +799,7 @@ elif (mode_selection == "1" and config["general"]["modes"]["enabled"]["prerecord
     if (config["prerecorded"]["image"]["processing"]["cropping"]["enabled"] == True): # Check to see if cropping is enabled in pre-recorded mode.
         debug_message("Cropping discrete frames")
         print("Cropping individual frames...")
+        crop_script_path = predator_root_directory + "/crop_image" # Path to the cropping script in the Predator directory.
         for frame in frames:
             os.system(crop_script_path + " " + config["general"]["working_directory"] + "/frames/" + frame + " " + str(config["prerecorded"]["image"]["processing"]["cropping"]["left_margin"]) + " " + str(config["prerecorded"]["image"]["processing"]["cropping"]["right_margin"]) + " " + str(config["prerecorded"]["image"]["processing"]["cropping"]["top_margin"]) + " " + str(config["prerecorded"]["image"]["processing"]["cropping"]["bottom_margin"]))
         print("Done.\n")
@@ -1080,15 +1077,15 @@ elif (mode_selection == "1" and config["general"]["modes"]["enabled"]["prerecord
                     print("Returning to main menu.")
                 elif (selection == "1"): # The user has selected to export license plate data as Python data.
                     export_data = str(plates_detected)
-                    save_to_file(config["general"]["working_directory"] + "/pre_recorded_license_plate_export.txt", export_data, config["general"]["display"]["silence_file_saving"]) # Save to disk.
+                    save_to_file(config["general"]["working_directory"] + "/pre_recorded_license_plate_export.txt", export_data) # Save to disk.
                 elif (selection == "2"): # The user has selected to export license plate data as a list.
                     for plate in plates_detected:
                         export_data = export_data + plate + "\n"
-                    save_to_file(config["general"]["working_directory"] + "/pre_recorded_license_plate_export.txt", export_data, config["general"]["display"]["silence_file_saving"]) # Save to disk.
+                    save_to_file(config["general"]["working_directory"] + "/pre_recorded_license_plate_export.txt", export_data) # Save to disk.
                 elif (selection == "3"): # The user has selected to export license plate data as CSV data.
                     for plate in plates_detected:
                         export_data = export_data + plate + ",\n"
-                    save_to_file(config["general"]["working_directory"] + "/pre_recorded_license_plate_export.csv", export_data, config["general"]["display"]["silence_file_saving"]) # Save to disk.
+                    save_to_file(config["general"]["working_directory"] + "/pre_recorded_license_plate_export.csv", export_data) # Save to disk.
                 elif (selection == "4"): # The user has selected to export license plate data as JSON data.
                     print("            Please select an option")
                     print("            0. Back")
@@ -1101,11 +1098,11 @@ elif (mode_selection == "1" and config["general"]["modes"]["enabled"]["prerecord
                     if (selection == "0"):
                         print("Returning to main menu.")
                     elif (selection == "1"): # The user has selected to export all license plate data as JSON.
-                        save_to_file(config["general"]["working_directory"] + "/pre_recorded_license_plate_export.json", json.dumps(alpr_frames), config["general"]["display"]["silence_file_saving"]) # Save the raw license plate analysis data to disk.
+                        save_to_file(config["general"]["working_directory"] + "/pre_recorded_license_plate_export.json", json.dumps(alpr_frames)) # Save the raw license plate analysis data to disk.
                     elif (selection == "2"): # The user has selected to export validated license plate data as JSON.
-                        save_to_file(config["general"]["working_directory"] + "/pre_recorded_license_plate_export.json", json.dumps(validated_alpr_frames), config["general"]["display"]["silence_file_saving"]) # Save the validated license plate analysis data to disk.
+                        save_to_file(config["general"]["working_directory"] + "/pre_recorded_license_plate_export.json", json.dumps(validated_alpr_frames)) # Save the validated license plate analysis data to disk.
                     elif (selection == "3"): # The user has selected to alert license plate data as JSON.
-                        save_to_file(config["general"]["working_directory"] + "/pre_recorded_license_plate_export.json", json.dumps(active_alerts), config["general"]["display"]["silence_file_saving"]) # Save detected license plate alerts to disk.
+                        save_to_file(config["general"]["working_directory"] + "/pre_recorded_license_plate_export.json", json.dumps(active_alerts)) # Save detected license plate alerts to disk.
                     else:
                         display_message("Invalid selection.", 2)
                 else:
@@ -1148,9 +1145,9 @@ elif (mode_selection == "1" and config["general"]["modes"]["enabled"]["prerecord
                     if (selection == "0"):
                         print("Returning to main menu.")
                     elif (selection == "1"):
-                        save_to_file(config["general"]["working_directory"] + "/pre_recorded_object_detection_export.txt", str(object_count), config["general"]["display"]["silence_file_saving"]) # Save to disk.
+                        save_to_file(config["general"]["working_directory"] + "/pre_recorded_object_detection_export.txt", str(object_count)) # Save to disk.
                     elif (selection == "2"):
-                        save_to_file(config["general"]["working_directory"] + "/pre_recorded_object_detection_export.json", json.dumps(object_count, indent=4), config["general"]["display"]["silence_file_saving"]) # Save to disk.
+                        save_to_file(config["general"]["working_directory"] + "/pre_recorded_object_detection_export.json", json.dumps(object_count, indent=4)) # Save to disk.
                     else:
                         display_message("Invalid selection.", 2)
 
@@ -1199,9 +1196,9 @@ elif (mode_selection == "1" and config["general"]["modes"]["enabled"]["prerecord
                     if (selection == 0):
                         print("Returning to main menu.")
                     elif (selection == "1"):
-                        save_to_file(config["general"]["working_directory"] + "/pre_recorded_location_data_export.txt", frame_locations, config["general"]["display"]["silence_file_saving"]) # Save to disk.
+                        save_to_file(config["general"]["working_directory"] + "/pre_recorded_location_data_export.txt", frame_locations) # Save to disk.
                     elif (selection == "2"):
-                        save_to_file(config["general"]["working_directory"] + "/pre_recorded_location_data_export.json", json.dumps(frame_locations, indent=4), config["general"]["display"]["silence_file_saving"]) # Save to disk.
+                        save_to_file(config["general"]["working_directory"] + "/pre_recorded_location_data_export.json", json.dumps(frame_locations, indent=4)) # Save to disk.
                     else:
                         display_message("Invalid selection.", 2)
 
@@ -1343,7 +1340,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
                         print("Objects identified: " + objects_identified)
                     export_data = str(round(time.time()*10)/10) + "," + objects_identified + "\n" # Add the timestamp to the export data, followed by the object's detected, followed by a line break to prepare for the next entry to be added later.
                     if (config["realtime"]["saving"]["object_recognition"]["enabled"] == True): # Check to see if the user has configured Predator to save recognized objects to disk.
-                        add_to_file(config["general"]["working_directory"] + "/" + str(config["realtime"]["saving"]["object_recognition"]["file"]), export_data, config["general"]["display"]["silence_file_saving"]) # Add the export data to the end of the file and write it to disk.
+                        add_to_file(config["general"]["working_directory"] + "/" + str(config["realtime"]["saving"]["object_recognition"]["file"]), export_data) # Add the export data to the end of the file and write it to disk.
             else:
                 display_message("Object recognition could not be completed since the video still image file does not exist.",2)
                     
