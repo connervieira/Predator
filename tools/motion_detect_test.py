@@ -18,7 +18,7 @@ except:
 
 capture = cv2.VideoCapture(0) # TODO: Replace with a capture device from the configuration.
 
-resolution = [config["dashcam"]["capture"]["opencv"]["resolution"]["width"], config["dashcam"]["capture"]["opencv"]["resolution"]["height"]] # This determines the resolution that will be used for the video capture device.
+resolution = [config["dashcam"]["capture"]["resolution"]["width"], config["dashcam"]["capture"]["resolution"]["height"]] # This determines the resolution that will be used for the video capture device.
 capture.set(cv2.CAP_PROP_FRAME_WIDTH,resolution[0]) # Set the video stream width.
 capture.set(cv2.CAP_PROP_FRAME_HEIGHT,resolution[1]) # Set the video stream height.
 
@@ -26,7 +26,7 @@ background_subtractor = cv2.createBackgroundSubtractorMOG2()
 
 total_area = resolution[0] * resolution[1] # Calculate the total area of the frame.
 
-#output = cv2.VideoWriter("/home/pi/Downloads/predator_motion_detect_test.avi", cv2.VideoWriter_fourcc(*'XVID'), float(config["dashcam"]["capture"]["opencv"]["framerate"]), (resolution[0], resolution[1])) # Update the video output.
+#output = cv2.VideoWriter("/home/pi/Downloads/predator_motion_detect_test.avi", cv2.VideoWriter_fourcc(*'XVID'), 16), (resolution[0], resolution[1])) # Update the video output.
 
 while True:
     ret, frame = capture.read()
@@ -47,7 +47,7 @@ while True:
     moving_percentage = moving_area / total_area # Calculate the percentage of the frame that is in motion.
     moving_percentage_human = "{:.5f}%".format(moving_percentage*100) # Convert the moving percentage to a human-readable string.
     if (moving_area > 0): # Check to see if there is any movement at all.
-        if (moving_percentage > float(config["dashcam"]["capture"]["opencv"]["parked"]["recording"]["sensitivity"])): # Check to see if there is movement that exceeds the sensitivity threshold.
+        if (moving_percentage > float(config["dashcam"]["parked"]["recording"]["sensitivity"])): # Check to see if there is movement that exceeds the sensitivity threshold.
             print(str(moving_area) + "\t(" + str(format(moving_percentage_human)) + ")\tTriggered") # Display the movement as both a number and a percentage.
         else:
             print(str(moving_area) + "\t(" + str(format(moving_percentage_human)) + ")") # Display the movement as both a number and a percentage.

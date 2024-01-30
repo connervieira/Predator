@@ -62,15 +62,17 @@ get_gps_location = utils.get_gps_location # Load the function to get the current
 convert_speed = utils.convert_speed # Load the function used to convert speeds from meters per second to other units.
 display_number = utils.display_number # Load the function used to display numbers as large ASCII font.
 closest_key = utils.closest_key # Load the function used to find the closest entry in a dictionary to a given number.
-start_dashcam_opencv = utils.start_dashcam_opencv # Load the function used to start dashcam recording using OpenCV.
-start_dashcam_ffmpeg = utils.start_dashcam_ffmpeg # Load the function used to start dashcam recording using FFMPEG.
 display_alerts = utils.display_alerts # Load the function used to display license plate alerts given the dictionary of alerts.
 load_alert_database = utils.load_alert_database # Load the function used to load license plate alert databases.
 heartbeat = utils.heartbeat # Load the function to issue heartbeats to the interface directory.
 log_plates = utils.log_plates # Load the function to issue ALPR results to the interface directory.
 log_alerts = utils.log_alerts # Load the function to issue active alerts to the interface directory.
 
-import alprstream
+if (config["general"]["modes"]["enabled"]["realtime"] == True):
+    import alprstream
+
+if (config["general"]["modes"]["enabled"]["dashcam"] == True or config["dashcam"]["background_recording"] == True): # Check to see if OpenCV is needed.
+    import dashcam
 
 
 
@@ -181,22 +183,9 @@ if (config["prerecorded"]["image"]["processing"]["cropping"]["left_margin"] < 0 
     config["prerecorded"]["image"]["processing"]["cropping"]["bottom_margin"] = 0
     config["prerecorded"]["image"]["processing"]["cropping"]["top_margin"] = 0
 
-if (re.fullmatch("(\d\d\dx\d\d\d)", config["dashcam"]["capture"]["ffmpeg"]["resolution"]) == None and re.fullmatch("(\d\d\d\dx\d\d\d)", config["dashcam"]["capture"]["ffmpeg"]["resolution"]) == None and re.fullmatch("(\d\d\d\dx\d\d\d\d)", config["dashcam"]["capture"]["ffmpeg"]["resolution"]) == None): # Verify that the dashcam resolution setting matches the format 000x000, 0000x000, or 0000x0000.
-    display_message("The 'dashcam>capture>ffmpeg>resolution' specified in the dashcam configuration section doesn't seem to align with the '0000x0000' format. It's possible there has been a typo. efaulting to '1280x720'", 3)
-    config["dashcam"]["capture"]["ffmpeg"]["resolution"] = "1280x720"
-
 for device in config["realtime"]["image"]["camera"]["devices"]: # Iterate through each video device specified in the configuration.
     if (os.path.exists(config["realtime"]["image"]["camera"]["devices"][device]) == False): # Check to make sure that a camera device points to a valid file.
         display_message("The 'realtime>image>camera>devices>" + device + "' configuration value does not point to a valid file.", 3)
-
-
-shared_realtime_dashcam_device = False
-for device in config["dashcam"]["capture"]["ffmpeg"]["devices"]:
-    if (config["dashcam"]["background_recording"] == True and config["dashcam"]["capture"]["ffmpeg"]["devices"][device] == config["realtime"]["image"]["camera"]["device"]): # If Predator is configured to run background dashcam recording in real-time mode, then make sure the the dashcam camera device and real-time camera device are different.
-        shared_realtime_dashcam_device = True
-        config["dashcam"]["background_recording"] = False
-if (shared_realtime_dashcam_device == True):
-    display_message("The 'dashcam>background_recording' setting is turned on, but the same recording device has been specified in 'dashcam>capture>ffmpeg>devices' and 'realtime>image>camera>device'. Predator can't use the same device for two different tasks. Background dash-cam recording in real-time mode has been disabled.", 3)
 
 
 if (int(config["dashcam"]["saving"]["unsaved_history_length"]) != float(config["dashcam"]["saving"]["unsaved_history_length"])): # Check to see if the dashcam unsaved history length is not a whole number.
@@ -1271,20 +1260,14 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
 
     if (config["dashcam"]["background_recording"] == True): # Check to see if the user has enabled auto dashcam background recording in real-time mode.
         debug_message("Starting background dash-cam recording")
-        if (config["dashcam"]["capture"]["provider"] == "ffmpeg"): # Check to see if the configured video back-end is FFMPEG.
-            start_dashcam_ffmpeg(config["dashcam"]["capture"]["ffmpeg"]["devices"], int(config["dashcam"]["capture"]["ffmpeg"]["segment_length"]), config["dashcam"]["capture"]["ffmpeg"]["resolution"], config["dashcam"]["capture"]["ffmpeg"]["frame_rate"], config["general"]["working_directory"], True) # Start the dashcam recording process.
-        elif (config["dashcam"]["capture"]["provider"] == "opencv"): # Check to see if the configured video back-end is OpenCV.
-            start_dashcam_opencv(config["dashcam"]["capture"]["opencv"]["devices"], int(config["dashcam"]["capture"]["opencv"]["resolution"]["width"]), config["dashcam"]["capture"]["opencv"]["resolution"]["height"], config["general"]["working_directory"], True) # Start the dashcam recording process.
+        dashcam.start_dashcam_recording(config["dashcam"]["capture"]["devices"], int(config["dashcam"]["capture"]["resolution"]["width"]), config["dashcam"]["capture"]["resolution"]["height"], config["general"]["working_directory"], True) # Start the dashcam recording process.
         print("Started background dash-cam recording.")
 
 
     # Load the license plate alert database.
     alert_database = load_alert_database(config["general"]["alerts"]["databases"], config["general"]["working_directory"])
 
-
-    
     alprstream.start_alpr_stream() # Start the ALPR stream.
-
 
     detected_license_plates = [] # Create an empty list that will hold each license plate detected by Predator during this session.
 
@@ -1573,17 +1556,11 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
 
 
 
-
 # Dash-cam mode
 elif (mode_selection == "3" and config["general"]["modes"]["enabled"]["dashcam"] == True): # The user has set Predator to boot into dash-cam mode.
     debug_message("Started dash-cam mode")
-    if (config["dashcam"]["capture"]["provider"] == "ffmpeg"): # Check to see if the configured video back-end is FFMPEG.
-        print("\nStarting dashcam recording at " + str(config["dashcam"]["capture"]["ffmpeg"]["resolution"]) + "@" + str(config["dashcam"]["capture"]["ffmpeg"]["frame_rate"]) + "fps") # Print information about the recording settings.
-        start_dashcam_ffmpeg(config["dashcam"]["capture"]["ffmpeg"]["devices"], int(config["dashcam"]["capture"]["ffmpeg"]["segment_length"]), config["dashcam"]["capture"]["ffmpeg"]["resolution"], config["dashcam"]["capture"]["ffmpeg"]["frame_rate"], config["general"]["working_directory"], False) # Start the dashcam recording process.
-
-    elif (config["dashcam"]["capture"]["provider"] == "opencv"): # Check to see if the configured video back-end is OpenCV.
-        print("\nStarting dashcam recording at " + str(config["dashcam"]["capture"]["opencv"]["resolution"]["width"]) + "x" + str(config["dashcam"]["capture"]["opencv"]["resolution"]["height"])) # Print information about the recording settings.
-        start_dashcam_opencv(config["dashcam"]["capture"]["opencv"]["devices"], int(config["dashcam"]["capture"]["opencv"]["resolution"]["width"]), config["dashcam"]["capture"]["opencv"]["resolution"]["height"], config["general"]["working_directory"], False) # Start the dashcam recording process.
+    print("\nStarting dashcam recording at " + str(config["dashcam"]["capture"]["resolution"]["width"]) + "x" + str(config["dashcam"]["capture"]["resolution"]["height"])) # Print information about the recording settings.
+    dashcam.start_dashcam_recording(config["dashcam"]["capture"]["devices"], int(config["dashcam"]["capture"]["resolution"]["width"]), config["dashcam"]["capture"]["resolution"]["height"], config["general"]["working_directory"], False) # Start the dashcam recording process.
 
 
 

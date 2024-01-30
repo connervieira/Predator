@@ -199,79 +199,57 @@ Configuration values in this section are settings specific to real-time mode.
         - This setting has no impact on videos that have been saved using the trigger file explained previously.
         - This functionality is only present with the OpenCV recording back-end, not the FFMPEG back-end.
 - `capture` contains settings related to the capturing of dashcam video.
-    - `provider` determines which video back-end Predator will use. This can only be set to `"ffmpeg"` or `"opencv"`.
-        - To enable full dashcam functionality, the OpenCV dashcam back-end is recommended.
-            - The FFMPEG doesn't support various features, including text overlays, segment saving via the trigger file, or automatic video clearing.
-    - `opencv` contains settings that control how the OpenCV back-end records video. These settings are only considered when the `provider` value is set to "opencv".
-        - `resolution` sets the resolution of the video.
-            - `width` sets the width of the video, measured in pixels.
-            - `height` sets the height of the video, measured in pixels.
-        - `segment_length` is a number that sets how many seconds long each video segment will be before another segment is created.
-        - `devices` is a list that contains the indexes of camera devices Predator will attempt to use when recording video in dash-cam mode.
-            - Each entry under this setting should contain a device identifier/name, as well as a reference to the device itself.
-            - Examples:
-                - `"main_camera": 0`
-                - `"secondary_camera": 1`
-        - `parked` contains settings to configure the dashcam's parking behavior.
-            - `enabled` is a boolean that determines whether Predator will ever go into a parked state.
-                - When this value is set to `false` Predator will never enable parked mode, even if the conditions defined in this configuration section are met.
-            - `conditions` contains settings that determine when Predator will consider the vehicle to be parked.
-                - `speed` is the speed at which Predator will consider the vehicle to be stopped, measured in meters per second.
-                - `time` is the length of time, in seconds, that the vehicle needs to be below the speed threshold for Predator to consider the vehicle to be parked.
-                    - This value should be long enough that Predator doesn't consider the vehicle to be parked while at red lights or in traffic, but short enough that parking mode will be activated within a reasonable amount of time of the vehicle being parked.
-            - `recording` contains settings that control how Predator will record video while parked.
-                - `highlight_motion` contains settings that control if/how Predator will highlight motion while running motion detection.
-                    - `enabled` is a boolean that determines whether Predator will draw bounding boxes around detected motion while parked.
-                    - `color` is a list that determines the color of the bounding boxes, where the first, second, and third values represent red, green, and blue respectively.
-                - `sensitivity` determines the fraction of the screen that motion needs to cover to trigger recording, ranging from 0 to 1.
-                    - For example, a value of `0.05` would require that motion cover 5% of the entire field of view of the camera in order to activate recording.
-                - `timeout` determines the length of time, in seconds, after motion is detected, that Predator will record video while parked.
-        - `stamps` contains several configurable stamps that can be overlayed on the video recording.
-            - `main`
-                - `color` is a list of three values between 0 and 255 that determines the font cover of the overlay stamp.
-                    - The first value represents red, the second value represents green, and the third value represents blue.
-                - `unix_time` contains settings for configuring Predator showing the number of seconds since the Unix epoch in the video overlay stamp.
-                    - `enabled` is a boolean value that determines whether the Unix timestamp will be displayed at all.
-                - `date` contains settings for configuring the date video overlay stamp.
-                    - `enabled` is a boolean value that determines whether Predator will show the current date in the video overlay stamp.
-                - `time` contains settings for configuring the time video overlay stamp.
-                    - `enabled` is a boolean value that determines whether Predator will show the current time in the video overlay stamp.
-                - `message_1` is a string that is intended to display a short custom message. This is often set to the license plate of the car Predator is installed in.
-                - `message_2` is a string that is intended to display a short custom message. This is often set to "Predator", or another name identifying the system the dashcam is running on.
-            - `gps`
-                - `color` is a list of three values between 0 and 255 that determines the font cover of the overlay stamp.
-                    - The first value represents red, the second value represents green, and the third value represents blue.
-                - `location` contains settings for configuring the GPS coordinate overlay stamp.
-                    - `enabled` is a boolean value that determines whether Predator will include the current location in the GPS overlay stamp.
-                - `altitude` contains settings for configuring the GPS altitude overlay stamp.
-                    - `enabled` is a boolean value that determines whether Predator will include the current altitude in the GPS overlay stamp.
-                - `speed` contains settings for configuring the GPS speed overlay stamp.
-                    - `enabled` is a boolean value that determines whether Predator will include the current speed in the GPS overlay stamp.
-                    - `unit` is a string that determines what unit of speed Predator will use for the speed overlay stamp.
-                        - This value can only be set to one of the following values:
-                            - `"mph"` for miles-per-hour
-                            - `"kph"` for kilometers-per-hour
-                            - `"mps"` for meters-per-second
-                            - `"fps"` for feet-per-second
-                            - `"knot"` for knots
-    - `ffmpeg` contains settings that control how the FFMPEG back-end records video. These settings are only considered when the `provider` value is set to "ffmpeg".
-        - `resolution` is a string that determines what resolution Predator will attmpt to record at, and takes the form of `"[width]x[height]"`
-            - Be sure that your camera is capable of recording at resolution specified here. If you set an unsupported resolution, it's likely Predator will fail and not record anything.
-            - Example: `"1920x1080"`
-        - `frame_rate` is an integer that determines what frame-rate the dashcam will attempt to record at.
-            - Be sure that your camera is capable of recording at the frame rate specified here. If you set an unsupported frame rate, it's likely Predator will fail and not record anything.
-            - If you enter a frame rate too slow for the encoder, it might automatically be sped to a higher frame rate.
-            - Example: `30`
-        - `segment_length` is an integer that determines the length of each dashcam video clip before a new segment is created, measured in seconds.
-            - It should be noted that video segments are not guaranteed to exactly match the length set here.
-            - When this value is set to `0`, recordings will not be separated into segments.
-        - `devices` is a list that contains the camera devices Predator will attempt to use when recording video in dash-cam mode.
-            - Each entry under this setting should contain a device identifier/name, as well as a reference to the device itself.
-            - Examples:
-                - `"main_camera": "/dev/video0"`
-                - `"secondary_camera": "/dev/video1"`
-            - The device name will be appended to any video file names in order to give the user a quick indication of which camera recorded each file.
-            - Note: While you can specify an infinite number of cameras here, be aware that Predator might not be able to record with all of them. Bottlenecks like processor speed, RAM, and USB controller capabilities can cause issues with high numbers of cameras. Be sure to test your configuration before you start using it formally.
+    - `resolution` sets the resolution of the video.
+        - `width` sets the width of the video, measured in pixels.
+        - `height` sets the height of the video, measured in pixels.
+    - `segment_length` is a number that sets how many seconds long each video segment will be before another segment is created.
+    - `devices` is a list that contains the indexes of camera devices Predator will attempt to use when recording video in dash-cam mode.
+        - Each entry under this setting should contain a device identifier/name, as well as a reference to the device itself.
+        - Examples:
+            - `"main_camera": 0`
+            - `"secondary_camera": 1`
+- `parked` contains settings to configure the dashcam's parking behavior.
+    - `enabled` is a boolean that determines whether Predator will ever go into a parked state.
+        - When this value is set to `false` Predator will never enable parked mode, even if the conditions defined in this configuration section are met.
+    - `conditions` contains settings that determine when Predator will consider the vehicle to be parked.
+        - `speed` is the speed at which Predator will consider the vehicle to be stopped, measured in meters per second.
+        - `time` is the length of time, in seconds, that the vehicle needs to be below the speed threshold for Predator to consider the vehicle to be parked.
+            - This value should be long enough that Predator doesn't consider the vehicle to be parked while at red lights or in traffic, but short enough that parking mode will be activated within a reasonable amount of time of the vehicle being parked.
+    - `recording` contains settings that control how Predator will record video while parked.
+        - `highlight_motion` contains settings that control if/how Predator will highlight motion while running motion detection.
+            - `enabled` is a boolean that determines whether Predator will draw bounding boxes around detected motion while parked.
+            - `color` is a list that determines the color of the bounding boxes, where the first, second, and third values represent red, green, and blue respectively.
+        - `sensitivity` determines the fraction of the screen that motion needs to cover to trigger recording, ranging from 0 to 1.
+            - For example, a value of `0.05` would require that motion cover 5% of the entire field of view of the camera in order to activate recording.
+        - `timeout` determines the length of time, in seconds, after motion is detected, that Predator will record video while parked.
+- `stamps` contains several configurable stamps that can be overlayed on the video recording.
+    - `main`
+        - `color` is a list of three values between 0 and 255 that determines the font cover of the overlay stamp.
+            - The first value represents red, the second value represents green, and the third value represents blue.
+        - `unix_time` contains settings for configuring Predator showing the number of seconds since the Unix epoch in the video overlay stamp.
+            - `enabled` is a boolean value that determines whether the Unix timestamp will be displayed at all.
+        - `date` contains settings for configuring the date video overlay stamp.
+            - `enabled` is a boolean value that determines whether Predator will show the current date in the video overlay stamp.
+        - `time` contains settings for configuring the time video overlay stamp.
+            - `enabled` is a boolean value that determines whether Predator will show the current time in the video overlay stamp.
+        - `message_1` is a string that is intended to display a short custom message. This is often set to the license plate of the car Predator is installed in.
+        - `message_2` is a string that is intended to display a short custom message. This is often set to "Predator", or another name identifying the system the dashcam is running on.
+    - `gps`
+        - `color` is a list of three values between 0 and 255 that determines the font cover of the overlay stamp.
+            - The first value represents red, the second value represents green, and the third value represents blue.
+        - `location` contains settings for configuring the GPS coordinate overlay stamp.
+            - `enabled` is a boolean value that determines whether Predator will include the current location in the GPS overlay stamp.
+        - `altitude` contains settings for configuring the GPS altitude overlay stamp.
+            - `enabled` is a boolean value that determines whether Predator will include the current altitude in the GPS overlay stamp.
+        - `speed` contains settings for configuring the GPS speed overlay stamp.
+            - `enabled` is a boolean value that determines whether Predator will include the current speed in the GPS overlay stamp.
+            - `unit` is a string that determines what unit of speed Predator will use for the speed overlay stamp.
+                - This value can only be set to one of the following values:
+                    - `"mph"` for miles-per-hour
+                    - `"kph"` for kilometers-per-hour
+                    - `"mps"` for meters-per-second
+                    - `"fps"` for feet-per-second
+                    - `"knot"` for knots
 - `background_recording` is a boolean that determines whether dashcam video will be recorded in the background while using real-time mode.
     - Note that Predator can only use each recording device for one task at a time, so if you run real-time mode with background recording enabled, you'll need to specify two different devices by changing `image>capture>device` and `dashcam>devices`.
 

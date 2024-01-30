@@ -30,7 +30,7 @@
             "enabled": false
         },
         "modes": {
-            "auto_start": "0",
+            "auto_start": "",
             "enabled": {
                 "management": true,
                 "prerecorded": true,
@@ -141,75 +141,64 @@
             "unsaved_history_length": 90
         },
         "capture": {
-            "provider": "opencv",
-            "opencv": {
-                "resolution": {
-                    "width": 640,
-                    "height": 480
-                },
-                "segment_length": 10,
-                "devices": {
-                    "main": 0
-                },
-                "parked": {
-                    "enabled": true,
-                    "conditions": {
-                        "speed": 2,
-                        "time": 10
-                    },
-                    "recording": {
-                        "highlight_motion": {
-                            "enabled": true,
-                            "color": [0, 255, 0]
-                        },
-                        "sensitivity": 0.0005,
-                        "timeout": 10
-                    }
-                },
-                "stamps": {
-                    "main": {
-                        "color": [
-                            255,
-                            255,
-                            255
-                        ],
-                        "unix_time": {
-                            "enabled": false
-                        },
-                        "date": {
-                            "enabled": true
-                        },
-                        "time": {
-                            "enabled": true
-                        },
-                        "message_1": "AAA0000",
-                        "message_2": "PREDATOR"
-                    },
-                    "gps": {
-                        "color": [
-                            0,
-                            0,
-                            0
-                        ],
-                        "location": {
-                            "enabled": true
-                        },
-                        "altitude": {
-                            "enabled": true
-                        },
-                        "speed": {
-                            "enabled": true,
-                            "unit": "mph"
-                        }
-                    }
-                }
+            "resolution": {
+                "width": 640,
+                "height": 480
             },
-            "ffmpeg": {
-                "resolution": "1920x1080",
-                "frame_rate": 15,
-                "segment_length": 60,
-                "devices": {
-                    "main": "/dev/video0"
+            "segment_length": 10,
+            "devices": {
+                "main": 0
+            }
+        },
+        "parked": {
+            "enabled": true,
+            "conditions": {
+                "speed": 2,
+                "time": 10
+            },
+            "recording": {
+                "highlight_motion": {
+                    "enabled": true,
+                    "color": [0, 255, 0]
+                },
+                "sensitivity": 0.01,
+                "timeout": 10
+            }
+        },
+        "stamps": {
+            "main": {
+                "color": [
+                    255,
+                    255,
+                    255
+                ],
+                "unix_time": {
+                    "enabled": false
+                },
+                "date": {
+                    "enabled": true
+                },
+                "time": {
+                    "enabled": true
+                },
+                "message_1": "AAA0000",
+                "message_2": "PREDATOR"
+            },
+            "gps": {
+                "color": [
+                    0,
+                    0,
+                    0
+                ],
+                "location": {
+                    "enabled": true
+                },
+                "altitude": {
+                    "enabled": true
+                },
+                "speed": {
+                    "enabled": true,
+                    "unit": "mph"
                 }
             }
         },

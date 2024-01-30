@@ -14,7 +14,7 @@ For further clarification on the terms used in this document, see [DEFINITIONS.m
 If you're already familiar with Predator, and you just want a quick set-up guide, you can use the following steps to set everything up. However, if you're new to Predator, or you don't yet understand how it works, it is highly recommended that you use the follow installation instructions below instead.
 
 1. Install Python packages: `pip3 install validators requests gps geopy gpsd-py3 opencv-python cvlib tensorflow keras silence-tensorflow psutil`
-2. Install Linux packages: `sudo apt-get install ffmpeg mpg321 gpsd gpsd-clients imagemagick`
+2. Install Linux packages: `sudo apt-get install ffmpeg mpg321 gpsd gpsd-clients imagemagick fswebcam`
 3. Install an ALPR engine, like [Phantom](https://v0lttech.com/phantom.php).
 
 ### Full Install Guide
@@ -28,7 +28,7 @@ This is the installation process for Predator and all of its dependencies. This 
     - Optional, but necessary for GPS functions: `pip3 install gps geopy gpsd-py3`
         - These packages are optional, but are required to enable live GPS features.
         - These packages are not necessary to handle information from GPX files, and are only required to interact with live GPS devices.
-    - Optional, but necessary for object recognition: `pip3 install opencv-python cvlib tensorflow keras silence-tensorflow`
+    - Optional, but necessary for object recognition and dashcam recording: `pip3 install opencv-python cvlib tensorflow keras silence-tensorflow`
         - These packages are optional, but are required to enable object recognition features.
         - If you do not install these packages, make sure object recognition is disabled in the configuration, and that the configuration isn't set to use the OpenCV back-end for dashcam recording.
         - These packages are not necessary for basic license plate recognition.
@@ -118,11 +118,11 @@ After configuring Predator, you can try it out for the first time!
             - In this mode, Predator will use a connected camera to detect license plates in real-time.
             - In real-time mode, Predator will stream video from a connected camera directly.
         - Dash-cam mode (Mode 3)
-            - In this mode, Predator will operate like a dash-cam, and simply record video without analyzing it.
-            - This mode can be used to record video to be used analyzed with pre-recorded mode later.
+            - In this mode, Predator will operate like a dash-cam, and simply record video without attempting to detect license plates.
+            - This mode can be used to record video to be analyzed with pre-recorded mode later.
     - Select a mode by entering the number associated with it in the selection menu.
 3. Set preferences
-    - Next (spending on the mode) Predator will prompt you to set your preferences for the session. The settings you are prompted for will change depending on the mode you choose. Below are the preference menus you'll see for all modes.
+    - Next (depending on the mode) Predator will prompt you to set your preferences for the session. The settings you are prompted for will change depending on the mode you choose. Below are the preference menus you'll see for all modes.
     - Management mode:
         - In management mode, you'll only be asked for a working directory. Simply enter the absolute file path to a folder containing the project you'd like to manage.
             - Leave this option blank to use the default value.
@@ -165,7 +165,7 @@ After configuring Predator, you can try it out for the first time!
             - Note that while Predator is running its analysis, a directory named 'frames' will appear in the working directory.
                 - Individual frames will begin to appear in this folder as Predator runs.
                 - Do not modify or delete these, since Predator will repeatedly access and modify these during the course of its analysis.
-                - After analysis completes, you can safely delete these files either manually, or by using Predator's management mode. However, these files will automatically be deleted the next time Predator runs in pre-recorded mode.
+                - After analysis completes, you can safely delete these files either manually, or by using Predator's management mode. These files will automatically be deleted the next time Predator runs in pre-recorded mode.
             - After Predator finishes running, you'll be sent to the analysis menu.
                 - This menu allows you to manage, view, export, and manipulate the data collected in the current session.
                 - To navigate this menu, simply enter the ID number of the menu item you want to select, then press enter.
@@ -178,12 +178,13 @@ After configuring Predator, you can try it out for the first time!
                 - Depending on the configuration, Predator might submit the license plate detected to a push notification service.
                 - If a plate detected is in one of the alert databases, it will show a prominent alert message in the console output.
         - Dash-cam mode
-            - In dash-cam mode, Predator will record video indefinitely until disk space runs out, the return key is pressed, the Predator process is terminated, or a problem is encountered.
+            - In dash-cam mode, Predator will record video indefinitely until `Ctrl + C` is pressed, the Predator process is terminated, or a problem is encountered.
             - Predator will not detect license plates in this mode. However, you can use video recorded dashcam video from this mode with pre-recorded mode in order to scan for license plates at a later time.
-            - The dash-cam video recorded will be saved to the working directory as `predator_dashcam_TIME_CHANNEL_SEGMENT.mkv`.
+            - The dash-cam video recorded will be saved to the working directory as `predator_dashcam_TIME_CHANNEL_SEGMENT_TYPE.mkv`.
                 - `TIME` is replaced by a Unix timestamp of when the file was created.
                 - `CHANNEL` is replaced by the name of the device used, as specified in the configuration.
                 - `SEGMENT` is replaced by the segment number, if dashcam video segmentation is enabled in the configuration.
+                - `TYPE` is replaced by either the letter "N" or "P" to indicate "normal" or "parked" mode respectively.
 
 
 ## Debugging
