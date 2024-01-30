@@ -1158,7 +1158,7 @@ elif (mode_selection == "1" and config["general"]["modes"]["enabled"]["prerecord
                     display_message("Invalid selection.", 2)
 
             else: # The user has selected the object recognition data management menu, but object recognition has been disabled.
-                display_message("Object recognition has been disabled. There is no object recogntion data to manage.", 2)
+                display_message("Object recognition has been disabled. There is no object recognition data to manage.", 2)
 
             utils.wait_for_input()
 
