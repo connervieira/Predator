@@ -12,6 +12,6 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Move object recognition logging configuration to the `saving` section.
 - [X] Create documentation for interfacing with Predator.
 - [X] Add automatic dashcam video segment clearing.
-- [ ] Add parking mode.
-    - [ ] Detect when the vehicle has been parked for a certain length of time.
-    - [ ] Detect motion to resume dashcam recording while parked.
+- [X] Add parking mode.
+    - [X] Detect when the vehicle has been parked for a certain length of time.
+    - [X] Detect motion to resume dashcam recording while parked.
