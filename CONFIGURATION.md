@@ -7,12 +7,13 @@ This document describes the configuration values found `config.json`.
 
 This section of configuration values will effect Predator's general operation.
 
-- `working_directory` specifies the default directory that Predator will use for projects.
+- `working_directory` specifies the default directory that Predator will use to persistently store files.
     - This value can be over-ridden using command line arguments.
     - In management mode and pre-recorded mode, this value serves as a default, but can be over-ridden by user input.
     - In real-time mode and dash-cam mode, this value will be automatically used without user input.
 - `interface_directory` specifies the directory that predator will store files used to share real-time information with external programs.
-    - This value is only used in real-time mode.
+    - This value is only used in real-time and dashcam mode.
+    - This directory does not need to be persistent, and can be stored in volatile memory for sake of endurance.
     - Setting this to a blank string will disable the interface directory.
 - `alpr` contains settings related to license plate recognition.
     - `engine` is a string that determines what ALPR engine Predator will use.
@@ -20,8 +21,7 @@ This section of configuration values will effect Predator's general operation.
     - `validation` contains settings for validating license plate candidates/guesses.
         - `guesses` is an integer that determines how many guesses the ALPR engine will make when analyzing a plate.
             - The higher this number is, the more likely Predator is to guess a plate incorrectly. The lower this number is, the less likely Predator will be to find a valid guess at all.
-        - `confidence` is a number that determines the minimum confidence a license plate guess needs to have before Predator will consider it valid, where 100 is extremely confidence and 0 is a complete lack of confidence.
-            - This value is only considered in real-time mode, and is ignored in pre-recorded mode.
+        - `confidence` is a number that determines the minimum confidence a license plate guess needs to have before Predator will consider it valid, where 100 is extreme confidence and 0 is a complete lack of confidence.
             - This value is ignored by alerts when `general>alerts>alerts_ignore_validation` is enabled.
         - `license_plate_format` is a list of strings that provide Predator with examples of how license plates in your region should be formatted.
             - For example, license plates in the state of Ohio generally follow the pattern of 3 letters followed by 4 numbers. In Ohio, this preference might contain `"AAA0000"` to filter out plate guesses that don't match the most common formatting pattern.
@@ -34,7 +34,7 @@ This section of configuration values will effect Predator's general operation.
             - When set to `false`, Predator will discard plates that don't have any valid guesses.
             - This setting does not override `general>alerts>alerts_ignore_validation`, and can be set to `false` without interferring with license plate hotlist alerts.
             - This value does not effect which license plates are logged to disk as configured in the `realtime>saving` configuration section.
-- `alerts` contains settings related to license plate alerting.
+- `alerts` contains settings related to license plate alerts.
     - `alerts_ignore_validation` is a boolean that determines whether alerts will respect or ignore the plate validation format.
         - When this is set to `true`, if a plate fails the validation test, but matches an alert database plate, the alert will be displayed anyway.
         - When set to `false`, only plates that have passed the validation test will be checked against the alert database.
@@ -42,9 +42,9 @@ This section of configuration values will effect Predator's general operation.
         - Setting this to `true` will cause Predator to check all guesses against all alert rules. This can lead to situations where alert rules with wildcards cause a single license plate to alert repeatedly, for each of its guesses.
     - `databases` is a list that contains strings, with each string pointing to either a local or remote license plate hot-list.
         - If a particular entry in this list is a file, the file path should be relative to the working directory.
-            - For example, if your alert database is in `/home/pi/Data/alerts.json`, and your root project directory is `/home/pi/Data/`, then then the alert database value should simply be set to `"alerts.json"`, not the the full file path.
+            - For example, if your alert database is in `/home/pi/Data/alerts.json`, and your working directory is `/home/pi/Data/`, then then the alert database value should simply be set to `"alerts.json"`, not the the full file path.
         - If a particular entry in this list is a remote source, the remote source should be a complete URL.
-            - For example, an entry might be set to `"https://website.tld/alerts.json"`.
+            - For example, an entry might be set to `"https://example.com/alerts.json"`.
 - `display` contains settings related to what is displayed in the command line interface.
     - `ascii_art_header` is a boolean that determines whether or not Predator will display a large ASCII art banner on start up.
         - When set to `false`, the ASCII art banner will be replaced with a small, normal text title.
@@ -55,7 +55,7 @@ This section of configuration values will effect Predator's general operation.
         - When this is set to `true`, console clearing is automatically disabled.
 - `object_recognition` contains settings related to Predator's object recogntion capabilities.
     - `enabled` is a boolean that determines whether or not object recognition is enabled globally.
-        - Setting this to `false` removes Predator's dependency on Tensorflow and OpenCV.
+        - Setting this to `false` removes Predator's dependency on Tensorflow.
 - `modes` contains settings related to Predator's operating modes.
     - `auto_start` is a string that determines which mode (if any) Predator will automatically load into upon start-up.
         - There are 4 possible values this can be set to, not including being left blank.
@@ -68,6 +68,7 @@ This section of configuration values will effect Predator's general operation.
         - When the value for a particular mode is set to `false`, that mode's option will be hidden from the mode selection menu shown to the user when Predator starts, and the auto-start-mode command line arguments won't allow the user to boot Predator directly to that mode.
         - Under normal circumstances, all of these settings should be left as 'true', in order to enable full functionality of Predator, but there may be certain situations in which is useful to block certain modes from starting.
             - This setting is not intended to a be a security feature. It's completely trivial to bypass this setting by simply modifying the configuration file directly.
+            - If you never plan to use a particular operating mode, disabling it might decrease Predator's loading time by preventing unnecessary libraries from being loaded.
 
 
 ## Management Mode Configuration
@@ -76,7 +77,6 @@ Configuration values in this section are settings specific to management mode.
 
 - `disk_statistics` is a boolean that enables and disables the disk statistics feature of management mode.
     - Setting this to `false` disables disk statistics, and eliminates the need for the 'psutil' Python package to be installed.
-
 
 
 ## Pre-recorded Mode Configuration
@@ -206,8 +206,8 @@ Configuration values in this section are settings specific to real-time mode.
     - `devices` is a list that contains the indexes of camera devices Predator will attempt to use when recording video in dash-cam mode.
         - Each entry under this setting should contain a device identifier/name, as well as a reference to the device itself.
         - Examples:
-            - `"main_camera": 0`
-            - `"secondary_camera": 1`
+            - `"main": 0`
+            - `"secondary": 1`
 - `parked` contains settings to configure the dashcam's parking behavior.
     - `enabled` is a boolean that determines whether Predator will ever go into a parked state.
         - When this value is set to `false` Predator will never enable parked mode, even if the conditions defined in this configuration section are met.
@@ -218,12 +218,14 @@ Configuration values in this section are settings specific to real-time mode.
     - `recording` contains settings that control how Predator will record video while parked.
         - `highlight_motion` contains settings that control if/how Predator will highlight motion while running motion detection.
             - `enabled` is a boolean that determines whether Predator will draw bounding boxes around detected motion while parked.
-            - `color` is a list that determines the color of the bounding boxes, where the first, second, and third values represent red, green, and blue respectively.
+            - `color` is a list that determines the color of the bounding boxes, where the first, second, and third values represent the red, green, and blue channels respectively.
         - `sensitivity` determines the fraction of the screen that motion needs to cover to trigger recording, ranging from 0 to 1.
             - For example, a value of `0.05` would require that motion cover 5% of the entire field of view of the camera in order to activate recording.
+            - Lower values make Predator more sensitive to motion, since less motion is required to trigger recording.
+            - You can use the `tools/motion_detect_test.py` script to test this setting to find the best value for your use case.
         - `timeout` determines the length of time, in seconds, after motion is detected, that Predator will record video while parked.
 - `stamps` contains several configurable stamps that can be overlayed on the video recording.
-    - `main`
+    - `main` contains configuration values for the main stamp shown at the bottom of the frame.
         - `color` is a list of three values between 0 and 255 that determines the font cover of the overlay stamp.
             - The first value represents red, the second value represents green, and the third value represents blue.
         - `unix_time` contains settings for configuring Predator showing the number of seconds since the Unix epoch in the video overlay stamp.
@@ -234,7 +236,7 @@ Configuration values in this section are settings specific to real-time mode.
             - `enabled` is a boolean value that determines whether Predator will show the current time in the video overlay stamp.
         - `message_1` is a string that is intended to display a short custom message. This is often set to the license plate of the car Predator is installed in.
         - `message_2` is a string that is intended to display a short custom message. This is often set to "Predator", or another name identifying the system the dashcam is running on.
-    - `gps`
+    - `gps` contains configuration values for the stamp shown at the top of the frame, containing location information.
         - `color` is a list of three values between 0 and 255 that determines the font cover of the overlay stamp.
             - The first value represents red, the second value represents green, and the third value represents blue.
         - `location` contains settings for configuring the GPS coordinate overlay stamp.

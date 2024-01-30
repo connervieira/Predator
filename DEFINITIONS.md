@@ -9,6 +9,10 @@ This document contains definitions for several terms used in Predator.
 
 ALPR stands for 'automated license plate reading', and is the practice of automatically scanning, detecting, and reading vehicle license plates using a computer.
 
+### ALPR Provider/Back-end
+
+The ALPR provider or back-end is the program that Predator uses to process images and receive ALPR results. Predator is designed to primarily to use Phantom as an ALPR back-end, but it is also compatible with OpenALPR.
+
 
 ## Predator
 
@@ -41,3 +45,11 @@ A preference is a user setting defined when Predator launches. These settings ar
 ### Configuration
 
 A configuration value is a setting defined in Predator's configuration file. These settings are persistent, and don't change between restarts unless specifically modified.
+
+### Capture Device
+
+Predator uses the term "capture device" to refer to a camera used to capture still images or video.
+
+### Console
+
+The term "console" or "console output" refers to the text-based output produced by Predator when run from the command line.

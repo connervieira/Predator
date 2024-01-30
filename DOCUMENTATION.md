@@ -2,7 +2,7 @@
 
 This document contains the information you need to know to set up and use Predator.
 
-### Note
+### Definitions
 
 For further clarification on the terms used in this document, see [DEFINITIONS.md](DEFINITIONS.md).
 
@@ -99,7 +99,7 @@ After configuring Predator, you can try it out for the first time!
     - After Predator starts, you should see a banner displaying the Predator name.
     - To force Predator to start into a particular mode, add the mode number to the end of the command.
         - Example: `python3 main.py 3`
-            - This command will force Predator to start into mode #3, which is dash-cam mode.
+            - This command will force Predator to start into mode 3, which is dash-cam mode.
         - To learn more about each mode, see the mode descriptions below.
         - If no mode number is supplied, Predator will respect the `auto_start_mode` configuration value instead. If the `auto_start_mode` configuration value is not set, then Predator will prompt the user to select an operating mode after start-up.
     - To force Predator to use a particular working directory, instead of the one specified in the configuration, add the directory path as the second command line argument.
@@ -110,13 +110,13 @@ After configuring Predator, you can try it out for the first time!
     - Predator can operate in 4 possible modes.
         - Management mode (Mode 0)
             - This mode isn't a main operating mode for Predator, and simply exists for doing management tasks.
-            - In situations where Predator is hard-installed, like in a vehicle or security system, this mode makes it easy to clear folders, copy files, and maintain Predator without having to remove the central processing device.
+            - In situations where Predator is hard-installed, like in a vehicle or security system, this mode makes it easy to clear folders, copy files, and maintain Predator without having to remove the central processing device from the installation.
         - Pre-recorded mode (Mode 1)
             - In this mode, Predator will analyze one or more pre-recorded video clips that you provide. This video can be in any format supported by FFMPEG.
-            - You can use this mode to analyze dash-cam video, whether it be from a generic dash-cam or from Predator running in dash-cam mode.
+            - You can use this mode to analyze both static and dash-cam video, whether it be from a generic dash-cam or from Predator running in dash-cam mode.
         - Real-time mode (Mode 2)
             - In this mode, Predator will use a connected camera to detect license plates in real-time.
-            - In real-time mode, Predator will stream video from a connected camera directly.
+            - In real-time mode, Predator will use the ALPR provider to stream video from a connected capture device directly.
         - Dash-cam mode (Mode 3)
             - In this mode, Predator will operate like a dash-cam, and simply record video without attempting to detect license plates.
             - This mode can be used to record video to be analyzed with pre-recorded mode later.
@@ -145,7 +145,7 @@ After configuring Predator, you can try it out for the first time!
             - Example: `AAA0000`
         - Next, you'll be asked for the time and date that the specified video recording started.
             - This preference takes the following format: YYYY-mm-dd HH:MM:SS
-            - This preference is optional but will enabled the GPX file setting which grants the ability to correlate license plates to physical GPS locations.
+            - This preference is optional but will enabled the GPX file setting, which grants the ability to correlate license plates to physical GPS locations.
                 - If you wish to correlate license plates to location data from a GPX file, simply place the GPX file in the working directory, then enter its file name at the prompt. Otherwise, leave it blank.
         - Finally, you'll be asked for the file name of a GPX file containing location information relevant to the video file you've specified.
             - This setting is optional, but supplying a GPX file with location data allows Predator to pin-point physical locations for each license plate it detects.

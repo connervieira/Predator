@@ -1,6 +1,6 @@
 # Predator
 
-**Copyright 2023 V0LT - Conner Vieira**
+**Copyright 2024 V0LT - Conner Vieira**
 
 An offline, privacy centric license plate recognition platform.
 
