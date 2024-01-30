@@ -147,17 +147,24 @@
                     "width": 640,
                     "height": 480
                 },
-                "framerate": 9.6,
                 "segment_length": 10,
                 "devices": {
                     "main": 0
                 },
                 "parked": {
+                    "enabled": true,
                     "conditions": {
                         "speed": 2,
                         "time": 10
                     },
-                    "sensitivity": 0.05
+                    "recording": {
+                        "highlight_motion": {
+                            "enabled": true,
+                            "color": [0, 255, 0]
+                        },
+                        "sensitivity": 0.0005,
+                        "timeout": 10
+                    }
                 },
                 "stamps": {
                     "main": {

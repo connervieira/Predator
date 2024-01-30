@@ -358,15 +358,29 @@ This update makes several changes to Predator that dramatically improve its proc
 *Release date to be determined*
 
 - Refined OpenCV dashcam recording.
-    - Added the ability to set the units for speed in the OpenCV GPS dashcam video overlay stamp.
-    - Made the font color of the video overlay stamps configurable.
-    - Added customizable video segmentation.
-    - Added dashcam video segment saving.
-        - Dashcam video saving can be triggered to copy the current and last video segment to a different location on disk.
-    - Fixed an issue where the FFMPEG frame rate would be displayed on start up even when OpenCV dashcam recording was selected.
-    - OpenCV dashcam segments now include the name of the capture device, rather than the ID number.
-    - Added the ability to configure Predator to automatically delete unsaved dashcam videos after a certain number of videos have been captured.
-        - This is useful to prevent Predator from completely filling the available storage space.
+    - Improved video overlay stamps.
+        - Added the ability to set the units for speed in the OpenCV GPS dashcam video overlay stamp.
+        - Made the font color of the video overlay stamps configurable.
+    - Improved dashcam video file saving.
+        - Added customizable video segmentation.
+        - Added dashcam video segment saving.
+            - Dashcam video saving can be triggered to copy the current and last video segment to a different location on disk.
+        - OpenCV dashcam segments now include the name of the capture device, rather than the ID number.
+        - Added the ability to configure Predator to automatically delete unsaved dashcam videos after a certain number of videos have been captured.
+            - This is useful to prevent Predator from completely filling the available storage space.
+        - Dashcam video file names now end with either an "N" or "P" to indicate "normal" or "parked" mode respectively.
+    - Improved the way frame-rate is handled in OpenCV recording.
+        - Fixed an issue where the FFMPEG frame rate would be displayed on start up even when OpenCV dashcam recording was selected.
+        - The frame-rate configuration value has been removed in favor of calculating FPS on the fly.
+            The frame-rate of each capture device is individually benchmarked when dashcam recording starts, and is re-calculated at the start of every subsequent segment.
+        - Simplified the OpenCV FPS benchmark tool.
+            - The script has been re-named to `framerate_benchmark.py` for clarify.
+            - The script now uses the information from `config.json`, instead of being configured by manually changing variables at the top of the script.
+            - The script is now able to benchmark multiple cameras in one run.
+    - Added parking-mode functionality.
+        - Predator can be configured to enter into parking mode when the vehicle has been stopped for a certain period of time.
+        - Predator will resume recording temporarily when motion is detected.
+            - Added a new tool (`motion_detect_test.py`) to test motion detection settings.
 - Fixed a typo in a debug message inside `alpr_stream_maintainer()`.
 - Improved debug message handling when multiple threads are running concurrently.
 - Added a configuration value to disable the logging of all license plate guesses alongside the top guess.
@@ -380,7 +394,3 @@ This update makes several changes to Predator that dramatically improve its proc
 - The option to view files in the working directory in management mode now shows all files, including those inside sub-directories.
 - Created a dedicated function to wait for user input before continuing.
 - The debug message showing that Predator is fetching the current GPS location is now only displayed when a request is made to GPSD.
-- Simplified the OpenCV FPS benchmark tool.
-    - The script has been re-named to `framerate_benchmark.py` for clarify.
-    - The script now uses the information from `config.json`, instead of being configured by manually changing variables at the top of the script.
-    - The script is now able to benchmark multiple cameras in one run.

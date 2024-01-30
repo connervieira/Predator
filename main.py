@@ -1577,13 +1577,12 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
 # Dash-cam mode
 elif (mode_selection == "3" and config["general"]["modes"]["enabled"]["dashcam"] == True): # The user has set Predator to boot into dash-cam mode.
     debug_message("Started dash-cam mode")
-    utils.parked = True
     if (config["dashcam"]["capture"]["provider"] == "ffmpeg"): # Check to see if the configured video back-end is FFMPEG.
         print("\nStarting dashcam recording at " + str(config["dashcam"]["capture"]["ffmpeg"]["resolution"]) + "@" + str(config["dashcam"]["capture"]["ffmpeg"]["frame_rate"]) + "fps") # Print information about the recording settings.
         start_dashcam_ffmpeg(config["dashcam"]["capture"]["ffmpeg"]["devices"], int(config["dashcam"]["capture"]["ffmpeg"]["segment_length"]), config["dashcam"]["capture"]["ffmpeg"]["resolution"], config["dashcam"]["capture"]["ffmpeg"]["frame_rate"], config["general"]["working_directory"], False) # Start the dashcam recording process.
 
     elif (config["dashcam"]["capture"]["provider"] == "opencv"): # Check to see if the configured video back-end is OpenCV.
-        print("\nStarting dashcam recording at " + str(config["dashcam"]["capture"]["opencv"]["resolution"]["width"]) + "x" + str(config["dashcam"]["capture"]["opencv"]["resolution"]["height"]) + "@" + str(config["dashcam"]["capture"]["opencv"]["framerate"]) + "fps") # Print information about the recording settings.
+        print("\nStarting dashcam recording at " + str(config["dashcam"]["capture"]["opencv"]["resolution"]["width"]) + "x" + str(config["dashcam"]["capture"]["opencv"]["resolution"]["height"])) # Print information about the recording settings.
         start_dashcam_opencv(config["dashcam"]["capture"]["opencv"]["devices"], int(config["dashcam"]["capture"]["opencv"]["resolution"]["width"]), config["dashcam"]["capture"]["opencv"]["resolution"]["height"], config["general"]["working_directory"], False) # Start the dashcam recording process.
 
 

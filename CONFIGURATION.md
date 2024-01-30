@@ -206,10 +206,6 @@ Configuration values in this section are settings specific to real-time mode.
         - `resolution` sets the resolution of the video.
             - `width` sets the width of the video, measured in pixels.
             - `height` sets the height of the video, measured in pixels.
-        - `framerate` is a decimal number determines the playback frame-rate of the video file.
-            - This value does not determine the frame-rate of video capture, but rather the frame-rate that the saved video file will play back at.
-            - To estimate the frame-rate of your capture device, use the `tools/framerate_benchmark.py` script.
-                - Run the script and wait several seconds for the benchmark to complete. The calculated frame-rate will be printed at the end of the test.
         - `segment_length` is a number that sets how many seconds long each video segment will be before another segment is created.
         - `devices` is a list that contains the indexes of camera devices Predator will attempt to use when recording video in dash-cam mode.
             - Each entry under this setting should contain a device identifier/name, as well as a reference to the device itself.
@@ -217,12 +213,19 @@ Configuration values in this section are settings specific to real-time mode.
                 - `"main_camera": 0`
                 - `"secondary_camera": 1`
         - `parked` contains settings to configure the dashcam's parking behavior.
+            - `enabled` is a boolean that determines whether Predator will ever go into a parked state.
+                - When this value is set to `false` Predator will never enable parked mode, even if the conditions defined in this configuration section are met.
             - `conditions` contains settings that determine when Predator will consider the vehicle to be parked.
                 - `speed` is the speed at which Predator will consider the vehicle to be stopped, measured in meters per second.
                 - `time` is the length of time, in seconds, that the vehicle needs to be below the speed threshold for Predator to consider the vehicle to be parked.
                     - This value should be long enough that Predator doesn't consider the vehicle to be parked while at red lights or in traffic, but short enough that parking mode will be activated within a reasonable amount of time of the vehicle being parked.
-            - `sensitivity` determines the fraction of the screen that motion needs to cover to trigger recording, ranging from 0 to 1.
-                - For example, a value of `0.05` would require that motion cover 5% of the entire field of view of the camera in order to activate recording.
+            - `recording` contains settings that control how Predator will record video while parked.
+                - `highlight_motion` contains settings that control if/how Predator will highlight motion while running motion detection.
+                    - `enabled` is a boolean that determines whether Predator will draw bounding boxes around detected motion while parked.
+                    - `color` is a list that determines the color of the bounding boxes, where the first, second, and third values represent red, green, and blue respectively.
+                - `sensitivity` determines the fraction of the screen that motion needs to cover to trigger recording, ranging from 0 to 1.
+                    - For example, a value of `0.05` would require that motion cover 5% of the entire field of view of the camera in order to activate recording.
+                - `timeout` determines the length of time, in seconds, after motion is detected, that Predator will record video while parked.
         - `stamps` contains several configurable stamps that can be overlayed on the video recording.
             - `main`
                 - `color` is a list of three values between 0 and 255 that determines the font cover of the overlay stamp.
