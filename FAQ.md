@@ -20,7 +20,7 @@ Predator is designed for hobbyists and tech enthusiasts who want to experiment w
 
 **What is Predator Apex?**
 
-Predator Apex is the paid support program behind the Predator software. Predator Apex uses the exact same, free and open source Predator software that everyone else has access to. Predator Apex customers get one-on-one tech support and/or pre-built hardware devices. This service is available both to commercial customers and individual users. To learn more, you can contact V0LT using th information found at <https://v0lttech.com/contact.php>
+Predator Apex is the paid support program behind the Predator software. Predator Apex uses the exact same, free and open source Predator software that everyone else has access to. Predator Apex customers get one-on-one tech support and/or pre-built hardware devices. This service is available both to commercial customers and individual users. To learn more, you can contact V0LT using the information found at <https://v0lttech.com/contact.php>
 
 
 **I have a problem with Predator and I need help.**
@@ -50,7 +50,7 @@ The Predator software itself is completely free, and has absolutely no subscript
 
 **What operating systems is Predator compatible with?**
 
-Officially, Predator is only compatible with Linux based operating systems, and is primarily designed for Debian-based distributions (though other distributions should work smoothly as well). However, if you're ok with a few hiccups, its also reasonably possible to install Predator on MacOS. Since Predator and all of its dependencies are all open source, it's technically possible to get it to work on Windows as well, but but you'll have to re-write a significant portion of it to get everything working as intended. In short, Predator on Linux works great, Predator on MacOS will probably work, and Predator in Windows would take extensive effort and modifications.
+Officially, Predator is only compatible with Linux based operating systems, and is primarily designed for Debian-based distributions (though other distributions should work smoothly as well). However, if you're OK with a few hiccups, its also reasonably possible to install Predator on MacOS. Since Predator and all of its dependencies are all open source, it's technically possible to get it to work on Windows as well, but but you'll have to re-write a significant portion of it to get everything working as intended. In short, Predator on Linux works great, Predator on MacOS will probably work, and Predator in Windows would take extensive effort and modifications.
 
 
 **Why is Predator written in Python, and not something more efficient, like C++?**

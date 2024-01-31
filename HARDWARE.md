@@ -8,10 +8,10 @@ Predator is primarily a software utility. However, it goes without saying that P
 This section contains recommendations for those looking to build a hardware device that runs Predator.
 
 - The processing device should be fully capable of running Linux.
-    - Having a device that can easily run Linux will make installing and setting up Predator drastically easier, as you'll spend less time troubleshooting compatability issues, and more time actually assembling and configuring your device.
+    - Having a device that can easily run Linux will make installing and setting up Predator drastically easier, as you'll spend less time troubleshooting compatibility issues, and more time actually assembling and configuring your device.
         - More specifically, something running a Debian-based distribution will work best. This includes operating systems like Ubuntu, Raspberry Pi OS, Pop!_OS, and several others.
 - Camera color accuracy is practically irrelevant when it comes to Predator's ability to recognize license plates.
-    - Even grayscale cameras should have no problems recognizing license plates.
+    - Even gray-scale cameras should have no problems recognizing license plates.
 - Consider the context of the situation you want to use Predator in, and consider how to align your camera and it's lens.
     - You should have your camera's lens zoomed in as far as reasonably possible.
         - For example, if you're installing Predator in a car, you may want to zoom in on the area in front of your car, where the license plate of the car in front of you is likely to be.
@@ -20,7 +20,7 @@ This section contains recommendations for those looking to build a hardware devi
     - As mentioned previously, zooming in as far as possible will increase Predator's ability to recognize plates at a distance. However, zooming in will also increase the effects of motion blur, since even tiny movements will shift the frame dramatically.
     - Ensure your camera is mounted somewhere stable enough that it can take clear images of the vehicles you're scanning, even while they are in motion.
 - If processing speed is a concern, consider looking into a more custom solution.
-    - During testing, a Rapberry Pi 3 was able to run through on processing cycle about every 10 seconds. That means Predator was able to take one frame, and scan it for license plates every 10 seconds. A Raspberry Pi 4 was able to do this same processing cycle in about 4 seconds. If you need something faster, you might want to consider a small-form-factor PC.
+    - During testing, a Raspberry Pi 3 was able to run through on processing cycle about every 10 seconds. That means Predator was able to take one frame, and scan it for license plates every 10 seconds. A Raspberry Pi 4 was able to do this same processing cycle in about 4 seconds. If you need something faster, you might want to consider a small-form-factor PC.
 
 
 ## Guidelines

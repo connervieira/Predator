@@ -1,6 +1,6 @@
 # Contributing
 
-This document describes the guidelines contrbutors should follow when making changes to Predator.
+This document describes the guidelines contributors should follow when making changes to Predator.
 
 
 ## General Guidelines
@@ -9,7 +9,7 @@ These guidelines describe general rules for Predator that you should be aware of
 
 - Predator and all it's dependencies should be completely free and open source.
     - Changes that involve a proprietary dependency or service will be rejected.
-- Predator should never connect to the internet unless explicity asked to be the user.
+- Predator should never connect to the internet unless explicitly asked to be the user.
     - This especially includes analytics. Predator should not "phone home" with analytics or other information.
     - This also includes automatic crowd-sourcing. Predator is designed to be a stand-alone, self contained, primarily offline tool.
 - Predator is designed for individual hobbyists, not law enforcement or commercial applications. Keep this in mind when considering the audience your changes will be used by.

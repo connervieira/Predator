@@ -1,6 +1,6 @@
 # To-Do
 
-This document quickly explains features that may be added to Predator in the future. This is an informal document, and it's typically used as a simple task tracker, not as changelog or official feature list.
+This document quickly explains features that may be added to Predator in the future. This is an informal document, and it's typically used as a simple task tracker, not as change-log or official feature list.
 
 
 ## Planned
