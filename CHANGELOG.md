@@ -367,6 +367,7 @@ This update overhauls Predator's dashcam functionality and adds various features
         - Added customizable video segmentation.
         - Added dashcam video segment saving.
             - Dashcam video saving can be triggered to copy the current and last video segment to a different location on disk.
+            - At the moment the save is trigger, both the previous segment, and current segment are saved. Once the current segment is completed, the updated file is saved again.
         - OpenCV dashcam segments now include the name of the capture device, rather than the ID number.
         - Added the ability to configure Predator to automatically delete unsaved dashcam videos after a certain number of videos have been captured.
             - This is useful to prevent Predator from completely filling the available storage space.

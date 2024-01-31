@@ -194,7 +194,7 @@ After you've gotten Predator working, you may want to use some of its debugging 
 1. Enable debugging messages.
     - To enable debugging messages, enable the `general>display>debugging_output` configuration value.
 2. Run Predator.
-    - After enabling debug messages, run Predator. You should see frequent grayed-out messages being printed to the console indicating important events behind the scenes
+    - After enabling debug messages, run Predator. You should see frequent grayed-out messages being printed to the console indicating important events behind the scenes.
 3. Interpret messages.
     - Debugging messages may look complicated, but they follow a consistent structure: `[current_time] ([time_since_last_message] - [thread_name]) - [message]`
         - [current_time] is a Unix timestamp of the exact time the message was printed.
@@ -206,8 +206,8 @@ After you've gotten Predator working, you may want to use some of its debugging 
     - One of the most useful implications of debugging messages is the ability to locate sources of delay during the operation of Predator.
     - To locate sources of slow-downs, you can use the `[time_since_last_message]` field described above.
         - This field will show how long the previous action in the thread took.
-            - To clarify, processes in different threads work independently.
-            - To locate sources of slow downs in a particular, pay attention to a specific thread's debug messages, and ignore other threads.
+            - To clarify, processes in different threads work independently, and often run concurrently.
+            - To locate sources of slow downs in a particular thread, pay attention to a specific thread's debug messages, and ignore other threads.
                 - For example, to find slow downs in the "Main" thread, pay attention to messages marked as "Main", and ignore "ALPRStream" and "ALPRStreamMaintainer".
     - Example:
         1. Here's an example debug message sequence:

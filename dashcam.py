@@ -76,6 +76,29 @@ def benchmark_camera_framerate(device, frames=5): # This function benchmarks a g
 
 
 
+
+
+# This function is called when the lock trigger file is created to save the current and last segments.
+def save_dashcam_segments(current_segment, last_segment=""):
+    global config
+
+    if (os.path.isdir(config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"]) == False): # Check to see if the saved dashcam video folder needs to be created.
+        os.system("mkdir -p '" + config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"] + "'") # Create the saved dashcam video directory.
+    time.sleep(0.3) # Wait for a short period of time so that other dashcam recording threads have time to detect the trigger file.
+    if (os.path.isdir(config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"])): # Check to see if the dashcam saving directory exists.
+        os.system("cp '" + current_segment + "' '" + config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"] + "'") # Copy the current dashcam video segment to the saved folder.
+        if (last_segment != ""): # Check to see if there is a "last file" to copy.
+            os.system("cp '" + last_segment + "' '" + config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"] + "'") # Copy the last dashcam video segment to the saved folder.
+    else:
+        display_message("The dashcam saving directory does not exist, and could not be created. The dashcam video could not be locked.", 2)
+    display_message("Saved the current dashcam segment.", 1)
+    os.system("rm -rf '" + config["general"]["interface_directory"] + "/" + config["dashcam"]["saving"]["trigger"] + "'") # Remove the dashcam lock trigger file.
+    if (os.path.exists(config["general"]["interface_directory"] + "/" + config["dashcam"]["saving"]["trigger"])): # Check to see if the trigger file exists even after it should have been removed.
+        display_message("Unable to remove trigger file.", 3)
+
+
+
+
 dashcam_recording_active = False
 parked = False
 
@@ -110,22 +133,12 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
         display_message("Failed to start dashcam video capture using '" + device  + "' device. Verify that this device is associated with a valid identifier.", 3)
         exit()
 
+    save_this_segment = False # This will be set to True when the saving trigger is created. The current and previous dashcam segments are saved immediately when the trigger is created, but this allows the completed segment to be saved once the next segment is started, such that the saved segment doesn't cut off at the moment the user triggered a save.
     while dashcam_recording_active: # Only run while the dashcam recording flag is set to 'True'.
         heartbeat() # Issue a status heartbeat.
         if (os.path.exists(config["general"]["interface_directory"] + "/" + config["dashcam"]["saving"]["trigger"])): # Check to see if the trigger file exists.
-            if (os.path.isdir(config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"]) == False): # Check to see if the saved dashcam video folder needs to be created.
-                os.system("mkdir -p '" + config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"] + "'") # Create the saved dashcam video directory.
-            time.sleep(0.3) # Wait for a short period of time so that other dashcam recording threads have time to detect the trigger file.
-            if (os.path.isdir(config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"])): # Check to see if the dashcam saving directory exists.
-                os.system("cp '" + file + "' '" + config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"] + "'") # Copy the current dashcam video segment to the saved folder.
-                if (last_file != ""): # Check to see if there is a "last file" to copy.
-                    os.system("cp '" + last_file + "' '" + config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"] + "'") # Copy the last dashcam video segment to the saved folder.
-            else:
-                display_message("The dashcam saving directory does not exist, and could not be created. The dashcam video could not be locked.", 2)
-            display_message("Saved the current dashcam segment.", 1)
-            os.system("rm -rf '" + config["general"]["interface_directory"] + "/" + config["dashcam"]["saving"]["trigger"] + "'") # Remove the dashcam lock trigger file.
-            if (os.path.exists(config["general"]["interface_directory"] + "/" + config["dashcam"]["saving"]["trigger"])): # Check to see if the trigger file exists even after it should have been removed.
-                display_message("Unable to remove.", 3)
+            save_dashcam_segments(file, last_file)
+            save_this_segment = True
 
 
         if (parked == True): # Check to see if the vehicle is parked before running motion detection.
@@ -164,6 +177,11 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
                 output = cv2.VideoWriter(file, cv2.VideoWriter_fourcc(*'XVID'), float(calculated_framerate), (width,  height)) # Update the video output.
             segment_start_time = time.time() # Update the segment start time.
             frames_since_last_segment = 0 # This will count the number of frames in this video segment.
+
+            
+            if (save_this_segment == True): # Now that the new segment has been started, check to see if the completed segment should be saved.
+                save_dashcam_segments(last_file) # In this case, "last_file" is actually the completed previous segment, since we just started a new segment.
+                save_this_segment = False # Reset the segment saving flag.
 
             # Handle the deletion of any expired dashcam videos.
             dashcam_files_list_command = "ls " + config["general"]["working_directory"] + " | grep predator_dashcam" # Set up the command to get a list of all unsaved dashcam videos in the working directory.

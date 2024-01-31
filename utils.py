@@ -176,7 +176,7 @@ def add_to_file(file_name, contents):
 if (config["general"]["interface_directory"] != ""): # Check to see if the interface directory is enabled.
     plate_file_location = config["general"]["interface_directory"] + "/plates.json"
     if (os.path.exists(plate_file_location) == False): # If the plate log file doesn't exist, create it.
-        save_to_file(plate_file_location, "{}", True) # Save a blank placeholder dictionary to the plate log file.
+        save_to_file(plate_file_location, "{}") # Save a blank placeholder dictionary to the plate log file.
 
     plate_file = open(plate_file_location, "r") # Open the plate log file for reading.
     plate_file_contents = plate_file.read() # Read the raw contents of the plate file as a string.
@@ -200,7 +200,7 @@ def log_plates(detected_plates):
     for key in entries_to_remove: # Iterate through each of the keys designated to be removed.
         plate_log.pop(key)
 
-    save_to_file(plate_file_location, json.dumps(plate_log), True) # Save the modified plate log to the disk as JSON data.
+    save_to_file(plate_file_location, json.dumps(plate_log)) # Save the modified plate log to the disk as JSON data.
 
 
 
@@ -209,7 +209,7 @@ def log_plates(detected_plates):
 if (config["general"]["interface_directory"] != ""): # Check to see if the interface directory is enabled.
     alert_file_location = config["general"]["interface_directory"] + "/alerts.json"
     if (os.path.exists(alert_file_location) == False): # If the alert log file doesn't exist, create it.
-        save_to_file(alert_file_location, "{}", True) # Save a blank placeholder dictionary to the alert log file.
+        save_to_file(alert_file_location, "{}") # Save a blank placeholder dictionary to the alert log file.
 
     alert_file = open(alert_file_location, "r") # Open the alert log file for reading.
     alert_file_contents = alert_file.read() # Read the raw contents of the alert file as a string.
@@ -233,7 +233,7 @@ def log_alerts(active_alerts):
     for key in entries_to_remove: # Iterate through each of the keys designated to be removed.
         alert_log.pop(key)
 
-    save_to_file(alert_file_location, json.dumps(alert_log), True) # Save the modified alert log to the disk as JSON data.
+    save_to_file(alert_file_location, json.dumps(alert_log)) # Save the modified alert log to the disk as JSON data.
 
 
 
@@ -242,7 +242,7 @@ def log_alerts(active_alerts):
 if (config["general"]["interface_directory"] != ""): # Check to see if the interface directory is enabled.
     heartbeat_file_location = config["general"]["interface_directory"] + "/heartbeat.json"
     if (os.path.exists(heartbeat_file_location) == False): # If the heartbeat log file doesn't exist, create it.
-        save_to_file(heartbeat_file_location, "[]", True) # Save a blank placeholder list to the heartbeat log file.
+        save_to_file(heartbeat_file_location, "[]") # Save a blank placeholder list to the heartbeat log file.
 
     heartbeat_file = open(heartbeat_file_location, "r") # Open the heartbeat log file for reading.
     heartbeat_file_contents = heartbeat_file.read() # Read the raw contents of the heartbeat file as a string.
@@ -261,7 +261,7 @@ def issue_heartbeat(): # This is the function that actually issues a heartbeat.
     global heartbeat_log
     heartbeat_log.append(time.time()) # Add this pulse to the heartbeat log file, using the current time as the key.
     heartbeat_log = heartbeat_log[-10:] # Trim the list to only contain the last entries.
-    save_to_file(heartbeat_file_location, json.dumps(heartbeat_log), True) # Save the modified heartbeat log to the disk as JSON data.
+    save_to_file(heartbeat_file_location, json.dumps(heartbeat_log)) # Save the modified heartbeat log to the disk as JSON data.
 
 
 
@@ -271,7 +271,7 @@ def issue_heartbeat(): # This is the function that actually issues a heartbeat.
 # Load the error log file.
 error_file_location = config["general"]["interface_directory"] + "/errors.json"
 if (os.path.exists(error_file_location) == False): # If the error log file doesn't exist, create it.
-    save_to_file(error_file_location, "{}", True) # Save a blank placeholder dictionary to the error log file.
+    save_to_file(error_file_location, "{}") # Save a blank placeholder dictionary to the error log file.
 
 error_file = open(error_file_location, "r") # Open the error log file for reading.
 error_file_contents = error_file.read() # Read the raw contents of the error file as a string.
@@ -285,15 +285,15 @@ else: # If the error file doesn't contain valid JSON data, then load a blank pla
 def display_message(message, level=1):
     if (level == 1): # Display the message as a notice.
         error_log[time.time()] = {"msg": message, "type": "notice"} # Add this message to the log file, using the current time as the key.
-        save_to_file(error_file_location, json.dumps(error_log), True) # Save the modified error log to the disk as JSON data.
+        save_to_file(error_file_location, json.dumps(error_log)) # Save the modified error log to the disk as JSON data.
         print("Notice: " + message)
     elif (level == 2): # Display the message as a warning.
         error_log[time.time()] = {"msg": message, "type": "warn"} # Add this message to the log file, using the current time as the key.
-        save_to_file(error_file_location, json.dumps(error_log), True) # Save the modified error log to the disk as JSON data.
+        save_to_file(error_file_location, json.dumps(error_log)) # Save the modified error log to the disk as JSON data.
         print(style.yellow + "Warning: " + message + style.end)
     elif (level == 3): # Display the message as an error.
         error_log[time.time()] = {"msg": message, "type": "error"} # Add this message to the log file, using the current time as the key.
-        save_to_file(error_file_location, json.dumps(error_log), True) # Save the modified error log to the disk as JSON data.
+        save_to_file(error_file_location, json.dumps(error_log)) # Save the modified error log to the disk as JSON data.
         print(style.red + "Error: " + message + style.end)
         prompt(style.faint + "Press enter to continue..." + style.end)
 
