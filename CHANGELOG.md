@@ -363,6 +363,7 @@ This update overhauls Predator's dashcam functionality and adds various features
     - Improved video overlay stamps.
         - Added the ability to set the units for speed in the OpenCV GPS dashcam video overlay stamp.
         - Made the font color of the video overlay stamps configurable.
+        - Made the font size configurable.
     - Improved dashcam video file saving.
         - Added customizable video segmentation.
         - Added dashcam video segment saving.

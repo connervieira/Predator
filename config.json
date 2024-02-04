@@ -165,6 +165,7 @@
             }
         },
         "stamps": {
+            "size": 0.8,
             "main": {
                 "color": [
                     255,

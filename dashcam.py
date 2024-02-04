@@ -234,8 +234,8 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
             gps_stamp_color = config["dashcam"]["stamps"]["gps"]["color"]
 
             # Add the stamps to the video stream.
-            cv2.putText(frame, main_stamp, (main_stamp_position[0], main_stamp_position[1]), 2, 0.8, (main_stamp_color[2], main_stamp_color[1], main_stamp_color[0])) # Add the main overlay stamp to the video stream.
-            cv2.putText(frame, gps_stamp, (gps_stamp_position[0], gps_stamp_position[1]), 2, 0.8, (gps_stamp_color[2], gps_stamp_color[1], gps_stamp_color[0])) # Add the GPS overlay stamp to the video stream.
+            cv2.putText(frame, main_stamp, (main_stamp_position[0], main_stamp_position[1]), 2, config["dashcam"]["stamps"]["size"], (main_stamp_color[2], main_stamp_color[1], main_stamp_color[0])) # Add the main overlay stamp to the video stream.
+            cv2.putText(frame, gps_stamp, (gps_stamp_position[0], gps_stamp_position[1]), 2, config["dashcam"]["stamps"]["size"], (gps_stamp_color[2], gps_stamp_color[1], gps_stamp_color[0])) # Add the GPS overlay stamp to the video stream.
 
             output.write(frame) # Save this frame to the video.
 
