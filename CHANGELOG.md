@@ -385,6 +385,8 @@ This update overhauls Predator's dashcam functionality and adds various features
         - Predator can be configured to enter into parking mode when the vehicle has been stopped for a certain period of time.
         - Predator will resume recording temporarily when motion is detected.
             - Added a new tool (`motion_detect_test.py`) to test motion detection settings.
+    - Added audio recording.
+        - Predator can now record audio along side dashcam video, and merge them into a single file when each segment completes.
     - Moved the dashcam recording system to a separate script for sake of organization.
         - Removed the FFMPEG recording back-end for stability and simplicity.
 - The ALPR stream library is now only imported if real-time mode is enabled in the configuration.

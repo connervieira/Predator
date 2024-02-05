@@ -47,6 +47,9 @@ This is the installation process for Predator and all of its dependencies. This 
 3. Optionally, install FFMPEG (Highly Recommended).
     - Predator uses FFMPEG to process videos.
     - If you don't install FFMPEG, Predator will encounter errors while operating in modes that require video processing.
+        - More specifically, FFMPEG is required for the following tasks:
+            1. Splitting videos into individual frames in pre-recorded mode.
+            2. Merging audio and video files in dash-cam mode.
     - You can install FFMPEG using the following command on a Debian based Linux machine: `sudo apt-get install ffmpeg`
 4. Optionally, install ImageMagick (Highly Recommended).
     - Predator uses ImageMagick to manipulate still frames of video.

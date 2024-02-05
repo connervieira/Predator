@@ -147,6 +147,11 @@
             "segment_length": 10,
             "devices": {
                 "main": 0
+            },
+            "audio": {
+                "enabled": false,
+                "extension": "wav",
+                "merge": true
             }
         },
         "parked": {
