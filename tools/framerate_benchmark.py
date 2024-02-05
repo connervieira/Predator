@@ -20,8 +20,8 @@ except:
 def benchmark_camera_framerate(device, frames=5): # This function benchmarks a given camera to determine its framerate.
     global config
 
-    resolution = [config["dashcam"]["capture"]["resolution"]["width"], config["dashcam"]["capture"]["resolution"]["height"]] # This determines the resolution that will be used for the video capture device.
-    capture = cv2.VideoCapture(config["dashcam"]["capture"]["devices"][device]); # Open the video capture device.
+    resolution = [config["dashcam"]["capture"]["video"]["resolution"]["width"], config["dashcam"]["capture"]["video"]["resolution"]["height"]] # This determines the resolution that will be used for the video capture device.
+    capture = cv2.VideoCapture(config["dashcam"]["capture"]["video"]["devices"][device]); # Open the video capture device.
 
     capture.set(cv2.CAP_PROP_FRAME_WIDTH,resolution[0]) # Set the video stream width.
     capture.set(cv2.CAP_PROP_FRAME_HEIGHT,resolution[1]) # Set the video stream height.
@@ -42,6 +42,6 @@ def benchmark_camera_framerate(device, frames=5): # This function benchmarks a g
     fps = frames / total_time # Calculate the number of frames captured per second.
     return fps # Return the calculated FPS.
 
-for device in config["dashcam"]["capture"]["devices"]:
+for device in config["dashcam"]["capture"]["video"]["devices"]:
     framerate = benchmark_camera_framerate(device) # Benchmark this capture device and record the calculated FPS.
     print("Calculated FPS: " + str(framerate)) # Display the calculated FPS.

@@ -49,12 +49,17 @@ if (config["realtime"]["gps"]["enabled"] == True): # Only import the GPS librari
 
 
 def merge_audio_video(video_file, audio_file, output_file):
+    debug_message("Merging audio and video files")
+
     merge_command = "ffmpeg -i " + video_file + " -i " + audio_file + " -c copy " + output_file
     erase_command = "rm " + video_file + " " + audio_file
 
     merge_process = subprocess.run(merge_command.split(), stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-    while (merge_process.returncode != 0): # If the merge process exited with an error
+    first_attempt = time.time()
+    while (merge_process.returncode != 0): # If the merge process exited with an error, keep trying until it is successful. This might happen if one of the files hasn't fully saved to disk.
         merge_process = subprocess.run(merge_command.split(), stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+        if (time.time() - first_attempt > 1): # Check to see if FFMPEG has been trying for at least 1 seconds.
+            return False # Time out, and exit with a success value False.
     subprocess.run(erase_command.split())
 
     return True
@@ -63,8 +68,8 @@ def merge_audio_video(video_file, audio_file, output_file):
 def benchmark_camera_framerate(device, frames=5): # This function benchmarks a given camera to determine its framerate.
     global config
 
-    resolution = [config["dashcam"]["capture"]["resolution"]["width"], config["dashcam"]["capture"]["resolution"]["height"]] # This determines the resolution that will be used for the video capture device.
-    capture = cv2.VideoCapture(config["dashcam"]["capture"]["devices"][device]); # Open the video capture device.
+    resolution = [config["dashcam"]["capture"]["video"]["resolution"]["width"], config["dashcam"]["capture"]["video"]["resolution"]["height"]] # This determines the resolution that will be used for the video capture device.
+    capture = cv2.VideoCapture(config["dashcam"]["capture"]["video"]["devices"][device]); # Open the video capture device.
 
     capture.set(cv2.CAP_PROP_FRAME_WIDTH,resolution[0]) # Set the video stream width.
     capture.set(cv2.CAP_PROP_FRAME_HEIGHT,resolution[1]) # Set the video stream height.
@@ -119,7 +124,7 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
     global parked
 
 
-    device_id = config["dashcam"]["capture"]["devices"][device]
+    device_id = config["dashcam"]["capture"]["video"]["devices"][device]
 
     if (os.path.isdir(config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"]) == False): # Check to see if the saved dashcam video folder needs to be created.
         os.system("mkdir -p '" + config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"] + "'") # Create the saved dashcam video directory.
@@ -187,13 +192,13 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
             if (moving_percentage > float(config["dashcam"]["parked"]["recording"]["sensitivity"])): # Check to see if there is movement that exceeds the sensitivity threshold.
                 if (moving_percentage < 0.9): # Check to make sure the amount of motion isn't above 90% to prevent camera's exposure adjustments from triggering motion detection.
                     if (time.time() - last_motion_detection > 2): # Check to see if it has been at least 2 seconds since motion was last detected before displaying the motion detection debug message.
-                        debug_message("Detected motion")
+                        display_message("Detected motion.", 1)
                     last_motion_detection = time.time() # Update the last time that motion was detected to the current time.
         else: # If the vehicle is not parked, clear some of the motion detection variables.
             contours = []
 
 
-        if (time.time()-segment_start_time > config["dashcam"]["capture"]["segment_length"]): # Check to see if this segment has exceeded the segment length time.
+        if (time.time()-segment_start_time > config["dashcam"]["saving"]["segment_length"]): # Check to see if this segment has exceeded the segment length time.
             # Handle the start of a new segment.
             segment_number+=1 # Increment the segment counter.
             last_video_filepath = video_file_path # Record the file name of the current video segment before updating it.
@@ -217,7 +222,10 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
 
             if (config["dashcam"]["capture"]["audio"]["merge"] == True and config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if Predator is configured to merge audio and video files.
                 last_filename_merged = last_filename + ".mkv"
-                merge_audio_video(last_video_filepath, last_audio_filepath, last_filename_merged)
+                if (os.path.exists(last_audio_filepath) == False):
+                    display_message("The audio file was missing during audio/video merging. It is possible something has gone wrong with recording.", 2)
+                elif (merge_audio_video(last_video_filepath, last_audio_filepath, last_filename_merged) == False): # Run the audio/video merge, and check to see if an error occurred.
+                    display_message("The audio and video segments could not be merged. It is possible something has gone wrong with recording.", 2)
             
             if (save_this_segment == True): # Now that the new segment has been started, check to see if the segment that was just completed should be saved.
                 if (config["dashcam"]["capture"]["audio"]["merge"] == True and config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if Predator is configured to merge audio and video files.
@@ -324,11 +332,11 @@ def start_dashcam_recording(dashcam_devices, video_width, video_height, director
                         last_moved_time = time.time()
                     if (time.time() - last_moved_time > config["dashcam"]["parked"]["conditions"]["time"]): # Check to see if the amount of time the vehicle has been stopped exceeds the time threshold to enable parked mode.
                         if (parked == False): # Check to see if Predator wasn't already in parked mode.
-                            debug_message("Entered parked mode") # Display a debug message, since parked mode was entered just now.
+                            display_message("Entered parked mode.", 1)
                         parked = True # Enter parked mode.
                     else:
                         if (parked == True): # Check to see if Predator wasn't already out of parked mode.
-                            debug_message("Exited parked mode") # Display a debug message, since parked mode was exited just now.
+                            display_message("Exited parked mode.", 1)
                         parked = False # Exit parked mode.
                     
                     time.sleep(1)

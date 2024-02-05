@@ -137,19 +137,21 @@
         "saving": {
             "directory": "saved_dashcam",
             "trigger": "dashcam_lock_trigger",
+            "segment_length": 10,
             "unsaved_history_length": 90
         },
         "capture": {
-            "resolution": {
-                "width": 640,
-                "height": 480
-            },
-            "segment_length": 10,
-            "devices": {
-                "main": 0
+            "video": {
+                "resolution": {
+                    "width": 640,
+                    "height": 480
+                },
+                "devices": {
+                    "main": 0
+                }
             },
             "audio": {
-                "enabled": false,
+                "enabled": true,
                 "extension": "wav",
                 "merge": true
             }
@@ -162,11 +164,15 @@
             },
             "recording": {
                 "highlight_motion": {
-                    "enabled": true,
-                    "color": [0, 255, 0]
+                    "enabled": false,
+                    "color": [
+                        0,
+                        255,
+                        0
+                    ]
                 },
                 "sensitivity": 0.01,
-                "timeout": 10
+                "timeout": 15
             }
         },
         "stamps": {

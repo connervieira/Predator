@@ -192,21 +192,22 @@ Configuration values in this section are settings specific to real-time mode.
         - To trigger a save, create this file in the interface directory. Predator will save the video then automatically remove the trigger file.
         - When this file is created, Predator will immediately save the previous and current dashcam video segments. Once the current segment is done recording, Predator will re-save it, such that the saved video doesn't cut off at the moment the saved was triggered.
             - If Predator is terminated between the initial save and the second save, only video captured after the save trigger shouldn't be saved.
+    - `segment_length` is a number that sets how many seconds long each video segment will be before another segment is created.
     - `unsaved_history_length` is a positive integer that determines how many unsaved videos Predator will keep.
         - Once this limit is reached, older unsaved videos will be progressively removed to stay under the threshold.
         - This value should be set to a number greater than 2.
             - Values less than 2 are likely to cause unexpected behavior, especially when saving videos with the trigger file.
         - This setting has no impact on videos that have been saved using the trigger file explained previously.
 - `capture` contains settings related to the capturing of dashcam video.
-    - `resolution` sets the resolution of the video.
-        - `width` sets the width of the video, measured in pixels.
-        - `height` sets the height of the video, measured in pixels.
-    - `segment_length` is a number that sets how many seconds long each video segment will be before another segment is created.
-    - `devices` is a list that contains the indexes of camera devices Predator will attempt to use when recording video in dash-cam mode.
-        - Each entry under this setting should contain a device identifier/name, as well as a reference to the device itself.
-        - Examples:
-            - `"main": 0`
-            - `"secondary": 1`
+    - `video` contains settings for configuring Predator's video recording behavior.
+        - `resolution` sets the resolution of the video.
+            - `width` sets the width of the video, measured in pixels.
+            - `height` sets the height of the video, measured in pixels.
+        - `devices` is a list that contains the indexes of camera devices Predator will attempt to use when recording video in dash-cam mode.
+            - Each entry under this setting should contain a device identifier/name, as well as a reference to the device itself.
+            - Examples:
+                - `"main": 0`
+                - `"secondary": 1`
     - `audio` contains settings for configuring Predator's audio recording behavior.
         - `enabled` is a boolean that determines whether or not audio will be recorded at all.
         - `extension` sets the file extension that audio will be saved with.
