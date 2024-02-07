@@ -1,43 +1,19 @@
 # Apex
 
-This document briefly explains Predator Apex, the paid hardware program for Predator LPRS.
+This document briefly explains Predator Apex, the paid hardware program for Predator.
+
+To inquire about any of the services described here, you can contact V0LT using the information found at <https://v0lttech.com/contact.php>.
+
+## Installation Services
+
+Apex installation services can get you a working Predator ALPR/dashcam system with the least amount of effort. As long as you're within driving distance of V0LT (in Chesterland Ohio), you can have your Predator system assembled, configured, and installed by V0LT directly.
 
 
-## Disclaimer
+## Hardware Services
 
-Predator Apex is by no means a mass produced product, and is not intended to be a consumer device. Each Predator Apex model is hand assembled. Think of Predator Apex as a quick and easy way to get started with the Predator system, not as a commercial product. Predator Apex is great for tinkerers and tech enthusiasts who just want everything they need to get started, not for people who want a simple, plug-and-play experience, like a traditional dashcam.
-
-
-## Hardware
-
-### Description
-
-Predator is a powerful, multipurpose system capable of scanning license plates in pre-recorded video, analyzing real-time video streams, and running as a fully-featured dash-cam. While this versatility provides huge amounts of customization for technical users and hobbyists, the majority of users probably want a pre-configured setup as a starting point. That's where Predator Apex is useful.
-
-Predator Apex is a collection of pre-built hardware devices and that come pre-configured with the Predator software, as well as one-on-one services to aid in DIY assembly of a Predator system. All Predator Apex devices use basic off-the-shelf parts, and are designed to be repairable, modifiable, and customizable, just like the Predator software itself.
+If you're a technical user who wants to build a customized Predator system, but you want a starting point to build from, hardware services might be a great option. Apex hardware services allow you to purchase pre-assembled kits that contain all of the basic components you'll need to do your own installation. These kits contain detailed installation instructions, and can be customized based on your preferences and use-case.
 
 
-### Documentation
+## Support Services
 
-While much simpler than building a Predator device from scratch, there are still some technical aspects to getting pre-built Predator Apex device up and running. In it's current state, Predator runs via command line, and therefore needs to be controlled via SSH or other shell. For this reason, each Predator device has documentation explaining how to use it from start to finish to help less technical users get up and running.
-
-
-### DIY
-
-If you'd like to try to build a Predator device yourself, see the [HARDWARE.md](HARDWARE.md) document.
-
-
-## Support
-
-### Description
-
-If you're technically proficient, and want to try building your own device to run Predator, but want to assistance in doing so, Predator Apex Support is a great alternative to the hardware program. With Predator Apex Support, you'll get direct, thorough support straight from V0LT.
-
-### Contact
-
-For more information about Predator Apex Support, contact V0LT using the information found at <https://v0lttech.com/contact.php>.
-
-
-## Learn More
-
-To learn more about the Predator Apex program, visit <https://v0lttech.com/predator/predatorapex.php>
+Support services allow you to build your own Predator system from scratch with the guidance of V0LT. Support services include extensive, start-to-finish support over email, phone, or instant messaging. Whether you want to build a basic Predator system, or you have a highly specific use-case, support services can be a very affordable way to get everything set-up how you want it.

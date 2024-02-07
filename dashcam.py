@@ -51,8 +51,8 @@ if (config["realtime"]["gps"]["enabled"] == True): # Only import the GPS librari
 def merge_audio_video(video_file, audio_file, output_file):
     debug_message("Merging audio and video files")
 
-    merge_command = "ffmpeg -i " + video_file + " -i " + audio_file + " -c copy " + output_file
-    erase_command = "rm " + video_file + " " + audio_file
+    merge_command = "timeout 10 ffmpeg -i " + video_file + " -i " + audio_file + " -c copy " + output_file
+    erase_command = "timeout 5 rm " + video_file + " " + audio_file
 
     merge_process = subprocess.run(merge_command.split(), stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     first_attempt = time.time()
@@ -62,6 +62,7 @@ def merge_audio_video(video_file, audio_file, output_file):
             return False # Time out, and exit with a success value False.
     subprocess.run(erase_command.split())
 
+    debug_message("Merged audio and video files")
     return True
 
 

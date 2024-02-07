@@ -2,7 +2,7 @@
 
 **Copyright 2024 V0LT - Conner Vieira**
 
-An offline, privacy centric license plate recognition platform.
+The ultimate customizable dashcam/license plate recognition platform.
 
 ![Predator header](./assets/images/branding/PredatorHeaderLight.svg)
 
