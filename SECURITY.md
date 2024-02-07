@@ -12,7 +12,7 @@ Due to Predator's update cycle, only the latest version receives security patche
 
 ## Reporting
 
-In the event that you find a security issue with Predator, you have several ways of reporting it. The safest option is to contact V0LT directly. You can find relevant contact information, including PGP keys at <https://v0lttech.com/contact.php>.
+In the event that you find a security issue with Predator, the safest way to report it is to contact V0LT directly. You can find relevant contact information, including PGP keys at <https://v0lttech.com/contact.php>.
 
 
 ## Considerations
