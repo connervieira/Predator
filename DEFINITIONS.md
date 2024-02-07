@@ -53,3 +53,7 @@ Predator uses the term "capture device" to refer to a camera used to capture sti
 ### Console
 
 The term "console" or "console output" refers to the text-based output produced by Predator when run from the command line.
+
+### Controller
+
+A"controller" is an external program that controls Predator and its operation. Optic and Cortex are both controllers for Predator.
