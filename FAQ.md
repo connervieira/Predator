@@ -18,6 +18,11 @@ For installation and setup instructions, check the [DOCUMENTATION.md](DOCUMENTAT
 Predator is designed for hobbyists and tech enthusiasts who want to experiment with ALPR without the need for expensive software and specialized equipment. It's for people who want to tinker and experiment with computer vision technology in a powerful and easy way.
 
 
+**Can Predator be used as a plain dashcam, without ALPR?**
+
+Absolutely. Predator's dashcam mode allows it to operate like a fully featured traditional dashcam, without any ALPR functionality. If you want to retroactively run ALPR on recorded dashcam video, you can do so using pre-recorded mode at a later time.
+
+
 **What is Predator Apex?**
 
 Predator Apex is the paid support program behind the Predator software. Predator Apex uses the exact same, free and open source Predator software that everyone else has access to. Predator Apex customers get one-on-one tech support and/or pre-built hardware devices. This service is available both to commercial customers and individual users. To learn more, you can contact V0LT using the information found at <https://v0lttech.com/contact.php>
@@ -25,7 +30,7 @@ Predator Apex is the paid support program behind the Predator software. Predator
 
 **I have a problem with Predator and I need help.**
 
-If you're encountering an issue with Predator, first ensure that you've followed all of the steps described in the [DOCUMENTATION.md](DOCUMENTATION.md). If your issue persists, try to work out its source by checking individual potential points of failure. The majority of Predator issues can be traced back to one of it's dependencies not working properly. Check that the ALPR engine, FFMPEG, and GPSD are all working properly. If you still can't resolve your issue, you can contact V0LT support using the information found at <https://v0lttech.com/contact.php>.
+If you're encountering an issue with Predator, first ensure that you've followed all of the steps described in the [DOCUMENTATION.md](DOCUMENTATION.md). If your issue persists, try to work out its source by checking individual potential points of failure. The majority of Predator issues can be traced back to one of its dependencies not working properly. Check that the ALPR engine, FFMPEG, and GPSD are all working properly. If you still can't resolve your issue, you can contact V0LT support using the information found at <https://v0lttech.com/contact.php>.
 
 
 **How is Predator related to OpenALPR?**
@@ -40,7 +45,7 @@ Using Phantom as the ALPR back-end over OpenALPR is recommended for a few reason
 
 **Who is Predator not designed for?**
 
-Predator is not designed for those who want to collect massive amounts of information on individuals. It's not for governments and law enforcement agencies looking to log the movements of civilians. It's not for companies who want to track how often certain people visit their business. For sake of privacy, Predator actively avoids features designed for mass-surveillance, and focuses on targeted, private alerts.
+Predator is not designed for those who want to conduct mass-surveillance. Its not for governments and law enforcement agencies looking to log the movements of civilians for criminal investigations. Its not for companies who want to track how often certain people visit their business. For sake of privacy, Predator actively avoids features designed for mass-surveillance, and focuses on targeted, private alerts for individual use.
 
 
 **How much does Predator cost?**
@@ -55,7 +60,7 @@ Officially, Predator is only compatible with Linux based operating systems, and 
 
 **Why is Predator written in Python, and not something more efficient, like C++?**
 
-While Predator itself is indeed written in Python, many of its processing-heavy dependencies are written in C++. For example, Phantom, Predator's ALPR engine, is written in C++.
+Python makes the development of the core Predator system much faster and more efficient. Additionally, Python makes it much easier to port Predator to new platforms. While Predator itself is indeed written in Python, many of its processing-heavy dependencies are written in C++. For example, Phantom, Predator's ALPR engine, is written in C++. This allows the system as a whole to benefit from the conveinence of Python, without significantly harming processing performance of critical processes.
 
 
 **How does Predator work?**
@@ -69,14 +74,14 @@ Predator is a fairly complex program, but below is a list of the general steps P
 5. Next, Predator's ALPR engine attempts interpret the plates detected, and makes a guess as to their contents.
 6. After the ALPR engine finishes, Predator forms a list of the most likely plates guesses.
 7. Predator then uses various methods of validation to filter out plate guesses that are unlikely to be correct.
-8. Next, Predator removes plates it believes to be invalid, and creates a list of (hopefully) correctly detected plates.
+8. Next, Predator removes plates it believes to be invalid, and creates a list of (ideally) correctly recognized plates.
 9. Finally, Predator checks the list of license plates against any alert lists that may be loaded to check for hot-list hits.
 9. After this, Predator might save the plates to a local log file, send a push notification to a Gotify server, play an audio alert, or any number of other customizable actions.
 
 
 **How many cameras can Predator use at one time?**
 
-This is a bit of a complex question, but in short, as many as you want. More specifically, Predator will use as many cameras as your OS, USB controller, and processor allow. In practice, this means that Predator can usually run at least two USB cameras at once, even on low powered devices like the Raspberry Pi, provided the cameras are connected to the correct USB ports.
+This is a bit of a complex question, but in short, as many as you want. More specifically, Predator will use as many cameras as your OS, USB controller, and processor allow. In practice, this means that Predator can usually run at least two USB cameras at once, even on low powered devices like the Raspberry Pi. However, you should keep in mind that adding more cameras will increase the processing load significantly. As such, you should expect a decrease in frame-rate for each camera you add, unless you have plenty of processing head-room.
 
 
 **Can I run multiple instances of Predator at the same time on a single device?**
