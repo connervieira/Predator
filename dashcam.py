@@ -51,7 +51,7 @@ if (config["realtime"]["gps"]["enabled"] == True): # Only import the GPS librari
 def merge_audio_video(video_file, audio_file, output_file):
     debug_message("Merging audio and video files")
 
-    merge_command = "timeout 10 ffmpeg -i " + video_file + " -i " + audio_file + " -c copy " + output_file
+    merge_command = "ffmpeg -i " + video_file + " -i " + audio_file + " -c copy " + output_file
     erase_command = "timeout 5 rm " + video_file + " " + audio_file
 
     merge_process = subprocess.run(merge_command.split(), stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
@@ -307,6 +307,7 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
 
 
         else: # If the vehicle is not parked, then run normal video processing.
+            frames_since_last_motion_detection = 0 # Motion detection is disabled in normal recording, so reset the motion detection counter.
             if (time.time()-segment_start_time > config["dashcam"]["saving"]["segment_length"]): # Check to see if this segment has exceeded the segment length time.
                 # Handle the start of a new segment.
                 segment_number+=1 # Increment the segment counter.

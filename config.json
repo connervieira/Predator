@@ -147,7 +147,8 @@
                     "height": 480
                 },
                 "devices": {
-                    "main": 0
+                    "main": 0,
+                    "rear": 2
                 }
             },
             "audio": {
