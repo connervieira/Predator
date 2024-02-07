@@ -58,7 +58,7 @@ def merge_audio_video(video_file, audio_file, output_file):
     first_attempt = time.time()
     while (merge_process.returncode != 0): # If the merge process exited with an error, keep trying until it is successful. This might happen if one of the files hasn't fully saved to disk.
         merge_process = subprocess.run(merge_command.split(), stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-        if (time.time() - first_attempt > 1): # Check to see if FFMPEG has been trying for at least 1 seconds.
+        if (time.time() - first_attempt > 3): # Check to see if FFMPEG has been trying for at least 3 seconds.
             return False # Time out, and exit with a success value False.
     subprocess.run(erase_command.split())
 
@@ -116,6 +116,104 @@ def save_dashcam_segments(current_segment, last_segment=""):
 
 
 
+def apply_dashcam_stamps(frame, width, height):
+    main_stamp_position = [10, height - 10] # Determine where the main overlay stamp should be positioned in the video stream.
+    main_stamp = ""
+    if (config["dashcam"]["stamps"]["main"]["unix_time"]["enabled"] == True): # Check to see if the Unix epoch time stamp is enabled.
+        main_stamp = main_stamp + str(round(time.time())) + " " # Add the current Unix epoch time to the main stamp.
+    if (config["dashcam"]["stamps"]["main"]["date"]["enabled"] == True): # Check to see if the date stamp is enabled.
+        main_stamp = main_stamp + str(datetime.datetime.today().strftime("%Y-%m-%d")) + " "  # Add the date to the main stamp.
+    if (config["dashcam"]["stamps"]["main"]["time"]["enabled"] == True): # Check to see if the time stamp is enabled.
+        main_stamp = main_stamp + str(datetime.datetime.now().strftime("%H:%M:%S")) + " "  # Add the time to the main stamp.
+    main_stamp = main_stamp  + "  " + config["dashcam"]["stamps"]["main"]["message_1"] + "  " + config["dashcam"]["stamps"]["main"]["message_2"] # Add the customizable messages to the overlay stamp.
+
+    gps_stamp_position = [10, 30] # Determine where the GPS overlay stamp should be positioned in the video stream.
+    gps_stamp = "" # Set the GPS to a blank placeholder. Elements will be added to this in the next steps.
+    current_location = get_gps_location() # Get the current location.
+    if (config["dashcam"]["stamps"]["gps"]["location"]["enabled"] == True): # Check to see if the GPS location stamp is enabled.
+        gps_stamp = gps_stamp + "(" + str(round(current_location[0]*100000)/100000) + ", " + str(round(current_location[1]*100000)/100000) + ")  " # Add the current coordinates to the GPS stamp.
+    if (config["dashcam"]["stamps"]["gps"]["altitude"]["enabled"] == True): # Check to see if the GPS altitude stamp is enabled.
+        gps_stamp = gps_stamp + str(round(current_location[3])) + "m  " # Add the current altitude to the GPS stamp.
+    if (config["dashcam"]["stamps"]["gps"]["speed"]["enabled"] == True): # Check to see if the GPS speed stamp is enabled.
+        gps_stamp = gps_stamp + str(round(convert_speed(current_location[2],config["dashcam"]["stamps"]["gps"]["speed"]["unit"])*10)/10) + config["dashcam"]["stamps"]["gps"]["speed"]["unit"] + "  " # Add the current speed to the GPS stamp.
+
+    # Determine the font color of the stamps from the configuration.
+    main_stamp_color = config["dashcam"]["stamps"]["main"]["color"]
+    gps_stamp_color = config["dashcam"]["stamps"]["gps"]["color"]
+
+    # Add the stamps to the video stream.
+    cv2.putText(frame, main_stamp, (main_stamp_position[0], main_stamp_position[1]), 2, config["dashcam"]["stamps"]["size"], (main_stamp_color[2], main_stamp_color[1], main_stamp_color[0])) # Add the main overlay stamp to the video stream.
+    cv2.putText(frame, gps_stamp, (gps_stamp_position[0], gps_stamp_position[1]), 2, config["dashcam"]["stamps"]["size"], (gps_stamp_color[2], gps_stamp_color[1], gps_stamp_color[0])) # Add the GPS overlay stamp to the video stream.
+
+    return frame
+
+
+
+
+
+# This function is called as a subprocess of the normal dashcam recording, and is triggered when motion is detected. This function exits when motion is no longer detected (after the motion detection timeout).
+def record_parked_motion(capture, framerate, width, height, device, directory):
+    last_motion_detected = time.time() # Initialize the last time that motion was detected to now. We can assume motion was just detected because this function is only called after motion is detected.
+
+    file_name = directory + "/predator_dashcam_" + str(round(time.time())) + "_" + str(device) + "_0_P"
+    video_file_name = file_name + ".avi"
+    audio_file_name = file_name + "." + str(config["dashcam"]["capture"]["audio"]["extension"])
+    output = cv2.VideoWriter(video_file_name, cv2.VideoWriter_fourcc(*'XVID'), float(framerate), (width,  height))
+
+    background_subtractor = cv2.createBackgroundSubtractorMOG2() # Initialize the background subtractor for motion detection.
+    total_image_area = width * height # Calculate the total number of pixels in the image.
+
+    audio_recorder = subprocess.Popen(["arecord", "-q", "--format=cd", audio_file_name], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Start the audio recorder for the parked segment.
+
+    while (time.time() - last_motion_detected < config["dashcam"]["parked"]["recording"]["timeout"]): # Run until motion is not detected for a certain period of time.
+        ret, frame = capture.read() # Capture a frame.
+
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        fgmask = background_subtractor.apply(gray)
+        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+        fgmask = cv2.erode(fgmask, kernel, iterations=1)
+        fgmask = cv2.dilate(fgmask, kernel, iterations=1)
+        contours, hierarchy = cv2.findContours(fgmask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+        moving_area = 0 # This value will hold the number of pixels in the image that are moving.
+        for contour in contours: # Iterate through each contour.
+            moving_area += cv2.contourArea(contour) # Increment the moving_area counter by the number of pixels in the contour.
+
+        moving_percentage = moving_area / total_image_area # Calculate the percentage of the frame that is in motion.
+        moving_percentage_human = "{:.5f}%".format(moving_percentage*100) # Convert the moving percentage to a human-readable string.
+
+
+        if (moving_percentage > float(config["dashcam"]["parked"]["recording"]["sensitivity"])): # Check to see if there is movement that exceeds the sensitivity threshold.
+            if (moving_percentage < 0.9): # Check to make sure the amount of motion isn't above 90% to prevent camera's exposure adjustments from triggering motion detection.
+                last_motion_detected = time.time()
+                if (time.time() - last_motion_detected > 2): # Check to see if it has been more than 2 seconds since motion was last detected so that the message is only displayed after there hasn't been motion for some time.
+                    display_message("Detected motion.", 1)
+
+        if (config["dashcam"]["parked"]["recording"]["highlight_motion"]["enabled"] == True):
+            for contour in contours: # Iterate through each contour.
+                if cv2.contourArea(contour) > 10: # Check to see if this contour is big enough to be worth highlighting.
+                    color = config["dashcam"]["parked"]["recording"]["highlight_motion"]["color"]
+                    x, y, w, h = cv2.boundingRect(contour) # Define the edges of the contour.
+                    cv2.rectangle(frame, (x, y), (x+w, y+h), (color[2], color[1], color[0]), 2) # Draw a box around the contour in the frame.
+
+        frame = apply_dashcam_stamps(frame, width, height) # Apply dashcam overlay stamps to the frame.
+        output.write(frame) # Save this frame to the video.
+
+    audio_recorder.terminate() # Kill the active audio recorder.
+
+    if (config["dashcam"]["capture"]["audio"]["merge"] == True and config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if Predator is configured to merge audio and video files.
+        merged_file_name = file_name + ".mkv"
+    if (os.path.exists(audio_file_name) == False):
+        display_message("The audio file was missing during audio/video merging at the end of parked motion recording. It is possible something has gone wrong with recording.", 2)
+    elif (merge_audio_video(video_file_name, audio_file_name, merged_file_name) == False): # Run the audio/video merge, and check to see if an error occurred.
+        display_message("The audio and video segments could not be merged at the end of parked motion recording. It is possible something has gone wrong with recording.", 2)
+
+    display_message("Stopped motion recording.", 1)
+
+
+
+
+
 dashcam_recording_active = False
 parked = False
 
@@ -136,12 +234,15 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
     capture.set(cv2.CAP_PROP_FRAME_WIDTH,width) # Set the video stream width.
     capture.set(cv2.CAP_PROP_FRAME_HEIGHT,height) # Set the video stream height.
     total_image_area = width * height # Calculate the total number of pixels in the image.
-    background_subtractor = cv2.createBackgroundSubtractorMOG2() # Initialize the background subtractor for motion detect.
+    background_subtractor = cv2.createBackgroundSubtractorMOG2() # Initialize the background subtractor for motion detection.
     last_motion_detection = 0 # This will hold the timestamp of the last time motion was detected.
 
     segment_number = 0 # This variable keeps track of the segment number, and will be incremented each time a new segment is started.
     segment_start_time = time.time() # This variable keeps track of when the current segment was started. It will be reset each time a new segment is started.
     frames_since_last_segment = 0 # This will count the number of frames in this video segment.
+
+    frames_since_last_motion_detection = 0 # This will count each frame, and is reset after motion is detected.
+    invalid_motion_detections = 0 # This will count how many frames of motion detection were rejected due to them occurring immediately after another motion detection instance.
 
     file_name = directory + "/predator_dashcam_" + str(round(time.time())) + "_" + str(device) + "_" + str(segment_number) + "_N"
     video_file_path = file_name + ".avi" # Determine the initial video file path.
@@ -158,7 +259,7 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
         exit()
 
     save_this_segment = False # This will be set to True when the saving trigger is created. The current and previous dashcam segments are saved immediately when the trigger is created, but this allows the completed segment to be saved once the next segment is started, such that the saved segment doesn't cut off at the moment the user triggered a save.
-    while dashcam_recording_active: # Only run while the dashcam recording flag is set to 'True'.
+    while dashcam_recording_active: # Only run while the dashcam recording flag is set to 'True'. While this flag changes to 'False' this recording process should exit entirely.
         heartbeat() # Issue a status heartbeat.
         if (os.path.exists(config["general"]["interface_directory"] + "/" + config["dashcam"]["saving"]["trigger"])): # Check to see if the trigger file exists.
 
@@ -175,7 +276,11 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
             save_this_segment = True # This flag causes Predator to save this entire segment again when the next segment is started.
 
 
-        if (parked == True): # Check to see if the vehicle is parked before running motion detection.
+        if (parked == True): # Check to see if the vehicle is parked.
+            if (audio_recorder.poll() is None): # Check to see if there is an active audio recorder.
+                audio_recorder.terminate() # Kill the active audio recorder.
+            if ("frame" not in globals()): # Check to see if the first frame hasn't been created yet.
+                ret, frame = capture.read() # Capture a frame.
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             fgmask = background_subtractor.apply(gray)
             kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
@@ -190,117 +295,84 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
             moving_percentage = moving_area / total_image_area # Calculate the percentage of the frame that is in motion.
             moving_percentage_human = "{:.5f}%".format(moving_percentage*100) # Convert the moving percentage to a human-readable string.
             if (moving_percentage > float(config["dashcam"]["parked"]["recording"]["sensitivity"])): # Check to see if there is movement that exceeds the sensitivity threshold.
-                if (moving_percentage < 0.9): # Check to make sure the amount of motion isn't above 90% to prevent camera's exposure adjustments from triggering motion detection.
-                    if (time.time() - last_motion_detection > 2): # Check to see if it has been at least 2 seconds since motion was last detected before displaying the motion detection debug message.
-                        display_message("Detected motion.", 1)
-                    last_motion_detection = time.time() # Update the last time that motion was detected to the current time.
-        else: # If the vehicle is not parked, clear some of the motion detection variables.
-            contours = []
+                if (frames_since_last_motion_detection > 3 or invalid_motion_detections > 10): # Make sure at least 3 frames have passed since motion was last detected. This prevents camera adjustments from forcing motion detection into an endless loop. Allow motion to punch through this restriction if more than 10 frames have passed and it is still being detected.
+                    display_message("Detected motion.", 1)
+                    record_parked_motion(capture, framerate, width, height, device, directory)
+                    background_subtractor = cv2.createBackgroundSubtractorMOG2() # Reset the background subtractor after motion is detected.
+                else:
+                    invalid_motion_detections = invalid_motion_detections + 1
+                    print ("Failed frame test")
+                frames_since_last_motion_detection = 0
 
 
-        if (time.time()-segment_start_time > config["dashcam"]["saving"]["segment_length"]): # Check to see if this segment has exceeded the segment length time.
-            # Handle the start of a new segment.
-            segment_number+=1 # Increment the segment counter.
-            last_video_filepath = video_file_path # Record the file name of the current video segment before updating it.
-            last_audio_filepath = audio_filepath # Record the file name of the current audio segment before updating it.
-            last_filename = file_name # Record the base file name of the current segment before updating.
-            file_name = directory + "/predator_dashcam_" + str(round(time.time())) + "_" + str(device) + "_" + str(segment_number) + "_"
-            if (parked == True):
-                file_name = file_name + "P"
-            else:
-                file_name = file_name + "N"
-            if (config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if audio recording is enabled in the configuration.
-                audio_recorder.terminate() # Kill the previous segment's audio recorder.
-                audio_filepath = file_name + "." + str(config["dashcam"]["capture"]["audio"]["extension"])
-                audio_recorder = subprocess.Popen(["arecord", "-q", "--format=cd", audio_filepath], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Start the next segment's audio recorder.
-            video_file_path = file_name + ".avi" # Update the file path.
-            if (parked == False or time.time() - last_motion_detection < 10): # Check to see if recording is active before intitializing the video file.
-                calculated_framerate = frames_since_last_segment / (time.time() - segment_start_time) # Calculate the frame-rate of the last segment.
-                output = cv2.VideoWriter(video_file_path, cv2.VideoWriter_fourcc(*'XVID'), float(calculated_framerate), (width,  height)) # Update the video output.
-            segment_start_time = time.time() # Update the segment start time.
-            frames_since_last_segment = 0 # This will count the number of frames in this video segment.
+        else: # If the vehicle is not parked, then run normal video processing.
+            if (time.time()-segment_start_time > config["dashcam"]["saving"]["segment_length"]): # Check to see if this segment has exceeded the segment length time.
+                # Handle the start of a new segment.
+                segment_number+=1 # Increment the segment counter.
+                last_video_filepath = video_file_path # Record the file name of the current video segment before updating it.
+                last_audio_filepath = audio_filepath # Record the file name of the current audio segment before updating it.
+                last_filename = file_name # Record the base file name of the current segment before updating.
+                file_name = directory + "/predator_dashcam_" + str(round(time.time())) + "_" + str(device) + "_" + str(segment_number) + "_N"
 
-            if (config["dashcam"]["capture"]["audio"]["merge"] == True and config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if Predator is configured to merge audio and video files.
-                last_filename_merged = last_filename + ".mkv"
-                if (os.path.exists(last_audio_filepath) == False):
-                    display_message("The audio file was missing during audio/video merging. It is possible something has gone wrong with recording.", 2)
-                elif (merge_audio_video(last_video_filepath, last_audio_filepath, last_filename_merged) == False): # Run the audio/video merge, and check to see if an error occurred.
-                    display_message("The audio and video segments could not be merged. It is possible something has gone wrong with recording.", 2)
-            
-            if (save_this_segment == True): # Now that the new segment has been started, check to see if the segment that was just completed should be saved.
+                if (config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if audio recording is enabled in the configuration.
+                    audio_recorder.terminate() # Kill the previous segment's audio recorder.
+                    audio_filepath = file_name + "." + str(config["dashcam"]["capture"]["audio"]["extension"])
+                    audio_recorder = subprocess.Popen(["arecord", "-q", "--format=cd", audio_filepath], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Start the next segment's audio recorder.
+                    
+                video_file_path = file_name + ".avi" # Update the file path.
+                if (parked == False or time.time() - last_motion_detection < config["dashcam"]["parked"]["recording"]["timeout"]): # Check to see if recording is active before intitializing the video file.
+                    calculated_framerate = frames_since_last_segment / (time.time() - segment_start_time) # Calculate the frame-rate of the last segment.
+                segment_start_time = time.time() # Update the segment start time.
+                frames_since_last_segment = 0 # This will count the number of frames in this video segment.
+
                 if (config["dashcam"]["capture"]["audio"]["merge"] == True and config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if Predator is configured to merge audio and video files.
-                    if (os.path.exists(last_filename_merged)): # Check to make sure the merged video file actually exists before saving.
-                        save_dashcam_segments(last_filename_merged) # Save the merged video/audio file. At this point "last_filename" is actually the segment that was just completed, since we just started a new segment.
+                    last_filename_merged = last_filename + ".mkv"
+                    if (os.path.exists(last_audio_filepath) == False):
+                        display_message("The audio file was missing during audio/video merging. It is possible something has gone wrong with recording.", 2)
+                    elif (merge_audio_video(last_video_filepath, last_audio_filepath, last_filename_merged) == False): # Run the audio/video merge, and check to see if an error occurred.
+                        display_message("The audio and video segments could not be merged. It is possible something has gone wrong with recording.", 2)
+                
+                if (save_this_segment == True): # Now that the new segment has been started, check to see if the segment that was just completed should be saved.
+                    if (config["dashcam"]["capture"]["audio"]["merge"] == True and config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if Predator is configured to merge audio and video files.
+                        if (os.path.exists(last_filename_merged)): # Check to make sure the merged video file actually exists before saving.
+                            save_dashcam_segments(last_filename_merged) # Save the merged video/audio file. At this point "last_filename" is actually the segment that was just completed, since we just started a new segment.
 
-                        # Now that the merged file has been saved, go back and delete the separate files that were saved previously.
-                        base_file = config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"] + "/" + os.path.splitext(os.path.basename(last_filename_merged))[0]
-                        os.system("rm '" + base_file + ".avi'")
-                        os.system("rm '" + base_file + "." + str(config["dashcam"]["capture"]["audio"]["extension"]) + "'")
-                    else: # If the merged video file doesn't exist, it is likely something went wrong with the merging process.
-                        display_message("The merged video/audio file did exist when Predator tried to save it. It is likely the merge process has failed unexpectedly. The separate files are being saved as a fallback.", 3)
+                            # Now that the merged file has been saved, go back and delete the separate files that were saved previously.
+                            base_file = config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"] + "/" + os.path.splitext(os.path.basename(last_filename_merged))[0]
+                            os.system("rm '" + base_file + ".avi'")
+                            os.system("rm '" + base_file + "." + str(config["dashcam"]["capture"]["audio"]["extension"]) + "'")
+                        else: # If the merged video file doesn't exist, it is likely something went wrong with the merging process.
+                            display_message("The merged video/audio file did exist when Predator tried to save it. It is likely the merge process has failed unexpectedly. The separate files are being saved as a fallback.", 3)
+                            save_dashcam_segments(last_video_filepath) # At this point, "last_video_filepath" is actually the completed previous video segment, since we just started a new segment.
+                            save_dashcam_segments(last_audio_filepath) # At this point, "last_audio_filepath" is actually the completed previous audio segment, since we just started a new segment.
+                    else: # If audio/video merging is disabled, then save the separate video and audio files.
                         save_dashcam_segments(last_video_filepath) # At this point, "last_video_filepath" is actually the completed previous video segment, since we just started a new segment.
-                        save_dashcam_segments(last_audio_filepath) # At this point, "last_audio_filepath" is actually the completed previous audio segment, since we just started a new segment.
-                else: # If audio/video merging is disabled, then save the separate video and audio files.
-                    save_dashcam_segments(last_video_filepath) # At this point, "last_video_filepath" is actually the completed previous video segment, since we just started a new segment.
-                    if (config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if audio recording is enabled.
-                        save_dashcam_segments(last_audio_filepath) # At this point, "last_audio_filepath" is actually the completed previous audio segment, since we just started a new segment.
-                save_this_segment = False # Reset the segment saving flag.
+                        if (config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if audio recording is enabled.
+                            save_dashcam_segments(last_audio_filepath) # At this point, "last_audio_filepath" is actually the completed previous audio segment, since we just started a new segment.
+                    save_this_segment = False # Reset the segment saving flag.
 
 
-            # Handle the deletion of any expired dashcam videos.
-            dashcam_files_list_command = "ls " + config["general"]["working_directory"] + " | grep predator_dashcam" # Set up the command to get a list of all unsaved dashcam videos in the working directory.
-            dashcam_files = str(os.popen(dashcam_files_list_command).read())[:-1].splitlines() # Run the command, and record the raw output string.
-            dashcam_files = sorted(dashcam_files) # Sort the dashcam files alphabetically to get them in chronological order.
-            if (len(dashcam_files) > int(config["dashcam"]["saving"]["unsaved_history_length"])): # Check to see if the current number of dashcam segments in the working directory is higher than the configured history length.
-                videos_to_delete = dashcam_files[0:len(dashcam_files) - int(config["dashcam"]["saving"]["unsaved_history_length"])] # Create a list of all of the videos that need to be deleted.
-                for video in videos_to_delete: # Iterate through each video that needs to be deleted.
-                    os.system("timeout 5 rm '" + config["general"]["working_directory"] + "/" + video + "'") # Delete the dashcam segment.
+                # Handle the deletion of any expired dashcam videos.
+                dashcam_files_list_command = "ls " + config["general"]["working_directory"] + " | grep predator_dashcam" # Set up the command to get a list of all unsaved dashcam videos in the working directory.
+                dashcam_files = str(os.popen(dashcam_files_list_command).read())[:-1].splitlines() # Run the command, and record the raw output string.
+                dashcam_files = sorted(dashcam_files) # Sort the dashcam files alphabetically to get them in chronological order.
+                if (len(dashcam_files) > int(config["dashcam"]["saving"]["unsaved_history_length"])): # Check to see if the current number of dashcam segments in the working directory is higher than the configured history length.
+                    videos_to_delete = dashcam_files[0:len(dashcam_files) - int(config["dashcam"]["saving"]["unsaved_history_length"])] # Create a list of all of the videos that need to be deleted.
+                    for video in videos_to_delete: # Iterate through each video that needs to be deleted.
+                        os.system("timeout 5 rm '" + config["general"]["working_directory"] + "/" + video + "'") # Delete the dashcam segment.
 
 
-        ret, frame = capture.read() # Capture a frame.
-        frames_since_last_segment += 1 # Increment the frame counter.
-        if not ret: # Check to see if the frame failed to be read.
-            display_message("Failed to receive video frame from the '" + device  + "' device. It is possible this device has been disconnected.", 3)
-            break
+            ret, frame = capture.read() # Capture a frame.
+            frames_since_last_segment += 1 # Increment the frame counter.
+            if not ret: # Check to see if the frame failed to be read.
+                display_message("Failed to receive video frame from the '" + device  + "' device. It is possible this device has been disconnected.", 3)
+                exit()
 
 
-        if (parked == False or time.time() - last_motion_detection < 10): # Check to see if recording is active so we don't do unnecessary image processing.
-            if (config["dashcam"]["parked"]["recording"]["highlight_motion"]["enabled"] == True):
-                for contour in contours: # Iterate through each contour.
-                    if cv2.contourArea(contour) > 10: # Check to see if this contour is big enough to be worth highlighting.
-                        color = config["dashcam"]["parked"]["recording"]["highlight_motion"]["color"]
-                        x, y, w, h = cv2.boundingRect(contour) # Define the edges of the contour.
-                        cv2.rectangle(frame, (x, y), (x+w, y+h), (color[2], color[1], color[0]), 2) # Draw a box around the contour in the frame.
-                        del color
-            main_stamp_position = [10, height - 10] # Determine where the main overlay stamp should be positioned in the video stream.
-            main_stamp = ""
-            if (config["dashcam"]["stamps"]["main"]["unix_time"]["enabled"] == True): # Check to see if the Unix epoch time stamp is enabled.
-                main_stamp = main_stamp + str(round(time.time())) + " " # Add the current Unix epoch time to the main stamp.
-            if (config["dashcam"]["stamps"]["main"]["date"]["enabled"] == True): # Check to see if the date stamp is enabled.
-                main_stamp = main_stamp + str(datetime.datetime.today().strftime("%Y-%m-%d")) + " "  # Add the date to the main stamp.
-            if (config["dashcam"]["stamps"]["main"]["time"]["enabled"] == True): # Check to see if the time stamp is enabled.
-                main_stamp = main_stamp + str(datetime.datetime.now().strftime("%H:%M:%S")) + " "  # Add the time to the main stamp.
-            main_stamp = main_stamp  + "  " + config["dashcam"]["stamps"]["main"]["message_1"] + "  " + config["dashcam"]["stamps"]["main"]["message_2"] # Add the customizable messages to the overlay stamp.
-
-            gps_stamp_position = [10, 30] # Determine where the GPS overlay stamp should be positioned in the video stream.
-            gps_stamp = "" # Set the GPS to a blank placeholder. Elements will be added to this in the next steps.
-            current_location = get_gps_location() # Get the current location.
-            if (config["dashcam"]["stamps"]["gps"]["location"]["enabled"] == True): # Check to see if the GPS location stamp is enabled.
-                gps_stamp = gps_stamp + "(" + str(round(current_location[0]*100000)/100000) + ", " + str(round(current_location[1]*100000)/100000) + ")  " # Add the current coordinates to the GPS stamp.
-            if (config["dashcam"]["stamps"]["gps"]["altitude"]["enabled"] == True): # Check to see if the GPS altitude stamp is enabled.
-                gps_stamp = gps_stamp + str(round(current_location[3])) + "m  " # Add the current altitude to the GPS stamp.
-            if (config["dashcam"]["stamps"]["gps"]["speed"]["enabled"] == True): # Check to see if the GPS speed stamp is enabled.
-                gps_stamp = gps_stamp + str(round(convert_speed(current_location[2],config["dashcam"]["stamps"]["gps"]["speed"]["unit"])*10)/10) + config["dashcam"]["stamps"]["gps"]["speed"]["unit"] + "  " # Add the current speed to the GPS stamp.
-
-            # Determine the font color of the stamps from the configuration.
-            main_stamp_color = config["dashcam"]["stamps"]["main"]["color"]
-            gps_stamp_color = config["dashcam"]["stamps"]["gps"]["color"]
-
-            # Add the stamps to the video stream.
-            cv2.putText(frame, main_stamp, (main_stamp_position[0], main_stamp_position[1]), 2, config["dashcam"]["stamps"]["size"], (main_stamp_color[2], main_stamp_color[1], main_stamp_color[0])) # Add the main overlay stamp to the video stream.
-            cv2.putText(frame, gps_stamp, (gps_stamp_position[0], gps_stamp_position[1]), 2, config["dashcam"]["stamps"]["size"], (gps_stamp_color[2], gps_stamp_color[1], gps_stamp_color[0])) # Add the GPS overlay stamp to the video stream.
-
+            frame = apply_dashcam_stamps(frame, width, height)
             output.write(frame) # Save this frame to the video.
+
+        frames_since_last_motion_detection = frames_since_last_motion_detection + 1 # Increment the frame counter.
 
     capture.release()
     cv2.destroyAllWindows()
