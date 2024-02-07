@@ -160,7 +160,7 @@
             "enabled": true,
             "conditions": {
                 "speed": 2,
-                "time": 10
+                "time": 3
             },
             "recording": {
                 "highlight_motion": {
