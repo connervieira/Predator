@@ -137,7 +137,7 @@
         "saving": {
             "directory": "saved_dashcam",
             "trigger": "dashcam_lock_trigger",
-            "segment_length": 90,
+            "segment_length": 10,
             "unsaved_history_length": 90
         },
         "capture": {
@@ -160,11 +160,11 @@
             "enabled": true,
             "conditions": {
                 "speed": 2,
-                "time": 3
+                "time": 10
             },
             "recording": {
                 "highlight_motion": {
-                    "enabled": true,
+                    "enabled": false,
                     "color": [
                         0,
                         255,

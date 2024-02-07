@@ -212,6 +212,7 @@ Configuration values in this section are settings specific to real-time mode.
         - `enabled` is a boolean that determines whether or not audio will be recorded at all.
         - `extension` sets the file extension that audio will be saved with.
         - `merge` is a boolean that determines whether or not Predator will merge the separate audio and video files when each segment is done recording.
+            - Enabling this setting may cause a slight stutter between dashcam segments, since the files will need to be merged before the next segment can start.
 - `parked` contains settings to configure the dashcam's parking behavior.
     - `enabled` is a boolean that determines whether Predator will ever go into a parked state.
         - When this value is set to `false` Predator will never enable parked mode, even if the conditions defined in this configuration section are met.
@@ -257,7 +258,7 @@ Configuration values in this section are settings specific to real-time mode.
                     - `"fps"` for feet-per-second
                     - `"knot"` for knots
 - `background_recording` is a boolean that determines whether dashcam video will be recorded in the background while using real-time mode.
-    - Note that Predator can only use each recording device for one task at a time, so if you run real-time mode with background recording enabled, you'll need to specify two different devices by changing `image>capture>device` and `dashcam>devices`.
+    - Note that Predator can only use each recording device for one task at a time, so if you run real-time mode with background recording enabled, you'll need to specify two different devices by changing `realtime>image>camera>devices` and `dashcam>capture>video>devices`.
 
 
 

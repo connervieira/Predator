@@ -406,3 +406,5 @@ This update overhauls Predator's dashcam functionality and adds various features
 - The debug message showing that Predator is fetching the current GPS location is now only displayed when a request is made to GPSD.
 - Removed the the `general>display>silence_file_saving` configuration value.
     - File saving is now always silenced unless an error is encountered.
+- The heartbeat log file is now only updated once every 0.25 seconds, even if a heartbeat issue call is made faster than that.
+    - This prevents the heartbeat log file from being written to disk every frame during dashcam recording.

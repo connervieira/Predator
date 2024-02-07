@@ -51,8 +51,8 @@ if (config["realtime"]["gps"]["enabled"] == True): # Only import the GPS librari
 def merge_audio_video(video_file, audio_file, output_file):
     debug_message("Merging audio and video files")
 
-    merge_command = "ffmpeg -i " + video_file + " -i " + audio_file + " -c copy " + output_file
-    erase_command = "rm " + video_file + " " + audio_file
+    merge_command = "timeout 10 ffmpeg -i " + video_file + " -i " + audio_file + " -c copy " + output_file
+    erase_command = "timeout 5 rm " + video_file + " " + audio_file
 
     merge_process = subprocess.run(merge_command.split(), stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     first_attempt = time.time()
@@ -62,6 +62,7 @@ def merge_audio_video(video_file, audio_file, output_file):
             return False # Time out, and exit with a success value False.
     subprocess.run(erase_command.split())
 
+    debug_message("Merged audio and video files")
     return True
 
 
@@ -95,19 +96,19 @@ def benchmark_camera_framerate(device, frames=5): # This function benchmarks a g
 
 
 
-# This function is called when the lock trigger file is created to save the current and last segments.
-def save_dashcam_segments(current_segment, last_segment=""):
+# This function is called when the lock trigger file is created, usually to save the current and last segments.
+def save_dashcam_segments(file1, file2=""):
     global config
 
     if (os.path.isdir(config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"]) == False): # Check to see if the saved dashcam video folder needs to be created.
         os.system("mkdir -p '" + config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"] + "'") # Create the saved dashcam video directory.
     time.sleep(0.3) # Wait for a short period of time so that other dashcam recording threads have time to detect the trigger file.
     if (os.path.isdir(config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"])): # Check to see if the dashcam saving directory exists.
-        os.system("cp '" + current_segment + "' '" + config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"] + "'") # Copy the current dashcam video segment to the saved folder.
-        if (last_segment != ""): # Check to see if there is a "last file" to copy.
-            os.system("cp '" + last_segment + "' '" + config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"] + "'") # Copy the last dashcam video segment to the saved folder.
+        os.system("cp '" + file1 + "' '" + config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"] + "'") # Copy the current dashcam video segment to the saved folder.
+        if (file2 != ""): # Check to see if there is a second file to copy.
+            os.system("cp '" + file2 + "' '" + config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"] + "'") # Copy the last dashcam video segment to the saved folder.
     else:
-        display_message("The dashcam saving directory does not exist, and could not be created. The dashcam video could not be locked.", 2)
+        display_message("The dashcam saving directory does not exist, and could not be created. The dashcam video could not be locked.", 3)
     display_message("Saved the current dashcam segment.", 1)
     os.system("rm -rf '" + config["general"]["interface_directory"] + "/" + config["dashcam"]["saving"]["trigger"] + "'") # Remove the dashcam lock trigger file.
     if (os.path.exists(config["general"]["interface_directory"] + "/" + config["dashcam"]["saving"]["trigger"])): # Check to see if the trigger file exists even after it should have been removed.
