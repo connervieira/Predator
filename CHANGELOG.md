@@ -408,3 +408,5 @@ This update overhauls Predator's dashcam functionality and adds various features
     - File saving is now always silenced unless an error is encountered.
 - The heartbeat log file is now only updated once every 0.25 seconds, even if a heartbeat issue call is made faster than that.
     - This prevents the heartbeat log file from being written to disk every frame during dashcam recording.
+- Refined the debug message system.
+    - Thread names are now automatically determined and assignment when debug messages are displayed.

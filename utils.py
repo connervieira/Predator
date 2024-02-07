@@ -60,14 +60,12 @@ import time # Required to add delays and handle dates/times
 
 # Define the function to print debugging information when the configuration specifies to do so.
 debugging_time_record = {}
-debugging_time_record["Main"] = time.time() # This value holds the time that the previous debug message in the main thread was displayed.
-debugging_time_record["ALPRStreamMaintainer"] = time.time() # This value holds the time that the previous debug message in the ALPR stream maintainer thread was displayed.
-debugging_time_record["ALPRStream"] = time.time() # This value holds the time that the previous debug message in the ALPR stream thread was displayed.
-for device in config["realtime"]["image"]["camera"]["devices"]: # Iterate over each device in the real-time configuration.
-    debugging_time_record["ALPRStream" + str(device)] = time.time() # Initialize each debug timer.
-def debug_message(message, thread="Main"):
+def debug_message(message, thread="MainThread"):
     if (config["general"]["display"]["debugging_output"] == True): # Only print the message if the debugging output configuration value is set to true.
         global debugging_time_record
+        thread = threading.current_thread().name
+        if (thread not in debugging_time_record):
+            debugging_time_record[thread] = time.time()
         time_since_last_message = (time.time()-debugging_time_record[thread]) # Calculate the time since the last debug message.
         print(f"{style.italic}{style.faint}{time.time():.10f} ({time_since_last_message:.10f} - {thread}) - {message}{style.end}") # Print the message.
         debugging_time_record[thread] = time.time() # Record the current timestamp.
@@ -259,7 +257,11 @@ def heartbeat(): # This is the function that is called to issue a heartbeat.
 
 def issue_heartbeat(): # This is the function that actually issues a heartbeat.
     global heartbeat_log
-    if (time.time() - float(heartbeat_log[-1]) > 0.25): # Check to see if it has been more than a brief period of time since the last heartbeat to avoid spamming heartbeat updates.
+    if (len(heartbeat_log) < 1):
+        heartbeat_log.append(time.time()) # Add this pulse to the heartbeat log file, using the current time as the key.
+        heartbeat_log = heartbeat_log[-10:] # Trim the list to only contain the last entries.
+        save_to_file(heartbeat_file_location, json.dumps(heartbeat_log)) # Save the modified heartbeat log to the disk as JSON data.
+    elif (time.time() - float(heartbeat_log[-1]) > 0.25): # Check to see if it has been more than a brief period of time since the last heartbeat to avoid spamming heartbeat updates.
         heartbeat_log.append(time.time()) # Add this pulse to the heartbeat log file, using the current time as the key.
         heartbeat_log = heartbeat_log[-10:] # Trim the list to only contain the last entries.
         save_to_file(heartbeat_file_location, json.dumps(heartbeat_log)) # Save the modified heartbeat log to the disk as JSON data.

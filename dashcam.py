@@ -52,7 +52,7 @@ def merge_audio_video(video_file, audio_file, output_file):
     debug_message("Merging audio and video files")
 
     merge_command = "ffmpeg -i " + video_file + " -i " + audio_file + " -c copy " + output_file
-    erase_command = "timeout 5 rm " + video_file + " " + audio_file
+    erase_command = "timeout 1 rm " + video_file + " " + audio_file
 
     merge_process = subprocess.run(merge_command.split(), stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     first_attempt = time.time()
@@ -235,7 +235,6 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
     global dashcam_recording_active
     global parked
 
-
     device_id = config["dashcam"]["capture"]["video"]["devices"][device]
 
     if (os.path.isdir(config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"]) == False): # Check to see if the saved dashcam video folder needs to be created.
@@ -389,7 +388,7 @@ def start_dashcam_recording(dashcam_devices, video_width, video_height, director
     dashcam_recording_active = True
     
     for device in dashcam_devices: # Run through each camera device specified in the configuration, and launch an FFMPEG recording instance for it.
-        dashcam_process.append(threading.Thread(target=capture_dashcam_video, args=[directory, device, video_width, video_height], name="Dashcam" + str(iteration_counter)))
+        dashcam_process.append(threading.Thread(target=capture_dashcam_video, args=[directory, device, video_width, video_height], name="Dashcam" + str(dashcam_devices[device])))
         dashcam_process[iteration_counter].start()
 
         iteration_counter += 1 # Iterate the counter. This value will be used to create unique file names for each recorded video.
