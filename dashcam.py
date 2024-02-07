@@ -189,13 +189,14 @@ def record_parked_motion(capture, framerate, width, height, device, directory):
     audio_recorder = subprocess.Popen(["arecord", "-q", "--format=cd", audio_file_name], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Start the audio recorder for the parked segment.
 
     while (time.time() - last_motion_detected < config["dashcam"]["parked"]["recording"]["timeout"] and parked == True): # Run until motion is not detected for a certain period of time.
+        heartbeat() # Issue a status heartbeat.
         ret, frame = capture.read() # Capture a frame.
 
         contours, moving_percentage = detect_motion(frame, background_subtractor) # Run motion analysis on this frame.
 
 
 
-        if (moving_percentage > float(config["dashcam"]["parked"]["recording"]["sensitivity"])): # Check to see if there is movement that exceeds the sensitivity threshold.
+        if (moving_percentage > float(config["dashcam"]["parked"]["recording"]["sensitivity"]) * 0.8): # Check to see if there is movement that exceeds 80% of the sensitivity threshold. This ensures that motion that is just barely over the threshold doesn't cause Predator to repeatedly start and stop recording.
             if (moving_percentage < 0.9): # Check to make sure the amount of motion isn't above 90% to prevent camera's exposure adjustments from triggering motion detection.
                 last_motion_detected = time.time()
                 if (time.time() - last_motion_detected > 2): # Check to see if it has been more than 2 seconds since motion was last detected so that the message is only displayed after there hasn't been motion for some time.
