@@ -24,7 +24,7 @@ Installation, set-up, and usage documentation can be found in the [DOCUMENTATION
 
 ## Description
 
-Predator is a multipurpose camera platform focused on license plate reading and object recognition. Predator can analyze pre-recorded video from dashcams, security cameras, or other devices, as well as real-time video streams from live vehicle-mounted cameras and fixed webcams. In addition to video analysis, Predator is also capable of acting as a traditional dash-cam or security camera, eliminating the need to install multiple devices for a single usage situation. When installed in a vehicle, Predator can seamlessly detect objects and license plates as you drive, sending you alerts automatically based on customizable criteria. When installed as a stationary security camera, Predator can run in the background, and use push notifications or audio alerts to indicate important events.
+Predator is a customizable camera platform focused primarily on license plate recognition in an automotive context. Predator is similar to a traditional dash-cam, but adds license plate recognition, object identification, motion detection, and many more features. It can detect license plates and recognize objects in both pre-recorded video and real-time video streams, or simply capture video like a typical dash-cam. Predator strives to be the ultimate dash-cam platform for both technical hobbyists and customers with unique needs.
 
 
 ## Modes
