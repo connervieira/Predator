@@ -82,8 +82,7 @@ def benchmark_camera_framerate(device, frames=5): # This function benchmarks a g
     start_time = time.time() # Record the exact time that the benchmark started.
     for i in range(0, frames): # Run until the specified number of frames have been captured.
         ret, frame = capture.read() # Capture a video frame.
-        stamp_test = str(round(time.time()*100)/100) + " PLACEHOLDER" + str(round(time.time()/2)) # Manipulate a few random values to simulate the generation of the overlay stamp.
-        cv2.putText(frame, stamp_test, (10, 10), 2, 0.8, (255,255,255)) # Add the test stamp to the video frame.
+        frame = apply_dashcam_stamps(frame) # Apply dashcam overlay stamps to the frame.
 
     end_time = time.time() # Record the exact time that the benchmark ended.
     total_time = end_time - start_time # Calculate how many seconds the benchmark took to complete.
@@ -297,7 +296,6 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
 
 
         if (os.path.exists(config["general"]["interface_directory"] + "/" + config["dashcam"]["saving"]["trigger"])): # Check to see if the trigger file exists.
-
             if (config["dashcam"]["capture"]["audio"]["merge"] == True and config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if Predator is configured to merge audio and video files.
                 save_dashcam_segments(video_file_path) # Save the current video segment as a separate file, even though merging is enabled, since the merge won't have been executed yet.
                 if (config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if audio recording is enabled.
