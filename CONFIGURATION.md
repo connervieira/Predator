@@ -229,6 +229,7 @@ Configuration values in this section are settings specific to real-time mode.
             - Lower values make Predator more sensitive to motion, since less motion is required to trigger recording.
             - You can use the `tools/motion_detect_test.py` script to test this setting to find the best value for your use case.
         - `timeout` determines the length of time, in seconds, after motion is detected, that Predator will record video while parked.
+        - `buffer` determines the number of frames that Predator will keep in a buffer. These frames will be added to the beginning of videos triggered by motion detection.
 - `stamps` contains several configurable stamps that can be overlaid on the video recording.
     - `main` contains configuration values for the main stamp shown at the bottom of the frame.
         - `color` is a list of three values between 0 and 255 that determines the font cover of the overlay stamp.

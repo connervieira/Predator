@@ -259,7 +259,6 @@ def issue_heartbeat(): # This is the function that actually issues a heartbeat.
     global heartbeat_log
     if (len(heartbeat_log) < 1):
         heartbeat_log.append(time.time()) # Add this pulse to the heartbeat log file, using the current time as the key.
-        heartbeat_log = heartbeat_log[-10:] # Trim the list to only contain the last entries.
         save_to_file(heartbeat_file_location, json.dumps(heartbeat_log)) # Save the modified heartbeat log to the disk as JSON data.
     elif (time.time() - float(heartbeat_log[-1]) > 0.25): # Check to see if it has been more than a brief period of time since the last heartbeat to avoid spamming heartbeat updates.
         heartbeat_log.append(time.time()) # Add this pulse to the heartbeat log file, using the current time as the key.
