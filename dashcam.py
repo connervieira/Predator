@@ -205,13 +205,14 @@ def record_parked_motion(capture, framerate, width, height, device, directory, f
         output.write(frame) # Save this frame to the video.
 
 
+    frames_captured = 0 # This is a placeholder that will keep track of how many frames are captured in this parked recording.
+    capture_start_time = time.time() # This stores the time that this parked recording started.
     while (time.time() - last_motion_detected < config["dashcam"]["parked"]["recording"]["timeout"] and parked == True): # Run until motion is not detected for a certain period of time.
         heartbeat() # Issue a status heartbeat.
         ret, frame = capture.read() # Capture a frame.
+        frames_captured+=1 # Increment the frame counter.
 
         contours, moving_percentage = detect_motion(frame, background_subtractor) # Run motion analysis on this frame.
-
-
 
         if (moving_percentage > float(config["dashcam"]["parked"]["recording"]["sensitivity"]) * 0.8): # Check to see if there is movement that exceeds 80% of the sensitivity threshold. This ensures that motion that is just barely over the threshold doesn't cause Predator to repeatedly start and stop recording.
             last_motion_detected = time.time()
@@ -220,7 +221,7 @@ def record_parked_motion(capture, framerate, width, height, device, directory, f
 
         if (config["dashcam"]["parked"]["recording"]["highlight_motion"]["enabled"] == True):
             for contour in contours: # Iterate through each contour.
-                if cv2.contourArea(contour) > 10: # Check to see if this contour is big enough to be worth highlighting.
+                if cv2.contourArea(contour) > 5: # Check to see if this contour is big enough to be worth highlighting.
                     color = config["dashcam"]["parked"]["recording"]["highlight_motion"]["color"]
                     x, y, w, h = cv2.boundingRect(contour) # Define the edges of the contour.
                     cv2.rectangle(frame, (x, y), (x+w, y+h), (color[2], color[1], color[0]), 2) # Draw a box around the contour in the frame.
@@ -229,6 +230,9 @@ def record_parked_motion(capture, framerate, width, height, device, directory, f
         output.write(frame) # Save this frame to the video.
 
     audio_recorder.terminate() # Kill the active audio recorder.
+    calculated_framerate = frames_captured / (time.time() - capture_start_time) # Calculate the rate at which frames were captured during this recording.
+    display_message("Stopped motion recording.", 1)
+
 
     if (config["dashcam"]["capture"]["audio"]["merge"] == True and config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if Predator is configured to merge audio and video files.
         merged_file_name = file_name + ".mkv"
@@ -237,7 +241,8 @@ def record_parked_motion(capture, framerate, width, height, device, directory, f
         elif (merge_audio_video(video_file_name, audio_file_name, merged_file_name, audio_offset) == False): # Run the audio/video merge, and check to see if an error occurred.
             display_message("The audio and video segments could not be merged at the end of parked motion recording. It is possible something has gone wrong with recording.", 2)
 
-    display_message("Stopped motion recording.", 1)
+    return calculated_framerate
+
 
 
 
@@ -319,7 +324,7 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
 
             if (moving_percentage > float(config["dashcam"]["parked"]["recording"]["sensitivity"])): # Check to see if there is movement that exceeds the sensitivity threshold.
                 display_message("Detected motion.", 1)
-                record_parked_motion(capture, framerate, width, height, device, directory, frame_history)
+                framerate = record_parked_motion(capture, framerate, width, height, device, directory, frame_history) # Run parked motion recording, and update the framerate to the newly calculated framerate.
                 background_subtractor = cv2.createBackgroundSubtractorMOG2() # Reset the background subtractor after motion is detected.
 
 
