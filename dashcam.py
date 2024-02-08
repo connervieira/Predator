@@ -153,6 +153,9 @@ def apply_dashcam_stamps(frame, width, height):
 
 
 def detect_motion(frame, background_subtractor):
+    frame_height, frame_width, channels = frame.shape
+    total_image_area = frame_height * frame_width
+
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     fgmask = background_subtractor.apply(gray)
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
@@ -160,16 +163,24 @@ def detect_motion(frame, background_subtractor):
     fgmask = cv2.dilate(fgmask, kernel, iterations=1)
     contours, hierarchy = cv2.findContours(fgmask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
+    filtered_contours = [] # This is a placeholder that will hold the list of filtered motion detection contours.
+
     moving_area = 0 # This value will hold the number of pixels in the image that are moving.
     for contour in contours: # Iterate through each contour.
-        moving_area += cv2.contourArea(contour) # Increment the moving_area counter by the number of pixels in the contour.
+        x, y, w, h = cv2.boundingRect(contour) # Define the edges of the contour.
+        width_percentage = (w / frame_width)
+        height_percentage = (h / frame_height)
 
-    height, width, channels = frame.shape
-    total_image_area = height * width
+        if (width_percentage < 0.95 and height_percentage < 0.95): # Check to make sure this movement contour doesn't cover the entire screen.
+            moving_area += cv2.contourArea(contour) # Increment the moving_area counter by the number of pixels in the contour.
+            filtered_contours.append(contour)
+
+
+
     moving_percentage = moving_area / total_image_area # Calculate the percentage of the frame that is in motion.
     moving_percentage_human = "{:.5f}%".format(moving_percentage*100) # Convert the moving percentage to a human-readable string.
 
-    return contours, moving_percentage
+    return filtered_contours, moving_percentage
 
 
 
@@ -253,7 +264,6 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
     segment_start_time = time.time() # This variable keeps track of when the current segment was started. It will be reset each time a new segment is started.
     frames_since_last_segment = 0 # This will count the number of frames in this video segment.
 
-    frames_since_last_motion_detection = 0 # This will count each frame, and is reset after motion is detected.
     invalid_motion_detections = 0 # This will count how many frames of motion detection were rejected due to them occurring immediately after another motion detection instance.
 
     file_name = directory + "/predator_dashcam_" + str(round(time.time())) + "_" + str(device) + "_" + str(segment_number) + "_N"
@@ -295,18 +305,14 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
                 ret, frame = capture.read() # Capture a frame.
             contours, moving_percentage = detect_motion(frame, background_subtractor) # Run motion analysis on this frame.
 
+
             if (moving_percentage > float(config["dashcam"]["parked"]["recording"]["sensitivity"])): # Check to see if there is movement that exceeds the sensitivity threshold.
-                if (frames_since_last_motion_detection > 3 or invalid_motion_detections > 10): # Make sure at least 3 frames have passed since motion was last detected. This prevents camera adjustments from forcing motion detection into an endless loop. Allow motion to punch through this restriction if more than 10 frames have passed and it is still being detected.
-                    display_message("Detected motion.", 1)
-                    record_parked_motion(capture, framerate, width, height, device, directory)
-                    background_subtractor = cv2.createBackgroundSubtractorMOG2() # Reset the background subtractor after motion is detected.
-                else:
-                    invalid_motion_detections = invalid_motion_detections + 1
-                frames_since_last_motion_detection = 0
+                display_message("Detected motion.", 1)
+                record_parked_motion(capture, framerate, width, height, device, directory)
+                background_subtractor = cv2.createBackgroundSubtractorMOG2() # Reset the background subtractor after motion is detected.
 
 
         else: # If the vehicle is not parked, then run normal video processing.
-            frames_since_last_motion_detection = 0 # Motion detection is disabled in normal recording, so reset the motion detection counter.
             if (time.time()-segment_start_time > config["dashcam"]["saving"]["segment_length"]): # Check to see if this segment has exceeded the segment length time.
                 # Handle the start of a new segment.
                 segment_number+=1 # Increment the segment counter.
@@ -373,7 +379,6 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
             frame = apply_dashcam_stamps(frame, width, height)
             output.write(frame) # Save this frame to the video.
 
-        frames_since_last_motion_detection = frames_since_last_motion_detection + 1 # Increment the frame counter.
 
     capture.release()
     cv2.destroyAllWindows()
