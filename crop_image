@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# This script serves the purpose of cropping images to increase analysis efficiency. It uses the following structure:
+# This script serves the purpose of cropping images to increase analysis efficiency. It uses the following command line syntax:
 # ./crop_image image_file_name left right top bottom
 
 import subprocess
