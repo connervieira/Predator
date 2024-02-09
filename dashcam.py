@@ -54,8 +54,6 @@ def merge_audio_video(video_file, audio_file, output_file, audio_offset=0):
     merge_command = "ffmpeg -i " + audio_file + " -itsoffset -" + str(audio_offset) + " -i " + video_file + " -c copy " + output_file
     erase_command = "timeout 1 rm " + video_file + " " + audio_file
 
-    print(merge_command) # TODO: REMOVE
-
     merge_process = subprocess.run(merge_command.split(), stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     first_attempt = time.time()
     while (merge_process.returncode != 0): # If the merge process exited with an error, keep trying until it is successful. This might happen if one of the files hasn't fully saved to disk.
