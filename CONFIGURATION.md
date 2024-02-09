@@ -181,7 +181,6 @@ Configuration values in this section are settings specific to real-time mode.
             - The "normal" status is used when Predator is running, and hasn't detected any license plates in the past processing cycle.
 
 
-
 ## Dash-cam Mode Configuration
 
 - `saving` contains settings related to "locking" dashcam video during important events.
@@ -260,9 +259,6 @@ Configuration values in this section are settings specific to real-time mode.
                     - `"knot"` for knots
 - `background_recording` is a boolean that determines whether dashcam video will be recorded in the background while using real-time mode.
     - Note that Predator can only use each recording device for one task at a time, so if you run real-time mode with background recording enabled, you'll need to specify two different devices by changing `realtime>image>camera>devices` and `dashcam>capture>video>devices`.
-
-
-
 
 
 ## Developer Configuration

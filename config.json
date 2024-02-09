@@ -153,14 +153,14 @@
             "audio": {
                 "enabled": true,
                 "extension": "wav",
-                "merge": false
+                "merge": true
             }
         },
         "parked": {
             "enabled": true,
             "conditions": {
                 "speed": 2,
-                "time": 1
+                "time": 5
             },
             "recording": {
                 "highlight_motion": {
