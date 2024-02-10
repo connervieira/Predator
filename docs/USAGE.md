@@ -72,7 +72,7 @@ This section describes the initial start-up process of Predator.
 
 ## Operation
 
-This section describes how each Predator mode works after the intial start-up.
+This section describes how each Predator mode works after the initial start-up.
 
 ### Management Mode
 - Unlike the other modes, the management mode revolves entirely around user menus.
@@ -103,7 +103,7 @@ This section describes how each Predator mode works after the intial start-up.
     - Predator will not detect license plates in this mode. However, you can analyze recorded dash-cam video using pre-recorded mode at a later time.
     - If configured to do so, Predator may automatically switch between "normal" and "parked" mode when the vehicle is stopped for a prolonged period of time.
         - In normal mode, Predator simply records dash-cam video as you would expect a traditional dash-cam to do. Separate video segments will be saved at regular intervals according to the configuration.
-        - In parked mode, Predator sits dormant, waiting to detect motion on any of its configured capture devices. When motion is detected, Predator saves a certain number of past frames from a buffer, and begins recording until motion has not been detected for a certain period of time. Predator treats different capture devices as different zones, and will only record video on the camera that detects motion. If multiple cameras detect motion at the same time, Predator will record on them simutaneously.
+        - In parked mode, Predator sits dormant, waiting to detect motion on any of its configured capture devices. When motion is detected, Predator saves a certain number of past frames from a buffer, and begins recording until motion has not been detected for a certain period of time. Predator treats different capture devices as different zones, and will only record video on the camera that detects motion. If multiple cameras detect motion at the same time, Predator will record on them simultaneously.
     - The dash-cam video recorded will be saved to the working directory as `predator_dashcam_TIME_CHANNEL_SEGMENT_TYPE.mkv`.
         - `TIME` is replaced by a Unix timestamp of when the file was created.
         - `CHANNEL` is replaced by the name of the device used, as specified in the configuration.

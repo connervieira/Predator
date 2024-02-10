@@ -88,3 +88,4 @@ In addition to the files for sharing information from Predator to external progr
 When an important event happens while driving, a user may want to save a specific dashcam video segment to a separate folder so that it doesn't get accidentally deleted. This is referred to as "locking" or "saving" a dashcam video.
 
 Dashcam saving can be triggered by create the file specified by the `dashcam>saving>trigger` configuration value inside the interface directory. When this file is created, Predator will save the current dashcam video to the configured directory, then delete the trigger file. The trigger file does not need to contain any information. Only its existence is required to trigger Predator.
+

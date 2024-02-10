@@ -2,7 +2,7 @@
 
 Predator is primarily a software utility. However, it goes without saying that Predator is only useful if it has hardware capable of effectively collecting and processing video and image information. This document describes hardware information related to Predator, including parts lists.
 
-To learn more about paid hardware/software support for Predator, see [APEX.md](APEX.md).
+To learn more about paid hardware/software support for Predator, see [../APEX.md](../APEX.md).
 
 
 ## Recommendations
@@ -53,6 +53,10 @@ As a general rule, these are the parts you'll need in a Predator device:
 - GPS
     - Optional
         - Predator doesn't need a GPS to function. However, certain features won't be operational without it.
+- Clock
+    - Optional
+        - Since most single-board computers (like the Raspberry Pi) don't have a real time clock (RTC), they will lose track of time without access to the internet. Adding a real time clock ensures your system's time remains accurate.
+        - Predator should generally work fine with inaccurate time, but you may find it inconvenient, especially when interpreting log files and dash-cam video files.
 
 
 ## Builds
