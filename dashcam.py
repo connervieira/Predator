@@ -351,8 +351,8 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
                     audio_recorder = subprocess.Popen(["arecord", "-q", "--format=cd", audio_filepath], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Start the next segment's audio recorder.
                     
                 video_filepath = file_name + ".avi" # Update the file path.
-                if (parked == False or time.time() - last_motion_detection < config["dashcam"]["parked"]["recording"]["timeout"]): # Check to see if recording is active before intitializing the video file.
-                    calculated_framerate = frames_since_last_segment / (time.time() - segment_start_time) # Calculate the frame-rate of the last segment.
+                calculated_framerate = frames_since_last_segment / (time.time() - segment_start_time) # Calculate the frame-rate of the last segment.
+                output = cv2.VideoWriter(video_filepath, cv2.VideoWriter_fourcc(*'XVID'), float(calculated_framerate), (width,  height)) # Update the video output.
                 segment_start_time = time.time() # Update the segment start time.
                 frames_since_last_segment = 0 # This will count the number of frames in this video segment.
 
