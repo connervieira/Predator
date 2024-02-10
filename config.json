@@ -157,7 +157,7 @@
             }
         },
         "parked": {
-            "enabled": true,
+            "enabled": false,
             "conditions": {
                 "speed": 2,
                 "time": 5
@@ -177,7 +177,7 @@
             }
         },
         "stamps": {
-            "size": 0.8,
+            "size": 0.6,
             "main": {
                 "color": [
                     255,
