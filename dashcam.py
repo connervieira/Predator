@@ -66,6 +66,7 @@ def merge_audio_video(video_file, audio_file, output_file, audio_offset=0):
     return True
 
 
+
 def benchmark_camera_framerate(device, frames=5): # This function benchmarks a given camera to determine its framerate.
     global config
 
@@ -88,6 +89,7 @@ def benchmark_camera_framerate(device, frames=5): # This function benchmarks a g
     total_time = end_time - start_time # Calculate how many seconds the benchmark took to complete.
     fps = frames / total_time # Calculate the number of frames captured per second.
     debug_message("Capture device '" + device + "' runs at " + str(round(fps*10)/10) + "fps")
+
     return fps # Return the calculated FPS.
 
 
@@ -249,10 +251,14 @@ def record_parked_motion(capture, framerate, width, height, device, directory, f
 
 dashcam_recording_active = False
 parked = False
+initial_benchmark_completed = {} # This is a global variable that will be used to keep track of which capture devices have completed their initial framerate benchmark.
+for device in config["dashcam"]["capture"]["video"]["devices"]: # Run through each camera device specified in the configuration, and set its benchmark completion to false.
+    initial_benchmark_completed[device] = False
 
 def capture_dashcam_video(directory, device="main", width=1280, height=720):
     global dashcam_recording_active
     global parked
+    global initial_benchmark_completed
 
     device_id = config["dashcam"]["capture"]["video"]["devices"][device]
 
@@ -260,6 +266,13 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
         os.system("mkdir -p '" + config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"] + "'") # Create the saved dashcam video directory.
 
     framerate = benchmark_camera_framerate(device) # Benchmark this capture device to determine its operating framerate.
+    initial_benchmark_completed[device] = True # Indicate that this device has completed its initial framerate benchmark.
+    benchmark_wait_started = time.time() # Record the time that this thread started waiting for the other benchmarks to complete.
+    while (all(list(initial_benchmark_completed.values())) == False): # Wait until every capture device has finished the intiail frame-rate benchmark.
+        if (time.time() - benchmark_wait_started > 10): # Check to see if this thread has been waiting for at least 10 seconds for the other frame-rate benchmarks to complete.
+            break # Override the loop and start recording, since it is likely something has gone wrong in one of the other threads.
+        time.sleep(0.01)
+
     debug_message("Opening video stream on '" + device + "'")
 
     capture = cv2.VideoCapture(device_id) # Open the video stream.
