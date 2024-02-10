@@ -5,7 +5,7 @@ This document contains a series of questions you may have concerning Predator.
 
 **What exactly is Predator?**
 
-In short, Predator is a camera utility designed primarily to be a vehicle-based system with a focus on automatic license plate recognition. Predator is also capable of operating as a dashcam, and can run general object recognition to identify objects like vehicles, traffic lights, and pedestrians.
+Predator is a camera utility designed primarily to be installed in a vehicle. It is focused on license plate reading and object recognition, although it works as a fully featured traditional dash-cam as well.
 
 
 **How do I install Predator?**
@@ -60,7 +60,7 @@ Officially, Predator is only compatible with Linux based operating systems, and 
 
 **Why is Predator written in Python, and not something more efficient, like C++?**
 
-Python makes the development of the core Predator system much faster and more efficient. Additionally, Python makes it much easier to port Predator to new platforms. While Predator itself is indeed written in Python, many of its processing-heavy dependencies are written in C++. For example, Phantom, Predator's ALPR engine, is written in C++. This allows the system as a whole to benefit from the conveinence of Python, without significantly harming processing performance of critical processes.
+Python makes the development of the core Predator system much faster and more efficient. Additionally, Python makes it much easier to port Predator to new platforms. While Predator itself is indeed written in Python, many of its processing-heavy dependencies are written in C++. For example, Phantom, Predator's ALPR engine, is written in C++. This allows the system as a whole to benefit from the convenience of Python, without significantly harming processing performance of critical processes.
 
 
 **How does Predator work?**
