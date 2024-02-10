@@ -52,7 +52,7 @@ Dash-cam mode allows Predator to record video without running any analysis or co
 
 ### Completely Private
 
-Since Predator is open source, self hosted, offline, and self contained, you can rest assured that it's completely private, and it doesn't collect any of the information you provide it.
+Since Predator is open source, self hosted, offline, and self contained, you can rest assured that it's completely private, and that it doesn't share any of the information it collects.
 
 ### Offline Capable
 
@@ -60,7 +60,7 @@ Predator works entirely offline, and never needs to connect to the internet to f
 
 ### Open Source
 
-Predator is free and open source from top to bottom, and is free software, meaning you can make changes and distribute them to others freely.
+Predator, and all of its dependencies, are free and open source from top to bottom, meaning you can study how it works, make changes, and distribute it to others freely.
 
 ### Generic Hardware
 
@@ -92,11 +92,11 @@ Predator is designed to be safe, regardless of the installation context. It's ea
 
 ### Full Dashcam
 
-Predator comes with a fully featured dash-cam mode, allowing for customizable real-time recording without processing license plates. Dash-cam videos can later be processed by Predator in pre-recorded mode. Predator's dash-cam mode allows for multi-channel recording, provided the hardware supports it, making it easy to simultaneously record multiple angles using multiple cameras.
+Predator comes with a fully featured dash-cam mode, allowing for customizable ecording without processing license plates. Dash-cam videos can later be processed by Predator in pre-recorded mode if desired. Predator's dash-cam mode allows for multi-channel recording, provided the hardware supports it, making it easy to simultaneously record multiple angles using multiple cameras.
 
 ### Headless Ready
 
-While Predator comes with a straight forward interface, it can be fully configured to run in headless mode, without any user interaction necessary. This makes it perfect for vehicle installations, where the driver wants Predator to automatically start when the vehicle turns on without any user input, especially when paired with a compatible user interface.
+While Predator comes with a straight-forward command-line interface, it can be fully configured to run in headless mode, without any user interaction necessary. This makes it perfect for vehicle installations, where the driver wants Predator to automatically start when the vehicle turns on.
 
 ### Object Recognition
 
@@ -104,11 +104,11 @@ In addition to license plate scanning, Predator also supports general object rec
 
 ### Well Documented
 
-Predator's extreme customizability can be a bit overwhelming to new users. For this reason, Predator is extensively documented, and comes bundled with step-by-step guides on how to download it, install it, configure it, and run it.
+Predator's extreme customizability can be a bit overwhelming to new users. For this reason, Predator is extensively documented, and comes bundled with step-by-step guides on how to download, install, configure, and run it.
 
 ### Dependable Alerts
 
-While it shouldn't be fully relied upon for safety critical tasks, Predator is designed to be extremely dependable regardless. When configured appropriately, steps are taken to decrease the likelihood that Predator will fail to alert to a true positive due mistakes in the analysis.
+While it shouldn't be fully relied upon for safety critical tasks, Predator is designed to be extremely dependable regardless. When configured appropriately, steps are taken to decrease the likelihood that Predator will false negative due mistakes in the analysis.
 
 ### Adaptive Framerate
 
@@ -117,6 +117,10 @@ Predator automatically adapts to changing lighting conditions in both real-time 
 ### Parking Mode
 
 Predator supports automatic parking dashcam functionality, where recording stops when the vehicle is parked, until motion is detected. This allows Predator to run continuously while only capturing important events on video.
+
+### Buffered Recording
+
+In dash-cam mode, when parking mode is active, Predator will keep a video buffer of customizable length at all times. This means that Predator can go "back in time" when motion is detected, and save the last few seconds of video retroactively.
 
 
 ## Screenshots
