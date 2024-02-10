@@ -1272,8 +1272,6 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
     debug_message("Starting main processing loop")
     while True: # Run in a loop forever.
 
-
-
         if (config["realtime"]["interface"]["behavior"]["clearing"] == True): # Clear the output screen at the beginning of each round if the configuration indicates to.
             clear()
 
