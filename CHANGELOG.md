@@ -375,9 +375,8 @@ This update overhauls Predator's dashcam functionality and adds various features
             - This is useful to prevent Predator from completely filling the available storage space.
         - Dashcam video file names now end with either an "N" or "P" to indicate "normal" or "parked" mode respectively.
     - Improved the way frame-rate is handled in OpenCV recording.
-        - Fixed an issue where the FFMPEG frame rate would be displayed on start up even when OpenCV dashcam recording was selected.
         - The frame-rate configuration value has been removed in favor of calculating FPS on the fly.
-            The frame-rate of each capture device is individually benchmarked when dashcam recording starts, and is re-calculated at the start of every subsequent segment.
+            - The frame-rate of each capture device is individually benchmarked when dashcam recording starts, and is re-calculated at the start of every subsequent segment.
         - Simplified the OpenCV FPS benchmark tool.
             - The script has been re-named to `framerate_benchmark.py` for clarity.
             - The script now uses the information from `config.json`, instead of being configured by manually changing variables at the top of the script.
