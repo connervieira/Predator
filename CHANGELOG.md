@@ -410,3 +410,4 @@ This update overhauls Predator's dashcam functionality and adds various features
     - This prevents the heartbeat log file from being written to disk every frame during dashcam recording.
 - Refined the debug message system.
     - Thread names are now automatically determined and assignment when debug messages are displayed.
+- Fixed speed display in real-time mode.

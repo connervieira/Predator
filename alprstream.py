@@ -69,7 +69,7 @@ def alpr_stream_maintainer(): # This function runs an endless loop that maintain
         stream_file = open(alpr_stream_file_location) # Open the ALPR stream file.
         stream_file_contents = stream_file.readlines() # Read the stream file line by line.
         stream_file.close() # Close the ALPR stream file.
-        save_to_file(alpr_stream_file_location, "", True) # Erase the contents of the ALPR stream file.
+        save_to_file(alpr_stream_file_location, "") # Erase the contents of the ALPR stream file.
 
         for message in stream_file_contents: # Iterate through each line in the loaded stream file contents.
             if (is_json(message) == True):
@@ -87,7 +87,7 @@ def alpr_stream_maintainer(): # This function runs an endless loop that maintain
 
 
 def start_alpr_stream(): # This function starts the ALPR stream threads.
-    save_to_file(alpr_stream_file_location, "", True) # Erase the contents of the ALPR stream file.
+    save_to_file(alpr_stream_file_location, "") # Erase the contents of the ALPR stream file.
     alpr_stream_count = 0 # This will keep track of the number of ALPR streams running.
     alpr_stream_threads = {} # This is a dictionary that will hold the ALPR sub-threads.
     os.popen("killall alpr") # Kill any ALPR processes that are running in the background in case they weren't terminated properly the last time Predator was run.

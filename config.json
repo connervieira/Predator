@@ -80,7 +80,7 @@
             "video_still_path": "/dev/shm/phantom-webcam.jpg"
         },
         "gps": {
-            "enabled": false,
+            "enabled": true,
             "alpr_location_tagging": true
         },
         "image": {
