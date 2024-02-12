@@ -82,7 +82,7 @@ if (config["developer"]["offline"] == False): # Only import networking libraries
 import re # Required to use Regex
 import datetime # Required for converting between timestamps and human readable date/time information
 from xml.dom import minidom # Required for processing GPX data
-if (config["realtime"]["gps"]["enabled"] == True): # Only import the GPS libraries if GPS settings are enabled.
+if (config["general"]["gps"]["enabled"] == True): # Only import the GPS libraries if GPS settings are enabled.
     from gps import * # Required to access GPS information.
     import gpsd
 import threading
@@ -488,7 +488,7 @@ def display_shape(shape):
 last_gps_request = {} # This is a placeholder that will store information regarding the last GPS request.
 def get_gps_location():
     global last_gps_request
-    if (config["realtime"]["gps"]["enabled"] == True): # Check to see if GPS is enabled.
+    if (config["general"]["gps"]["enabled"] == True): # Check to see if GPS is enabled.
         gpsd.connect() # Connect to the GPS daemon.
         gps_data_packet = gpsd.get_current() # Query the GPS for the most recent information.
         if (gps_data_packet.mode >= 2): # Check to see if the GPS has a fix yet.

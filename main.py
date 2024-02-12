@@ -40,7 +40,6 @@ import sys # Required to read command line arguments.
 import re # Required to use Regex.
 import datetime # Required for converting between timestamps and human readable date/time information.
 import fnmatch # Required to use wildcards to check strings.
-import threading # Required to make use of multi-threading.
 
 
 
@@ -1276,7 +1275,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
             clear()
 
 
-        if (config["realtime"]["interface"]["display"]["speed"]["enabled"] == True and config["realtime"]["gps"]["enabled"] == True): # Display the current speed based on GPS, if enabled in the configuration.
+        if (config["realtime"]["interface"]["display"]["speed"]["enabled"] == True and config["general"]["gps"]["enabled"] == True): # Display the current speed based on GPS, if enabled in the configuration.
             current_location = get_gps_location() # Get the current location.
             current_speed = convert_speed(float(current_location[2]), config["realtime"]["interface"]["display"]["speed"]["unit"]) # Convert the speed data from the GPS into the units specified by the configuration.
             print("Current speed: " + str(current_speed) + " " + str(config["realtime"]["interface"]["display"]["speed"]["unit"])) # Print the current speed to the console.
@@ -1495,7 +1494,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
                 plate_log[current_time] = {} # Initialize an entry in the plate history log using the current time.
 
                 if (config["realtime"]["gps"]["alpr_location_tagging"] == True): # Check to see if the configuration value for geotagging license plate detections has been enabled.
-                    if (config["realtime"]["gps"]["enabled"] == True): # Check to see if GPS functionality is enabled.
+                    if (config["general"]["gps"]["enabled"] == True): # Check to see if GPS functionality is enabled.
                         current_location = get_gps_location() # Get the current location.
                     else:
                         current_location = [0.0, 0.0] # Grab a placeholder for the current location, since GPS functionality is disabled.

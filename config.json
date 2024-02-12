@@ -25,6 +25,9 @@
             "startup_message": "",
             "debugging_output": true
         },
+        "gps": {
+            "enabled": false
+        },
         "object_recognition": {
             "enabled": false
         },
@@ -80,7 +83,6 @@
             "video_still_path": "/dev/shm/phantom-webcam.jpg"
         },
         "gps": {
-            "enabled": true,
             "alpr_location_tagging": true
         },
         "image": {
