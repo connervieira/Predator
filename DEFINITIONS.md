@@ -1,6 +1,6 @@
 # Definitions
 
-This document contains definitions for several terms used in Predator.
+This document contains definitions for several terms used in relation to Predator.
 
 
 ## General
@@ -33,14 +33,14 @@ The terms 'file path', 'directory path', or simply 'path' are used to refer to a
     - This type of path is defined relative to the current working (project) directory.
     - This kind of file path is typically used to define files that will change each time Predator runs, including analysis videos and a export information.
     - For example, a file path defined relative to the root project directory as `data/file.txt`, when the current root project directory is `/home/pi/Downloads/`, will translate to a complete file path of `/home/pi/Downloads/data/file.txt`
-- Predator Directory Relative
+- Instance Directory Relative/Predator Directory Relative
     - This type of path is defined relative to the directory of Predator itself.
     - This kind of file path is typically used to define files that should be moved around with Predator, including configuration files and logs.
     - For example, a file path defined relative to the Predator directory as `config.json`, when Predator's directory is `/home/pi/Downloads/Predator`, will translate to a complete file path of `/home/pi/Downloads/Predator/config.json`
 
 ### Preference
 
-A preference is a user setting defined when Predator launches. These settings are temporary, and are configured each time Predator boots.
+A preference is a user setting defined when Predator launches. These settings are temporary, and are configured each time Predator starts.
 
 ### Configuration
 
@@ -56,4 +56,4 @@ The term "console" or "console output" refers to the text-based output produced 
 
 ### Controller
 
-A"controller" is an external program that controls Predator and its operation. Optic and Cortex are both controllers for Predator.
+A "controller" is an external program that controls Predator and its operation. [Optic](https://v0lttech.com/optic.php) and [Cortex](https://v0lttech.com/cortex.php) are both examples of controllers for Predator.
