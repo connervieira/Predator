@@ -402,7 +402,6 @@ This update overhauls Predator's dashcam functionality and adds various features
 - Added additional configuration error checking.
 - The option to view files in the working directory in management mode now shows all files, including those inside sub-directories.
 - Created a dedicated function to wait for user input before continuing.
-- The debug message showing that Predator is fetching the current GPS location is now only displayed when a request is made to GPSD.
 - Removed the the `general>display>silence_file_saving` configuration value.
     - File saving is now always silenced unless an error is encountered.
 - The heartbeat log file is now only updated once every 0.25 seconds, even if a heartbeat issue call is made faster than that.
@@ -410,3 +409,4 @@ This update overhauls Predator's dashcam functionality and adds various features
 - Refined the debug message system.
     - Thread names are now automatically determined and assignment when debug messages are displayed.
 - Fixed speed display in real-time mode.
+- Improved GPS handling.

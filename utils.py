@@ -492,11 +492,21 @@ def get_gps_location():
         gpsd.connect() # Connect to the GPS daemon.
         gps_data_packet = gpsd.get_current() # Query the GPS for the most recent information.
         if (gps_data_packet.mode >= 2): # Check to see if the GPS has a fix yet.
-            print( [gps_data_packet.position()[0], gps_data_packet.position()[1], gps_data_packet.speed(), gps_data_packet.altitude(), gps_data_packet.movement()["track"], gps_data_packet.sats, gps_data_packet.time]) # Record the current information as the last GPS query response.
-            return gps_data_packet.position()[0], gps_data_packet.position()[1], gps_data_packet.speed(), gps_data_packet.altitude(), gps_data_packet.movement()["track"], gps_data_packet.sats, gps_data_packet.time # Return GPS information.
+            position = gps_data_packet.position()
+            speed = gps_data_packet.speed()
+            if (gps_data_packet.mode >= 3): # Check to see if the GPS has a 3D fix yet.
+                altitude = gps_data_packet.altitude()
+                heading = gps_data_packet.movement()["track"]
+            else:
+                altitude = 0 # Use a placeholder for altitude.
+                heading = 0 # Use a placeholder for heading.
+            satellites = gps_data_packet.sats
+            time = gps_data_packet.time
+            return position[0], position[1], speed, altitude, heading, satellites, time
         else: # Since the GPS doesn't have a fix, just return blank information.
             return 0.0000, 0.0000, 0.0, 0.0, 0.0, 0, 0 # Return a default placeholder location.
     else: # If GPS is disabled, then this function should never be called, but return a placeholder position regardless.
+        display_message("The `get_gps_location` function was called, even though GPS is disabled. This is a bug, and should never occur.", 2)
         return 0.0000, 0.0000, 0.0, 0.0, 0.0, 0, 0 # Return a default placeholder location.
 
 
