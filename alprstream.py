@@ -62,7 +62,7 @@ def alpr_stream(device):
 
 def alpr_stream_maintainer(): # This function runs an endless loop that maintains
     global queued_plate_reads
-    last_message_received = time.time() + 5 # This variable holds the time that the last ALPR message was received. Initialize it to a time a few seconds into the future to allow the ALPR process extra time to start before a warning is displayed.
+    last_message_received = utils.get_time() + 5 # This variable holds the time that the last ALPR message was received. Initialize it to a time a few seconds into the future to allow the ALPR process extra time to start before a warning is displayed.
     while True:
         debug_message("Starting ALPR stream maintainance cycle")
         time.sleep(0.3) # Delay for a short period of time before each loop so that the ALPR stream has time to output some results.
@@ -73,7 +73,7 @@ def alpr_stream_maintainer(): # This function runs an endless loop that maintain
 
         for message in stream_file_contents: # Iterate through each line in the loaded stream file contents.
             if (is_json(message) == True):
-                last_message_received = time.time() # Update the last message received time to the current time.
+                last_message_received = utils.get_time() # Update the last message received time to the current time.
                 message = json.loads(message) # Parse each line into JSON.
                 if ("error" in message): # Check to see if there were errors while executing the ALPR process. This will only work for alerts issued by Phantom, not OpenALPR.
                     display_message("Phantom ALPR encountered an error: " + message["error"], 2) # Display the ALPR error.
@@ -82,7 +82,7 @@ def alpr_stream_maintainer(): # This function runs an endless loop that maintain
             else:
                 display_message("The information returned by the ALPR engine is not valid JSON. Maybe you've specified the wrong ALPR engine in the configuration?", 2)
 
-        if (time.time() - last_message_received > 3): # Check to see if a certain number of seconds have passed without receiving any messages from the ALPR process.
+        if (utils.get_time() - last_message_received > 3): # Check to see if a certain number of seconds have passed without receiving any messages from the ALPR process.
             display_message("The ALPR stream hasn't received any ALPR messages in several seconds. The ALPR process may not be running.", 2)
 
 

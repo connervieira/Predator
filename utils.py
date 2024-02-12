@@ -58,6 +58,13 @@ class style:
 
 import time # Required to add delays and handle dates/times
 
+global_time_offset = 0 
+def get_time():
+    global global_time_offset
+    adjusted_time = time.time() + global_time_offset
+    return adjusted_time
+
+
 # Define the function to print debugging information when the configuration specifies to do so.
 debugging_time_record = {}
 def debug_message(message, thread="MainThread"):
@@ -65,10 +72,10 @@ def debug_message(message, thread="MainThread"):
         global debugging_time_record
         thread = threading.current_thread().name
         if (thread not in debugging_time_record):
-            debugging_time_record[thread] = time.time()
-        time_since_last_message = (time.time()-debugging_time_record[thread]) # Calculate the time since the last debug message.
-        print(f"{style.italic}{style.faint}{time.time():.10f} ({time_since_last_message:.10f} - {thread}) - {message}{style.end}") # Print the message.
-        debugging_time_record[thread] = time.time() # Record the current timestamp.
+            debugging_time_record[thread] = get_time()
+        time_since_last_message = (get_time()-debugging_time_record[thread]) # Calculate the time since the last debug message.
+        print(f"{style.italic}{style.faint}{get_time():.10f} ({time_since_last_message:.10f} - {thread}) - {message}{style.end}") # Print the message.
+        debugging_time_record[thread] = get_time() # Record the current timestamp.
 
 
 
@@ -188,11 +195,11 @@ if (config["general"]["interface_directory"] != ""): # Check to see if the inter
 def log_plates(detected_plates):
     global plate_log
 
-    plate_log[time.time()] = detected_plates
+    plate_log[get_time()] = detected_plates
     entries_to_remove = [] # Create a blank placeholder list to hold all of the entry keys that have expired and need to be removed.
 
     for entry in plate_log.keys(): # Iterate through each entry in the plate history.
-        if (time.time() - float(entry) > 10): # Check to see if this entry has expired according the max age configuration value.
+        if (get_time() - float(entry) > 10): # Check to see if this entry has expired according the max age configuration value.
             entries_to_remove.append(entry) # Add this entry key to the list of entries to remove.
 
     for key in entries_to_remove: # Iterate through each of the keys designated to be removed.
@@ -221,11 +228,11 @@ if (config["general"]["interface_directory"] != ""): # Check to see if the inter
 def log_alerts(active_alerts):
     global alert_log
 
-    alert_log[time.time()] = active_alerts
+    alert_log[get_time()] = active_alerts
     entries_to_remove = [] # Create a blank placeholder list to hold all of the entry keys that have expired and need to be removed.
 
     for entry in alert_log.keys(): # Iterate through each entry in the alert history.
-        if (time.time() - float(entry) > 10): # Check to see if this entry has expired according the max age configuration value.
+        if (get_time() - float(entry) > 10): # Check to see if this entry has expired according the max age configuration value.
             entries_to_remove.append(entry) # Add this entry key to the list of entries to remove.
 
     for key in entries_to_remove: # Iterate through each of the keys designated to be removed.
@@ -258,10 +265,10 @@ def heartbeat(): # This is the function that is called to issue a heartbeat.
 def issue_heartbeat(): # This is the function that actually issues a heartbeat.
     global heartbeat_log
     if (len(heartbeat_log) < 1):
-        heartbeat_log.append(time.time()) # Add this pulse to the heartbeat log file, using the current time as the key.
+        heartbeat_log.append(get_time()) # Add this pulse to the heartbeat log file, using the current time as the key.
         save_to_file(heartbeat_file_location, json.dumps(heartbeat_log)) # Save the modified heartbeat log to the disk as JSON data.
-    elif (time.time() - float(heartbeat_log[-1]) > 0.25): # Check to see if it has been more than a brief period of time since the last heartbeat to avoid spamming heartbeat updates.
-        heartbeat_log.append(time.time()) # Add this pulse to the heartbeat log file, using the current time as the key.
+    elif (get_time() - float(heartbeat_log[-1]) > 0.25): # Check to see if it has been more than a brief period of time since the last heartbeat to avoid spamming heartbeat updates.
+        heartbeat_log.append(get_time()) # Add this pulse to the heartbeat log file, using the current time as the key.
         heartbeat_log = heartbeat_log[-10:] # Trim the list to only contain the last entries.
         save_to_file(heartbeat_file_location, json.dumps(heartbeat_log)) # Save the modified heartbeat log to the disk as JSON data.
 
@@ -286,15 +293,15 @@ else: # If the error file doesn't contain valid JSON data, then load a blank pla
 
 def display_message(message, level=1):
     if (level == 1): # Display the message as a notice.
-        error_log[time.time()] = {"msg": message, "type": "notice"} # Add this message to the log file, using the current time as the key.
+        error_log[get_time()] = {"msg": message, "type": "notice"} # Add this message to the log file, using the current time as the key.
         save_to_file(error_file_location, json.dumps(error_log)) # Save the modified error log to the disk as JSON data.
         print("Notice: " + message)
     elif (level == 2): # Display the message as a warning.
-        error_log[time.time()] = {"msg": message, "type": "warn"} # Add this message to the log file, using the current time as the key.
+        error_log[get_time()] = {"msg": message, "type": "warn"} # Add this message to the log file, using the current time as the key.
         save_to_file(error_file_location, json.dumps(error_log)) # Save the modified error log to the disk as JSON data.
         print(style.yellow + "Warning: " + message + style.end)
     elif (level == 3): # Display the message as an error.
-        error_log[time.time()] = {"msg": message, "type": "error"} # Add this message to the log file, using the current time as the key.
+        error_log[get_time()] = {"msg": message, "type": "error"} # Add this message to the log file, using the current time as the key.
         save_to_file(error_file_location, json.dumps(error_log)) # Save the modified error log to the disk as JSON data.
         print(style.red + "Error: " + message + style.end)
         prompt(style.faint + "Press enter to continue..." + style.end)
@@ -492,19 +499,23 @@ def get_gps_location():
         gpsd.connect() # Connect to the GPS daemon.
         gps_data_packet = gpsd.get_current() # Query the GPS for the most recent information.
         if (gps_data_packet.mode >= 2): # Check to see if the GPS has a fix yet.
+            gps_time = gps_data_packet.time
             position = gps_data_packet.position()
             speed = gps_data_packet.speed()
-            if (gps_data_packet.mode >= 3): # Check to see if the GPS has a 3D fix yet.
-                altitude = gps_data_packet.altitude()
-                heading = gps_data_packet.movement()["track"]
-            else:
-                altitude = 0 # Use a placeholder for altitude.
-                heading = 0 # Use a placeholder for heading.
+        else:
+            position = [0, 0]
+            speed = 0
+            gps_time = 0
+        if (gps_data_packet.mode >= 3): # Check to see if the GPS has a 3D fix yet.
+            altitude = gps_data_packet.altitude()
+            heading = gps_data_packet.movement()["track"]
             satellites = gps_data_packet.sats
-            time = gps_data_packet.time
-            return position[0], position[1], speed, altitude, heading, satellites, time
-        else: # Since the GPS doesn't have a fix, just return blank information.
-            return 0.0000, 0.0000, 0.0, 0.0, 0.0, 0, 0 # Return a default placeholder location.
+        else:
+            altitude = 0 # Use a placeholder for altitude.
+            heading = 0 # Use a placeholder for heading.
+            satellites = 0 # Use a placeholder for satellites.
+
+        return position[0], position[1], speed, altitude, heading, satellites, gps_time
     else: # If GPS is disabled, then this function should never be called, but return a placeholder position regardless.
         display_message("The `get_gps_location` function was called, even though GPS is disabled. This is a bug, and should never occur.", 2)
         return 0.0000, 0.0000, 0.0, 0.0, 0.0, 0, 0 # Return a default placeholder location.
@@ -568,7 +579,7 @@ def display_number(display_number="0"):
 
 # This function returns the nearest timestamp key in dictionary to a given timestamp.
 def closest_key(array, search_key):
-    current_best = [0, time.time()]
+    current_best = [0, get_time()]
     for key in array: # Iterate through each timestamp in the given dictionary.
         difference = abs(float(search_key) - float(key)) # Calculate the difference in time between the given timestamp, and this timestamp.
         if (difference < current_best[1]): # Check to see if this entry is closer than the current best.
@@ -660,3 +671,6 @@ def process_gpx(gpx_file):
 
 
     return gpx_data
+
+
+

@@ -1335,7 +1335,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
                 if (objects_identified != "[]"): # Check to see that there were actually identified objects.
                     if (config["realtime"]["interface"]["display"]["output_level"] >= 2): # Only display this status message if the output level indicates to do so.
                         print("Objects identified: " + objects_identified)
-                    export_data = str(round(time.time()*10)/10) + "," + objects_identified + "\n" # Add the timestamp to the export data, followed by the object's detected, followed by a line break to prepare for the next entry to be added later.
+                    export_data = str(round(utils.get_time()*10)/10) + "," + objects_identified + "\n" # Add the timestamp to the export data, followed by the object's detected, followed by a line break to prepare for the next entry to be added later.
                     if (config["realtime"]["saving"]["object_recognition"]["enabled"] == True): # Check to see if the user has configured Predator to save recognized objects to disk.
                         add_to_file(config["general"]["working_directory"] + "/" + str(config["realtime"]["saving"]["object_recognition"]["file"]), export_data) # Add the export data to the end of the file and write it to disk.
             else:
@@ -1489,7 +1489,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
             debug_message("Saving license plate history")
 
             if (len(all_current_plate_guesses) > 0): # Only save the license plate history for this round if 1 or more plates were detected.
-                current_time = time.time() # Get the current timestamp.
+                current_time = utils.get_time() # Get the current timestamp.
 
                 plate_log[current_time] = {} # Initialize an entry in the plate history log using the current time.
 
