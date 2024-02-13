@@ -49,6 +49,8 @@ This document describes the configuration values found `config.json`.
         - `startup_message` is a string used to set a custom start-up message that displays after the initial Predator start-up header.
         - `debugging_output` is a boolean that determines whether or not Predator will display debugging messages through-out normal operation.
             - When this is set to `true`, console clearing is automatically disabled.
+    - `gps` contains settings that control Predator's GPS capabilities across all modes.
+        - `enabled` is a boolean determines whether GPS features are enabled or disabled.
     - `object_recognition` contains settings related to Predator's object recognition capabilities.
         - `enabled` is a boolean that determines whether or not object recognition is enabled globally.
             - Setting this to `false` removes Predator's dependency on Tensorflow.
@@ -91,7 +93,7 @@ This document describes the configuration values found `config.json`.
                     - Level "1": Only alerts are displayed.
                     - Level "2": Only detections and other important events are displayed.
                     - Level "3": All messages are displayed.
-            - `speed_display` contains settings related to displaying the current GPS speed. These settings are only applicable when the `realtime>gps>enabled` setting is set to `true`.
+            - `speed_display` contains settings related to displaying the current GPS speed. These settings are only applicable when the `general>gps>enabled` setting is set to `true`.
                 - `enabled` is a boolean value that determines whether Predator will display the current speed at the beginning of each processing round.
                 - `unit` determines the unit of measurement that Predator will display the current speed in. This can only be set to one of the following values:
                     - `"mph"` for miles-per-hour
@@ -109,8 +111,7 @@ This document describes the configuration values found `config.json`.
             - This setting does not override the `general>object_recognition>enabled` setting.
         - `video_still_path` is an absolute file-path to the image Predator should run object recognition on.
             - By default, Phantom stores video stills from the capture device stream to `/dev/shm/phantom-webcam.jpg`, so that is where this setting should point to in most cases.
-    - `gps` contains settings related to GPS-based features.
-        - `enabled` is a boolean determines whether GPS features are enabled or disabled.
+    - `gps` contains settings related to GPS-based features in real-time mode.
         - `alpr_location_tagging` is a boolean that determines whether or not the current GPS location will be saved to the log file each time a plate is logged.
     - `image` contains settings related to image handling.
         - `camera` contains settings related to image capture.
