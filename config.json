@@ -26,7 +26,7 @@
             "debugging_output": true
         },
         "gps": {
-            "enabled": true
+            "enabled": false
         },
         "object_recognition": {
             "enabled": false
@@ -140,7 +140,16 @@
             "directory": "saved_dashcam",
             "trigger": "dashcam_lock_trigger",
             "segment_length": 10,
-            "unsaved_history_length": 90
+            "looped_recording": {
+                "mode": "automatic",
+                "manual": {
+                    "history_length": 90
+                },
+                "automatic": {
+                    "minimum_free_percentage": 0.5465,
+                    "max_deletions_per_round": 10
+                }
+            }
         },
         "capture": {
             "video": {

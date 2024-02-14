@@ -371,8 +371,7 @@ This update overhauls Predator's dashcam functionality and adds various features
             - Dashcam video saving can be triggered to copy the current and last video segment to a different location on disk.
             - At the moment the save is trigger, both the previous segment, and current segment are saved. Once the current segment is completed, the updated file is saved again.
         - OpenCV dashcam segments now include the name of the capture device, rather than the ID number.
-        - Added the ability to configure Predator to automatically delete unsaved dashcam videos after a certain number of videos have been captured.
-            - This is useful to prevent Predator from completely filling the available storage space.
+        - Added support for looped video recording, where older unsaved dashcam segments are erased to make space for new ones.
         - Dashcam video file names now end with either an "N" or "P" to indicate "normal" or "parked" mode respectively.
     - Improved the way frame-rate is handled in OpenCV recording.
         - The frame-rate configuration value has been removed in favor of calculating FPS on the fly.

@@ -183,17 +183,6 @@ for device in config["realtime"]["image"]["camera"]["devices"]: # Iterate throug
         display_message("The 'realtime>image>camera>devices>" + device + "' configuration value does not point to a valid file.", 3)
 
 
-if (int(config["dashcam"]["saving"]["unsaved_history_length"]) != float(config["dashcam"]["saving"]["unsaved_history_length"])): # Check to see if the dashcam unsaved history length is not a whole number.
-    display_message("The 'dashcam>saving>unsaved_history_length' setting doesn't appear to be an integer. This value has been rounded to the nearest whole number.", 3)
-    config["dashcam"]["saving"]["unsaved_history_length"] = round(float(config["dashcam"]["saving"]["unsaved_history_length"])) # Found the dashcam history length off to a whole number.
-elif (type(config["dashcam"]["saving"]["unsaved_history_length"]) != int): # Check to see if the dashcam history length is not an integer.
-    display_message("The 'dashcam>saving>unsaved_history_length' setting doesn't appear to be an integer, but it is a whole number. Make sure this configuration value does not have a decimal point.", 2)
-if (int(config["dashcam"]["saving"]["unsaved_history_length"]) < 0): # Check to see if the dashcam history length is a negative number.
-    display_message("The 'dashcam>saving>unsaved_history_length' setting appears to be a negative number. This value has been defaulted to 0, which is likely to cause unexpected behavior.", 3)
-    config["dashcam"]["saving"]["unsaved_history_length"] = 0 # Default the dashcam history length to 0, even though this is likely to cause unexpected behavior.
-elif (int(config["dashcam"]["saving"]["unsaved_history_length"]) < 2): # Check to see if the dashcam history length is less than 2.
-    display_message("The 'dashcam>saving>unsaved_history_length' setting appears to be a number that is less than 2. This is likely to cause unexpected behavior.", 2)
-
 
 if (config["realtime"]["push_notifications"]["enabled"] == True): # Check to see if the user has Gotify notifications turned on in the configuration.
     if (config["realtime"]["push_notifications"]["server"] == "" or config["realtime"]["push_notifications"]["server"] == None): # Check to see if the gotify server configuration value has been left blank
@@ -695,9 +684,6 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
 
         else: # The user has selected an invalid option in the main management menu.
             display_message("Invalid selection.", 2)
-
-
-
 
 
 
@@ -1417,7 +1403,6 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
 
 
 
-
         debug_message("Displaying detected plates")
         if (config["realtime"]["interface"]["display"]["output_level"] >= 3): # Only display this status message if the output level indicates to do so.
             print("Displaying detected license plates...")
@@ -1427,7 +1412,6 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
             for plate in new_plates_detected:
                 play_sound("notification")
                 print("    Detected plate: " + plate) # Print the detected plate.
-
 
 
 
@@ -1474,12 +1458,8 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
 
                 play_sound("alert") # Play the alert sound, if configured to do so.
 
-
         if (config["realtime"]["interface"]["display"]["output_level"] >= 3): # Only display this status message if the output level indicates to do so.
             print("Done.\n----------")
-
-
-
 
 
 
@@ -1522,8 +1502,6 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
 
 
 
-
-
         # Issue interface file updates.
         if (config["general"]["interface_directory"] != ""):
             debug_message("Issuing interface updates")
@@ -1534,7 +1512,6 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
             log_alerts(active_alerts) # Update the list of active alerts.
             if (config["realtime"]["interface"]["display"]["output_level"] >= 3): # Only display this status message if the output level indicates to do so.
                 print("Done.\n----------")
-
 
 
 

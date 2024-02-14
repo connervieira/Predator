@@ -172,11 +172,23 @@ This document describes the configuration values found `config.json`.
             - When this file is created, Predator will immediately save the previous and current dashcam video segments. Once the current segment is done recording, Predator will re-save it, such that the saved video doesn't cut off at the moment the saved was triggered.
                 - If Predator is terminated between the initial save and the second save, only video captured after the save trigger shouldn't be saved.
         - `segment_length` is a number that sets how many seconds long each video segment will be before another segment is created.
-        - `unsaved_history_length` is a positive integer that determines how many unsaved videos Predator will keep.
-            - Once this limit is reached, older unsaved videos will be progressively removed to stay under the threshold.
-            - This value should be set to a number greater than 2.
-                - Values less than 2 are likely to cause unexpected behavior, especially when saving videos with the trigger file.
-            - This setting has no impact on videos that have been saved using the trigger file explained previously.
+        - `looped_recording` contains settings that control how and when Predator will erase old dashcam segments to make space for new ones.
+            - `mode` determines the method by which Predator determines how to erase old files. This can only be set to one of 3 strings:
+                - In "automatic" mode, Predator uses the percentage of free disk space to determine when files need to be erased.
+                - In "manual" mode, Predator uses a fixed maximum number of files that will be kept, after which, old videos will start being erased.
+                - In "disabled" mode, Predator doesn't erase old files. This is not recommended, since it will cause Predator to run until there is no disk space remaining, at which point it will crash.
+            - `manual` contains settings for controlling how Predator erases video in manual mode.
+                - `history_length` is a positive integer that determines how many unsaved videos Predator will keep.
+                    - Once this limit is reached, older unsaved videos will be progressively removed to stay under the threshold.
+                    - This value should be set to a number greater than 2.
+                        - Values less than 2 are likely to cause unexpected behavior, especially when saving videos with the trigger file.
+                    - This setting has no impact on videos that have been saved using the trigger file.
+            - `automatic` contains settings for controlling how Predator erases video in automatic mode.
+                - `minimum_free_percentage` is a fraction that determines the minimum free disk space required before Predator starts erasing old segments.
+                    - For example, setting this to `0.5` will instruct Predator to erase old files if the total disk usage exceeds 50% of the total disk size.
+                    - Disk usage includes the entire disk, not just the Predator working directory.
+                - `max_deletions_per_round` is an integer number that determines the maximum number of files that Predator will delete at a time.
+                    - This is prevents Predator from erasing too many dashcam segments if something goes wrong with the disk usage analysis.
     - `capture` contains settings related to the capturing of dashcam video.
         - `video` contains settings for configuring Predator's video recording behavior.
             - `resolution` sets the resolution of the video.
