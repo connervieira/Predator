@@ -167,9 +167,17 @@ if (config["general"]["alpr"]["engine"] != "phantom" and config["general"]["alpr
 
 if (os.path.isdir(config["general"]["working_directory"]) == False): # Check to see if the configured working directory is missing.
     display_message("The 'general>working_directory' configuration value does not point to an existing directory.", 3)
+elif ("'" in config["general"]["working_directory"]):
+    display_message("The 'general>working_directory' configuration value contains an apostrophe. This will likely cause unexpected behavior.", 3)
+elif ("\"" in config["general"]["working_directory"]):
+    display_message("The 'general>working_directory' configuration value contains a quotation mark. This will likely cause unexpected behavior.", 3)
 
 if (os.path.isdir(config["general"]["interface_directory"]) == False): # Check to see if the configured interface directory is missing.
     display_message("The 'general>interface_directory' configuration value does not point to an existing directory.", 3)
+elif ("'" in config["general"]["interface_directory"]):
+    display_message("The 'general>interface_directory' configuration value contains an apostrophe. This will likely cause unexpected behavior.", 3)
+elif ("\"" in config["general"]["interface_directory"]):
+    display_message("The 'general>interface_directory' configuration value contains a quotation mark. This will likely cause unexpected behavior.", 3)
 
 if (config["prerecorded"]["image"]["processing"]["cropping"]["left_margin"] < 0 or config["prerecorded"]["image"]["processing"]["cropping"]["right_margin"] < 0 or config["prerecorded"]["image"]["processing"]["cropping"]["bottom_margin"] < 0 or config["prerecorded"]["image"]["processing"]["cropping"]["top_margin"] < 0): # Check to make sure that all of the pre-recorded mode cropping margins are positive numbers.
     display_message("One or more of the cropping margins for pre-recorded mode are below 0. This should never happen, and it's likely there's a configuration issue somewhere. Cropping margins have all been set to 0.", 3)

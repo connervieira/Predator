@@ -28,7 +28,7 @@ This is the installation process for Predator and all of its dependencies. This 
         - `opencv-python`, `cvlib`, `tensorflow`, `keras`, `silence-tensorflow`: Required for object recognition features and dash-cam video capture.
             - These packages are not required for basic license plate recognition.
     - Optional:
-       - `psutil`: Required to process disk usage information.
+       - `psutil`: Required to process disk usage information in management mode and dash-cam mode.
 - System packages: `sudo apt-get install ffmpeg mpg321 gpsd gpsd-clients imagemagick fswebcam`
     - Highly recommended:
         - `ffmpeg`: Required for audio/video merging in dash-cam mode, and video processing in pre-recorded mode.

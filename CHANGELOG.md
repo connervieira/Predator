@@ -411,3 +411,4 @@ This update overhauls Predator's dashcam functionality and adds various features
 - Improved GPS handling.
     - 2D position information can now be displayed even when a 3D fix has not been aquired yet.
 - Updated the time handling back-end to allow for custom time offsets.
+- Improved configuration validation.
