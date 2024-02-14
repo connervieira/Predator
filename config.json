@@ -146,8 +146,8 @@
                     "history_length": 90
                 },
                 "automatic": {
-                    "minimum_free_percentage": 0.5465,
-                    "max_deletions_per_round": 10
+                    "minimum_free_percentage": 0.5461,
+                    "max_deletions_per_round": 15
                 }
             }
         },
@@ -171,11 +171,11 @@
             "enabled": false,
             "conditions": {
                 "speed": 2,
-                "time": 5
+                "time": 10
             },
             "recording": {
                 "highlight_motion": {
-                    "enabled": true,
+                    "enabled": false,
                     "color": [
                         0,
                         255,

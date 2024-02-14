@@ -292,11 +292,41 @@ def record_parked_motion(capture, framerate, width, height, device, directory, f
         if (os.path.exists(audio_file_name) == False):
             display_message("The audio file was missing during audio/video merging at the end of parked motion recording. It is possible something has gone wrong with recording.", 2)
         else:
-            #merge_audio_video(video_file_name, audio_file_name, merged_file_name, audio_offset) # Run the audio/video merge.
             audio_video_merge = threading.Thread(target=merge_audio_video, args=[video_file_name, audio_file_name, merged_file_name], name="AudioVideoMerge") # Create the thread to merge the audio and video files.
             audio_video_merge.start() # Start the merging thread.
 
     return calculated_framerate
+
+
+def delete_old_segments():
+    global config
+
+    dashcam_files_list_command = "ls " + config["general"]["working_directory"] + " | grep predator_dashcam" # Set up the command to get a list of all unsaved dashcam videos in the working directory.
+    dashcam_files = str(os.popen(dashcam_files_list_command).read())[:-1].splitlines() # Run the command, and record the raw output string.
+    dashcam_files = sorted(dashcam_files) # Sort the dashcam files alphabetically to get them in chronological order (oldest first).
+
+    if (config["dashcam"]["saving"]["looped_recording"]["mode"] == "manual"): # Check to see if looped recording is in manual mode.
+        if (len(dashcam_files) > int(config["dashcam"]["saving"]["looped_recording"]["manual_history_length"])): # Check to see if the current number of dashcam segments in the working directory is higher than the configured history length.
+            videos_to_delete = dashcam_files[0:len(dashcam_files) - int(config["dashcam"]["saving"]["looped_recording"]["manual_history_length"])] # Create a list of all of the videos that need to be deleted.
+            for video in videos_to_delete: # Iterate through each video that needs to be deleted.
+                os.system("timeout 5 rm '" + config["general"]["working_directory"] + "/" + video + "'") # Delete the dashcam segment.
+    elif (config["dashcam"]["saving"]["looped_recording"]["mode"] == "automatic"): # Check to see if looped recording is in automatic mode.
+        free_disk_percentage = psutil.disk_usage(path=config["general"]["working_directory"]).free / psutil.disk_usage(path=config["general"]["working_directory"]).total # Calculate the initial free disk percentage.
+        videos_deleted_this_round = 0 # This is a placeholder that will be incremented for each video deleted in the following step.
+        while free_disk_percentage < float(config["dashcam"]["saving"]["looped_recording"]["automatic"]["minimum_free_percentage"]): # Run until the free disk percentage is lower than the configured minimum.
+            if (len(dashcam_files) - videos_deleted_this_round <= 1): # Check to see if there is one or fewer total dashcam videos.
+                display_message("The minimum free disk space hasn't been reached, but there are no more dashcam segments that can be deleted. You should try to free up space on the storage device, or decrease the minimum free disk space percentage in the configuration.", 2)
+                break
+            if (videos_deleted_this_round > config["dashcam"]["saving"]["looped_recording"]["automatic"]["max_deletions_per_round"]): # Check to see if the maximum allowed deletions per round have been reached.
+                display_message("The maximum number of segments that can be deleted per round have been erased by looped recording. It is possible something has gone wrong with the disk usage analysis, or you recently increased the maximum free disk space percentage.", 2)
+                break # Exit the loop
+            os.system("timeout 5 rm '" + config["general"]["working_directory"] + "/" + dashcam_files[videos_deleted_this_round] + "'") # Delete the oldest remaining segment.
+            free_disk_percentage = psutil.disk_usage(path=config["general"]["working_directory"]).free / psutil.disk_usage(path=config["general"]["working_directory"]).total # Recalculate the free disk percentage.
+            videos_deleted_this_round += 1
+    elif (config["dashcam"]["saving"]["looped_recording"]["mode"] == "disabled"): # Check to see if looped recording is disabled.
+        pass
+    else:
+        display_message("The 'dashcam>saving>looped_recording>mode' configuration value is invalid. Looped recording is disabled.", 3)
 
 
 
@@ -457,33 +487,7 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
                     save_this_segment = False # Reset the segment saving flag.
 
 
-                # Handle the deletion of any expired dashcam videos.
-                dashcam_files_list_command = "ls " + config["general"]["working_directory"] + " | grep predator_dashcam" # Set up the command to get a list of all unsaved dashcam videos in the working directory.
-                dashcam_files = str(os.popen(dashcam_files_list_command).read())[:-1].splitlines() # Run the command, and record the raw output string.
-                dashcam_files = sorted(dashcam_files) # Sort the dashcam files alphabetically to get them in chronological order (oldest first).
-
-                if (config["dashcam"]["saving"]["looped_recording"]["mode"] == "manual"): # Check to see if looped recording is in manual mode.
-                    if (len(dashcam_files) > int(config["dashcam"]["saving"]["looped_recording"]["manual_history_length"])): # Check to see if the current number of dashcam segments in the working directory is higher than the configured history length.
-                        videos_to_delete = dashcam_files[0:len(dashcam_files) - int(config["dashcam"]["saving"]["looped_recording"]["manual_history_length"])] # Create a list of all of the videos that need to be deleted.
-                        for video in videos_to_delete: # Iterate through each video that needs to be deleted.
-                            os.system("timeout 5 rm '" + config["general"]["working_directory"] + "/" + video + "'") # Delete the dashcam segment.
-                elif (config["dashcam"]["saving"]["looped_recording"]["mode"] == "automatic"): # Check to see if looped recording is in automatic mode.
-                    free_disk_percentage = psutil.disk_usage(path=config["general"]["working_directory"]).free / psutil.disk_usage(path=config["general"]["working_directory"]).total # Calculate the initial free disk percentage.
-                    videos_deleted_this_round = 0 # This is a placeholder that will be incremented for each video deleted in the following step.
-                    while free_disk_percentage < float(config["dashcam"]["saving"]["looped_recording"]["automatic"]["minimum_free_percentage"]): # Run until the free disk percentage is lower than the configured minimum.
-                        if (len(dashcam_files) - videos_deleted_this_round <= 1): # Check to see if there is one or fewer total dashcam videos.
-                            display_message("The minimum free disk space hasn't been reached, but there are no more dashcam segments that can be deleted. You should try to free up space on the storage device, or decrease the minimum free disk space percentage in the configuration.", 2)
-                            break
-                        if (videos_deleted_this_round > config["dashcam"]["saving"]["looped_recording"]["automatic"]["max_deletions_per_round"]): # Check to see if the maximum allowed deletions per round have been reached.
-                            display_message("The maximum number of segments that can be deleted per round have been erased by looped recording. It is possible something has gone wrong with the disk usage analysis, or you recently increased the maximum free disk space percentage.", 2)
-                            break # Exit the loop
-                        os.system("timeout 5 rm '" + config["general"]["working_directory"] + "/" + dashcam_files[videos_deleted_this_round] + "'") # Delete the oldest remaining segment.
-                        free_disk_percentage = psutil.disk_usage(path=config["general"]["working_directory"]).free / psutil.disk_usage(path=config["general"]["working_directory"]).total # Recalculate the free disk percentage.
-                        videos_deleted_this_round += 1
-                elif (config["dashcam"]["saving"]["looped_recording"]["mode"] == "off"): # Check to see if looped recording is disabled.
-                    pass
-                else:
-                    display_message("The 'dashcam>saving>looped_recording>mode' configuration value is invalid. Looped recording is disabled.", 3)
+                delete_old_segments() # Handle the erasing of any old dash-cam segments that need to be deleted.
 
 
             frames_since_last_segment += 1 # Increment the frame counter.
