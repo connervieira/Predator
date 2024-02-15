@@ -13,7 +13,7 @@
 
 
 
-# This script contains several funtions and classes used in main.py
+# This script contains several functions and classes used in main.py
 
 
 
@@ -154,7 +154,7 @@ def save_to_file(file_name, contents):
 
 
 
-# Define the fuction that will be used to add to the end of a file.
+# Define the function that will be used to add to the end of a file.
 def add_to_file(file_name, contents):
     fh = None
     success = False
@@ -390,7 +390,7 @@ def validate_plate(plate, template):
     if (len(template) == len(plate)): # Make sure the template and plate are the same length. If so, continue with validation. Otherwise, automatically invalidate the plate, and skip the rest of the validation process.
         for x in range(len(template)):
             if (template[x].isalpha() == plate[x].isalpha() or template[x].isnumeric() == plate[x].isnumeric()): # If this character is alphabetical in both the template and plate, or if this character is numeric in both the template and plate, then this character is valid.
-                # This characteris valid, so don't change anything.
+                # This character is valid, so don't change anything.
                 pass
             else:
                 # This character doesn't match between the template and plate, so mark the plate as invalid.
@@ -630,7 +630,7 @@ def load_alert_database(sources, project_directory):
                 display_message("A remote alert database source " + source + " was specified, but Predator is in offline mode. This source has not been loaded.", 2)
         else: # The input the user supplied doesn't appear to be a URL, so assume it is a file.
             if (os.path.exists(project_directory + "/" + source)): # Check to see if the database specified by the user actually exists.
-                f = open(project_directory + "/" + source, "r") # Open the user-specified datbase file.
+                f = open(project_directory + "/" + source, "r") # Open the user-specified database file.
                 file_contents = f.read() # Read the file.
                 if (file_contents[0] == "{"): # Check to see if the first character in the file indicates that this alert database is a JSON database.
                     alert_database = json.loads(file_contents) # Load the alert database as JSON data.

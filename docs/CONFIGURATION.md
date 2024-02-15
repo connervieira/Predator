@@ -185,7 +185,7 @@ This document describes the configuration values found `config.json`.
                     - This setting has no impact on videos that have been saved using the trigger file.
             - `automatic` contains settings for controlling how Predator erases video in automatic mode.
                 - `minimum_free_percentage` is a fraction that determines the minimum free disk space required before Predator starts erasing old segments.
-                    - For example, setting this to `0.5` will instruct Predator to erase old files if the total disk usage exceeds 50% of the total disk size.
+                    - For example, setting this to `0.2` will instruct Predator to erase old files if the total disk usage exceeds 80% of the total disk size.
                     - Disk usage includes the entire disk, not just the Predator working directory.
                 - `max_deletions_per_round` is an integer number that determines the maximum number of files that Predator will delete at a time.
                     - This is prevents Predator from erasing too many dashcam segments if something goes wrong with the disk usage analysis.

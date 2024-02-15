@@ -161,7 +161,7 @@ if (config["realtime"]["push_notifications"]["enabled"] == True): # Check to see
 
 # Run some basic error checks to see if any of the data supplied in the configuration seems wrong.
 debug_message("Validating configuration")
-config["general"]["alpr"]["engine"] = config["general"]["alpr"]["engine"].lower().strip() # Convert the ALPR engine configuration value to all lowercase, and trim leading and trailing whitespaces.
+config["general"]["alpr"]["engine"] = config["general"]["alpr"]["engine"].lower().strip() # Convert the ALPR engine configuration value to all lowercase, and trim leading and trailing white-spaces.
 if (config["general"]["alpr"]["engine"] != "phantom" and config["general"]["alpr"]["engine"] != "openalpr"): # Check to see if the configured ALPR engine is invalid.
     display_message("The configured ALPR engine is invalid. Please select either 'phantom' or 'openalpr' in the configuration.", 3)
 
@@ -245,7 +245,7 @@ else: # No 'auto start mode' has been configured, so ask the user to select manu
 
 
 
-# Intial setup has been completed, and Predator will now load into the specified mode.
+# Initial setup has been completed, and Predator will now load into the specified mode.
 
 
 
@@ -744,7 +744,7 @@ elif (mode_selection == "1" and config["general"]["modes"]["enabled"]["prerecord
             video_start_time = 0
 
 
-    if (video[0] == "*"): # Check to see if the first character is a wilcard.
+    if (video[0] == "*"): # Check to see if the first character is a wildcard.
         video_list_command = "ls " + config["general"]["working_directory"] + "/" + video + " | tr '\n' ','";
         videos = str(os.popen(video_list_command).read())[:-1].split(",") # Run the command, and record the raw output string.
         for key, video in enumerate(videos):
@@ -809,7 +809,7 @@ elif (mode_selection == "1" and config["general"]["modes"]["enabled"]["prerecord
             object_count[frame] = {} # Initial the dictionary for this frame.
             frame_path = config["general"]["working_directory"] + "/frames/" + frame # Set the file path of the current frame.
             image = cv2.imread(frame_path) # Load the frame.
-            object_recognition_bounding_box, object_recognition_labels, object_recognition_confidence = cv.detect_common_objects(image) # Anaylze the image.
+            object_recognition_bounding_box, object_recognition_labels, object_recognition_confidence = cv.detect_common_objects(image) # Analyze the image.
             for object_recognized in object_recognition_labels: # Iterate through each object recognized.
                 if (object_recognized in object_count[frame]):
                     object_count[frame][object_recognized]+=1
@@ -1004,7 +1004,7 @@ elif (mode_selection == "1" and config["general"]["modes"]["enabled"]["prerecord
             print("Shutting down...")
             break
 
-        elif (selection == "1"): # If the user selects option 1 on the main menu, then load the license pl atedata viewing menu.
+        elif (selection == "1"): # If the user selects option 1 on the main menu, then load the license plate data viewing menu.
             print("    Please select an option")
             print("    0. Back")
             print("    1. View data")
@@ -1204,7 +1204,7 @@ elif (mode_selection == "1" and config["general"]["modes"]["enabled"]["prerecord
             utils.wait_for_input()
 
 
-        elif (selection == "4"): # If the user selects option 4 on the main menu, then show the statstics for this session.
+        elif (selection == "4"): # If the user selects option 4 on the main menu, then show the statistics for this session.
             print("    Frames analyzed: " + str(len(alpr_frames))) # Show how many frames of video were analyzed.
             print("    Plates found: " + str(len(plates_detected))) # Show how many unique plates were detected.
             print("    Videos analyzed: " + str(len(videos))) # Show how many videos were analyzed.
@@ -1285,7 +1285,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
 
 
 
-        # Fetch the lastest plates in the queue from the ALPR stream.
+        # Fetch the latest plates in the queue from the ALPR stream.
         debug_message("Fetching ALPR results")
         reading_output = {}
         reading_output["results"] = alprstream.alpr_get_queued_plates() 
@@ -1324,7 +1324,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
 
             if (os.path.exists(config["realtime"]["object_recognition"]["video_still_path"]) == True): # Check to see if the video still image file exists.
                 image = cv2.imread(config["realtime"]["object_recognition"]["video_still_path"]) # Load the frame.
-                object_recognition_bounding_box, object_recognition_labels, object_recognition_confidence = cv.detect_common_objects(image) # Anaylze the image.
+                object_recognition_bounding_box, object_recognition_labels, object_recognition_confidence = cv.detect_common_objects(image) # Analyze the image.
                 objects_identified = str(object_recognition_labels) # Convert the list of objects identified into a plain string.
                 if (objects_identified != "[]"): # Check to see that there were actually identified objects.
                     if (config["realtime"]["interface"]["display"]["output_level"] >= 2): # Only display this status message if the output level indicates to do so.
@@ -1349,7 +1349,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
             if (config["realtime"]["interface"]["display"]["show_validation"] == True): # Only print the validated plate if the configuration says to do so.
                 print("Plates detected: " + str(len(all_current_plate_guesses))) # Show the number of plates detected this round.
             for individual_detected_plate in all_current_plate_guesses: # Iterate through each individual plate detected in the image frame.
-                successfully_found_plate = False # Reset the 'sucessfully_found_plate` variable to 'False'. This will be changed back if a valid plate is detected.
+                successfully_found_plate = False # Reset the 'successfully_found_plate` variable to 'False'. This will be changed back if a valid plate is detected.
 
                 # Run validation according to the configuration on the plate(s) detected.
                 if (len(config["general"]["alpr"]["validation"]["license_plate_format"]) == 0): # If the user didn't supply a license plate format, then skip license plate validation.
