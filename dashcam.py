@@ -69,7 +69,26 @@ elif (config["dashcam"]["saving"]["looped_recording"]["mode"] == "automatic"): #
     elif (config["dashcam"]["saving"]["looped_recording"]["automatic"]["minimum_free_percentage"] >= 0.99):
         display_message("The 'dashcam>saving>looped_recording>automatic>minimum_free_percentage' value is greater than or equal to 0.99 (or 99%). This is exceedingly high, and may cause Predator to run out of disk space in between segments.", 2)
     elif (config["dashcam"]["saving"]["looped_recording"]["automatic"]["minimum_free_percentage"] <= 0.05):
-        display_message("The 'dashcam>saving>looped_recording>automatic>minimum_free_percentage' value is less than or equal to 0.05 (or 5%). This is exceedingly low, and may cause issues if Predator is unable to reach the minimum free disk space threhsold by only erasing dashcam segments.", 2)
+        display_message("The 'dashcam>saving>looped_recording>automatic>minimum_free_percentage' value is less than or equal to 0.05 (or 5%). This is exceedingly low, and may cause issues if Predator is unable to reach the minimum free disk space threshold by only erasing dashcam segments.", 2)
+
+    if (type(config["dashcam"]["saving"]["looped_recording"]["automatic"]["max_deletions_per_round"]) != int):
+        config["dashcam"]["saving"]["looped_recording"]["automatic"]["max_deletions_per_round"] = int(round(config["dashcam"]["saving"]["looped_recording"]["automatic"]["max_deletions_per_round"]))
+        display_message("The 'dashcam>saving>looped_recording>automatic>max_deletions_per_round' setting is not an integer number. This value has been temporarily rounded to the nearest whole number.", 2)
+    if (config["dashcam"]["saving"]["looped_recording"]["automatic"]["max_deletions_per_round"] < 0):
+        display_message("The 'dashcam>saving>looped_recording>automatic>max_deletions_per_round' setting is a negative number. This will prevent Predator from ever erasing old dash-cam segments.", 3)
+    elif (config["dashcam"]["saving"]["looped_recording"]["automatic"]["max_deletions_per_round"] < 2):
+        display_message("The 'dashcam>saving>looped_recording>automatic>max_deletions_per_round' setting is less than 2. This is likely to cause unexpected behavior.", 2)
+
+if (config["dashcam"]["parked"]["enabled"] == True): # Only validate the parking mode configuration values if parking mode is enabled.
+    if (config["dashcam"]["parked"]["conditions"]["speed"] < 0):
+        display_message("The 'dashcam>parked>conditions>speed' setting is a negative number. This will prevent Predator from ever entering parked mode. To prevent unexpected behavior, you should set 'dashcam>parked>enabled' to 'false'.", 2)
+
+    if (config["dashcam"]["parked"]["recording"]["sensitivity"] < 0):
+        display_message("The 'dashcam>parked>recording>sensitivity' setting is a negative number. This will cause unexpected behavior.", 3)
+    elif (config["dashcam"]["parked"]["recording"]["sensitivity"] > 0.9):
+        display_message("The 'dashcam>parked>recording>sensitivity' setting is an exceedingly high value (above 90%). This will likely cause unexpected behavior.", 2)
+    elif (config["dashcam"]["parked"]["recording"]["sensitivity"] > 1):
+        display_message("The 'dashcam>parked>recording>sensitivity' setting is above 100%. This will effectively prevent Predator from ever detecting motion.", 2)
 
 
 
@@ -139,21 +158,21 @@ def save_dashcam_segments(file1, file2=""):
             if (utils.get_time() - segments_saved_time[file1] > cooldown): # Check to see if a certain amount of time has passed since this segment was last saved before saving it again.
                 os.system("cp '" + file1 + "' '" + config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"] + "'") # Copy the current dashcam video segment to the saved folder.
                 segments_saved_time[file1] = utils.get_time()
-                anything_saved = True # Inidicate that at least one file was saved.
+                anything_saved = True # Indicate that at least one file was saved.
         else: # If file 1 hasn't been saved previously, then save it.
             os.system("cp '" + file1 + "' '" + config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"] + "'") # Copy the current dashcam video segment to the saved folder.
             segments_saved_time[file1] = utils.get_time()
-            anything_saved = True # Inidicate that at least one file was saved.
+            anything_saved = True # Indicate that at least one file was saved.
         if (file2 != ""): # Check to see if there is a second file to copy.
             if (file2 in segments_saved_time): # Check to see if file 2 has been saved previously.
                 if (utils.get_time() - segments_saved_time[file2] > cooldown): # Check to see if a certain amount of time has passed since this segment was last saved before saving it again.
                     os.system("cp '" + file2 + "' '" + config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"] + "'") # Copy the last dashcam video segment to the saved folder.
                     segments_saved_time[file2] = utils.get_time()
-                    anything_saved = True # Inidicate that at least one file was saved.
+                    anything_saved = True # Indicate that at least one file was saved.
             else: # If file 2 hasn't been saved previously, then save it.
                 os.system("cp '" + file2 + "' '" + config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"] + "'") # Copy the last dashcam video segment to the saved folder.
                 segments_saved_time[file2] = utils.get_time()
-                anything_saved = True # Inidicate that at least one file was saved.
+                anything_saved = True # Indicate that at least one file was saved.
     else:
         display_message("The dashcam saving directory does not exist, and could not be created. The dashcam video could not be locked.", 3)
 
@@ -352,7 +371,7 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
     framerate = benchmark_camera_framerate(device) # Benchmark this capture device to determine its operating framerate.
     initial_benchmark_completed[device] = True # Indicate that this device has completed its initial framerate benchmark.
     benchmark_wait_started = utils.get_time() # Record the time that this thread started waiting for the other benchmarks to complete.
-    while (all(list(initial_benchmark_completed.values())) == False): # Wait until every capture device has finished the intiail frame-rate benchmark.
+    while (all(list(initial_benchmark_completed.values())) == False): # Wait until every capture device has finished the initial frame-rate benchmark.
         if (utils.get_time() - benchmark_wait_started > 10): # Check to see if this thread has been waiting for at least 10 seconds for the other frame-rate benchmarks to complete.
             break # Override the loop and start recording, since it is likely something has gone wrong in one of the other threads.
         time.sleep(0.01)
