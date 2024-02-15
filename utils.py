@@ -496,26 +496,30 @@ last_gps_request = {} # This is a placeholder that will store information regard
 def get_gps_location():
     global last_gps_request
     if (config["general"]["gps"]["enabled"] == True): # Check to see if GPS is enabled.
-        gpsd.connect() # Connect to the GPS daemon.
-        gps_data_packet = gpsd.get_current() # Query the GPS for the most recent information.
-        if (gps_data_packet.mode >= 2): # Check to see if the GPS has a fix yet.
-            gps_time = gps_data_packet.time
-            position = gps_data_packet.position()
-            speed = gps_data_packet.speed()
-        else:
-            position = [0, 0]
-            speed = 0
-            gps_time = 0
-        if (gps_data_packet.mode >= 3): # Check to see if the GPS has a 3D fix yet.
-            altitude = gps_data_packet.altitude()
-            heading = gps_data_packet.movement()["track"]
-            satellites = gps_data_packet.sats
-        else:
-            altitude = 0 # Use a placeholder for altitude.
-            heading = 0 # Use a placeholder for heading.
-            satellites = 0 # Use a placeholder for satellites.
+        try:
+            gpsd.connect() # Connect to the GPS daemon.
+            gps_data_packet = gpsd.get_current() # Query the GPS for the most recent information.
+            if (gps_data_packet.mode >= 2): # Check to see if the GPS has a 2D fix yet.
+                gps_time = gps_data_packet.time
+                position = gps_data_packet.position()
+                speed = gps_data_packet.speed()
+            else:
+                gps_time = 0
+                position = [0, 0]
+                speed = 0
+            if (gps_data_packet.mode >= 3): # Check to see if the GPS has a 3D fix yet.
+                altitude = gps_data_packet.altitude()
+                heading = gps_data_packet.movement()["track"]
+                satellites = gps_data_packet.sats
+            else:
+                altitude = 0 # Use a placeholder for altitude.
+                heading = 0 # Use a placeholder for heading.
+                satellites = 0 # Use a placeholder for satellites.
 
-        return position[0], position[1], speed, altitude, heading, satellites, gps_time
+            return position[0], position[1], speed, altitude, heading, satellites, gps_time
+        except:
+            display_message("An unknown error occured while fetching the latest GPS position. It is possible something has gone wrong with the GPS back-end.", 2)
+            return 0.0000, 0.0000, 0.0, 0.0, 0.0, 0, 0 # Return a default placeholder location.
     else: # If GPS is disabled, then this function should never be called, but return a placeholder position regardless.
         display_message("The `get_gps_location` function was called, even though GPS is disabled. This is a bug, and should never occur.", 2)
         return 0.0000, 0.0000, 0.0, 0.0, 0.0, 0, 0 # Return a default placeholder location.

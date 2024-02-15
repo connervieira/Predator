@@ -146,7 +146,7 @@
                     "history_length": 90
                 },
                 "automatic": {
-                    "minimum_free_percentage": 0.5461,
+                    "minimum_free_percentage": 0.54,
                     "max_deletions_per_round": 15
                 }
             }
