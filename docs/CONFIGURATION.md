@@ -20,17 +20,17 @@ This document describes the configuration values found `config.json`.
                 - The higher this number is, the more likely Predator is to guess a plate incorrectly. The lower this number is, the less likely Predator will be to find a valid guess at all.
             - `confidence` is a number that determines the minimum confidence a license plate guess needs to have before Predator will consider it valid, where 100 is extreme confidence and 0 is a complete lack of confidence.
                 - This value is ignored by alerts when `general>alerts>alerts_ignore_validation` is enabled.
+            - `best_effort` is a boolean that determines whether Predator will accept the most confident guess when none of the guesses are considered valid by the validation rules.
+                - This setting can override both the license plate validation format, as well as the minimum confidence threshold.
+                - When set to `false`, Predator will discard plates that don't have any valid guesses.
+                - This setting does not override `general>alerts>alerts_ignore_validation`, and can be set to `false` without interfering with license plate hot-list alerts.
+                - This value does not effect which license plates are logged to disk as configured in the `realtime>saving` configuration section.
             - `license_plate_format` is a list of strings that provide Predator with examples of how license plates in your region should be formatted.
                 - For example, license plates in the state of Ohio generally follow the pattern of 3 letters followed by 4 numbers. In Ohio, this preference might contain `"AAA0000"` to filter out plate guesses that don't match the most common formatting pattern.
                 - This preference only considers the type of each character, not the character itself.
                     - In other words, `AAA0000` and `ABC1234` will function identically.
                     - This also means you can simply enter any given plate from a car located in the region you're scanning in to have a reasonably good chance at matching your region's formatting guidelines for license plates.
                 - Leaving this as an empty list (a list with a length of 0) will disable license plate format validation.
-            - `best_effort` is a boolean that determines whether Predator will accept the most confident guess when none of the guesses are considered valid by the validation rules.
-                - This setting can override both the license plate validation format, as well as the minimum confidence threshold.
-                - When set to `false`, Predator will discard plates that don't have any valid guesses.
-                - This setting does not override `general>alerts>alerts_ignore_validation`, and can be set to `false` without interfering with license plate hot-list alerts.
-                - This value does not effect which license plates are logged to disk as configured in the `realtime>saving` configuration section.
     - `alerts` contains settings related to license plate alerts.
         - `alerts_ignore_validation` is a boolean that determines whether alerts will respect or ignore the plate validation format.
             - When this is set to `true`, if a plate fails the validation test, but matches an alert database plate, the alert will be displayed anyway.

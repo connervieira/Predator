@@ -7,10 +7,10 @@
             "validation": {
                 "guesses": 15,
                 "confidence": 80,
+                "best_effort": true,
                 "license_plate_format": [
                     "AAA0000"
-                ],
-                "best_effort": false
+                ]
             }
         },
         "alerts": {

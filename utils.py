@@ -628,7 +628,7 @@ def load_alert_database(sources, project_directory):
                     alert_database = json.loads(processed_download_data) # Load the alert database as JSON data.
                 except:
                     alert_database = {}
-                    display_message("The license plate alert database returned by the remote source " + source + " doesn't appear to be compatible JSON data. This source has not been loaded.", 3)
+                    display_message("The license plate alert database returned by the remote source " + source + " doesn't appear to be compatible JSON data. This source has not been loaded.", 2)
             else: # Predator is in offline mode, but a remote alert database source was specified.
                 alert_database = {} # Set the alert database to an empty dictionary.
                 display_message("A remote alert database source " + source + " was specified, but Predator is in offline mode. This source has not been loaded.", 2)
