@@ -35,6 +35,7 @@ except:
 
 
 
+
 # Define some styling information
 class style:
     # Define colors
@@ -56,7 +57,14 @@ class style:
     end = '\033[0m'
 
 
+import pytz # Required to handle timezones.
 import time # Required to add delays and handle dates/times
+
+if (time.daylight and time.localtime().tm_isdst > 1):
+    daylight_savings = True
+else:
+    daylight_savings = False
+timezone_offset = -(time.altzone if daylight_savings else time.timezone) # This is the local timezone's offset from UTC in seconds.
 
 global_time_offset = 0 
 def get_time():
@@ -492,15 +500,14 @@ def display_shape(shape):
 
 
 # Define the function that will be used to get the current GPS coordinates.
-last_gps_request = {} # This is a placeholder that will store information regarding the last GPS request.
 def get_gps_location():
-    global last_gps_request
+    global global_time_offset
     if (config["general"]["gps"]["enabled"] == True): # Check to see if GPS is enabled.
         try:
             gpsd.connect() # Connect to the GPS daemon.
             gps_data_packet = gpsd.get_current() # Query the GPS for the most recent information.
             if (gps_data_packet.mode >= 2): # Check to see if the GPS has a 2D fix yet.
-                gps_time = gps_data_packet.time
+                gps_time = datetime.datetime.strptime(str(gps_data_packet.time)[:-1]+"000" , '%Y-%m-%dT%H:%M:%S.%f').astimezone().timestamp() + timezone_offset # Determine the local Unix timestamp from the GPS timestamp.
                 position = gps_data_packet.position()
                 speed = gps_data_packet.speed()
             else:
@@ -515,6 +522,13 @@ def get_gps_location():
                 altitude = 0 # Use a placeholder for altitude.
                 heading = 0 # Use a placeholder for heading.
                 satellites = 0 # Use a placeholder for satellites.
+
+            if (abs(get_time() - gps_time) > config["general"]["gps"]["time_correction"]["threshold"]):
+                if (config["general"]["gps"]["time_correction"]["enabled"] == True):
+                    global_time_offset = gps_time - time.time()
+                    display_message("The local system time differs significantly from the GPS time. Applied time offset of " + str(round(global_time_offset*10**3)/10**3) + " seconds.", 2)
+                else:
+                    display_message("The local system time differs significantly from the GPS time.", 2)
 
             return position[0], position[1], speed, altitude, heading, satellites, gps_time
         except:

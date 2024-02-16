@@ -26,7 +26,11 @@
             "debugging_output": true
         },
         "gps": {
-            "enabled": false
+            "enabled": true,
+            "time_correction": {
+                "enabled": true,
+                "threshold": 0.1
+            }
         },
         "object_recognition": {
             "enabled": false
