@@ -28,8 +28,8 @@
         "gps": {
             "enabled": true,
             "time_correction": {
-                "enabled": true,
-                "threshold": 0.1
+                "enabled": false,
+                "threshold": 1
             }
         },
         "object_recognition": {
@@ -150,7 +150,7 @@
                     "history_length": 90
                 },
                 "automatic": {
-                    "minimum_free_percentage": 0.54,
+                    "minimum_free_percentage": 0.25,
                     "max_deletions_per_round": 15
                 }
             }
@@ -209,7 +209,7 @@
                     "enabled": true
                 },
                 "message_1": "AAA0000",
-                "message_2": "PREDATOR"
+                "message_2": ""
             },
             "gps": {
                 "color": [
