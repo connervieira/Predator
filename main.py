@@ -64,6 +64,7 @@ closest_key = utils.closest_key # Load the function used to find the closest ent
 display_alerts = utils.display_alerts # Load the function used to display license plate alerts given the dictionary of alerts.
 load_alert_database = utils.load_alert_database # Load the function used to load license plate alert databases.
 heartbeat = utils.heartbeat # Load the function to issue heartbeats to the interface directory.
+update_state = utils.update_state # Load the function to issue state updates to the interface directory.
 log_plates = utils.log_plates # Load the function to issue ALPR results to the interface directory.
 log_alerts = utils.log_alerts # Load the function to issue active alerts to the interface directory.
 
@@ -1329,7 +1330,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
                 if (objects_identified != "[]"): # Check to see that there were actually identified objects.
                     if (config["realtime"]["interface"]["display"]["output_level"] >= 2): # Only display this status message if the output level indicates to do so.
                         print("Objects identified: " + objects_identified)
-                    export_data = str(round(utils.get_time()*10)/10) + "," + objects_identified + "\n" # Add the timestamp to the export data, followed by the object's detected, followed by a line break to prepare for the next entry to be added later.
+                    export_data = str(round(time.time()*10)/10) + "," + objects_identified + "\n" # Add the timestamp to the export data, followed by the object's detected, followed by a line break to prepare for the next entry to be added later.
                     if (config["realtime"]["saving"]["object_recognition"]["enabled"] == True): # Check to see if the user has configured Predator to save recognized objects to disk.
                         add_to_file(config["general"]["working_directory"] + "/" + str(config["realtime"]["saving"]["object_recognition"]["file"]), export_data) # Add the export data to the end of the file and write it to disk.
             else:
@@ -1477,7 +1478,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
             debug_message("Saving license plate history")
 
             if (len(all_current_plate_guesses) > 0): # Only save the license plate history for this round if 1 or more plates were detected.
-                current_time = utils.get_time() # Get the current timestamp.
+                current_time = time.time() # Get the current timestamp.
 
                 plate_log[current_time] = {} # Initialize an entry in the plate history log using the current time.
 
@@ -1516,6 +1517,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
             if (config["realtime"]["interface"]["display"]["output_level"] >= 3): # Only display this status message if the output level indicates to do so.
                 print("Issuing interface updates...")
             heartbeat() # Issue a status heartbeat.
+            update_state("realtime") # Update the system status.
             log_plates(all_current_plate_guesses) # Update the list of recently detected license plates.
             log_alerts(active_alerts) # Update the list of active alerts.
             if (config["realtime"]["interface"]["display"]["output_level"] >= 3): # Only display this status message if the output level indicates to do so.

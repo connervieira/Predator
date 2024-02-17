@@ -32,6 +32,7 @@ display_message = utils.display_message
 debug_message = utils.debug_message
 get_gps_location = utils.get_gps_location
 heartbeat = utils.heartbeat
+update_state = utils.update_state
 convert_speed = utils.convert_speed
 
 import threading
@@ -281,6 +282,7 @@ def record_parked_motion(capture, framerate, width, height, device, directory, f
     capture_start_time = utils.get_time() # This stores the time that this parked recording started.
     while (utils.get_time() - last_motion_detected < config["dashcam"]["parked"]["recording"]["timeout"] and parked == True): # Run until motion is not detected for a certain period of time.
         heartbeat() # Issue a status heartbeat.
+        update_state("dashcam/parked_active")
         ret, frame = capture.read() # Capture a frame.
         frames_captured+=1 # Increment the frame counter.
 
@@ -436,6 +438,7 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
 
 
         if (parked == True): # Check to see if the vehicle is parked.
+            update_state("dashcam/parked_dormant")
             if (previously_parked == False): # Check to see if this is the first loop in parking mode since the last time normal recording took place.
                 if (config["dashcam"]["capture"]["audio"]["merge"] == True and config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if Predator is configured to merge audio and video files.
                     last_filename_merged = file_name + ".mkv"
@@ -457,6 +460,7 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
 
 
         else: # If the vehicle is not parked, then run normal video processing.
+            update_state("dashcam/normal")
             previously_parked = False
             if (utils.get_time()-segment_start_time > config["dashcam"]["saving"]["segment_length"]): # Check to see if this segment has exceeded the segment length time.
                 # Handle the start of a new segment.

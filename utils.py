@@ -80,10 +80,10 @@ def debug_message(message, thread="MainThread"):
         global debugging_time_record
         thread = threading.current_thread().name
         if (thread not in debugging_time_record):
-            debugging_time_record[thread] = get_time()
-        time_since_last_message = (get_time()-debugging_time_record[thread]) # Calculate the time since the last debug message.
-        print(f"{style.italic}{style.faint}{get_time():.10f} ({time_since_last_message:.10f} - {thread}) - {message}{style.end}") # Print the message.
-        debugging_time_record[thread] = get_time() # Record the current timestamp.
+            debugging_time_record[thread] = time.time()
+        time_since_last_message = (time.time()-debugging_time_record[thread]) # Calculate the time since the last debug message.
+        print(f"{style.italic}{style.faint}{time.time():.10f} ({time_since_last_message:.10f} - {thread}) - {message}{style.end}") # Print the message.
+        debugging_time_record[thread] = time.time() # Record the current timestamp.
 
 
 
@@ -203,11 +203,11 @@ if (config["general"]["interface_directory"] != ""): # Check to see if the inter
 def log_plates(detected_plates):
     global plate_log
 
-    plate_log[get_time()] = detected_plates
+    plate_log[time.time()] = detected_plates
     entries_to_remove = [] # Create a blank placeholder list to hold all of the entry keys that have expired and need to be removed.
 
     for entry in plate_log.keys(): # Iterate through each entry in the plate history.
-        if (get_time() - float(entry) > 10): # Check to see if this entry has expired according the max age configuration value.
+        if (time.time() - float(entry) > 10): # Check to see if this entry has expired according the max age configuration value.
             entries_to_remove.append(entry) # Add this entry key to the list of entries to remove.
 
     for key in entries_to_remove: # Iterate through each of the keys designated to be removed.
@@ -236,11 +236,11 @@ if (config["general"]["interface_directory"] != ""): # Check to see if the inter
 def log_alerts(active_alerts):
     global alert_log
 
-    alert_log[get_time()] = active_alerts
+    alert_log[time.time()] = active_alerts
     entries_to_remove = [] # Create a blank placeholder list to hold all of the entry keys that have expired and need to be removed.
 
     for entry in alert_log.keys(): # Iterate through each entry in the alert history.
-        if (get_time() - float(entry) > 10): # Check to see if this entry has expired according the max age configuration value.
+        if (time.time() - float(entry) > 10): # Check to see if this entry has expired according the max age configuration value.
             entries_to_remove.append(entry) # Add this entry key to the list of entries to remove.
 
     for key in entries_to_remove: # Iterate through each of the keys designated to be removed.
@@ -267,19 +267,36 @@ if (config["general"]["interface_directory"] != ""): # Check to see if the inter
         heartbeat_log = json.loads("[]") # Load a blank placeholder list.
 
 def heartbeat(): # This is the function that is called to issue a heartbeat.
-    heartbeat_thread = threading.Thread(target=issue_heartbeat)
+    heartbeat_thread = threading.Thread(target=issue_heartbeat, name="InterfaceHeartbeatUpdate")
     heartbeat_thread.start()
 
 def issue_heartbeat(): # This is the function that actually issues a heartbeat.
     global heartbeat_log
-    if (len(heartbeat_log) < 1):
-        heartbeat_log.append(get_time()) # Add this pulse to the heartbeat log file, using the current time as the key.
-        save_to_file(heartbeat_file_location, json.dumps(heartbeat_log)) # Save the modified heartbeat log to the disk as JSON data.
-    elif (get_time() - float(heartbeat_log[-1]) > 0.25): # Check to see if it has been more than a brief period of time since the last heartbeat to avoid spamming heartbeat updates.
-        heartbeat_log.append(get_time()) # Add this pulse to the heartbeat log file, using the current time as the key.
+    heartbeat_log.append(time.time()) # Add this pulse to the heartbeat log file, using the current time as the key.
+    if (len(heartbeat_log) >= 1):
         heartbeat_log = heartbeat_log[-10:] # Trim the list to only contain the last entries.
-        save_to_file(heartbeat_file_location, json.dumps(heartbeat_log)) # Save the modified heartbeat log to the disk as JSON data.
+    save_to_file(heartbeat_file_location, json.dumps(heartbeat_log)) # Save the modified heartbeat log to the disk as JSON data.
 
+
+
+
+# Define the function used to handle system state updates, which allow external services to see the current state of Predator.
+if (config["general"]["interface_directory"] != ""): # Check to see if the interface directory is enabled.
+    state_file_location = config["general"]["interface_directory"] + "/state.json"
+    if (os.path.exists(state_file_location) == False): # If the state log file doesn't exist, create it.
+        save_to_file(state_file_location, "{}") # Save a blank placeholder dictionary to the state log file.
+
+gps_state = 0
+def update_state(mode): # This is the function that is called to issue a state update.
+    global gps_state
+    current_state = {}
+    current_state["mode"] = mode
+    current_state["gps"] = gps_state
+    state_update_thread = threading.Thread(target=update_state_file, args=[current_state], name="InterfaceStateUpdate")
+    state_update_thread.start()
+
+def update_state_file(current_state): # This is the function that actually issues a status update.
+    save_to_file(state_file_location, json.dumps(current_state)) # Save the modified state to the disk as JSON data.
 
 
 
@@ -301,15 +318,15 @@ else: # If the error file doesn't contain valid JSON data, then load a blank pla
 
 def display_message(message, level=1):
     if (level == 1): # Display the message as a notice.
-        error_log[get_time()] = {"msg": message, "type": "notice"} # Add this message to the log file, using the current time as the key.
+        error_log[time.time()] = {"msg": message, "type": "notice"} # Add this message to the log file, using the current time as the key.
         save_to_file(error_file_location, json.dumps(error_log)) # Save the modified error log to the disk as JSON data.
         print("Notice: " + message)
     elif (level == 2): # Display the message as a warning.
-        error_log[get_time()] = {"msg": message, "type": "warn"} # Add this message to the log file, using the current time as the key.
+        error_log[time.time()] = {"msg": message, "type": "warn"} # Add this message to the log file, using the current time as the key.
         save_to_file(error_file_location, json.dumps(error_log)) # Save the modified error log to the disk as JSON data.
         print(style.yellow + "Warning: " + message + style.end)
     elif (level == 3): # Display the message as an error.
-        error_log[get_time()] = {"msg": message, "type": "error"} # Add this message to the log file, using the current time as the key.
+        error_log[time.time()] = {"msg": message, "type": "error"} # Add this message to the log file, using the current time as the key.
         save_to_file(error_file_location, json.dumps(error_log)) # Save the modified error log to the disk as JSON data.
         print(style.red + "Error: " + message + style.end)
         prompt(style.faint + "Press enter to continue..." + style.end)
@@ -501,11 +518,14 @@ def display_shape(shape):
 
 # Define the function that will be used to get the current GPS coordinates.
 def get_gps_location():
+    global gps_state
     global global_time_offset
     if (config["general"]["gps"]["enabled"] == True): # Check to see if GPS is enabled.
         try:
             gpsd.connect() # Connect to the GPS daemon.
             gps_data_packet = gpsd.get_current() # Query the GPS for the most recent information.
+
+            gps_state = gps_data_packet.mode 
             if (gps_data_packet.mode >= 2): # Check to see if the GPS has a 2D fix yet.
                 gps_time = datetime.datetime.strptime(str(gps_data_packet.time)[:-1]+"000" , '%Y-%m-%dT%H:%M:%S.%f').astimezone().timestamp() + timezone_offset # Determine the local Unix timestamp from the GPS timestamp.
                 position = gps_data_packet.position()
