@@ -413,3 +413,4 @@ This update overhauls Predator's dashcam functionality and adds various features
 - Updated the time handling back-end to allow for custom time offsets.
     - Predator can automatically apply an offset to the current time if the system time drifts from the GPS time.
 - Improved configuration validation.
+- Added `state.json` interface file to communicate Predator's current mode of operation to external programs.
