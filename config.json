@@ -29,7 +29,7 @@
             "enabled": true,
             "time_correction": {
                 "enabled": false,
-                "threshold": 1
+                "threshold": 2
             }
         },
         "object_recognition": {
@@ -172,10 +172,10 @@
             }
         },
         "parked": {
-            "enabled": false,
+            "enabled": true,
             "conditions": {
                 "speed": 2,
-                "time": 10
+                "time": 3
             },
             "recording": {
                 "highlight_motion": {
@@ -189,6 +189,25 @@
                 "sensitivity": 0.005,
                 "timeout": 5,
                 "buffer": 20
+            }
+        },
+        "notifications": {
+            "reticulum": {
+                "enabled": true,
+                "destinations": ["7d72f75f4aebdb94f977b71d394dd12f"],
+                "identity_file": "/home/cvieira/.reticulum/storage/identities/predator",
+                "instance_name": "Conner's Car",
+                "events": {
+                    "motion_detected": {
+                        "enabled": true
+                    },
+                    "parking_mode_enabled": {
+                        "enabled": true
+                    },
+                    "parking_mode_disabled": {
+                        "enabled": true
+                    }
+                }
             }
         },
         "stamps": {

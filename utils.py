@@ -543,7 +543,7 @@ def get_gps_location():
                 heading = 0 # Use a placeholder for heading.
                 satellites = 0 # Use a placeholder for satellites.
 
-            if (abs(get_time() - gps_time) > config["general"]["gps"]["time_correction"]["threshold"]):
+            if (gps_time > 0 and abs(get_time() - gps_time) > config["general"]["gps"]["time_correction"]["threshold"]):
                 if (config["general"]["gps"]["time_correction"]["enabled"] == True):
                     global_time_offset = gps_time - time.time()
                     display_message("The local system time differs significantly from the GPS time. Applied time offset of " + str(round(global_time_offset*10**3)/10**3) + " seconds.", 2)

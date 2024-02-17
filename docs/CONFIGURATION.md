@@ -223,6 +223,18 @@ This document describes the configuration values found `config.json`.
                 - You can use the `tools/motion_detect_test.py` script to test this setting to find the best value for your use case.
             - `timeout` determines the length of time, in seconds, after motion is detected, that Predator will record video while parked.
             - `buffer` determines the number of frames that Predator will keep in a buffer. These frames will be added to the beginning of videos triggered by motion detection.
+    - `notifications` contains settings to control how Predator issues notifications about dashcam events.
+        - `reticulum` controls LXMF notifications over the Reticulum networking protocol.
+            - `enabled` is a boolean value that determines whether or not Reticulum LXMF notifications are enabled.
+            - `destinations` is a list of strings, where each entry is a LXMF recipient address where notifications will be sent to.
+            - `identity_file` is a string, and determines the absolute file-path of where Predator will store its Reticulum identity file.
+                - This file will be generated automatically if it does not exist.
+            - `instance_name` is a string that determines a friendly name that will be used to identify this instance of Predator in the content of notifications.
+                - This will be appended to the beginning of notifications. For example, when motion is detected, the following format might be used: "[instance_name] has detected motion while parked."
+            - `events` contains individual controls to enable and disable notifications for certain events.
+                - `motion_detect` is triggered when Predator detects motion while parked.
+                - `parking_mode_enabled` is triggered when Predator enters parking mode.
+                - `parking_mode_disabled` is triggered when Predator exits parking mode.
     - `stamps` contains several configurable stamps that can be overlaid on the video recording.
         - `main` contains configuration values for the main stamp shown at the bottom of the frame.
             - `color` is a list of three values between 0 and 255 that determines the font cover of the overlay stamp.

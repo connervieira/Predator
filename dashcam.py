@@ -47,6 +47,9 @@ if (config["general"]["gps"]["enabled"] == True): # Only import the GPS librarie
 if (config["dashcam"]["saving"]["looped_recording"]["mode"] == "automatic"): # Only import the disk usage library if it is enabled in the configuration.
     import psutil # Required to get disk usage information
 
+if (config["dashcam"]["notifications"]["reticulum"]["enabled"] == True): # Check to see if Reticulum notifications are enabled.
+    import reticulum
+
 
 
 if (config["dashcam"]["saving"]["looped_recording"]["mode"] == "manual"): # Only validate the manual history length if manual looped recording mode is enabled.
@@ -292,6 +295,9 @@ def record_parked_motion(capture, framerate, width, height, device, directory, f
             last_motion_detected = utils.get_time()
             if (utils.get_time() - last_motion_detected > 2): # Check to see if it has been more than 2 seconds since motion was last detected so that the message is only displayed after there hasn't been motion for some time.
                 display_message("Detected motion.", 1)
+                if (config["dashcam"]["notifications"]["reticulum"]["enabled"] == True and config["dashcam"]["notifications"]["reticulum"]["events"]["motion_detected"]["enabled"] == True): # Check to see if Predator is configured to send motion detection notifications over Reticulum.
+                    for destination in config["dashcam"]["notifications"]["reticulum"]["destinations"]: # Iterate over each configured destination.
+                        reticulum.lxmf_send_message(str(config["dashcam"]["notifications"]["reticulum"]["instance_name"]) + " has detected motion while parked", destination) # Send a Reticulum LXMF message to this destination.
 
         if (config["dashcam"]["parked"]["recording"]["highlight_motion"]["enabled"] == True):
             for contour in contours: # Iterate through each contour.
@@ -455,6 +461,9 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
 
             if (moving_percentage > float(config["dashcam"]["parked"]["recording"]["sensitivity"])): # Check to see if there is movement that exceeds the sensitivity threshold.
                 display_message("Detected motion.", 1)
+                if (config["dashcam"]["notifications"]["reticulum"]["enabled"] == True and config["dashcam"]["notifications"]["reticulum"]["events"]["motion_detected"]["enabled"] == True): # Check to see if Predator is configured to send motion detection notifications over Reticulum.
+                    for destination in config["dashcam"]["notifications"]["reticulum"]["destinations"]: # Iterate over each configured destination.
+                        reticulum.lxmf_send_message(str(config["dashcam"]["notifications"]["reticulum"]["instance_name"]) + " has detected motion while parked", destination) # Send a Reticulum LXMF message to this destination.
                 framerate = record_parked_motion(capture, framerate, width, height, device, directory, frame_history) # Run parked motion recording, and update the framerate to the newly calculated framerate.
                 background_subtractor = cv2.createBackgroundSubtractorMOG2() # Reset the background subtractor after motion is detected.
 
@@ -554,10 +563,16 @@ def start_dashcam_recording(dashcam_devices, video_width, video_height, director
                     if (utils.get_time() - last_moved_time > config["dashcam"]["parked"]["conditions"]["time"]): # Check to see if the amount of time the vehicle has been stopped exceeds the time threshold to enable parked mode.
                         if (parked == False): # Check to see if Predator wasn't already in parked mode.
                             display_message("Entered parked mode.", 1)
+                            if (config["dashcam"]["notifications"]["reticulum"]["enabled"] == True and config["dashcam"]["notifications"]["reticulum"]["events"]["parking_mode_enabled"]["enabled"] == True): # Check to see if Predator is configured to parking mode activation notifications over Reticulum.
+                                for destination in config["dashcam"]["notifications"]["reticulum"]["destinations"]: # Iterate over each configured destination.
+                                    reticulum.lxmf_send_message(str(config["dashcam"]["notifications"]["reticulum"]["instance_name"]) + " has entered parked mode.", destination) # Send a Reticulum LXMF message to this destination.
                         parked = True # Enter parked mode.
                     else:
                         if (parked == True): # Check to see if Predator wasn't already out of parked mode.
                             display_message("Exited parked mode.", 1)
+                            if (config["dashcam"]["notifications"]["reticulum"]["enabled"] == True and config["dashcam"]["notifications"]["reticulum"]["events"]["parking_mode_disabled"]["enabled"] == True): # Check to see if Predator is configured to parking mode deactivation notifications over Reticulum.
+                                for destination in config["dashcam"]["notifications"]["reticulum"]["destinations"]: # Iterate over each configured destination.
+                                    reticulum.lxmf_send_message(str(config["dashcam"]["notifications"]["reticulum"]["instance_name"]) + " has exited parked mode.", destination) # Send a Reticulum LXMF message to this destination.
                         parked = False # Exit parked mode.
                     
                     time.sleep(1)
