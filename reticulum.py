@@ -36,6 +36,7 @@ import LXMF
 import RNS
 import time
 import utils
+display_message = utils.display_message
 debug_message = utils.debug_message
 
 
@@ -63,8 +64,11 @@ def lxmf_send_message(message, destination):
     recipient_hash = bytes.fromhex(destination)
     if not RNS.Transport.has_path(recipient_hash): # Check to see if the destination is currently unknown.
         RNS.Transport.request_path(recipient_hash)
+        start_time = time.time()
         while not RNS.Transport.has_path(recipient_hash): # Wait until the destination is known.
-            # TODO: Time out after several seconds.
+            if (time.time() - start_time > 10): # Check to see if the request has been stuck for more than a certain number of seconds.
+                display_message("Failed to determine Reticulum destination.", 2)
+                break
             time.sleep(0.1)
     recipient_identity = RNS.Identity.recall(recipient_hash)
     dest = RNS.Destination(recipient_identity, RNS.Destination.OUT, RNS.Destination.SINGLE, "lxmf", "delivery") # Establish the LXMF destination.
