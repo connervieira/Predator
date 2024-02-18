@@ -26,7 +26,7 @@
             "debugging_output": true
         },
         "gps": {
-            "enabled": true,
+            "enabled": false,
             "time_correction": {
                 "enabled": false,
                 "threshold": 2
@@ -145,7 +145,7 @@
             "trigger": "dashcam_lock_trigger",
             "segment_length": 10,
             "looped_recording": {
-                "mode": "automatic",
+                "mode": "manual",
                 "manual": {
                     "history_length": 90
                 },
@@ -162,7 +162,10 @@
                     "height": 480
                 },
                 "devices": {
-                    "main": 0
+                    "main": {
+                        "index": 0,
+                        "flip": true
+                    }
                 }
             },
             "audio": {
@@ -172,10 +175,10 @@
             }
         },
         "parked": {
-            "enabled": true,
+            "enabled": false,
             "conditions": {
                 "speed": 2,
-                "time": 3
+                "time": 10
             },
             "recording": {
                 "highlight_motion": {
@@ -193,8 +196,10 @@
         },
         "notifications": {
             "reticulum": {
-                "enabled": true,
-                "destinations": ["7d72f75f4aebdb94f977b71d394dd12f"],
+                "enabled": false,
+                "destinations": [
+                    "7d72f75f4aebdb94f977b71d394dd12f"
+                ],
                 "identity_file": "/home/cvieira/.reticulum/storage/identities/predator",
                 "instance_name": "Conner's Car",
                 "events": {

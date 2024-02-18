@@ -384,10 +384,12 @@ This update overhauls Predator's dashcam functionality and adds various features
         - Predator can be configured to enter into parking mode when the vehicle has been stopped for a certain period of time.
         - Predator will resume recording temporarily when motion is detected.
             - Added a new tool (`motion_detect_test.py`) to test motion detection settings.
+        - Added offline push notifications to dash-cam mode via Reticulum LXMF.
     - Added audio recording.
         - Predator can now record audio along side dashcam video, and merge them into a single file when each segment completes.
     - Moved the dashcam recording system to a separate script for sake of organization.
         - Removed the FFMPEG recording back-end for stability and simplicity.
+    - Added a configuration option to flip the video output individual dash-cam capture devices to support more camera mounting possibilities.
 - The ALPR stream library is now only imported if real-time mode is enabled in the configuration.
 - Fixed a typo in a debug message inside `alpr_stream_maintainer()`.
 - Improved debug message handling when multiple threads are running concurrently.
@@ -414,4 +416,3 @@ This update overhauls Predator's dashcam functionality and adds various features
     - Predator can automatically apply an offset to the current time if the system time drifts from the GPS time.
 - Improved configuration validation.
 - Added `state.json` interface file to communicate Predator's current mode of operation to external programs.
-- Added offline push notifications to dash-cam mode via Reticulum LXMF.

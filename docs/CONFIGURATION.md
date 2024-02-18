@@ -197,11 +197,9 @@ This document describes the configuration values found `config.json`.
             - `resolution` sets the resolution of the video.
                 - `width` sets the width of the video, measured in pixels.
                 - `height` sets the height of the video, measured in pixels.
-            - `devices` is a list that contains the indexes of camera devices Predator will attempt to use when recording video in dash-cam mode.
-                - Each entry under this setting should contain a device identifier/name, as well as a reference to the device itself.
-                - Examples:
-                    - `"main": 0`
-                    - `"secondary": 1`
+            - `devices` is a list that contains the camera devices Predator will use when recording video in dash-cam mode.
+                - `index` is the capture device identifier. This is an integer number, and is typically the same as the number at the end of the `/dev/video` file associated with the device.
+                    - For example, if your camera is connected to your system as `/dev/video2`, its index would be `2`.
         - `audio` contains settings for configuring Predator's audio recording behavior.
             - `enabled` is a boolean that determines whether or not audio will be recorded at all.
             - `extension` sets the file extension that audio will be saved with.
@@ -209,6 +207,7 @@ This document describes the configuration values found `config.json`.
     - `parked` contains settings to configure the dashcam's parking behavior.
         - `enabled` is a boolean that determines whether Predator will ever go into a parked state.
             - When this value is set to `false` Predator will never enable parked mode, even if the conditions defined in this configuration section are met.
+            - For parking mode to be enabled, GPS must also be enabled in the "general" section.
         - `conditions` contains settings that determine when Predator will consider the vehicle to be parked.
             - `speed` is the speed at which Predator will consider the vehicle to be stopped, measured in meters per second.
             - `time` is the length of time, in seconds, that the vehicle needs to be below the speed threshold for Predator to consider the vehicle to be parked.

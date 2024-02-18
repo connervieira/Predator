@@ -121,7 +121,7 @@ def benchmark_camera_framerate(device, frames=5): # This function benchmarks a g
     global config
 
     resolution = [config["dashcam"]["capture"]["video"]["resolution"]["width"], config["dashcam"]["capture"]["video"]["resolution"]["height"]] # This determines the resolution that will be used for the video capture device.
-    capture = cv2.VideoCapture(config["dashcam"]["capture"]["video"]["devices"][device]); # Open the video capture device.
+    capture = cv2.VideoCapture(config["dashcam"]["capture"]["video"]["devices"][device]["index"]); # Open the video capture device.
 
     capture.set(cv2.CAP_PROP_FRAME_WIDTH,resolution[0]) # Set the video stream width.
     capture.set(cv2.CAP_PROP_FRAME_HEIGHT,resolution[1]) # Set the video stream height.
@@ -130,10 +130,14 @@ def benchmark_camera_framerate(device, frames=5): # This function benchmarks a g
 
     for i in range(0, 10): # Loop a few times to allow the camera to warm up before the benchmark starts.
         ret, frame = capture.read() # Capture a video frame.
+        if (config["dashcam"]["capture"]["video"]["devices"][device]["flip"]): # Check to see if Predator is convered to flip this capture device's output.
+            frame = cv2.rotate(frame, cv2.ROTATE_180) # Flip the frame by 180 degrees.
     start_time = utils.get_time() # Record the exact time that the benchmark started.
     for i in range(0, frames): # Run until the specified number of frames have been captured.
         ret, frame = capture.read() # Capture a video frame.
         frame = apply_dashcam_stamps(frame) # Apply dashcam overlay stamps to the frame.
+        if (config["dashcam"]["capture"]["video"]["devices"][device]["flip"]): # Check to see if Predator is convered to flip this capture device's output.
+            frame = cv2.rotate(frame, cv2.ROTATE_180) # Flip the frame by 180 degrees.
 
     end_time = utils.get_time() # Record the exact time that the benchmark ended.
     total_time = end_time - start_time # Calculate how many seconds the benchmark took to complete.
@@ -287,6 +291,8 @@ def record_parked_motion(capture, framerate, width, height, device, directory, f
         heartbeat() # Issue a status heartbeat.
         update_state("dashcam/parked_active")
         ret, frame = capture.read() # Capture a frame.
+        if (config["dashcam"]["capture"]["video"]["devices"][device]["flip"]): # Check to see if Predator is convered to flip this capture device's output.
+            frame = cv2.rotate(frame, cv2.ROTATE_180) # Flip the frame by 180 degrees.
         frames_captured+=1 # Increment the frame counter.
 
         contours, moving_percentage = detect_motion(frame, background_subtractor) # Run motion analysis on this frame.
@@ -333,8 +339,8 @@ def delete_old_segments():
     dashcam_files = sorted(dashcam_files) # Sort the dashcam files alphabetically to get them in chronological order (oldest first).
 
     if (config["dashcam"]["saving"]["looped_recording"]["mode"] == "manual"): # Check to see if looped recording is in manual mode.
-        if (len(dashcam_files) > int(config["dashcam"]["saving"]["looped_recording"]["manual_history_length"])): # Check to see if the current number of dashcam segments in the working directory is higher than the configured history length.
-            videos_to_delete = dashcam_files[0:len(dashcam_files) - int(config["dashcam"]["saving"]["looped_recording"]["manual_history_length"])] # Create a list of all of the videos that need to be deleted.
+        if (len(dashcam_files) > int(config["dashcam"]["saving"]["looped_recording"]["manual"]["history_length"])): # Check to see if the current number of dashcam segments in the working directory is higher than the configured history length.
+            videos_to_delete = dashcam_files[0:len(dashcam_files) - int(config["dashcam"]["saving"]["looped_recording"]["manual"]["history_length"])] # Create a list of all of the videos that need to be deleted.
             for video in videos_to_delete: # Iterate through each video that needs to be deleted.
                 os.system("timeout 5 rm '" + config["general"]["working_directory"] + "/" + video + "'") # Delete the dashcam segment.
     elif (config["dashcam"]["saving"]["looped_recording"]["mode"] == "automatic"): # Check to see if looped recording is in automatic mode.
@@ -371,7 +377,7 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
     global parked
     global initial_benchmark_completed
 
-    device_id = config["dashcam"]["capture"]["video"]["devices"][device]
+    device_id = config["dashcam"]["capture"]["video"]["devices"][device]["index"]
 
     if (os.path.isdir(config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"]) == False): # Check to see if the saved dashcam video folder needs to be created.
         os.system("mkdir -p '" + config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"] + "'") # Create the saved dashcam video directory.
@@ -418,6 +424,8 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
     while dashcam_recording_active: # Only run while the dashcam recording flag is set to 'True'. While this flag changes to 'False' this recording process should exit entirely.
         heartbeat() # Issue a status heartbeat.
         ret, frame = capture.read() # Capture a frame.
+        if (config["dashcam"]["capture"]["video"]["devices"][device]["flip"]): # Check to see if Predator is convered to flip this capture device's output.
+            frame = cv2.rotate(frame, cv2.ROTATE_180) # Flip the frame by 180 degrees.
         if (config["dashcam"]["parked"]["recording"]["buffer"] > 0): # Check to see if the frame buffer is greater than 0 before adding frames to the buffer.
             frame_history.append(apply_dashcam_stamps(frame)) # Add the frame that was just captured to the frame buffer.
             if (len(frame_history) > config["dashcam"]["parked"]["recording"]["buffer"]): # Check to see if the frame buffer has exceeded the maximum length.
@@ -545,16 +553,16 @@ def start_dashcam_recording(dashcam_devices, video_width, video_height, director
     dashcam_recording_active = True
     
     for device in dashcam_devices: # Run through each camera device specified in the configuration, and launch an OpenCV recording instance for it.
-        dashcam_process.append(threading.Thread(target=capture_dashcam_video, args=[directory, device, video_width, video_height], name="Dashcam" + str(dashcam_devices[device])))
+        dashcam_process.append(threading.Thread(target=capture_dashcam_video, args=[directory, device, video_width, video_height], name="Dashcam" + str(dashcam_devices[device]["index"])))
         dashcam_process[iteration_counter].start()
 
         iteration_counter += 1 # Iterate the counter. This value will be used to create unique file names for each recorded video.
-        print("Started dashcam recording on " + str(dashcam_devices[device])) # Inform the user that recording was initiation for this camera device.
+        print("Started dashcam recording on " + str(dashcam_devices[device]["index"])) # Inform the user that recording was initiation for this camera device.
 
     if (background == False): # If background recording is disabled, then prompt the user to press enter to halt recording.
         try:
             print("Press Ctrl+C to stop dashcam recording...") # Wait for the user to press enter before continuing, since continuing will terminate recording.
-            if (config["dashcam"]["parked"]["enabled"] == True): # Check to see if parked mode functionality is enabled.
+            if (config["dashcam"]["parked"]["enabled"] == True and config["general"]["gps"]["enabled"] == True): # Check to see if parked mode functionality is enabled.
                 last_moved_time = utils.get_time() # This value holds the Unix timestamp of the last time the vehicle exceeded the parking speed threshold.
                 while True: # The user can break this loop with Ctrl+C to terminate dashcam recording.
                     current_location = get_gps_location() # Get the current GPS location.
