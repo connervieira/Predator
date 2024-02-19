@@ -22,6 +22,9 @@ These are the features actively planned for Predator and are likely to be added 
 
 Features in this section may be added in the future, but are not actively planned.
 
+- [ ] Add more stamp options to dash-cam mode.
+    - [ ] Add custom relay status stamps through GPIO.
+    - [ ] Add dash-cam operation mode stamp.
 - [ ] Add individual resolution configuration for dashcam capture devices.
 - [ ] Add status light interfacing to dashcam mode.
 - [ ] Add remote motion detection alerts for dashcam mode via Reticulum.
