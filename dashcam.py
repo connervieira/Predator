@@ -454,6 +454,7 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
         if (parked == True): # Check to see if the vehicle is parked.
             update_state("dashcam/parked_dormant")
             if (previously_parked == False): # Check to see if this is the first loop in parking mode since the last time normal recording took place.
+                output = None # Release the video output file.
                 if (config["dashcam"]["capture"]["audio"]["merge"] == True and config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if Predator is configured to merge audio and video files.
                     last_filename_merged = file_name + ".mkv"
                     if (os.path.exists(audio_filepath) and os.path.exists(video_filepath)): # Check to make sure there is actually an audio and video file to merge.
@@ -494,6 +495,7 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
                     
                 video_filepath = file_name + ".avi" # Update the file path.
                 calculated_framerate = frames_since_last_segment / (utils.get_time() - segment_start_time) # Calculate the frame-rate of the last segment.
+                output = None # Release the previous video output file.
                 output = cv2.VideoWriter(video_filepath, cv2.VideoWriter_fourcc(*'XVID'), float(calculated_framerate), (width,  height)) # Update the video output.
                 segment_start_time = utils.get_time() # Update the segment start time.
                 frames_since_last_segment = 0 # This will count the number of frames in this video segment.
@@ -562,10 +564,13 @@ def start_dashcam_recording(dashcam_devices, video_width, video_height, director
     if (background == False): # If background recording is disabled, then prompt the user to press enter to halt recording.
         try:
             print("Press Ctrl+C to stop dashcam recording...") # Wait for the user to press enter before continuing, since continuing will terminate recording.
-            if (config["dashcam"]["parked"]["enabled"] == True and config["general"]["gps"]["enabled"] == True): # Check to see if parked mode functionality is enabled.
+            if (config["dashcam"]["parked"]["enabled"] == True): # Check to see if parked mode functionality is enabled.
                 last_moved_time = utils.get_time() # This value holds the Unix timestamp of the last time the vehicle exceeded the parking speed threshold.
                 while True: # The user can break this loop with Ctrl+C to terminate dashcam recording.
-                    current_location = get_gps_location() # Get the current GPS location.
+                    if (config["general"]["gps"]["enabled"] == True): # Check to see if GPS is enabled.
+                        current_location = get_gps_location() # Get the current GPS location.
+                    else:
+                        current_location = [0, 0, 0, 0, 0, 0]
                     if (current_location[2] > config["dashcam"]["parked"]["conditions"]["speed"]): # Check to see if the current speed exceeds the parked speed threshold.
                         last_moved_time = utils.get_time()
                     if (utils.get_time() - last_moved_time > config["dashcam"]["parked"]["conditions"]["time"]): # Check to see if the amount of time the vehicle has been stopped exceeds the time threshold to enable parked mode.

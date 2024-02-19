@@ -267,8 +267,9 @@ if (config["general"]["interface_directory"] != ""): # Check to see if the inter
         heartbeat_log = json.loads("[]") # Load a blank placeholder list.
 
 def heartbeat(): # This is the function that is called to issue a heartbeat.
-    heartbeat_thread = threading.Thread(target=issue_heartbeat, name="InterfaceHeartbeatUpdate")
-    heartbeat_thread.start()
+    if (config["general"]["interface_directory"] != ""): # Check to see if the interface directory is enabled.
+        heartbeat_thread = threading.Thread(target=issue_heartbeat, name="InterfaceHeartbeatUpdate")
+        heartbeat_thread.start()
 
 def issue_heartbeat(): # This is the function that actually issues a heartbeat.
     global heartbeat_log
@@ -283,17 +284,17 @@ def issue_heartbeat(): # This is the function that actually issues a heartbeat.
 # Define the function used to handle system state updates, which allow external services to see the current state of Predator.
 if (config["general"]["interface_directory"] != ""): # Check to see if the interface directory is enabled.
     state_file_location = config["general"]["interface_directory"] + "/state.json"
-    if (os.path.exists(state_file_location) == False): # If the state log file doesn't exist, create it.
-        save_to_file(state_file_location, "{}") # Save a blank placeholder dictionary to the state log file.
+    save_to_file(state_file_location, "{}") # Save a blank placeholder dictionary to the state log file.
 
 gps_state = 0
 def update_state(mode): # This is the function that is called to issue a state update.
-    global gps_state
-    current_state = {}
-    current_state["mode"] = mode
-    current_state["gps"] = gps_state
-    state_update_thread = threading.Thread(target=update_state_file, args=[current_state], name="InterfaceStateUpdate")
-    state_update_thread.start()
+    if (config["general"]["interface_directory"] != ""): # Check to see if the interface directory is enabled.
+        global gps_state
+        current_state = {}
+        current_state["mode"] = mode
+        current_state["gps"] = gps_state
+        state_update_thread = threading.Thread(target=update_state_file, args=[current_state], name="InterfaceStateUpdate")
+        state_update_thread.start()
 
 def update_state_file(current_state): # This is the function that actually issues a status update.
     save_to_file(state_file_location, json.dumps(current_state)) # Save the modified state to the disk as JSON data.
@@ -303,31 +304,35 @@ def update_state_file(current_state): # This is the function that actually issue
 # Define the function to display warning and error messages.
 
 # Load the error log file.
-error_file_location = config["general"]["interface_directory"] + "/errors.json"
-if (os.path.exists(error_file_location) == False): # If the error log file doesn't exist, create it.
-    save_to_file(error_file_location, "{}") # Save a blank placeholder dictionary to the error log file.
+if (config["general"]["interface_directory"] != ""): # Check to see if the interface directory is enabled.
+    error_file_location = config["general"]["interface_directory"] + "/errors.json"
+    if (os.path.exists(error_file_location) == False): # If the error log file doesn't exist, create it.
+        save_to_file(error_file_location, "{}") # Save a blank placeholder dictionary to the error log file.
 
-error_file = open(error_file_location, "r") # Open the error log file for reading.
-error_file_contents = error_file.read() # Read the raw contents of the error file as a string.
-error_file.close() # Close the error log file.
+    error_file = open(error_file_location, "r") # Open the error log file for reading.
+    error_file_contents = error_file.read() # Read the raw contents of the error file as a string.
+    error_file.close() # Close the error log file.
 
-if (is_json(error_file_contents) == True): # If the error file contains valid JSON data, then load it.
-    error_log = json.loads(error_file_contents) # Read and load the error log from the file.
-else: # If the error file doesn't contain valid JSON data, then load a blank placeholder in it's place.
-    error_log = json.loads("{}") # Load a blank placeholder dictionary.
+    if (is_json(error_file_contents) == True): # If the error file contains valid JSON data, then load it.
+        error_log = json.loads(error_file_contents) # Read and load the error log from the file.
+    else: # If the error file doesn't contain valid JSON data, then load a blank placeholder in it's place.
+        error_log = json.loads("{}") # Load a blank placeholder dictionary.
 
 def display_message(message, level=1):
     if (level == 1): # Display the message as a notice.
-        error_log[time.time()] = {"msg": message, "type": "notice"} # Add this message to the log file, using the current time as the key.
-        save_to_file(error_file_location, json.dumps(error_log)) # Save the modified error log to the disk as JSON data.
+        if (config["general"]["interface_directory"] != ""): # Check to see if the interface directory is enabled.
+            error_log[time.time()] = {"msg": message, "type": "notice"} # Add this message to the log file, using the current time as the key.
+            save_to_file(error_file_location, json.dumps(error_log)) # Save the modified error log to the disk as JSON data.
         print("Notice: " + message)
     elif (level == 2): # Display the message as a warning.
-        error_log[time.time()] = {"msg": message, "type": "warn"} # Add this message to the log file, using the current time as the key.
-        save_to_file(error_file_location, json.dumps(error_log)) # Save the modified error log to the disk as JSON data.
+        if (config["general"]["interface_directory"] != ""): # Check to see if the interface directory is enabled.
+            error_log[time.time()] = {"msg": message, "type": "warn"} # Add this message to the log file, using the current time as the key.
+            save_to_file(error_file_location, json.dumps(error_log)) # Save the modified error log to the disk as JSON data.
         print(style.yellow + "Warning: " + message + style.end)
     elif (level == 3): # Display the message as an error.
-        error_log[time.time()] = {"msg": message, "type": "error"} # Add this message to the log file, using the current time as the key.
-        save_to_file(error_file_location, json.dumps(error_log)) # Save the modified error log to the disk as JSON data.
+        if (config["general"]["interface_directory"] != ""): # Check to see if the interface directory is enabled.
+            error_log[time.time()] = {"msg": message, "type": "error"} # Add this message to the log file, using the current time as the key.
+            save_to_file(error_file_location, json.dumps(error_log)) # Save the modified error log to the disk as JSON data.
         print(style.red + "Error: " + message + style.end)
         prompt(style.faint + "Press enter to continue..." + style.end)
 

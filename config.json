@@ -175,7 +175,7 @@
             }
         },
         "parked": {
-            "enabled": false,
+            "enabled": true,
             "conditions": {
                 "speed": 2,
                 "time": 10
@@ -189,7 +189,7 @@
                         0
                     ]
                 },
-                "sensitivity": 0.005,
+                "sensitivity": 0.02,
                 "timeout": 5,
                 "buffer": 20
             }

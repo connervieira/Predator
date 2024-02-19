@@ -173,7 +173,7 @@ elif ("'" in config["general"]["working_directory"]):
 elif ("\"" in config["general"]["working_directory"]):
     display_message("The 'general>working_directory' configuration value contains a quotation mark. This will likely cause unexpected behavior.", 3)
 
-if (os.path.isdir(config["general"]["interface_directory"]) == False): # Check to see if the configured interface directory is missing.
+if (os.path.isdir(config["general"]["interface_directory"]) == False and config["general"]["interface_directory"] != ""): # Check to see if the configured interface directory is missing.
     display_message("The 'general>interface_directory' configuration value does not point to an existing directory.", 3)
 elif ("'" in config["general"]["interface_directory"]):
     display_message("The 'general>interface_directory' configuration value contains an apostrophe. This will likely cause unexpected behavior.", 3)
