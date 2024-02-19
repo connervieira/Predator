@@ -125,6 +125,8 @@ def benchmark_camera_framerate(device, frames=5): # This function benchmarks a g
 
     capture.set(cv2.CAP_PROP_FRAME_WIDTH,resolution[0]) # Set the video stream width.
     capture.set(cv2.CAP_PROP_FRAME_HEIGHT,resolution[1]) # Set the video stream height.
+    if (capture is None or capture.isOpened() == False): # Check to see if the capture failed to open.
+        display_message("Failed to open video capture on device '" + str(device) + "'", 3)
 
     debug_message("Running benchmark for '" + device + "'...")
 
