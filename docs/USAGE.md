@@ -20,6 +20,11 @@ This section describes the initial start-up process of Predator.
         - A mode number must be entered as the first command line argument to specify a working directory.
         - Example: `python3 main.py 2 /home/pi/PredatorData/`
             - This command will force Predator to start into real-time mode, using the /home/pi/PredatorData directory as the working directory.
+    - To force Predator to run in headless mode, add "--headless" after the positional arguments.
+        - In headless mode, Predator will skip over all user input prompts.
+            - This is useful if you're running Predator in the background, and want to avoid user input prompts causing Predator to hang.
+            - This may cause unexpected behavior if used improperly.
+        - Example: `python3 main.py 3 --headless`
 2. Select a mode
     - Predator can operate in 4 possible modes.
         - Management mode (Mode 0)

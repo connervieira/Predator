@@ -57,6 +57,7 @@ class style:
     end = '\033[0m'
 
 
+import sys # Required to process command line arguments.
 import pytz # Required to handle timezones.
 import time # Required to add delays and handle dates/times
 
@@ -338,9 +339,11 @@ def display_message(message, level=1):
 
 
 
-
 # Define the function used to prompt the user for input.
 def prompt(message, optional=True, input_type=str, default=""):
+    if ("--headless" in sys.argv): # Check to see if the headless flag exists in the command line arguments.
+        return default
+
     user_input = input(message)
 
     if (optional == True and user_input == ""): # If the this input is optional, and the user left the input blank, then simply return the default value.
