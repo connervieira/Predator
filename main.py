@@ -224,7 +224,8 @@ if (len(sys.argv) > 1): # Check to see if there is at least 1 command line argum
         config["general"]["modes"]["auto_start"] = sys.argv[1] # Set the automatic start mode to the mode specified by the command line argument.
 
 if (len(sys.argv) > 2): # Check to see if there are at least 2 command line arguments.
-    config["general"]["working_directory"] = str(sys.argv[2]) # Set the working directory to the path specified by the command line argument.
+    if (sys.argv[2] != "--headless"):
+        config["general"]["working_directory"] = str(sys.argv[2]) # Set the working directory to the path specified by the command line argument.
 
 
 if (config["general"]["modes"]["auto_start"] == "0" and config["general"]["modes"]["enabled"]["management"] == True): # Based on the configuration, Predator will automatically boot into management mode.

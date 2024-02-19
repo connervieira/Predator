@@ -84,6 +84,8 @@ elif (config["dashcam"]["saving"]["looped_recording"]["mode"] == "automatic"): #
         display_message("The 'dashcam>saving>looped_recording>automatic>max_deletions_per_round' setting is less than 2. This is likely to cause unexpected behavior.", 2)
 
 if (config["dashcam"]["parked"]["enabled"] == True): # Only validate the parking mode configuration values if parking mode is enabled.
+    if (config["general"]["gps"]["enabled"] == False):
+        display_message("Dash-cam parking mode is enabled, but GPS functionality is disabled. Parking mode needs GPS information to determine when the vehicle is stopped. Without it, Predator will enter parking mode as soon as the threshold time is reached, and it will never return to normal recording mode.", 3)
     if (config["dashcam"]["parked"]["conditions"]["speed"] < 0):
         display_message("The 'dashcam>parked>conditions>speed' setting is a negative number. This will prevent Predator from ever entering parked mode. To prevent unexpected behavior, you should set 'dashcam>parked>enabled' to 'false'.", 2)
 
@@ -303,9 +305,6 @@ def record_parked_motion(capture, framerate, width, height, device, directory, f
             last_motion_detected = utils.get_time()
             if (utils.get_time() - last_motion_detected > 2): # Check to see if it has been more than 2 seconds since motion was last detected so that the message is only displayed after there hasn't been motion for some time.
                 display_message("Detected motion.", 1)
-                if (config["dashcam"]["notifications"]["reticulum"]["enabled"] == True and config["dashcam"]["notifications"]["reticulum"]["events"]["motion_detected"]["enabled"] == True): # Check to see if Predator is configured to send motion detection notifications over Reticulum.
-                    for destination in config["dashcam"]["notifications"]["reticulum"]["destinations"]: # Iterate over each configured destination.
-                        reticulum.lxmf_send_message(str(config["dashcam"]["notifications"]["reticulum"]["instance_name"]) + " has detected motion while parked", destination) # Send a Reticulum LXMF message to this destination.
 
         if (config["dashcam"]["parked"]["recording"]["highlight_motion"]["enabled"] == True):
             for contour in contours: # Iterate through each contour.
@@ -317,6 +316,7 @@ def record_parked_motion(capture, framerate, width, height, device, directory, f
         frame = apply_dashcam_stamps(frame) # Apply dashcam overlay stamps to the frame.
         output.write(frame) # Save this frame to the video.
 
+    output = None # Release the video writer.
     audio_recorder.terminate() # Kill the active audio recorder.
     calculated_framerate = frames_captured / (utils.get_time() - capture_start_time) # Calculate the rate at which frames were captured during this recording.
     display_message("Stopped motion recording.", 1)
