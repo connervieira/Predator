@@ -1,6 +1,6 @@
 {
     "general": {
-        "working_directory": "/home/cvieira/Software/Support/Predator/Working/",
+        "working_directory": "/home/alpr/Software/Support/Predator/Working/",
         "interface_directory": "/dev/shm/PredatorInterface/",
         "alpr": {
             "engine": "phantom",
@@ -26,7 +26,7 @@
             "debugging_output": true
         },
         "gps": {
-            "enabled": false,
+            "enabled": true,
             "time_correction": {
                 "enabled": false,
                 "threshold": 2
@@ -92,7 +92,7 @@
         "image": {
             "camera": {
                 "devices": {
-                    "primary": "/dev/video0"
+                    "primary": "/dev/video1"
                 }
             }
         },
@@ -147,7 +147,7 @@
             "looped_recording": {
                 "mode": "manual",
                 "manual": {
-                    "history_length": 90
+                    "history_length": 1000
                 },
                 "automatic": {
                     "minimum_free_percentage": 0.25,
@@ -163,13 +163,13 @@
                 },
                 "devices": {
                     "main": {
-                        "index": 0,
-                        "flip": true
+                        "index": 1,
+                        "flip": false
                     }
                 }
             },
             "audio": {
-                "enabled": true,
+                "enabled": false,
                 "extension": "wav",
                 "merge": true
             }
