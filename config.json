@@ -1,6 +1,6 @@
 {
     "general": {
-        "working_directory": "/home/alpr/Software/Support/Predator/Working/",
+        "working_directory": "/home/cvieira/Software/Support/Predator/Working/",
         "interface_directory": "/dev/shm/PredatorInterface/",
         "alpr": {
             "engine": "phantom",
@@ -26,7 +26,7 @@
             "debugging_output": true
         },
         "gps": {
-            "enabled": true,
+            "enabled": false,
             "time_correction": {
                 "enabled": false,
                 "threshold": 2
@@ -163,7 +163,7 @@
                 },
                 "devices": {
                     "main": {
-                        "index": 1,
+                        "index": 0,
                         "flip": false
                     }
                 }

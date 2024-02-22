@@ -310,7 +310,7 @@ def record_parked_motion(capture, framerate, width, height, device, directory, f
 
         if (config["dashcam"]["parked"]["recording"]["highlight_motion"]["enabled"] == True):
             for contour in contours: # Iterate through each contour.
-                if cv2.contourArea(contour) > 5: # Check to see if this contour is big enough to be worth highlighting.
+                if cv2.contourArea(contour) > 1: # Check to see if this contour is big enough to be worth highlighting.
                     color = config["dashcam"]["parked"]["recording"]["highlight_motion"]["color"]
                     x, y, w, h = cv2.boundingRect(contour) # Define the edges of the contour.
                     cv2.rectangle(frame, (x, y), (x+w, y+h), (color[2], color[1], color[0]), 2) # Draw a box around the contour in the frame.
