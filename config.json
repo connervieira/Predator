@@ -33,7 +33,7 @@
             }
         },
         "object_recognition": {
-            "enabled": false
+            "enabled": true
         },
         "modes": {
             "auto_start": "",
@@ -82,7 +82,7 @@
             }
         },
         "object_recognition": {
-            "enabled": true,
+            "enabled": false,
             "log_file": "object_recognition_log.csv",
             "video_still_path": "/dev/shm/phantom-webcam.jpg"
         },

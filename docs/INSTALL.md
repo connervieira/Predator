@@ -7,7 +7,7 @@ This document contains detailed instructions on how to install Predator.
 
 If you're already familiar with Predator, and you just want a quick set-up guide, you can use the following steps to set everything up. For more detailed instructions, skip to the 'Full Install Guide' later in the document.
 
-1. Install Python packages: `pip3 install pytz validators requests gps geopy gpsd-py3 opencv-python cvlib tensorflow keras silence-tensorflow psutil`
+1. Install Python packages: `pip3 install pytz validators requests gps gpsd-py3 opencv-python cvlib tensorflow keras silence-tensorflow psutil`
 2. Install Linux packages: `sudo apt-get install ffmpeg mpg321 gpsd gpsd-clients imagemagick fswebcam`
 3. Install an ALPR engine, like [Phantom](https://v0lttech.com/phantom.php).
 

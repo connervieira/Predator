@@ -274,6 +274,7 @@ def detect_motion(frame, background_subtractor):
 # This function is called as a subprocess of the normal dashcam recording, and is triggered when motion is detected. This function exits when motion is no longer detected (after the motion detection timeout).
 def record_parked_motion(capture, framerate, width, height, device, directory, frame_history):
     global parked
+    global config
     last_motion_detected = utils.get_time() # Initialize the last time that motion was detected to now. We can assume motion was just detected because this function is only called after motion is detected.
 
     file_name = directory + "/predator_dashcam_" + str(round(utils.get_time())) + "_" + str(device) + "_0_P"
@@ -282,7 +283,8 @@ def record_parked_motion(capture, framerate, width, height, device, directory, f
     output = cv2.VideoWriter(video_file_name, cv2.VideoWriter_fourcc(*'XVID'), float(framerate), (width,  height))
 
     background_subtractor = cv2.createBackgroundSubtractorMOG2() # Initialize the background subtractor for motion detection.
-    audio_recorder = subprocess.Popen(["arecord", "-q", "--format=cd", audio_file_name], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Start the audio recorder for the parked segment.
+    if (config["dashcam"]["capture"]["audio"]["enabled"] == True):
+        audio_recorder = subprocess.Popen(["arecord", "-q", "--format=cd", audio_file_name], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Start the audio recorder for the parked segment.
 
     audio_offset = len(frame_history) / framerate
     for frame in frame_history: # Iterate through each frame in the frame history.
@@ -317,7 +319,8 @@ def record_parked_motion(capture, framerate, width, height, device, directory, f
         output.write(frame) # Save this frame to the video.
 
     output = None # Release the video writer.
-    audio_recorder.terminate() # Kill the active audio recorder.
+    if (config["dashcam"]["capture"]["audio"]["enabled"] == True):
+        audio_recorder.terminate() # Kill the active audio recorder.
     calculated_framerate = frames_captured / (utils.get_time() - capture_start_time) # Calculate the rate at which frames were captured during this recording.
     display_message("Stopped motion recording.", 1)
 
@@ -465,8 +468,9 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
 
             previously_parked = True # Indicate that Predator was parked so that we know that the next loop isn't the first loop of Predator being in parked mode.
 
-            if (audio_recorder.poll() is None): # Check to see if there is an active audio recorder.
-                audio_recorder.terminate() # Kill the active audio recorder.
+            if (config["dashcam"]["capture"]["audio"]["enabled"] == True):
+                if (audio_recorder.poll() is None): # Check to see if there is an active audio recorder.
+                    audio_recorder.terminate() # Kill the active audio recorder.
             contours, moving_percentage = detect_motion(frame, background_subtractor) # Run motion analysis on this frame.
 
 
