@@ -102,6 +102,7 @@ if (config["general"]["gps"]["enabled"] == True): # Only import the GPS librarie
     from gps import * # Required to access GPS information.
     import gpsd
 import threading
+import signal # Required to time out functions.
 
 
 
@@ -525,13 +526,26 @@ def display_shape(shape):
 
 
 # Define the function that will be used to get the current GPS coordinates.
+class TimeOutException(Exception):
+   pass
+def alarm_handler(signum, frame):
+    print("Timed out")
+    raise TimeOutException()
 def get_gps_location():
     global gps_state
     global global_time_offset
     if (config["general"]["gps"]["enabled"] == True): # Check to see if GPS is enabled.
         try:
-            gpsd.connect() # Connect to the GPS daemon.
-            gps_data_packet = gpsd.get_current() # Query the GPS for the most recent information.
+            signal.signal(signal.SIGALRM, alarm_handler)
+            signal.alarm(2)
+            try:
+                gpsd.connect() # Connect to the GPS daemon.
+                gps_data_packet = gpsd.get_current() # Query the GPS for the most recent information.
+            except TimeOutException as ex:
+                print(ex)
+                display_message("The GPS connection timed out. GPS data could not be received.", 2)
+                return 0, 0, 0, 0, 0, 0, 0 
+            signal.alarm(0)
 
             gps_state = gps_data_packet.mode 
             if (gps_data_packet.mode >= 2): # Check to see if the GPS has a 2D fix yet.

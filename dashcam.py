@@ -597,4 +597,4 @@ def start_dashcam_recording(dashcam_devices, video_width, video_height, director
                     time.sleep(1)
         except:
             dashcam_recording_active = False # All dashcam threads are watching this variable globally, and will terminate when it is changed to 'False'.
-            print("Dashcam recording halted.")
+            display_message("Dashcam recording halted.", 1)
