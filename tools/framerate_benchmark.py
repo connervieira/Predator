@@ -21,8 +21,8 @@ def benchmark_camera_framerate(device, frames=5): # This function benchmarks a g
     global config
 
     resolution = [config["dashcam"]["capture"]["video"]["resolution"]["width"], config["dashcam"]["capture"]["video"]["resolution"]["height"]] # This determines the resolution that will be used for the video capture device.
-    capture = cv2.VideoCapture(config["dashcam"]["capture"]["video"]["devices"][device]); # Open the video capture device.
-
+    capture = cv2.VideoCapture(config["dashcam"]["capture"]["video"]["devices"][device]["index"]); # Open the video capture device.
+    capture.set(cv2.CAP_PROP_FOURCC, 0x47504A4D) # MJPEG
     capture.set(cv2.CAP_PROP_FRAME_WIDTH,resolution[0]) # Set the video stream width.
     capture.set(cv2.CAP_PROP_FRAME_HEIGHT,resolution[1]) # Set the video stream height.
 

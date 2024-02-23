@@ -390,6 +390,8 @@ This update overhauls Predator's dashcam functionality and adds various features
     - Moved the dashcam recording system to a separate script for sake of organization.
         - Removed the FFMPEG recording back-end for stability and simplicity.
     - Added a configuration option to flip the video output individual dash-cam capture devices to support more camera mounting possibilities.
+    - Switched to MJPEG codec for improved resolution and frame-rate.
+        - Predator now sets the intended OpenCV video capture frame-rate to an arbitrarily high value in order to request the fastest frame-rate option.
 - The ALPR stream library is now only imported if real-time mode is enabled in the configuration.
 - Fixed a typo in a debug message inside `alpr_stream_maintainer()`.
 - Improved debug message handling when multiple threads are running concurrently.

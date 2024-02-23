@@ -16,9 +16,9 @@ except:
     print("The configuration database couldn't be loaded. It may be corrupted.")
     exit()
 
-capture = cv2.VideoCapture(0) # TODO: Replace with a capture device from the configuration.
+capture = cv2.VideoCapture("/dev/video2", cv2.CAP_OPENCV_MJPEG) # TODO: Replace with a capture device from the configuration.
 
-resolution = [config["dashcam"]["capture"]["resolution"]["width"], config["dashcam"]["capture"]["resolution"]["height"]] # This determines the resolution that will be used for the video capture device.
+resolution = [config["dashcam"]["capture"]["video"]["resolution"]["width"], config["dashcam"]["capture"]["video"]["resolution"]["height"]] # This determines the resolution that will be used for the video capture device.
 capture.set(cv2.CAP_PROP_FRAME_WIDTH,resolution[0]) # Set the video stream width.
 capture.set(cv2.CAP_PROP_FRAME_HEIGHT,resolution[1]) # Set the video stream height.
 

@@ -52,7 +52,7 @@ class video_stream:
 
 resolution = [config["dashcam"]["capture"]["video"]["resolution"]["width"], config["dashcam"]["capture"]["video"]["resolution"]["height"]] # This determines the resolution that will be used for the video capture device.
 for device in config["dashcam"]["capture"]["video"]["devices"]:
-    stream = video_stream(src=config["dashcam"]["capture"]["video"]["devices"][device]).start()
+    stream = video_stream(src=config["dashcam"]["capture"]["video"]["devices"][device]["index"]).start()
     start_time = time.time()
 
     frame_number = 0

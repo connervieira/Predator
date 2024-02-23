@@ -33,7 +33,7 @@
             }
         },
         "object_recognition": {
-            "enabled": true
+            "enabled": false
         },
         "modes": {
             "auto_start": "",
@@ -158,12 +158,12 @@
         "capture": {
             "video": {
                 "resolution": {
-                    "width": 640,
-                    "height": 480
+                    "width": 1920,
+                    "height": 1080
                 },
                 "devices": {
                     "main": {
-                        "index": 0,
+                        "index": 2,
                         "flip": false
                     }
                 }
@@ -175,7 +175,7 @@
             }
         },
         "parked": {
-            "enabled": true,
+            "enabled": false,
             "conditions": {
                 "speed": 2,
                 "time": 10
