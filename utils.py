@@ -549,7 +549,10 @@ def get_gps_location():
 
             gps_state = gps_data_packet.mode 
             if (gps_data_packet.mode >= 2): # Check to see if the GPS has a 2D fix yet.
-                gps_time = datetime.datetime.strptime(str(gps_data_packet.time)[:-1]+"000" , '%Y-%m-%dT%H:%M:%S.%f').astimezone().timestamp() + timezone_offset # Determine the local Unix timestamp from the GPS timestamp.
+                try:
+                    gps_time = datetime.datetime.strptime(str(gps_data_packet.time)[:-1]+"000" , '%Y-%m-%dT%H:%M:%S.%f').astimezone().timestamp() + timezone_offset # Determine the local Unix timestamp from the GPS timestamp.
+                except:
+                    gps_time = 0
                 position = gps_data_packet.position()
                 speed = gps_data_packet.speed()
             else:
