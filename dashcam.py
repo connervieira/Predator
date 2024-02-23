@@ -124,7 +124,8 @@ def benchmark_camera_framerate(device, frames=5): # This function benchmarks a g
 
     resolution = [config["dashcam"]["capture"]["video"]["resolution"]["width"], config["dashcam"]["capture"]["video"]["resolution"]["height"]] # This determines the resolution that will be used for the video capture device.
     capture = cv2.VideoCapture(config["dashcam"]["capture"]["video"]["devices"][device]["index"]); # Open the video capture device.
-    capture.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G')) # Set the codec to be MJPEG.
+    codec = list(config["dashcam"]["capture"]["video"]["devices"][device]["codec"])
+    capture.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(codec[0], codec[1], codec[2], codec[3])) # Set the video codec.
     capture.set(cv2.CAP_PROP_FPS, 120) # Set the frame-rate to a high value so OpenCV will use the highest frame-rate the capture supports.
 
     capture.set(cv2.CAP_PROP_FRAME_WIDTH,resolution[0]) # Set the video stream width.
@@ -400,7 +401,8 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
     debug_message("Opening video stream on '" + device + "'")
 
     capture = cv2.VideoCapture(device_id) # Open the video stream.
-    capture.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G')) # Set the codec to be MJPEG.
+    codec = list(config["dashcam"]["capture"]["video"]["devices"][device]["codec"])
+    capture.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(codec[0], codec[1], codec[2], codec[3])) # Set the video codec.
     capture.set(cv2.CAP_PROP_FPS, 120) # Set the frame-rate to a high value so OpenCV will use the highest frame-rate the capture supports.
 
     capture.set(cv2.CAP_PROP_FRAME_WIDTH,width) # Set the video stream width.

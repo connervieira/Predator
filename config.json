@@ -164,7 +164,8 @@
                 "devices": {
                     "main": {
                         "index": 2,
-                        "flip": false
+                        "flip": false,
+                        "codec": "MPEG"
                     }
                 }
             },

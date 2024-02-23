@@ -17,14 +17,17 @@ from threading import Thread
 import cv2
 import time
 
-frames = 10000 # This determines how many frames will be captured for the benchmark.
-
-display = True 
+frames = 240 # This determines how many frames will be captured for the benchmark.
+output_file = "./output.avi"
+display = False
 
 
 class video_stream:
     def __init__(self, src=0): # This initializes the video stream object.
         self.stream = cv2.VideoCapture(src)
+        codec = list("MJPG")
+        self.stream.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(codec[0], codec[1], codec[2], codec[3])) # Set the codec to be MJPEG.
+        self.stream.set(cv2.CAP_PROP_FPS, 120) # Set the frame-rate to a high value so OpenCV will use the highest frame-rate the capture supports.
         self.stream.set(cv2.CAP_PROP_FRAME_WIDTH,resolution[0]) # Set the video stream width.
         self.stream.set(cv2.CAP_PROP_FRAME_HEIGHT,resolution[1]) # Set the video stream height.
         (self.grabbed, self.frame) = self.stream.read()
@@ -52,6 +55,8 @@ class video_stream:
 
 resolution = [config["dashcam"]["capture"]["video"]["resolution"]["width"], config["dashcam"]["capture"]["video"]["resolution"]["height"]] # This determines the resolution that will be used for the video capture device.
 for device in config["dashcam"]["capture"]["video"]["devices"]:
+    if (len(output_file) > 0):
+        output = cv2.VideoWriter(output_file, cv2.VideoWriter_fourcc(*'XVID'), 50, (resolution[0], resolution[1]))
     stream = video_stream(src=config["dashcam"]["capture"]["video"]["devices"][device]["index"]).start()
     start_time = time.time()
 
@@ -63,7 +68,10 @@ for device in config["dashcam"]["capture"]["video"]["devices"]:
         if (display == True):
             cv2.imshow("Frame", frame)
             key = cv2.waitKey(1) & 0xFF
+        if (len(output_file) > 0):
+            output.write(frame) # Save this frame to the video.
 
+    output = None
     end_time = time.time()
     fps = frames / (end_time-start_time)
     print("Calculated FPS:" + str(round(fps)))
