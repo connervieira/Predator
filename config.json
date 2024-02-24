@@ -158,14 +158,19 @@
         "capture": {
             "video": {
                 "resolution": {
-                    "width": 1920,
-                    "height": 1080
+                    "width": 1280,
+                    "height": 720
                 },
                 "devices": {
                     "main": {
                         "index": 2,
                         "flip": false,
-                        "codec": "MPEG"
+                        "codec": "MJPG"
+                    },
+                    "secondary": {
+                        "index": 4,
+                        "flip": false,
+                        "codec": "MJPG"
                     }
                 }
             },
