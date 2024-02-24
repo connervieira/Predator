@@ -526,26 +526,13 @@ def display_shape(shape):
 
 
 # Define the function that will be used to get the current GPS coordinates.
-class TimeOutException(Exception):
-   pass
-def alarm_handler(signum, frame):
-    print("Timed out")
-    raise TimeOutException()
+gpsd.connect() # Connect to the GPS daemon.
 def get_gps_location():
     global gps_state
     global global_time_offset
     if (config["general"]["gps"]["enabled"] == True): # Check to see if GPS is enabled.
         try:
-            signal.signal(signal.SIGALRM, alarm_handler)
-            signal.alarm(2)
-            try:
-                gpsd.connect() # Connect to the GPS daemon.
-                gps_data_packet = gpsd.get_current() # Query the GPS for the most recent information.
-            except TimeOutException as ex:
-                print(ex)
-                display_message("The GPS connection timed out. GPS data could not be received.", 2)
-                return 0, 0, 0, 0, 0, 0, 0 
-            signal.alarm(0)
+            gps_data_packet = gpsd.get_current() # Query the GPS for the most recent information.
 
             gps_state = gps_data_packet.mode 
             if (gps_data_packet.mode >= 2): # Check to see if the GPS has a 2D fix yet.
@@ -576,8 +563,9 @@ def get_gps_location():
                     display_message("The local system time differs significantly from the GPS time.", 2)
 
             return position[0], position[1], speed, altitude, heading, satellites, gps_time
-        except:
-            display_message("An unknown error occured while fetching the latest GPS position. It is possible something has gone wrong with the GPS back-end.", 2)
+        except Exception as exception:
+            gps_connection_active = False
+            display_message("An unknown error occured while fetching the latest GPS position: " + str(exception), 2)
             return 0.0000, 0.0000, 0.0, 0.0, 0.0, 0, 0 # Return a default placeholder location.
     else: # If GPS is disabled, then this function should never be called, but return a placeholder position regardless.
         display_message("The `get_gps_location` function was called, even though GPS is disabled. This is a bug, and should never occur.", 2)
