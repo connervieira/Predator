@@ -26,7 +26,7 @@
             "debugging_output": true
         },
         "gps": {
-            "enabled": false,
+            "enabled": true,
             "time_correction": {
                 "enabled": false,
                 "threshold": 2
@@ -158,12 +158,12 @@
         "capture": {
             "video": {
                 "resolution": {
-                    "width": 1280,
-                    "height": 720
+                    "width": 1920,
+                    "height": 1080
                 },
                 "devices": {
                     "main": {
-                        "index": 2,
+                        "index": 0,
                         "flip": false,
                         "codec": "MJPG"
                     },
@@ -181,7 +181,7 @@
             }
         },
         "parked": {
-            "enabled": false,
+            "enabled": true,
             "conditions": {
                 "speed": 2,
                 "time": 10
