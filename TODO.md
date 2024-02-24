@@ -16,6 +16,7 @@ These are the features actively planned for Predator and are likely to be added 
     - [X] Detect when the vehicle has been parked for a certain length of time.
     - [X] Detect motion to resume dashcam recording while parked.
 - [X] Add GPS time verification.
+- [ ] Fix desynced video channels in dash-cam mode.
 
 
 ## Hypothetical
