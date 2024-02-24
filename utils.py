@@ -565,7 +565,7 @@ def get_gps_location():
             return position[0], position[1], speed, altitude, heading, satellites, gps_time
         except Exception as exception:
             gps_connection_active = False
-            display_message("An unknown error occured while fetching the latest GPS position: " + str(exception), 2)
+            display_message("A GPS error occurred: " + str(exception), 2)
             return 0.0000, 0.0000, 0.0, 0.0, 0.0, 0, 0 # Return a default placeholder location.
     else: # If GPS is disabled, then this function should never be called, but return a placeholder position regardless.
         display_message("The `get_gps_location` function was called, even though GPS is disabled. This is a bug, and should never occur.", 2)

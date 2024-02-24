@@ -166,11 +166,6 @@
                         "index": 0,
                         "flip": false,
                         "codec": "MJPG"
-                    },
-                    "secondary": {
-                        "index": 4,
-                        "flip": false,
-                        "codec": "MJPG"
                     }
                 }
             },
