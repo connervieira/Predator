@@ -526,7 +526,8 @@ def display_shape(shape):
 
 
 # Define the function that will be used to get the current GPS coordinates.
-gpsd.connect() # Connect to the GPS daemon.
+if (config["general"]["gps"]["enabled"] == True): # Check to see if GPS is enabled.
+    gpsd.connect() # Connect to the GPS daemon.
 def get_gps_location():
     global gps_state
     global global_time_offset
