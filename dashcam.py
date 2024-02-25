@@ -421,7 +421,7 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
 
     previously_parked = False # This will be used to keep track of whether or not Predator was in parked mode during the previous loop.
 
-    file_name = directory + "/predator_dashcam_" + str(round(segment_start_time)) + "_" + str(device) + "_" + str(segment_number) + "_N" # TODO
+    file_name = directory + "/predator_dashcam_" + str(round(first_segment_started_time)) + "_" + str(device) + "_" + str(segment_number) + "_N"
     video_filepath = file_name + ".avi" # Determine the initial video file path.
     audio_filepath = file_name + "." + str(config["dashcam"]["capture"]["audio"]["extension"]) # Determine the initial audio file path.
     if (config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if audio recording is enabled in the configuration.
@@ -512,7 +512,7 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
                     
                 calculated_framerate = frames_since_last_segment / (utils.get_time() - segment_start_time) # Calculate the frame-rate of the last segment.
                 segment_start_time = utils.get_time() # Update the segment start time.
-                file_name = directory + "/predator_dashcam_" + str(round(segment_start_time)) + "_" + str(device) + "_" + str(segment_number) + "_N"
+                file_name = directory + "/predator_dashcam_" + str(round(first_segment_started_time + (segment_number*config["dashcam"]["saving"]["segment_length"]))) + "_" + str(device) + "_" + str(segment_number) + "_N"
                 video_filepath = file_name + ".avi" # Update the file path.
                 output = None # Release the previous video output file.
                 output = cv2.VideoWriter(video_filepath, cv2.VideoWriter_fourcc(*'XVID'), float(calculated_framerate), (width,  height)) # Update the video output.
