@@ -202,6 +202,8 @@ This document describes the configuration values found `config.json`.
                     - For example, if your camera is connected to your system as `/dev/video2`, its index would be `2`.
                 - `flip` is a boolean that determines if this camera's output will be rotated 180 degrees.
                     - This is useful if the camera is mounted upside down.
+                - `codec` is the 4 character codec identifier that will be used to capture video.
+                    - In most cases, setting this to `"MJPG"`  is a safe option.
         - `audio` contains settings for configuring Predator's audio recording behavior.
             - `enabled` is a boolean that determines whether or not audio will be recorded at all.
             - `extension` sets the file extension that audio will be saved with.
