@@ -165,7 +165,7 @@
                     "main": {
                         "index": 0,
                         "flip": false,
-                        "codec": "MJPG"
+                        "codec": "H264"
                     }
                 }
             },
@@ -183,7 +183,7 @@
             },
             "recording": {
                 "highlight_motion": {
-                    "enabled": true,
+                    "enabled": false,
                     "color": [
                         0,
                         255,
