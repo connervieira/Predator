@@ -298,7 +298,7 @@ def update_state(mode): # This is the function that is called to issue a state u
         state_update_thread = threading.Thread(target=update_state_file, args=[current_state], name="InterfaceStateUpdate")
         state_update_thread.start()
 
-def update_state_file(current_state): # This is the function that actually issues a status update.
+def update_state_file(current_state): # This is the function that actually issues a status update to disk.
     save_to_file(state_file_location, json.dumps(current_state)) # Save the modified state to the disk as JSON data.
 
 
@@ -526,51 +526,57 @@ def display_shape(shape):
 
 
 # Define the function that will be used to get the current GPS coordinates.
-if (config["general"]["gps"]["enabled"] == True): # Check to see if GPS is enabled.
+if (len(config["general"]["gps"]["demo_file"]) > 0): # Check to see if there is a demo file set.
+    display_message("The GPS is in demo mode. A pre-recorded file is being played back in place of live GPS data.", 1)
+    # TODO: Load the GPX file.
+elif (config["general"]["gps"]["enabled"] == True): # Check to see if GPS is enabled.
     gpsd.connect() # Connect to the GPS daemon.
 def get_gps_location():
     global gps_state
     global global_time_offset
     if (config["general"]["gps"]["enabled"] == True): # Check to see if GPS is enabled.
-        try:
-            gps_data_packet = gpsd.get_current() # Query the GPS for the most recent information.
+        if (len(config["general"]["gps"]["demo_file"]) > 0): # Check to see if there is a demo file set.
+            pass # TODO: Return relevant GPS point.
+        else: # Otherwise, GPS demo mode is disabled.
+            try:
+                gps_data_packet = gpsd.get_current() # Query the GPS for the most recent information.
 
-            gps_state = gps_data_packet.mode 
-            if (gps_data_packet.mode >= 2): # Check to see if the GPS has a 2D fix yet.
-                try:
-                    gps_time = datetime.datetime.strptime(str(gps_data_packet.time)[:-1]+"000" , '%Y-%m-%dT%H:%M:%S.%f').astimezone().timestamp() + timezone_offset # Determine the local Unix timestamp from the GPS timestamp.
-                except:
-                    gps_time = 0
-                position = gps_data_packet.position()
-                speed = gps_data_packet.speed()
-            else:
-                gps_time = 0
-                position = [0, 0]
-                speed = 0
-            if (gps_data_packet.mode >= 3): # Check to see if the GPS has a 3D fix yet.
-                altitude = gps_data_packet.altitude()
-                heading = gps_data_packet.movement()["track"]
-                satellites = gps_data_packet.sats
-            else:
-                altitude = 0 # Use a placeholder for altitude.
-                heading = 0 # Use a placeholder for heading.
-                satellites = 0 # Use a placeholder for satellites.
-
-            if (gps_time > 0 and abs(get_time() - gps_time) > config["general"]["gps"]["time_correction"]["threshold"]):
-                if (config["general"]["gps"]["time_correction"]["enabled"] == True):
-                    global_time_offset = gps_time - time.time()
-                    display_message("The local system time differs significantly from the GPS time. Applied time offset of " + str(round(global_time_offset*10**3)/10**3) + " seconds.", 2)
+                gps_state = gps_data_packet.mode 
+                if (gps_data_packet.mode >= 2): # Check to see if the GPS has a 2D fix yet.
+                    try:
+                        gps_time = datetime.datetime.strptime(str(gps_data_packet.time)[:-1]+"000" , '%Y-%m-%dT%H:%M:%S.%f').astimezone().timestamp() + timezone_offset # Determine the local Unix timestamp from the GPS timestamp.
+                    except:
+                        gps_time = 0
+                    position = gps_data_packet.position()
+                    speed = gps_data_packet.speed()
                 else:
-                    display_message("The local system time differs significantly from the GPS time.", 2)
+                    gps_time = 0
+                    position = [0, 0]
+                    speed = 0
+                if (gps_data_packet.mode >= 3): # Check to see if the GPS has a 3D fix yet.
+                    altitude = gps_data_packet.altitude()
+                    heading = gps_data_packet.movement()["track"]
+                    satellites = gps_data_packet.sats
+                else:
+                    altitude = 0 # Use a placeholder for altitude.
+                    heading = 0 # Use a placeholder for heading.
+                    satellites = 0 # Use a placeholder for satellites.
 
-            return position[0], position[1], speed, altitude, heading, satellites, gps_time
-        except Exception as exception:
-            gps_connection_active = False
-            display_message("A GPS error occurred: " + str(exception), 2)
+                if (gps_time > 0 and abs(get_time() - gps_time) > config["general"]["gps"]["time_correction"]["threshold"]):
+                    if (config["general"]["gps"]["time_correction"]["enabled"] == True):
+                        global_time_offset = gps_time - time.time()
+                        display_message("The local system time differs significantly from the GPS time. Applied time offset of " + str(round(global_time_offset*10**3)/10**3) + " seconds.", 2)
+                    else:
+                        display_message("The local system time differs significantly from the GPS time.", 2)
+
+                return position[0], position[1], speed, altitude, heading, satellites, gps_time
+            except Exception as exception:
+                gps_connection_active = False
+                display_message("A GPS error occurred: " + str(exception), 2)
+                return 0.0000, 0.0000, 0.0, 0.0, 0.0, 0, 0 # Return a default placeholder location.
+        else: # If GPS is disabled, then this function should never be called, but return a placeholder position regardless.
+            display_message("The `get_gps_location` function was called, even though GPS is disabled. This is a bug, and should never occur.", 2)
             return 0.0000, 0.0000, 0.0, 0.0, 0.0, 0, 0 # Return a default placeholder location.
-    else: # If GPS is disabled, then this function should never be called, but return a placeholder position regardless.
-        display_message("The `get_gps_location` function was called, even though GPS is disabled. This is a bug, and should never occur.", 2)
-        return 0.0000, 0.0000, 0.0, 0.0, 0.0, 0, 0 # Return a default placeholder location.
 
 
 
@@ -703,12 +709,16 @@ def load_alert_database(sources, project_directory):
 
 
 # This function is used to parse GPX files into a Python dictionary.
-def process_gpx(gpx_file):
+def process_gpx(gpx_file, modernize=False):
     gpx_file = open(gpx_file, 'r') # Open the GPX file.
     xmldoc = minidom.parse(gpx_file) # Read the full XML GPX document.
 
     track = xmldoc.getElementsByTagName('trkpt') # Get all of the location information from the GPX document.
     timing = xmldoc.getElementsByTagName('time') # Get all of the timing information from the GPX document.
+
+    offset = 0 # This is the value that all timestamps in the file will be offset by.
+    if (modernize == True): # Check to see if this GPX file should be modernized, such that the first entry in the file is the current time, and all subsequent points are offset by the same amount.
+        print(timing[0]) # TODO
 
     gpx_data = {} # This is a dictionary that will hold each location point, where the key is a timestamp.
 
@@ -723,6 +733,4 @@ def process_gpx(gpx_file):
 
 
     return gpx_data
-
-
 
