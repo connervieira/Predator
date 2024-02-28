@@ -85,7 +85,7 @@ elif (config["dashcam"]["saving"]["looped_recording"]["mode"] == "automatic"): #
 
 if (config["dashcam"]["parked"]["enabled"] == True): # Only validate the parking mode configuration values if parking mode is enabled.
     if (config["general"]["gps"]["enabled"] == False):
-        display_message("Dash-cam parking mode is enabled, but GPS functionality is disabled. Parking mode needs GPS information to determine when the vehicle is stopped. Without it, Predator will enter parking mode as soon as the threshold time is reached, and it will never return to normal recording mode.", 3)
+        display_message("Dash-cam parking mode is enabled, but GPS functionality is disabled. Parking mode needs GPS information to determine when the vehicle is stopped. Without it, Predator will enter parking mode as soon as the threshold time is reached, and it will never return to normal recording mode.", 2)
     if (config["dashcam"]["parked"]["conditions"]["speed"] < 0):
         display_message("The 'dashcam>parked>conditions>speed' setting is a negative number. This will prevent Predator from ever entering parked mode. To prevent unexpected behavior, you should set 'dashcam>parked>enabled' to 'false'.", 2)
 
@@ -131,7 +131,7 @@ def benchmark_camera_framerate(device, frames=5): # This function benchmarks a g
     capture.set(cv2.CAP_PROP_FRAME_WIDTH,resolution[0]) # Set the video stream width.
     capture.set(cv2.CAP_PROP_FRAME_HEIGHT,resolution[1]) # Set the video stream height.
     if (capture is None or capture.isOpened() == False): # Check to see if the capture failed to open.
-        display_message("Failed to open video capture on device '" + str(device) + "'", 3)
+        display_message("Failed to open video capture on device '" + str(device) + "' for frame-rate benchmarking.", 3)
 
     debug_message("Running benchmark for '" + device + "'...")
 
@@ -203,7 +203,11 @@ def save_dashcam_segments(file1, file2=""):
 
 
 def apply_dashcam_stamps(frame):
-    height, width, channels = frame.shape
+    try:
+        height, width, channels = frame.shape
+    except:
+        display_message("Failed to determine frame size while applying overlay stamps. It is likely something has gone wrong with video capture.", 3)
+
     main_stamp_position = [10, height - 10] # Determine where the main overlay stamp should be positioned in the video stream.
     main_stamp = ""
     if (config["dashcam"]["stamps"]["main"]["unix_time"]["enabled"] == True): # Check to see if the Unix epoch time stamp is enabled.
@@ -299,6 +303,8 @@ def record_parked_motion(capture, framerate, width, height, device, directory, f
     while (utils.get_time() - last_motion_detected < config["dashcam"]["parked"]["recording"]["timeout"] and parked == True): # Run until motion is not detected for a certain period of time.
         heartbeat() # Issue a status heartbeat.
         update_state("dashcam/parked_active")
+        if (capture is None or capture.isOpened() == False): # Check to see if the capture failed to open.
+            display_message("The video capture on device '" + str(device) + "' was dropped during parked recording", 3)
         ret, frame = capture.read() # Capture a frame.
         if (config["dashcam"]["capture"]["video"]["devices"][device]["flip"]): # Check to see if Predator is convered to flip this capture device's output.
             frame = cv2.rotate(frame, cv2.ROTATE_180) # Flip the frame by 180 degrees.
@@ -553,6 +559,7 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
 
 
 
+parked = False # Start with parked mode disabled.
 def start_dashcam_recording(dashcam_devices, video_width, video_height, directory, background=False): # This function starts dashcam recording on a given list of dashcam devices.
     dashcam_process = [] # Create a placeholder list to store the dashcam processes.
     iteration_counter = 0 # Set the iteration counter to 0 so that we can increment it for each recording device specified.
@@ -595,6 +602,7 @@ def start_dashcam_recording(dashcam_devices, video_width, video_height, director
                         parked = False # Exit parked mode.
                     
                     time.sleep(1)
-        except:
+        except Exception as exception:
             dashcam_recording_active = False # All dashcam threads are watching this variable globally, and will terminate when it is changed to 'False'.
             display_message("Dashcam recording halted.", 1)
+            print(exception)
