@@ -1,7 +1,7 @@
 {
     "general": {
-        "working_directory": "/home/cvieira/Software/Support/Predator/Working/",
-        "interface_directory": "/dev/shm/PredatorInterface/",
+        "working_directory": "/Users/cvieira/Software/Support/Predator/Working/",
+        "interface_directory": "/Users/cvieira/Software/Support/Predator/Interface/",
         "alpr": {
             "engine": "phantom",
             "validation": {
@@ -26,8 +26,8 @@
             "debugging_output": true
         },
         "gps": {
-            "enabled": false,
-            "demo_file": "test.gpx",
+            "enabled": true,
+            "demo_file": "demo.gpx",
             "time_correction": {
                 "enabled": false,
                 "threshold": 2
@@ -179,7 +179,7 @@
         "parked": {
             "enabled": true,
             "conditions": {
-                "speed": 2,
+                "speed": 1,
                 "time": 10
             },
             "recording": {

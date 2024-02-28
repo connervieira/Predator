@@ -138,12 +138,6 @@ def countdown(timer):
 
 
 
-# This function can be called from within threads to exit Predator.
-def trigger_exit():
-    exit()
-
-
-
 # Define the function that will be used to save files for exported data.
 def save_to_file(file_name, contents):
     fh = None
@@ -437,6 +431,48 @@ def validate_plate(plate, template):
 
 
 
+
+# This function is used to parse GPX files into a Python dictionary.
+def process_gpx(gpx_file, modernize=False): # `gpx_file` is the absolute path to a GPX file. `modernize` determines if the timestamps will be offset such that the first timestamp is equal to the current time.
+    gpx_file = open(gpx_file, 'r') # Open the GPX file.
+    xmldoc = minidom.parse(gpx_file) # Read the full XML GPX document.
+
+    track = xmldoc.getElementsByTagName('trkpt') # Get all of the location information from the GPX document.
+    speed = xmldoc.getElementsByTagName('speed') # Get all of the speed information from the GPX document.
+    altitude = xmldoc.getElementsByTagName('ele') # Get all of the elevation information from the GPX document.
+    timing = xmldoc.getElementsByTagName('time') # Get all of the timing information from the GPX document.
+
+    offset = 0 # This is the value that all timestamps in the file will be offset by.
+    if (modernize == True): # Check to see if this GPX file should be modernized, such that the first entry in the file is the current time, and all subsequent points are offset by the same amount.
+        first_point_time = str(timing[0].toxml().replace("<time>", "").replace("</time>", "").replace("Z", "").replace("T", " ")) # Get the time for the first point in human readable text format.
+
+        first_point_time = round(time.mktime(datetime.datetime.strptime(first_point_time, "%Y-%m-%d %H:%M:%S").timetuple())) # Convert the human readable timestamp into a Unix timestamp.
+        offset = get_time()-first_point_time # Calculate the offset to make the first point in this GPX file the current time.
+
+    gpx_data = {} # This is a dictionary that will hold each location point, where the key is a timestamp.
+
+    for i in range(0, len(track)): # Iterate through each point in the GPX file.
+        point_lat = track[i].getAttribute('lat') # Get the latitude for this point.
+        point_lon = track[i].getAttribute('lon') # Get the longitude for this point.
+        try:
+            point_speed = speed[i].toxml().replace("<speed>","").replace("</speed>","")
+        except:
+            point_speed = 0
+        try:
+            point_altitude = altitude[i].toxml().replace("<ele>","").replace("</ele>","")
+        except:
+            point_altitude = 0
+        point_time = str(timing[i].toxml().replace("<time>", "").replace("</time>", "").replace("Z", "").replace("T", " ")) # Get the time for this point in human readable text format.
+
+        point_time = round(time.mktime(datetime.datetime.strptime(point_time, "%Y-%m-%d %H:%M:%S").timetuple())) # Convert the human readable timestamp into a Unix timestamp.
+
+        gpx_data[point_time + offset] = {"lat": float(point_lat), "lon": float(point_lon), "spd": float(point_speed), "alt": float(point_altitude)} # Add this point to the decoded GPX data.
+
+    return gpx_data
+
+
+
+
 # This is a simple function used to display large ASCII shapes.
 def display_shape(shape):
     if (shape == "square"):
@@ -528,15 +564,24 @@ def display_shape(shape):
 # Define the function that will be used to get the current GPS coordinates.
 if (len(config["general"]["gps"]["demo_file"]) > 0): # Check to see if there is a demo file set.
     display_message("The GPS is in demo mode. A pre-recorded file is being played back in place of live GPS data.", 1)
-    # TODO: Load the GPX file.
+    demo_file_path = config["general"]["working_directory"] + "/" + config["general"]["gps"]["demo_file"]
+    if (os.path.exists(demo_file_path)):
+        gps_demo_gpx_data = process_gpx(demo_file_path, modernize=True)
+    else:
+        gps_demo_gpx_data = {}
+        display_message("The configured GPS demo file does not exist. GPS functionality is currently disabled.", 2)
+    del demo_file_path
 elif (config["general"]["gps"]["enabled"] == True): # Check to see if GPS is enabled.
     gpsd.connect() # Connect to the GPS daemon.
 def get_gps_location():
+    global gps_demo_gpx_data
     global gps_state
     global global_time_offset
     if (config["general"]["gps"]["enabled"] == True): # Check to see if GPS is enabled.
         if (len(config["general"]["gps"]["demo_file"]) > 0): # Check to see if there is a demo file set.
-            pass # TODO: Return relevant GPS point.
+            current_gpx_key = closest_key(gps_demo_gpx_data, get_time()) # Get the closest entry to the current time in the GPX file.
+            current_location = gps_demo_gpx_data[current_gpx_key[0]]
+            return current_location["lat"], current_location["lon"], current_location["spd"], current_location["alt"], 0.0, 0, 0 # Return the current location from the GPX file.
         else: # Otherwise, GPS demo mode is disabled.
             try:
                 gps_data_packet = gpsd.get_current() # Query the GPS for the most recent information.
@@ -574,9 +619,9 @@ def get_gps_location():
                 gps_connection_active = False
                 display_message("A GPS error occurred: " + str(exception), 2)
                 return 0.0000, 0.0000, 0.0, 0.0, 0.0, 0, 0 # Return a default placeholder location.
-        else: # If GPS is disabled, then this function should never be called, but return a placeholder position regardless.
-            display_message("The `get_gps_location` function was called, even though GPS is disabled. This is a bug, and should never occur.", 2)
-            return 0.0000, 0.0000, 0.0, 0.0, 0.0, 0, 0 # Return a default placeholder location.
+    else: # If GPS is disabled, then this function should never be called, but return a placeholder position regardless.
+        display_message("The `get_gps_location` function was called, even though GPS is disabled. This is a bug, and should never occur.", 2)
+        return 0.0000, 0.0000, 0.0, 0.0, 0.0, 0, 0 # Return a default placeholder location.
 
 
 
@@ -707,30 +752,4 @@ def load_alert_database(sources, project_directory):
 
 
 
-
-# This function is used to parse GPX files into a Python dictionary.
-def process_gpx(gpx_file, modernize=False):
-    gpx_file = open(gpx_file, 'r') # Open the GPX file.
-    xmldoc = minidom.parse(gpx_file) # Read the full XML GPX document.
-
-    track = xmldoc.getElementsByTagName('trkpt') # Get all of the location information from the GPX document.
-    timing = xmldoc.getElementsByTagName('time') # Get all of the timing information from the GPX document.
-
-    offset = 0 # This is the value that all timestamps in the file will be offset by.
-    if (modernize == True): # Check to see if this GPX file should be modernized, such that the first entry in the file is the current time, and all subsequent points are offset by the same amount.
-        print(timing[0]) # TODO
-
-    gpx_data = {} # This is a dictionary that will hold each location point, where the key is a timestamp.
-
-    for i in range(0, len(timing)): # Iterate through each point in the GPX file.
-        point_lat = track[i].getAttribute('lat') # Get the latitude for this point.
-        point_lon = track[i].getAttribute('lon') # Get the longitude for this point.
-        point_time = str(timing[i].toxml().replace("<time>", "").replace("</time>", "").replace("Z", "").replace("T", " ")) # Get the time for this point in human readable text format.
-
-        point_time = round(time.mktime(datetime.datetime.strptime(point_time, "%Y-%m-%d %H:%M:%S").timetuple())) # Convert the human readable timestamp into a Unix timestamp.
-
-        gpx_data[point_time] = {"lat": point_lat, "lon": point_lon} # Add this point to the decoded GPX data.
-
-
-    return gpx_data
 
