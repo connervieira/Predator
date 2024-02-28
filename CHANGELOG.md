@@ -415,7 +415,7 @@ This update overhauls Predator's dashcam functionality and adds various features
 - Improved GPS handling.
     - 2D position information can now be displayed even when a 3D fix has not been aquired yet.
     - Predator now only opens a single GPS connection, instead of repeatedly opening and closing a connection every time the GPS is queried.
-    - Predator can now be configured to replay a GPX file to simulate GPS data.
+    - Predator can now be configured to replay a GPX file to simulate GPS data for sake of demonstration and testing.
     - Updated the time handling back-end to allow for custom time offsets.
         - Predator can automatically apply an offset to the current time if the system time drifts from the GPS time.
 - Improved configuration validation.
