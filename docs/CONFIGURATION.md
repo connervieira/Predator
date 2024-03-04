@@ -54,6 +54,8 @@ This document describes the configuration values found `config.json`.
         - `demo_file` is a string that sets a GPX file that Predator will replay location information from for sake of demonstration.
             - This file path is relative to the working directory.
             - When this value is not empty, Predator will ignore live GPS information and instead play back the information from the GPX file.
+            - The `general>gps>enabled` value should be set to `true` to use demo mode.
+                - A real GPS does not need to be connected.
         - `time_correction` contains settings that control how Predator will use GPS information to correct the system date and time.
             - `enabled` is a boolean that determines whether Predator will apply a time offset to correct the system time if the difference between the GPS time and system time exceeds the configured threshold.
             - `threshold` is the amount of time, measured in seconds, that the system time has to drift from the GPS time before Predator will issue a warning, and (if configured to do so) apply a time offset.
