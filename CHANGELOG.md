@@ -355,9 +355,9 @@ This update makes several changes to Predator that dramatically improve its proc
 
 ### Dashcam Update 2
 
-*Release date to be determined*
+March 4th, 2024
 
-This update overhauls Predator's dashcam functionality and adds various features to allow it to be used a full dedicated dashcam.
+This update overhauls Predator's dashcam functionality and adds various features to allow it to be used a fully-featured dedicated dashcam.
 
 - Refined OpenCV dashcam recording.
     - Improved video overlay stamps.

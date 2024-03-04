@@ -26,7 +26,7 @@
             "debugging_output": true
         },
         "gps": {
-            "enabled": true,
+            "enabled": false,
             "demo_file": "",
             "time_correction": {
                 "enabled": false,
@@ -164,6 +164,11 @@
                 },
                 "devices": {
                     "main": {
+                        "index": 1,
+                        "flip": true,
+                        "codec": "MJPG"
+                    },
+                    "secondary": {
                         "index": 2,
                         "flip": true,
                         "codec": "MJPG"
