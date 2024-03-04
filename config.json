@@ -1,6 +1,6 @@
 {
     "general": {
-        "working_directory": "/home/cvieira/Software/Support/Predator/Working/",
+        "working_directory": "/home/pi/Software/Support/Predator/Working/",
         "interface_directory": "/dev/shm/PredatorInterface/",
         "alpr": {
             "engine": "phantom",
@@ -23,14 +23,14 @@
         "display": {
             "ascii_art_header": true,
             "startup_message": "",
-            "debugging_output": true
+            "debugging_output": false
         },
         "gps": {
             "enabled": false,
             "demo_file": "",
             "time_correction": {
-                "enabled": false,
-                "threshold": 2
+                "enabled": true,
+                "threshold": 10
             }
         },
         "object_recognition": {
@@ -93,7 +93,7 @@
         "image": {
             "camera": {
                 "devices": {
-                    "primary": "/dev/video1"
+                    "primary": "/dev/video0"
                 }
             }
         },
@@ -146,13 +146,13 @@
             "trigger": "dashcam_lock_trigger",
             "segment_length": 60,
             "looped_recording": {
-                "mode": "manual",
+                "mode": "automatic",
                 "manual": {
                     "history_length": 1000
                 },
                 "automatic": {
                     "minimum_free_percentage": 0.25,
-                    "max_deletions_per_round": 15
+                    "max_deletions_per_round": 10
                 }
             }
         },
@@ -164,13 +164,8 @@
                 },
                 "devices": {
                     "main": {
-                        "index": 1,
-                        "flip": true,
-                        "codec": "MJPG"
-                    },
-                    "secondary": {
-                        "index": 2,
-                        "flip": true,
+                        "index": 0,
+                        "flip": false,
                         "codec": "MJPG"
                     }
                 }
@@ -185,7 +180,7 @@
             "enabled": false,
             "conditions": {
                 "speed": 1,
-                "time": 10
+                "time": 120
             },
             "recording": {
                 "highlight_motion": {
@@ -207,8 +202,8 @@
                 "destinations": [
                     "7d72f75f4aebdb94f977b71d394dd12f"
                 ],
-                "identity_file": "/home/cvieira/.reticulum/storage/identities/predator",
-                "instance_name": "Conner's Car",
+                "identity_file": "/home/pi/.reticulum/storage/identities/predator",
+                "instance_name": "My Car",
                 "events": {
                     "motion_detected": {
                         "enabled": true
@@ -240,7 +235,7 @@
                     "enabled": true
                 },
                 "message_1": "AAA0000",
-                "message_2": ""
+                "message_2": "V0LT Predator"
             },
             "gps": {
                 "color": [
