@@ -1,6 +1,6 @@
 # Credits
 
-Predator is primarily developed by V0LT. However, this wouldn't be possible without the hard work of dozens of other projects. This document contains credits to all of the software and people Predator depends on to function.
+Predator is primarily developed by V0LT. However, this wouldn't be possible without the effort of dozens of other projects. This document contains credits to all of the software and people Predator depends on to function.
 
 
 ## Individuals
@@ -14,14 +14,14 @@ Brandon is responsible for creating the camera mounting brackets used during the
 
 ### OpenALPR
 
-OpenALPR is the heart of Predator. OpenALPR is an open source tool for scanning images and reporting back a list of potential license plates, along with confidence levels. Predator uses OpenALPR as it's primarly computer-vision tool.
+OpenALPR is the basis for Phantom, which is the license plate recognition engine at the heart of Predator. Without OpenALPR the entire Predator project wouldn't have been possible.
 
 <https://www.openalpr.com/>
 
 
 ### FFMPEG
 
-FFMPEG is one of the most powerful video processing tools currently available, and it's what gives Predator it's ability to quickly process large amounts of video. Predator uses FFMPEG to automatically break up videos into individual frames based on user preferences.
+FFMPEG is one of the most powerful video processing tools currently available, and it's what gives Predator it's ability to quickly process large amounts of video. Predator uses FFMPEG to process recorded videos in both pre-recorded and real-time mode.
 
 <https://ffmpeg.org/>
 

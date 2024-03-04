@@ -1,7 +1,7 @@
 {
     "general": {
-        "working_directory": "/Users/cvieira/Software/Support/Predator/Working/",
-        "interface_directory": "/Users/cvieira/Software/Support/Predator/Interface/",
+        "working_directory": "/home/cvieira/Software/Support/Predator/Working/",
+        "interface_directory": "/dev/shm/PredatorInterface/",
         "alpr": {
             "engine": "phantom",
             "validation": {
@@ -27,7 +27,7 @@
         },
         "gps": {
             "enabled": true,
-            "demo_file": "demo.gpx",
+            "demo_file": "",
             "time_correction": {
                 "enabled": false,
                 "threshold": 2
@@ -144,7 +144,7 @@
         "saving": {
             "directory": "saved_dashcam",
             "trigger": "dashcam_lock_trigger",
-            "segment_length": 10,
+            "segment_length": 60,
             "looped_recording": {
                 "mode": "manual",
                 "manual": {
@@ -164,8 +164,8 @@
                 },
                 "devices": {
                     "main": {
-                        "index": 0,
-                        "flip": false,
+                        "index": 2,
+                        "flip": true,
                         "codec": "MJPG"
                     }
                 }
@@ -177,7 +177,7 @@
             }
         },
         "parked": {
-            "enabled": true,
+            "enabled": false,
             "conditions": {
                 "speed": 1,
                 "time": 10
@@ -218,7 +218,7 @@
             }
         },
         "stamps": {
-            "size": 0.6,
+            "size": 0.8,
             "main": {
                 "color": [
                     255,

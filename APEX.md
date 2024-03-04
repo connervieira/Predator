@@ -1,6 +1,6 @@
 # Apex
 
-This document briefly explains Predator Apex, the paid hardware program for Predator.
+This document briefly explains Predator Apex: the paid hardware program for Predator.
 
 To inquire about any of the services described here, you can contact V0LT using the information found at <https://v0lttech.com/contact.php>.
 

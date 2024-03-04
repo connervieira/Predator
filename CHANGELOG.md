@@ -412,7 +412,7 @@ This update overhauls Predator's dashcam functionality and adds various features
 - Refined the debug message system.
     - Thread names are now automatically determined and assignment when debug messages are displayed.
 - Fixed speed display in real-time mode.
-- Improved GPS handling.
+- Improved GPS integration.
     - 2D position information can now be displayed even when a 3D fix has not been aquired yet.
     - Predator now only opens a single GPS connection, instead of repeatedly opening and closing a connection every time the GPS is queried.
     - Predator can now be configured to replay a GPX file to simulate GPS data for sake of demonstration and testing.
