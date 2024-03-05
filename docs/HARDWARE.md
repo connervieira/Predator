@@ -66,16 +66,49 @@ This section contains part recommendations. Please keep in mind that these parts
 Each build in this section has a nick-name to keep it distinct from the other builds. These nick-names align with the pre-built Predator Apex models on the V0LT website at <https://v0lttech.com/predator/predatorapex.php>
 
 
+### Predator Owl
+
+- Link: <https://v0lttech.com/products/modulardashcam.php>
+- Description: Predator Owl is designed to be a general purpose automotive dash-cam, with a wide angle lens and great close-range ALPR performance.
+- Advantages:
+    - All of the parts are physically small, and can be easily fit in tight places, like the interior of a vehicle.
+    - The entire system is lightweight, making it easy to move around.
+    - Each device is very low power usage, so it should be easy to install using existing infrastructure in your car, building, or other system.
+    - The camera in this kit has a lens with a generous field of view, which makes it great for close-range ALPR and typical dash-cam recording.
+    - The faster processing device allows for much higher frame-rates, even with multiple capture devices.
+- Disadvantages:
+    - The wide-angle lens means that this build will struggle to read license plates at a distance.
+- Price: ~$200
+- Parts:
+    - Camera: Noroum V11
+        - Price: $30
+        - Resolution: 1440p
+        - Frame Rate: up to 60FPS (30FPS typical)
+    - Processing: Raspberry Pi 5
+        - Price: $70
+    - Mounting: GoPro style buckle mounts with 1/4th inch tripod adapter
+        - Price: $20
+    - Power: 12V to 5V 8A transformer
+        - Price: $20
+    - Networking: GL.iNet GL-SFT1200 mini router
+        - Price: $50
+    - Miscellaneous:
+        - Cables and wiring
+        - Storage
+            - SD card for OS, flash-drive for images, etc.
+
+
 ### Predator Scorpion
 
 - Link: <https://v0lttech.com/predator/predatorscorpion.php>
-- Description: Predator Scorpion is designed for general use in vehicles, security systems, and other low-power applications that require medium to long distance scanning.
+- Description: Predator Scorpion is designed for general use in vehicles, security systems, and other low-power applications that require focused, long distance scanning.
 - Advantages:
     - All of the parts are physically small, and can be easily fit in tight places, like the interior of a vehicle.
     - The entire system is lightweight, making it easy to move around.
     - Each device is very low power usage, so it should be easy to install using existing infrastructure in your car, building, or other system.
 - Disadvantages:
     - This hardware configuration severely struggles to successfully read license plates on fast moving vehicles due to the low shutter speed of the camera.
+    - The camera used in this package is designed for long distance scanning, and may struggle in most typical ALPR usage situations.
 - Price: ~$140
 - Parts:
     - Camera: ELP-USB500W02M-SFV(5-50)

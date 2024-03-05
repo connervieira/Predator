@@ -168,8 +168,8 @@
                         "flip": false,
                         "codec": "MJPG",
                         "framerate": {
-                            "max": 60,
-                            "min": 10 
+                            "max": "30",
+                            "min": "20"
                         }
                     }
                 }
