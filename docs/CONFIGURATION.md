@@ -209,6 +209,13 @@ This document describes the configuration values found `config.json`.
                     - This is useful if the camera is mounted upside down.
                 - `codec` is the 4 character codec identifier that will be used to capture video.
                     - In most cases, setting this to `"MJPG"`  is a safe option.
+                - `framerate contains settings that control this device's framerate. Note that Predator uses variable framerate, so these settings only specify the range that Predator will attempt to use.
+                    - `max` is the maximum frame-rate (measured in frames per second) that Predator will allow this camera to run at.
+                        - If this frame-rate is exceeded, Predator will throttle the frame-rate to stay under the limit.
+                        - This value is useful for making the frame-rate more consistent between segments, or reducing processor utilization.
+                    - `min` is the minimum frame-rate (measured in frames per second) that you expect this camera to run at.
+                        - If the frame-rate falls below this value, Predator will display a warning.
+                        - Adjusting this value has no effect on the actual frame-rate, only the point at which warnings are displayed.
         - `audio` contains settings for configuring Predator's audio recording behavior.
             - `enabled` is a boolean that determines whether or not audio will be recorded at all.
             - `extension` sets the file extension that audio will be saved with.

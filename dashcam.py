@@ -287,6 +287,8 @@ def record_parked_motion(capture, framerate, width, height, device, directory, f
     file_name = directory + "/predator_dashcam_" + str(round(utils.get_time())) + "_" + str(device) + "_0_P"
     video_file_name = file_name + ".avi"
     audio_file_name = file_name + "." + str(config["dashcam"]["capture"]["audio"]["extension"])
+    if (framerate > config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"]): # Check to see if the frame-rate benchmark results exceed the maximum allowed frame-rate.
+        framerate = config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"] # Set the frame-rate to the maximum allowed frame-rate.
     output = cv2.VideoWriter(video_file_name, cv2.VideoWriter_fourcc(*'XVID'), float(framerate), (width,  height))
 
     background_subtractor = cv2.createBackgroundSubtractorMOG2() # Initialize the background subtractor for motion detection.
@@ -300,12 +302,25 @@ def record_parked_motion(capture, framerate, width, height, device, directory, f
 
     frames_captured = 0 # This is a placeholder that will keep track of how many frames are captured in this parked recording.
     capture_start_time = utils.get_time() # This stores the time that this parked recording started.
+    last_frame_captured = time.time() # This will hold the exact time that the last frame was captured. Here, the value is initialized to the current time before any frames have been captured.
     while (utils.get_time() - last_motion_detected < config["dashcam"]["parked"]["recording"]["timeout"] and parked == True): # Run until motion is not detected for a certain period of time.
         heartbeat() # Issue a status heartbeat.
         update_state("dashcam/parked_active")
+
         if (capture is None or capture.isOpened() == False): # Check to see if the capture failed to open.
             display_message("The video capture on device '" + str(device) + "' was dropped during parked recording", 3)
+
+        time_since_last_frame = time.time()-last_frame_captured # Calculate the time (in seconds) since the last frame was captured.
+        if (time_since_last_frame > expected_time_since_last_frame_slowest): # Check see if the current frame-rate is below the minimum expected frame-rate.
+            if (time.time() - last_alert_minimum_framerate_time > 1): # Check to see if at least 1 second has passed since the last minimum frame-rate alert.
+                display_message("The framerate on '" + device + "' (" + str(round((1/time_since_last_frame)*100)/100) + "fps) has fallen below the minimum frame-rate.", 2)
+            last_alert_minimum_framerate_time = time.time() # Record the current time as the time that the last minimum frame-rate alert was shown.
+        elif (time_since_last_frame < expected_time_since_last_frame_fastest): # Check see if the current frame-rate is above the maximum expected frame-rate.
+            time.sleep(expected_time_since_last_frame_fastest - time_since_last_frame) # Wait to force the frame-rate to stay below the maximum limit.
+        last_frame_captured = time.time() # Update the time that the last frame was captured immediately before capturing the next frame.
         ret, frame = capture.read() # Capture a frame.
+
+        last_frame_captured = time.time() # Update the time that the last frame was captured.
         if (config["dashcam"]["capture"]["video"]["devices"][device]["flip"]): # Check to see if Predator is convered to flip this capture device's output.
             frame = cv2.rotate(frame, cv2.ROTATE_180) # Flip the frame by 180 degrees.
         frames_captured+=1 # Increment the frame counter.
@@ -393,7 +408,8 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
         os.system("mkdir -p '" + config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"] + "'") # Create the saved dashcam video directory.
 
     framerate = benchmark_camera_framerate(device) # Benchmark this capture device to determine its operating framerate.
-    benchmark_wait_started = utils.get_time() # Record the time that this thread started waiting for the other benchmarks to complete.
+    if (framerate > config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"]): # Check to see if the frame-rate benchmark results exceed the maximum allowed frame-rate.
+        framerate = config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"] # Set the frame-rate to the maximum allowed frame-rate.
 
     debug_message("Opening video stream on '" + device + "'")
 
@@ -425,15 +441,32 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
     last_filename = "" # Initialize the path of the last base filename to just be a blank string.
 
     frame_history = [] # This will hold the last several frames in a buffer.
+    if (framerate > config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"]): # Check to see if the calculated frame-rate exceeds the maximum allowed frame-rate.
+        framerate = config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"] # Set the frame-rate to the maximum allowed frame-rate.
     output = cv2.VideoWriter(video_filepath, cv2.VideoWriter_fourcc(*'XVID'), float(framerate), (width,  height))
 
     if (capture is None or not capture.isOpened()):
         display_message("Failed to start dashcam video capture using '" + device  + "' device. Verify that this device is associated with a valid identifier.", 3)
         exit()
 
+    last_alert_minimum_framerate_time = 0 # This value holds the last time a minimum frame-rate alert was displayed. Here the value is initialized.
+
+    expected_time_since_last_frame_slowest = 1/config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["min"] # Calculate the longest expected time between two frames.
+    expected_time_since_last_frame_fastest = 1/config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"] # Calculate the shortest expected time between two frames.
+
     save_this_segment = False # This will be set to True when the saving trigger is created. The current and previous dashcam segments are saved immediately when the trigger is created, but this allows the completed segment to be saved once the next segment is started, such that the saved segment doesn't cut off at the moment the user triggered a save.
+    last_frame_captured = time.time() # This will hold the exact time that the last frame was captured. Here, the value is initialized to the current time before any frames have been captured.
     while dashcam_recording_active: # Only run while the dashcam recording flag is set to 'True'. While this flag changes to 'False' this recording process should exit entirely.
         heartbeat() # Issue a status heartbeat.
+
+        time_since_last_frame = time.time()-last_frame_captured # Calculate the time (in seconds) since the last frame was captured.
+        if (time_since_last_frame > expected_time_since_last_frame_slowest): # Check see if the current frame-rate is below the minimum expected frame-rate.
+            if (time.time() - last_alert_minimum_framerate_time > 1): # Check to see if at least 1 second has passed since the last minimum frame-rate alert.
+                display_message("The framerate on '" + device + "' (" + str(round((1/time_since_last_frame)*100)/100) + "fps) has fallen below the minimum frame-rate.", 2)
+            last_alert_minimum_framerate_time = time.time() # Record the current time as the time that the last minimum frame-rate alert was shown.
+        elif (time_since_last_frame < expected_time_since_last_frame_fastest): # Check see if the current frame-rate is above the maximum expected frame-rate.
+            time.sleep(expected_time_since_last_frame_fastest - time_since_last_frame) # Wait to force the frame-rate to stay below the maximum limit.
+        last_frame_captured = time.time() # Update the time that the last frame was captured immediately before capturing the next frame.
         ret, frame = capture.read() # Capture a frame.
         if (config["dashcam"]["capture"]["video"]["devices"][device]["flip"]): # Check to see if Predator is convered to flip this capture device's output.
             frame = cv2.rotate(frame, cv2.ROTATE_180) # Flip the frame by 180 degrees.
@@ -509,6 +542,8 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
                 file_name = directory + "/predator_dashcam_" + str(round(first_segment_started_time + (segment_number*config["dashcam"]["saving"]["segment_length"]))) + "_" + str(device) + "_" + str(segment_number) + "_N"
                 video_filepath = file_name + ".avi" # Update the file path.
                 output = None # Release the previous video output file.
+                if (calculated_framerate > config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"]): # Check to see if the calculated frame-rate exceeds the maximum allowed frame-rate.
+                    calculated_framerate = config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"] # Set the frame-rate to the maximum allowed frame-rate.
                 output = cv2.VideoWriter(video_filepath, cv2.VideoWriter_fourcc(*'XVID'), float(calculated_framerate), (width,  height)) # Update the video output.
                 frames_since_last_segment = 0 # This will count the number of frames in this video segment.
 

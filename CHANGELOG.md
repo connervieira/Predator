@@ -421,3 +421,12 @@ This update overhauls Predator's dashcam functionality and adds various features
 - Improved configuration validation.
 - Added `state.json` interface file to communicate Predator's current mode of operation to external programs.
 - Added headless operation mode, where all user input prompts are skipped.
+
+
+## Version 10.1
+
+*Release date to be determined*
+
+- Added customizable frame-rate restrictions.
+    - Added a per-device configuration value to set a maximum allowed frame-rate. When this frame-rate is exceeded, Predator will throttle dash-cam recording to stay below the limit.
+    - Added a per-device configuration to set a minimum expected frame-rate, below which a warning is displayed. This value does not have any impact on the actual recording frame-rate.

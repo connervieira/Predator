@@ -1,6 +1,6 @@
 {
     "general": {
-        "working_directory": "/home/pi/Software/Support/Predator/Working/",
+        "working_directory": "/home/cvieira/Software/Support/Predator/Working/",
         "interface_directory": "/dev/shm/PredatorInterface/",
         "alpr": {
             "engine": "phantom",
@@ -93,7 +93,7 @@
         "image": {
             "camera": {
                 "devices": {
-                    "primary": "/dev/video0"
+                    "primary": "/dev/video1"
                 }
             }
         },
@@ -164,9 +164,13 @@
                 },
                 "devices": {
                     "main": {
-                        "index": 0,
+                        "index": 1,
                         "flip": false,
-                        "codec": "MJPG"
+                        "codec": "MJPG",
+                        "framerate": {
+                            "max": 60,
+                            "min": 10 
+                        }
                     }
                 }
             },
