@@ -330,6 +330,7 @@ def display_message(message, level=1):
             error_log[time.time()] = {"msg": message, "type": "warn"} # Add this message to the log file, using the current time as the key.
             save_to_file(error_file_location, json.dumps(error_log)) # Save the modified error log to the disk as JSON data.
         print(style.yellow + "Warning: " + message + style.end)
+        prompt(style.faint + "Press enter to continue..." + style.end)
     elif (level == 3): # Display the message as an error.
         if (config["general"]["interface_directory"] != ""): # Check to see if the interface directory is enabled.
             error_log[time.time()] = {"msg": message, "type": "error"} # Add this message to the log file, using the current time as the key.
