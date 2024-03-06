@@ -93,25 +93,25 @@
         "image": {
             "camera": {
                 "devices": {
-                    "primary": "/dev/video1"
+                    "primary": "/dev/video0"
                 }
             }
         },
         "sounds": {
             "startup_sound": {
                 "path": "./assets/sounds/testnoise.mp3",
-                "repeat": "0",
-                "delay": "0.3"
+                "repeat": 0,
+                "delay": 0.3
             },
             "notification_sound": {
                 "path": "./assets/sounds/platedetected.mp3",
-                "repeat": "1",
-                "delay": "0.3"
+                "repeat": 1,
+                "delay": 0.3
             },
             "alert_sound": {
                 "path": "./assets/sounds/alerthit.mp3",
-                "repeat": "1",
-                "delay": "2.5"
+                "repeat": 1,
+                "delay": 2.5
             }
         },
         "saving": {
@@ -168,8 +168,8 @@
                         "flip": false,
                         "codec": "MJPG",
                         "framerate": {
-                            "max": "30",
-                            "min": "20"
+                            "max": 30,
+                            "min": 20
                         }
                     }
                 }

@@ -20,18 +20,14 @@ import os # Required to interact with certain operating system functions
 import json # Required to process JSON data
 
 
+import config
+load_config = config.load_config
+validate_config = config.validate_config
+
+config = load_config()
+
 predator_root_directory = str(os.path.dirname(os.path.realpath(__file__))) # This variable determines the folder path of the root Predator directory. This should usually automatically recognize itself, but it if it doesn't, you can change it manually.
 
-
-try:
-    if (os.path.exists(predator_root_directory + "/config.json")):
-        config = json.load(open(predator_root_directory + "/config.json")) # Load the configuration database from config.json
-    else:
-        print("The configuration file doesn't appear to exist at " + predator_root_directory + "/config.json.")
-        exit()
-except:
-    print("The configuration database couldn't be loaded. It may be corrupted.")
-    exit()
 
 
 
@@ -93,6 +89,12 @@ import ignore # Import the library to handle license plates in the ignore list.
 ignore_list = ignore.fetch_ignore_list() # Fetch the ignore lists.
 
 
+debug_message("Validating configuration values")
+invalid_configuration_values = validate_config(config) # Validation the configuration, and display any potential problems.
+for entry in invalid_configuration_values: # Iterate through each invalid configuration value in the list.
+    display_message("Invalid configuration value: " + entry, 3) # Print each invalid configuration value as an error.
+del invalid_configuration_values # Delete the variable holding the list of invalid configuration_values.
+debug_message("Validated configuration values")
 
 
 if (config["developer"]["offline"] == True): # If offline mode is enabled, then disable all network based features.
@@ -100,6 +102,7 @@ if (config["developer"]["offline"] == True): # If offline mode is enabled, then 
     config["realtime"]["push_notifications"]["server"] = "" # This is redundant, since 'realtime>push_notifications>enabled' is disabled, but it serves as a backup.
     config["realtime"]["status_lighting"]["enabled"] = False
     config["developer"]["remote_sources"] = []
+
 
 
 heartbeat() # Issue an initial heartbeat at start-up.

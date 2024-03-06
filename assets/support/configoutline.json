@@ -1,0 +1,243 @@
+{
+    "general": {
+        "working_directory": "dir",
+        "interface_directory": "str",
+        "alpr": {
+            "engine": ["phantom", "openalpr"],
+            "validation": {
+                "guesses": "+int",
+                "confidence": "+float",
+                "best_effort": "bool",
+                "license_plate_format": "list"
+            }
+        },
+        "alerts": {
+            "alerts_ignore_validation": "bool",
+            "allow_duplicate_alerts": "bool",
+            "databases": "list"
+        },
+        "display": {
+            "ascii_art_header": "bool",
+            "startup_message": "str",
+            "debugging_output": "bool"
+        },
+        "gps": {
+            "enabled": "bool",
+            "demo_file": "str",
+            "time_correction": {
+                "enabled": "bool",
+                "threshold": "+float"
+            }
+        },
+        "object_recognition": {
+            "enabled": "bool"
+        },
+        "modes": {
+            "auto_start": "str",
+            "enabled": {
+                "management": "bool",
+                "prerecorded": "bool",
+                "realtime": "bool",
+                "dashcam": "bool"
+            }
+        }
+    },
+    "management": {
+        "disk_statistics": "bool"
+    },
+    "prerecorded": {
+        "image": {
+            "processing": {
+                "cropping": {
+                    "enabled": "bool",
+                    "left_margin": "+int",
+                    "right_margin": "+int",
+                    "top_margin": "+int",
+                    "bottom_margin": "+int"
+                }
+            }
+        },
+        "max_gpx_time_difference": "+float"
+    },
+    "realtime": {
+        "interface": {
+            "display": {
+                "show_validation": "bool",
+                "shape_alerts": "bool",
+                "output_level": [0, 1, 2, 3],
+                "speed": {
+                    "enabled": "bool",
+                    "unit": ["mph", "kph", "mps", "fps", "knot"]
+                }
+            },
+            "behavior": {
+                "delays": {
+                    "alert": "+int",
+                    "normal": "+int"
+                },
+                "clearing": "bool"
+            }
+        },
+        "object_recognition": {
+            "enabled": "bool",
+            "log_file": "str",
+            "video_still_path": "str"
+        },
+        "gps": {
+            "alpr_location_tagging": "bool"
+        },
+        "image": {
+            "camera": {
+                "devices": "dict"
+            }
+        },
+        "sounds": {
+            "startup_sound": {
+                "path": "file",
+                "repeat": "+int",
+                "delay": "+float"
+            },
+            "notification_sound": {
+                "path": "file",
+                "repeat": "+int",
+                "delay": "+float"
+            },
+            "alert_sound": {
+                "path": "file",
+                "repeat": "+int",
+                "delay": "+float"
+            }
+        },
+        "saving": {
+            "license_plates": {
+                "enabled": "bool",
+                "file": "str",
+                "save_guesses": "bool"
+            },
+            "object_recognition": {
+                "enabled": "bool",
+                "file": "str"
+            }
+        },
+        "push_notifications": {
+            "enabled": "bool",
+            "server": "str",
+            "token": "str"
+        },
+        "status_lighting": {
+            "enabled": "bool",
+            "base_url": "str",
+            "values": {
+                "alert": "str",
+                "warning": "str",
+                "normal": "str"
+            }
+        }
+    },
+    "dashcam": {
+        "saving": {
+            "directory": "str",
+            "trigger": "str",
+            "segment_length": "+float",
+            "looped_recording": {
+                "mode": ["automatic", "manual"],
+                "manual": {
+                    "history_length": "+int"
+                },
+                "automatic": {
+                    "minimum_free_percentage": "+float",
+                    "max_deletions_per_round": "+int"
+                }
+            }
+        },
+        "capture": {
+            "video": {
+                "resolution": {
+                    "width": "+int",
+                    "height": "+int"
+                },
+                "devices": "dict"
+            },
+            "audio": {
+                "enabled": "bool",
+                "extension": "str",
+                "merge": "bool"
+            }
+        },
+        "parked": {
+            "enabled": "bool",
+            "conditions": {
+                "speed": "+float",
+                "time": "+float"
+            },
+            "recording": {
+                "highlight_motion": {
+                    "enabled": "bool",
+                    "color": "list"
+                },
+                "sensitivity": "+float",
+                "timeout": "+float",
+                "buffer": "+int"
+            }
+        },
+        "notifications": {
+            "reticulum": {
+                "enabled": "bool",
+                "destinations": "list",
+                "identity_file": "str",
+                "instance_name": "str",
+                "events": {
+                    "motion_detected": {
+                        "enabled": "bool"
+                    },
+                    "parking_mode_enabled": {
+                        "enabled": "bool"
+                    },
+                    "parking_mode_disabled": {
+                        "enabled": "bool"
+                    }
+                }
+            }
+        },
+        "stamps": {
+            "size": "+float",
+            "main": {
+                "color": "list",
+                "unix_time": {
+                    "enabled": "bool"
+                },
+                "date": {
+                    "enabled": "bool"
+                },
+                "time": {
+                    "enabled": "bool"
+                },
+                "message_1": "str",
+                "message_2": "str"
+            },
+            "gps": {
+                "color": "list",
+                "location": {
+                    "enabled": "bool"
+                },
+                "altitude": {
+                    "enabled": "bool"
+                },
+                "speed": {
+                    "enabled": "bool",
+                    "unit": ["mph", "kph", "mps", "fps", "knot"]
+                }
+            }
+        },
+        "background_recording": "bool"
+    },
+    "developer": {
+        "ignore_list": {
+            "enabled": "bool",
+            "local_file": "str",
+            "remote_sources": "list"
+        },
+        "offline": "bool",
+        "kill_plate": "str"
+    }
+}

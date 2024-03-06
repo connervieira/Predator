@@ -468,6 +468,9 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
             time.sleep(expected_time_since_last_frame_fastest - time_since_last_frame) # Wait to force the frame-rate to stay below the maximum limit.
         last_frame_captured = time.time() # Update the time that the last frame was captured immediately before capturing the next frame.
         ret, frame = capture.read() # Capture a frame.
+        if not ret: # Check to see if the frame failed to be read.
+            display_message("Failed to receive video frame from the '" + device  + "' device. It is possible this device has been disconnected.", 3)
+            exit()
         if (config["dashcam"]["capture"]["video"]["devices"][device]["flip"]): # Check to see if Predator is convered to flip this capture device's output.
             frame = cv2.rotate(frame, cv2.ROTATE_180) # Flip the frame by 180 degrees.
         if (config["dashcam"]["parked"]["recording"]["buffer"] > 0): # Check to see if the frame buffer is greater than 0 before adding frames to the buffer.
@@ -580,9 +583,6 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
 
 
             frames_since_last_segment += 1 # Increment the frame counter.
-            if not ret: # Check to see if the frame failed to be read.
-                display_message("Failed to receive video frame from the '" + device  + "' device. It is possible this device has been disconnected.", 3)
-                exit()
 
 
             frame = apply_dashcam_stamps(frame)
