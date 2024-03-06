@@ -37,13 +37,18 @@ The `state.json` file contains a basic JSON dictionary that indicates the curren
     - `1` indicates that no GPS fix has been acquired.
     - `2` indicates that the GPS has a 2D fix.
     - `3` indicates that the GPS has a 3D fix.
-- `performance` contains frame-rate information for each capture device.
+- `performance` contains frame-rate information for each capture device while recording in dash-cam mode.
 
 Example file contents:
 ```json
 {
     "mode": "dashcam/parked_dormant",
-    "gps": 3
+    "gps": 3,
+    "performance": {
+        "front": 49.571633251
+        "rear": 46.661928151
+        "cabin": 21.128199629
+    }
 }
 ```
 
