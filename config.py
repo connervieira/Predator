@@ -119,25 +119,46 @@ def validate_config(config):
                                                             print("The configuration validation function hit a nested configuration outline section that exceeded 7 layers. The normal configuration outline file should never reach this point.")
                                                             exit()
                                                         else:
-                                                            if (check_value(config[key1][key2][key3][key4][key5][key6][key7], section7) == False):
+                                                            try: # Run inside a try block to check if the corresponding value does not exist in the configuration file.
+                                                                if (check_value(config[key1][key2][key3][key4][key5][key6][key7], section7) == False):
+                                                                    invalid_values.append(key1 + ">" + key2 + ">" + key3 + ">" + key4 + ">" + key5 + ">" + key6 + ">" + key7)
+                                                            except KeyError:
                                                                 invalid_values.append(key1 + ">" + key2 + ">" + key3 + ">" + key4 + ">" + key5 + ">" + key6 + ">" + key7)
                                                 else:
-                                                    if (check_value(config[key1][key2][key3][key4][key5][key6], section6) == False):
+                                                    try: # Run inside a try block to check if the corresponding value does not exist in the configuration file.
+                                                        if (check_value(config[key1][key2][key3][key4][key5][key6], section6) == False):
+                                                            invalid_values.append(key1 + ">" + key2 + ">" + key3 + ">" + key4 + ">" + key5 + ">" + key6)
+                                                    except KeyError:
                                                         invalid_values.append(key1 + ">" + key2 + ">" + key3 + ">" + key4 + ">" + key5 + ">" + key6)
                                         else:
-                                            if (check_value(config[key1][key2][key3][key4][key5], section5) == False):
+                                            try: # Run inside a try block to check if the corresponding value does not exist in the configuration file.
+                                                if (check_value(config[key1][key2][key3][key4][key5], section5) == False):
+                                                    invalid_values.append(key1 + ">" + key2 + ">" + key3 + ">" + key4 + ">" + key5)
+                                            except KeyError:
                                                 invalid_values.append(key1 + ">" + key2 + ">" + key3 + ">" + key4 + ">" + key5)
                                 else:
-                                    if (check_value(config[key1][key2][key3][key4], section4) == False):
+                                    try: # Run inside a try block to check if the corresponding value does not exist in the configuration file.
+                                        if (check_value(config[key1][key2][key3][key4], section4) == False):
+                                            invalid_values.append(key1 + ">" + key2 + ">" + key3 + ">" + key4)
+                                    except KeyError:
                                         invalid_values.append(key1 + ">" + key2 + ">" + key3 + ">" + key4)
                         else:
-                            if (check_value(config[key1][key2][key3], section3) == False):
+                            try: # Run inside a try block to check if the corresponding value does not exist in the configuration file.
+                                if (check_value(config[key1][key2][key3], section3) == False):
+                                    invalid_values.append(key1 + ">" + key2 + ">" + key3)
+                            except KeyError:
                                 invalid_values.append(key1 + ">" + key2 + ">" + key3)
                 else:
-                    if (check_value(config[key1][key2], section2) == False):
+                    try: # Run inside a try block to check if the corresponding value does not exist in the configuration file.
+                        if (check_value(config[key1][key2], section2) == False):
+                            invalid_values.append(key1 + ">" + key2)
+                    except KeyError:
                         invalid_values.append(key1 + ">" + key2)
         else:
-            if (check_value(config[key1], section1) == False):
+            try: # Run inside a try block to check if the corresponding value does not exist in the configuration file.
+                if (check_value(config[key1], section1) == False):
+                    invalid_values.append(key1)
+            except KeyError:
                 invalid_values.append(key1)
 
     return invalid_values

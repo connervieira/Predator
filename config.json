@@ -23,7 +23,7 @@
         "display": {
             "ascii_art_header": true,
             "startup_message": "",
-            "debugging_output": false
+            "debugging_output": true
         },
         "gps": {
             "enabled": false,
