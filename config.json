@@ -144,7 +144,7 @@
         "saving": {
             "directory": "saved_dashcam",
             "trigger": "dashcam_lock_trigger",
-            "segment_length": 60,
+            "segment_length": 10,
             "looped_recording": {
                 "mode": "automatic",
                 "manual": {
@@ -164,7 +164,7 @@
                 },
                 "devices": {
                     "main": {
-                        "index": 1,
+                        "index": 0,
                         "flip": false,
                         "codec": "MJPG",
                         "framerate": {
@@ -175,7 +175,7 @@
                 }
             },
             "audio": {
-                "enabled": false,
+                "enabled": true,
                 "extension": "wav",
                 "merge": true
             }
@@ -184,7 +184,7 @@
             "enabled": false,
             "conditions": {
                 "speed": 1,
-                "time": 120
+                "time": 10
             },
             "recording": {
                 "highlight_motion": {

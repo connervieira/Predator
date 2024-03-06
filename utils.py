@@ -287,12 +287,13 @@ if (config["general"]["interface_directory"] != ""): # Check to see if the inter
     save_to_file(state_file_location, "{}") # Save a blank placeholder dictionary to the state log file.
 
 gps_state = 0
-def update_state(mode): # This is the function that is called to issue a state update.
+def update_state(mode, performance={}): # This is the function that is called to issue a state update.
     if (config["general"]["interface_directory"] != ""): # Check to see if the interface directory is enabled.
         global gps_state
         current_state = {}
         current_state["mode"] = mode
         current_state["gps"] = gps_state
+        current_state["performance"] = performance
         state_update_thread = threading.Thread(target=update_state_file, args=[current_state], name="InterfaceStateUpdate")
         state_update_thread.start()
 

@@ -434,3 +434,5 @@ This update overhauls Predator's dashcam functionality and adds various features
 - Added comprehensive configuration validation.
     - Predator now checks to see if each value in the configuration matches the expected data type.
     - Configuration values that exist in the configuration template file but not in the actual configuration file will show errors.
+- Added performance monitoring to state interface file to allow external programs to see basic performance diagnostics.
+- Fixed a bug where the audio file name wouldn't be properly updated when a new dash-cam video segment starts.

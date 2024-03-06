@@ -18,7 +18,7 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Add GPS time verification.
 - [X] Fix desynced video channels in dash-cam mode.
 - [X] Add GPS demo mode.
-- [ ] Add configuration value to set maximum permitted framerate per capture device.
+- [X] Add configuration value to set maximum permitted framerate per capture device.
 
 
 ## Hypothetical

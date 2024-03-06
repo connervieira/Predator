@@ -32,11 +32,12 @@ The `state.json` file contains a basic JSON dictionary that indicates the curren
     - `"dashcam/normal"` indicates normal dash-cam recording.
     - `"dashcam/parked_dormant"` indicates that Predator is in parked dash-cam mode, and is waiting to detect motion before resuming recording.
     - `"dashcam/parked_active"` indicates that Predator is in parked dash-cam mode, and is actively recording after motion was detected.
-- `gps`
+- `gps` indicates the current operating mode of the GPS.
     - `0` indicates that no GPS information has been received yet.
     - `1` indicates that no GPS fix has been acquired.
     - `2` indicates that the GPS has a 2D fix.
     - `3` indicates that the GPS has a 3D fix.
+- `performance` contains frame-rate information for each capture device.
 
 Example file contents:
 ```json
