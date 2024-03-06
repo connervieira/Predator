@@ -108,8 +108,12 @@ import signal # Required to time out functions.
 
 if (config["general"]["interface_directory"] != ""): # Check to see if the interface directory is enabled.
     if (os.path.exists(config["general"]["interface_directory"]) == False): # Check to see if the interface directory is missing.
-        os.makedirs(config["general"]["interface_directory"]) # Attempt to create the interface directory.
-        os.system("chmod 777 " + config["general"]["interface_directory"]) # Make the interface directory accessible to all users and processes.
+        try:
+            os.makedirs(config["general"]["interface_directory"]) # Attempt to create the interface directory.
+            os.system("chmod 777 " + config["general"]["interface_directory"]) # Make the interface directory accessible to all users and processes.
+        except:
+            print(style.red + "Failed to create interface directory. Is the `general>interface_directory` configuration value set to a valid file-path?" + style.end)
+            exit()
 
 
 
