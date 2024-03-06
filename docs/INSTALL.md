@@ -13,6 +13,7 @@ If you're already familiar with Predator, and you just want a quick set-up guide
         - Note that depending on a virtual environment is likely to cause issues if you want to run Predator through Optic, Cortex, or another front-end interface, since these interfaces run outside of the virtual environment. In this case, you should try to install the required Python packages through your operating system's default package manager.
 2. Install Linux packages: `sudo apt-get install ffmpeg mpg321 gpsd gpsd-clients imagemagick fswebcam`
 3. Install an ALPR engine, like [Phantom](https://v0lttech.com/phantom.php).
+4. Configure Predator, as described in the [CONFIGURATION.md](CONFIGURATION.md) file.
 
 
 ## Full Install Guide
