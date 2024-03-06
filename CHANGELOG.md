@@ -431,4 +431,6 @@ This update overhauls Predator's dashcam functionality and adds various features
     - Added a per-device configuration value to set a maximum allowed frame-rate. When this frame-rate is exceeded, Predator will throttle dash-cam recording to stay below the limit.
     - Added a per-device configuration to set a minimum expected frame-rate, below which a warning is displayed. This value does not have any impact on the actual recording frame-rate.
 - Added more descriptive error messages when the interface directory fails to be created.
-- Added complete configuration validation.
+- Added comprehensive configuration validation.
+    - Predator now checks to see if each value in the configuration matches the expected data type.
+    - Configuration values that exist in the configuration template file but not in the actual configuration file will show errors.
