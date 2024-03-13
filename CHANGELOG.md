@@ -443,3 +443,6 @@ March 6th, 2024
     - Predator now checks to see if each value in the configuration matches the expected data type.
     - Configuration values that exist in the configuration template file but not in the actual configuration file will show errors.
 - Added performance monitoring to state interface file to allow external programs to see basic performance diagnostics.
+- Updated the way automatic GPS time correction is handled.
+    - Predator will not longer try to apply a time offset when the system time is in the future relative to the GPS time.
+    - Predator no longer displays warning about the time being desynced when GPS time correction is disabled.

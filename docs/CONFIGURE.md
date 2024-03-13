@@ -58,7 +58,7 @@ This document describes the configuration values found `config.json`.
                 - A real GPS does not need to be connected.
         - `time_correction` contains settings that control how Predator will use GPS information to correct the system date and time.
             - `enabled` is a boolean that determines whether Predator will apply a time offset to correct the system time if the difference between the GPS time and system time exceeds the configured threshold.
-            - `threshold` is the amount of time, measured in seconds, that the system time has to drift from the GPS time before Predator will issue a warning, and (if configured to do so) apply a time offset.
+            - `threshold` is the amount of time, measured in seconds, that the system time has to drift from the GPS time before Predator will issue a warning and apply a time offset.
     - `object_recognition` contains settings related to Predator's object recognition capabilities.
         - `enabled` is a boolean that determines whether or not object recognition is enabled globally.
             - Setting this to `false` removes Predator's dependency on Tensorflow.

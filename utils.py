@@ -613,12 +613,13 @@ def get_gps_location():
                     heading = 0 # Use a placeholder for heading.
                     satellites = 0 # Use a placeholder for satellites.
 
-                if (gps_time > 0 and abs(get_time() - gps_time) > config["general"]["gps"]["time_correction"]["threshold"]):
-                    if (config["general"]["gps"]["time_correction"]["enabled"] == True):
-                        global_time_offset = gps_time - time.time()
-                        display_message("The local system time differs significantly from the GPS time. Applied time offset of " + str(round(global_time_offset*10**3)/10**3) + " seconds.", 2)
-                    else:
-                        display_message("The local system time differs significantly from the GPS time.", 2)
+                if (config["general"]["gps"]["time_correction"]["enabled"] == True):
+                    if (gps_time > 0 and abs(get_time() - gps_time) > config["general"]["gps"]["time_correction"]["threshold"]):
+                        if (gps_time - time.time() < 0): # Check to see if the time offset is a negative number (the system time is in the future).
+                            display_message("The local system time is in the future relative to the GPS time by " + str(gps_time - time.time()) + "seconds. This can't be corrected by the GPS time offset, and is indicative of a more in-depth time desync problem.", 2)
+                        else:
+                            global_time_offset = gps_time - time.time()
+                            display_message("The local system time differs significantly from the GPS time. Applied time offset of " + str(round(global_time_offset*10**3)/10**3) + " seconds.", 2)
 
                 return position[0], position[1], speed, altitude, heading, satellites, gps_time
             except Exception as exception:
