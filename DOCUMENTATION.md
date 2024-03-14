@@ -7,6 +7,8 @@ This document contains the information you need to know to set up and use Predat
 
 For installation instructions, see [docs/INSTALL.md](docs/INSTALL.md).
 
+If you want to quickly deploy the entire Predator ecosystem automatically (including Phantom ALPR, Optic, and Cortex) on a system running a clean install of Debian, Raspbian, Ubuntu, or similar Linux distribution, you can do so by authenticating as root using the `sudo su` command, then running the following script: `curl https://v0lttech.com/predator/autodeploy/autoinstall.sh | bash`. **This script should only be run on systems dedicated to the usage of Predator**, since it will overwrite and erase files without consideration for other software. While the script will generally work just fine with other software (particularly programs written by V0LT, like Assassin and Parallax), you should not run it on a system with files you're unwilling to lose.
+
 
 ## Configuration
 
