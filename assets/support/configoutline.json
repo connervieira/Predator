@@ -80,7 +80,6 @@
         },
         "object_recognition": {
             "enabled": "bool",
-            "log_file": "str",
             "video_still_path": "str"
         },
         "gps": {
