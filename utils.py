@@ -88,6 +88,29 @@ def debug_message(message, thread="MainThread"):
 
 
 
+process_timers = {}
+def process_timing(action, identifier):
+    global process_timers
+
+    if (identifier not in process_timers and action != "dump"): # Check to see if the specified identifier doesn't exist in the process_timer dictionary.
+        process_timers[identifier] = {"total": 0, "start": 0} # Initialize the timer for this process.
+
+    if (action == "dump"):
+        return process_timers
+    elif (action == "start"):
+        process_timers[identifier]["start"] = time.time()
+    elif (action == "end"):
+        if (process_timers[identifier]["start"] != 0):
+            process_timers[identifier]["total"] = process_timers[identifier]["total"] + (time.time() - process_timers[identifier]["start"])
+            process_timers[identifier]["start"] = 0
+        else:
+            display_message("The `processing_timing` function was called setting the end of the timer (" + identifier + "), but the timer wasn't started. This is likely a bug.", 2)
+    else:
+        display_message("The `processing_timing` function was called with an unknown action. This likely a bug.", 2)
+
+
+
+
 
 import subprocess # Required for starting some shell commands
 import sys
