@@ -128,7 +128,7 @@ def benchmark_camera_framerate(device, frames=5): # This function benchmarks a g
     capture = cv2.VideoCapture(config["dashcam"]["capture"]["video"]["devices"][device]["index"]); # Open the video capture device.
     codec = list(config["dashcam"]["capture"]["video"]["devices"][device]["codec"])
     capture.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(codec[0], codec[1], codec[2], codec[3])) # Set the video codec.
-    capture.set(cv2.CAP_PROP_FPS, 120) # Set the frame-rate to a high value so OpenCV will use the highest frame-rate the capture supports.
+    capture.set(cv2.CAP_PROP_FPS, 240) # Set the frame-rate to a high value so OpenCV will use the highest frame-rate the capture supports.
 
     capture.set(cv2.CAP_PROP_FRAME_WIDTH,resolution[0]) # Set the video stream width.
     capture.set(cv2.CAP_PROP_FRAME_HEIGHT,resolution[1]) # Set the video stream height.
@@ -786,9 +786,9 @@ def dashcam_output_handler(directory, device, width, height, framerate):
 
 
 
-for device in config["dashcam"]["capture"]["video"]["devices"]:
-    frames_to_write[device] = []
+for device in config["dashcam"]["capture"]["video"]["devices"]: # Iterate through each device in the configuration.
+    frames_to_write[device] = [] # Add this device to the frame buffer.
 def write_frame(frame, device):
     global frames_to_write
-    frames_to_write[device].append(frame)
+    frames_to_write[device].append(frame) # Add the frame to the queue of frames to write.
 
