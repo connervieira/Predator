@@ -446,4 +446,5 @@ March 6th, 2024
 - Updated the way automatic GPS time correction is handled.
     - Predator will not longer try to apply a time offset when the system time is in the future relative to the GPS time.
     - Predator no longer displays warning about the time being desynced when GPS time correction is disabled.
-- Added threaded dash-cam video saving.
+- Overhauled dash-cam saving.
+    - Frames captured during dash-cam recording are now saved in a separate thread.

@@ -183,7 +183,7 @@
             "enabled": false,
             "conditions": {
                 "speed": 1,
-                "time": 10
+                "time": 5
             },
             "recording": {
                 "highlight_motion": {
