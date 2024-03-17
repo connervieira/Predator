@@ -321,9 +321,15 @@ def record_parked_motion(capture, framerate, width, height, device, directory, f
     capture_start_time = utils.get_time() # This stores the time that this parked recording started.
     last_frame_captured = time.time() # This will hold the exact time that the last frame was captured. Here, the value is initialized to the current time before any frames have been captured.
 
+    process_timing("start", "Dashcam/Calculations")
     last_alert_minimum_framerate_time = 0 # This value holds the last time a minimum frame-rate alert was displayed. Here the value is initialized.
-    expected_time_since_last_frame_slowest = 1/float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["min"]) # Calculate the longest expected time between two frames.
+    if (float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["min"]) == 0): # Check to see if the minimum frame-rate is 0.
+        expected_time_since_last_frame_slowest = 100 # Default to an arbitrarily high expected slowest frame-rate.
+    else:
+        expected_time_since_last_frame_slowest = 1/float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["min"]) # Calculate the longest expected time between two frames.
     expected_time_since_last_frame_fastest = 1/float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"]) # Calculate the shortest expected time between two frames.
+    process_timing("end", "Dashcam/Calculations")
+
     while (utils.get_time() - last_motion_detected < config["dashcam"]["parked"]["recording"]["timeout"] and parked == True): # Run until motion is not detected for a certain period of time.
         heartbeat() # Issue a status heartbeat.
         update_state("dashcam/parked_active", instant_framerate)
@@ -505,7 +511,10 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
     process_timing("start", "Dashcam/Calculations")
     last_alert_minimum_framerate_time = 0 # This value holds the last time a minimum frame-rate alert was displayed. Here the value is initialized.
 
-    expected_time_since_last_frame_slowest = 1/float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["min"]) # Calculate the longest expected time between two frames.
+    if (float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["min"]) == 0): # Check to see if the minimum frame-rate is 0.
+        expected_time_since_last_frame_slowest = 100
+    else:
+        expected_time_since_last_frame_slowest = 1/float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["min"]) # Calculate the longest expected time between two frames.
     expected_time_since_last_frame_fastest = 1/float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"]) # Calculate the shortest expected time between two frames.
     process_timing("end", "Dashcam/Calculations")
 
@@ -672,7 +681,8 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
             frame = apply_dashcam_stamps(frame)
 
             process_timing("start", "Dashcam/Writing")
-            output.write(frame) # Save this frame to the video.
+            write_frame(frame, output) # TODO: Test
+            #output.write(frame) # Save this frame to the video.
             process_timing("end", "Dashcam/Writing")
 
             #os.system("clear") # TODO: Remove
@@ -731,3 +741,7 @@ def start_dashcam_recording(dashcam_devices, video_width, video_height, director
             dashcam_recording_active = False # All dashcam threads are watching this variable globally, and will terminate when it is changed to 'False'.
             display_message("Dashcam recording halted.", 1)
             print(exception)
+
+
+def write_frame(frame, output): # TODO: Test
+    output.write(frame)
