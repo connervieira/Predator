@@ -750,5 +750,11 @@ def start_dashcam_recording(dashcam_devices, video_width, video_height, director
 
 
 
+currently_writing_frame = False
 def write_frame(frame, output):
+    global currently_writing_frame
+    while (currently_writing_frame == True):
+        time.sleep(0.001)
+    currently_writing_frame = True
     output.write(frame)
+    currently_writing_frame = False
