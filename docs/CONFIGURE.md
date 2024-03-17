@@ -296,3 +296,5 @@ This document describes the configuration values found `config.json`.
         - This can be used for debugging purposes, when Predator is hard-installed, and the hardware can't easily be accessed.
         - During normal circumstances, this should be set to a a blank string in order to disable the kill plate feature.
     - `print_timings` is a boolean that determines if Predator will print timers showing how much CPU time was spent on each category of process.
+        - The timers tracked by this setting don't necessarily represent the true CPU time. Rather, they are intended to keep track of what processes are causing threads to delay. As such, they typically don't keep track of how long sub-threads take the complete, only how long it took to process those threads in the parent thread.
+        - When this value is set to `false`, Predator will no longer keep track of timers in the background.

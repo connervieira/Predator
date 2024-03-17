@@ -95,7 +95,7 @@ def process_timing(action, identifier):
     thread = threading.current_thread().name # Get the name of the current thread.
 
     if (config["developer"]["print_timings"] == True): # Only run timing if it is enabled in the configuration.
-        if (identifier not in process_timers and action != "dump"): # Check to see if the specified identifier doesn't exist in the process_timer dictionary.
+        if (thread not in process_timers and action != "dump"): # Check to see if the specified identifier doesn't exist in the process_timer dictionary.
             process_timers[thread] = {} # Initialize the timer for this thread.
         if (identifier not in process_timers[thread] and action != "dump"): # Check to see if the specified identifier doesn't exist in the process_timer dictionary.
             process_timers[thread][identifier] = {"total": 0, "start": 0} # Initialize the timer for this process.
