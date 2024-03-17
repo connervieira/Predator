@@ -141,8 +141,8 @@ if (config["general"]["interface_directory"] != ""): # Check to see if the inter
 
 
 # Define the function that will be used to clear the screen.
-def clear():
-    if (config["general"]["display"]["debugging_output"] == False): # Only clear the console if the debugging output configuration value is disabled.
+def clear(force=False):
+    if (config["general"]["display"]["debugging_output"] == False or force == True): # Only clear the console if the debugging output configuration value is disabled.
         os.system("clear")
 
 

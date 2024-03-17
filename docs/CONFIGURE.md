@@ -295,3 +295,4 @@ This document describes the configuration values found `config.json`.
     - `kill_plate` is a string that specifies a plate that will cause Predator to immediately exit, when detected.
         - This can be used for debugging purposes, when Predator is hard-installed, and the hardware can't easily be accessed.
         - During normal circumstances, this should be set to a a blank string in order to disable the kill plate feature.
+    - `print_timings` is a boolean that determines if Predator will print timers showing how much CPU time was spent on each category of process.

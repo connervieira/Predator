@@ -267,6 +267,7 @@
             "remote_sources": []
         },
         "offline": false,
-        "kill_plate": ""
+        "kill_plate": "",
+        "print_timings": true
     }
 }

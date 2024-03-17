@@ -102,7 +102,6 @@ if (config["dashcam"]["parked"]["enabled"] == True): # Only validate the parking
 
 def merge_audio_video(video_file, audio_file, output_file, audio_offset=0):
     debug_message("Merging audio and video files")
-    process_timing("start", "Dashcam/File Merging")
 
     merge_command = "ffmpeg -i " + audio_file + " -itsoffset -" + str(audio_offset) + " -i " + video_file + " -c copy " + output_file
     erase_command = "timeout 1 rm " + video_file + " " + audio_file
@@ -118,7 +117,6 @@ def merge_audio_video(video_file, audio_file, output_file, audio_offset=0):
     subprocess.run(erase_command.split())
 
     debug_message("Merged audio and video files")
-    process_timing("end", "Dashcam/File Merging")
     return True
 
 
@@ -376,7 +374,8 @@ def record_parked_motion(capture, framerate, width, height, device, directory, f
         frame = apply_dashcam_stamps(frame) # Apply dashcam overlay stamps to the frame.
 
         process_timing("start", "Dashcam/Writing")
-        output.write(frame) # Save this frame to the video.
+        frame_write_thread = threading.Thread(target=write_frame, args=[frame, output], name="FrameWrite")
+        frame_write_thread.start()
         process_timing("end", "Dashcam/Writing")
 
     output = None # Release the video writer.
@@ -391,6 +390,7 @@ def record_parked_motion(capture, framerate, width, height, device, directory, f
     display_message("Stopped motion recording.", 1)
 
 
+    process_timing("start", "Dashcam/File Merging")
     if (config["dashcam"]["capture"]["audio"]["merge"] == True and config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if Predator is configured to merge audio and video files.
         merged_file_name = file_name + ".mkv"
         if (os.path.exists(audio_file_name) == False):
@@ -398,6 +398,7 @@ def record_parked_motion(capture, framerate, width, height, device, directory, f
         else:
             audio_video_merge = threading.Thread(target=merge_audio_video, args=[video_file_name, audio_file_name, merged_file_name], name="AudioVideoMerge") # Create the thread to merge the audio and video files.
             audio_video_merge.start() # Start the merging thread.
+    process_timing("end", "Dashcam/File Merging")
 
     return calculated_framerate
 
@@ -489,7 +490,7 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
 
     previously_parked = False # This will be used to keep track of whether or not Predator was in parked mode during the previous loop.
 
-    process_timing("start", "Dashcam/WritingMan")
+    process_timing("start", "Dashcam/Writing")
     file_name = directory + "/predator_dashcam_" + str(round(first_segment_started_time)) + "_" + str(device) + "_" + str(segment_number) + "_N"
     video_filepath = file_name + ".avi" # Determine the initial video file path.
     audio_filepath = file_name + "." + str(config["dashcam"]["capture"]["audio"]["extension"]) # Determine the initial audio file path.
@@ -501,7 +502,7 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
 
     frame_history = [] # This will hold the last several frames in a buffer.
     output = cv2.VideoWriter(video_filepath, cv2.VideoWriter_fourcc(*'XVID'), float(framerate), (width,  height))
-    process_timing("end", "Dashcam/WritingMan")
+    process_timing("end", "Dashcam/Writing")
 
     if (capture is None or not capture.isOpened()):
         display_message("Failed to start dashcam video capture using '" + device  + "' device. Verify that this device is associated with a valid identifier.", 3)
@@ -580,11 +581,13 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
             update_state("dashcam/parked_dormant")
             if (previously_parked == False): # Check to see if this is the first loop in parking mode since the last time normal recording took place.
                 output = None # Release the video output file.
+                process_timing("start", "Dashcam/File Merging")
                 if (config["dashcam"]["capture"]["audio"]["merge"] == True and config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if Predator is configured to merge audio and video files.
                     last_filename_merged = file_name + ".mkv"
                     if (os.path.exists(audio_filepath) and os.path.exists(video_filepath)): # Check to make sure there is actually an audio and video file to merge.
                         audio_video_merge = threading.Thread(target=merge_audio_video, args=[video_filepath, audio_filepath, last_filename_merged], name="AudioVideoMerge") # Create the thread to merge the audio and video files.
                         audio_video_merge.start() # Start the merging thread.
+                process_timing("end", "Dashcam/File Merging")
 
             previously_parked = True # Indicate that Predator was parked so that we know that the next loop isn't the first loop of Predator being in parked mode.
 
@@ -638,17 +641,19 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
                 if (calculated_framerate > float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"])): # Check to see if the calculated frame-rate exceeds the maximum allowed frame-rate.
                     calculated_framerate = float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"]) # Set the frame-rate to the maximum allowed frame-rate.
                 process_timing("end", "Dashcam/Calculations")
-                process_timing("start", "Dashcam/WritingMan")
+                process_timing("start", "Dashcam/Writing")
                 output = cv2.VideoWriter(video_filepath, cv2.VideoWriter_fourcc(*'XVID'), float(calculated_framerate), (width,  height)) # Update the video output.
-                process_timing("end", "Dashcam/WritingMan")
+                process_timing("end", "Dashcam/Writing")
                 frames_since_last_segment = 0 # This will count the number of frames in this video segment.
 
+                process_timing("start", "Dashcam/File Merging")
                 if (config["dashcam"]["capture"]["audio"]["merge"] == True and config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if Predator is configured to merge audio and video files.
                     last_filename_merged = last_filename + ".mkv"
                     if (os.path.exists(last_audio_filepath) == False):
                         display_message("The audio file was missing during audio/video merging. It is possible something has gone wrong with recording.", 2)
                     else:
                         merge_audio_video(last_video_filepath, last_audio_filepath, last_filename_merged) # Run the audio/video merge.
+                process_timing("end", "Dashcam/File Merging")
                 
                 if (save_this_segment == True): # Now that the new segment has been started, check to see if the segment that was just completed should be saved.
                     if (config["dashcam"]["capture"]["audio"]["merge"] == True and config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if Predator is configured to merge audio and video files.
@@ -681,12 +686,13 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
             frame = apply_dashcam_stamps(frame)
 
             process_timing("start", "Dashcam/Writing")
-            write_frame(frame, output) # TODO: Test
-            #output.write(frame) # Save this frame to the video.
+            frame_write_thread = threading.Thread(target=write_frame, args=[frame, output], name="FrameWrite")
+            frame_write_thread.start()
             process_timing("end", "Dashcam/Writing")
 
-            #os.system("clear") # TODO: Remove
-            #print(process_timing("dump", "")) # TODO: REMOVE
+            if (config["developer"]["print_timings"] == True):
+                utils.clear(True)
+                print(json.dumps(process_timing("dump", ""), indent=4))
 
 
     capture.release()
@@ -743,5 +749,6 @@ def start_dashcam_recording(dashcam_devices, video_width, video_height, director
             print(exception)
 
 
-def write_frame(frame, output): # TODO: Test
+
+def write_frame(frame, output):
     output.write(frame)
