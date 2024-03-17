@@ -61,7 +61,7 @@ import sys # Required to process command line arguments.
 import pytz # Required to handle timezones.
 import time # Required to add delays and handle dates/times
 
-if (time.daylight and time.localtime().tm_isdst > 1):
+if (time.daylight and time.localtime().tm_isdst >= 1):
     daylight_savings = True
 else:
     daylight_savings = False

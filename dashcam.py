@@ -374,8 +374,7 @@ def record_parked_motion(capture, framerate, width, height, device, directory, f
         frame = apply_dashcam_stamps(frame) # Apply dashcam overlay stamps to the frame.
 
         process_timing("start", "Dashcam/Writing")
-        frame_write_thread = threading.Thread(target=write_frame, args=[frame, output], name="FrameWrite")
-        frame_write_thread.start()
+        write_frame(frame, device)
         process_timing("end", "Dashcam/Writing")
 
     output = None # Release the video writer.
@@ -385,7 +384,7 @@ def record_parked_motion(capture, framerate, width, height, device, directory, f
         audio_recorder.terminate() # Kill the active audio recorder.
         process_timing("end", "Dashcam/Audio Processing")
     process_timing("start", "Dashcam/Calculations")
-    calculated_framerate = frames_captured / (utils.get_time() - capture_start_time) # Calculate the rate at which frames were captured during this recording.
+    calculated_framerate = frames_captured / (utils.get_time() - capture_start_time) # Calculate the rate at which frames were captured during this parked recording.
     process_timing("end", "Dashcam/Calculations")
     display_message("Stopped motion recording.", 1)
 
@@ -443,25 +442,22 @@ def delete_old_segments():
 
 
 dashcam_recording_active = False
-first_segment_started_time = 0
+frames_since_last_segment = {}
 def capture_dashcam_video(directory, device="main", width=1280, height=720):
+    global frames_since_last_segment
     global dashcam_recording_active
-    global first_segment_started_time 
     global instant_framerate
-    global parked
 
     device_id = config["dashcam"]["capture"]["video"]["devices"][device]["index"]
 
-    if (os.path.isdir(config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"]) == False): # Check to see if the saved dashcam video folder needs to be created.
-        os.system("mkdir -p '" + config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"] + "'") # Create the saved dashcam video directory.
 
-    framerate = benchmark_camera_framerate(device) # Benchmark this capture device to determine its operating framerate.
-    process_timing("start", "Dashcam/Calculations")
-    if (framerate > float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"])): # Check to see if the frame-rate benchmark results exceed the maximum allowed frame-rate.
-        framerate = float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"]) # Set the frame-rate to the maximum allowed frame-rate.
-    process_timing("end", "Dashcam/Calculations")
 
     debug_message("Opening video stream on '" + device + "'")
+
+    framerate = benchmark_camera_framerate(device) # Benchmark this capture device to determine its initial operating framerate.
+
+    output_process = threading.Thread(target=dashcam_output_handler, args=[directory, device, width, height, framerate], name="OutputHandler" + str(device))
+    output_process.start()
 
     process_timing("start", "Dashcam/Capture Management")
     capture = cv2.VideoCapture(device_id) # Open the video stream.
@@ -478,31 +474,9 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
     last_motion_detection = 0 # This will hold the timestamp of the last time motion was detected.
     process_timing("end", "Dashcam/Motion Detection")
 
-    process_timing("start", "Dashcam/Calculations")
-    segment_number = 0 # This variable keeps track of the segment number, and will be incremented each time a new segment is started.
-    segment_start_time = utils.get_time() # This variable keeps track of when the current segment was started. It will be reset each time a new segment is started.
-    if (first_segment_started_time == 0): # Check to see if the first segment start time hasn't yet been updated. Since this is a global variable, another dashcam thread may have already set it.
-        first_segment_started_time = utils.get_time() # This variable keeps track of when the first segment was started.
-    frames_since_last_segment = 0 # This will count the number of frames in this video segment.
-
-    frames_captured = 0
-    process_timing("end", "Dashcam/Calculations")
-
-    previously_parked = False # This will be used to keep track of whether or not Predator was in parked mode during the previous loop.
-
-    process_timing("start", "Dashcam/Writing")
-    file_name = directory + "/predator_dashcam_" + str(round(first_segment_started_time)) + "_" + str(device) + "_" + str(segment_number) + "_N"
-    video_filepath = file_name + ".avi" # Determine the initial video file path.
-    audio_filepath = file_name + "." + str(config["dashcam"]["capture"]["audio"]["extension"]) # Determine the initial audio file path.
-    if (config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if audio recording is enabled in the configuration.
-        audio_recorder = subprocess.Popen(["arecord", "-q", "--format=cd", file_name + "." + str(config["dashcam"]["capture"]["audio"]["extension"])], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Start the next segment's audio recorder.
-    last_video_filepath = "" # Initialize the path of the last video file to just be a blank string.
-    last_audio_filepath = "" # Initialize the path of the last audio file to just be a blank string.
-    last_filename = "" # Initialize the path of the last base filename to just be a blank string.
 
     frame_history = [] # This will hold the last several frames in a buffer.
-    output = cv2.VideoWriter(video_filepath, cv2.VideoWriter_fourcc(*'XVID'), float(framerate), (width,  height))
-    process_timing("end", "Dashcam/Writing")
+
 
     if (capture is None or not capture.isOpened()):
         display_message("Failed to start dashcam video capture using '" + device  + "' device. Verify that this device is associated with a valid identifier.", 3)
@@ -519,7 +493,8 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
     expected_time_since_last_frame_fastest = 1/float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"]) # Calculate the shortest expected time between two frames.
     process_timing("end", "Dashcam/Calculations")
 
-    save_this_segment = False # This will be set to True when the saving trigger is created. The current and previous dashcam segments are saved immediately when the trigger is created, but this allows the completed segment to be saved once the next segment is started, such that the saved segment doesn't cut off at the moment the user triggered a save.
+    frames_captured = 0
+    frames_since_last_segment[device] = 0
     last_frame_captured = time.time() # This will hold the exact time that the last frame was captured. Here, the value is initialized to the current time before any frames have been captured.
     while dashcam_recording_active: # Only run while the dashcam recording flag is set to 'True'. While this flag changes to 'False' this recording process should exit entirely.
         heartbeat() # Issue a status heartbeat.
@@ -528,7 +503,7 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
         time_since_last_frame = time.time()-last_frame_captured # Calculate the time (in seconds) since the last frame was captured.
         instant_framerate[device] = 1/time_since_last_frame
         if (time_since_last_frame > expected_time_since_last_frame_slowest): # Check see if the current frame-rate is below the minimum expected frame-rate.
-            if (frames_since_last_segment > 1 and previously_parked == False): # Check to make sure we aren't at the very beginning of recording, where frame-rate might be inconsistent.
+            if (frames_since_last_segment[device] > 1 and previously_parked == False): # Check to make sure we aren't at the very beginning of recording, where frame-rate might be inconsistent.
                 if (time.time() - last_alert_minimum_framerate_time > 1): # Check to see if at least 1 second has passed since the last minimum frame-rate alert.
                     display_message("The framerate on '" + device + "' (" + str(round((1/time_since_last_frame)*100)/100) + "fps) has fallen below the minimum frame-rate.", 2)
             last_alert_minimum_framerate_time = time.time() # Record the current time as the time that the last minimum frame-rate alert was shown.
@@ -556,38 +531,10 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
             process_timing("end", "Dashcam/Frame Buffer")
 
 
-        process_timing("start", "Dashcam/Interface Interactions")
-        if (os.path.exists(config["general"]["interface_directory"] + "/" + config["dashcam"]["saving"]["trigger"])): # Check to see if the trigger file exists.
-            if (config["dashcam"]["capture"]["audio"]["merge"] == True and config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if Predator is configured to merge audio and video files.
-                dashcam_segment_saving = threading.Thread(target=save_dashcam_segments, args=[video_filepath], name="DashcamSegmentSave") # Create the thread to save this dashcam segment.
-                dashcam_segment_saving.start() # Start the dashcam segment saving thread.
-                if (config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if audio recording is enabled.
-                    dashcam_segment_saving = threading.Thread(target=save_dashcam_segments, args=[audio_filepath], name="DashcamSegmentSave") # Create the thread to save the current audio segment as a separate file, even though merging is enabled, since the merge won't have been executed yet.
-                    dashcam_segment_saving.start() # Start the dashcam segment saving thread.
-                if (last_filename != ""): # Check to see if a last filename is set before attempting to copy the last merged video file.
-                    dashcam_segment_saving = threading.Thread(target=save_dashcam_segments, args=[str(last_filename + ".mkv")], name="DashcamSegmentSave") # Create the thread to save the last video segment.
-                    dashcam_segment_saving.start() # Start the dashcam segment saving thread.
-            else: # Otherwise, save the last segment as separate audio/video files.
-                dashcam_segment_saving = threading.Thread(target=save_dashcam_segments, args=[video_filepath, last_video_filepath], name="DashcamSegmentSave") # Create the thread to save the current and last video segments.
-                dashcam_segment_saving.start() # Start the dashcam segment saving thread.
-                if (config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if audio recording is enabled.
-                    dashcam_segment_saving = threading.Thread(target=save_dashcam_segments, args=[audio_filepath, last_audio_filepath], name="DashcamSegmentSave") # Create the thread to save the current and last audio segments.
-                    dashcam_segment_saving.start() # Start the dashcam segment saving thread.
-            save_this_segment = True # This flag causes Predator to save this entire segment again when the next segment is started.
-        process_timing("end", "Dashcam/Interface Interactions")
 
 
         if (parked == True): # Check to see if the vehicle is parked.
             update_state("dashcam/parked_dormant")
-            if (previously_parked == False): # Check to see if this is the first loop in parking mode since the last time normal recording took place.
-                output = None # Release the video output file.
-                process_timing("start", "Dashcam/File Merging")
-                if (config["dashcam"]["capture"]["audio"]["merge"] == True and config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if Predator is configured to merge audio and video files.
-                    last_filename_merged = file_name + ".mkv"
-                    if (os.path.exists(audio_filepath) and os.path.exists(video_filepath)): # Check to make sure there is actually an audio and video file to merge.
-                        audio_video_merge = threading.Thread(target=merge_audio_video, args=[video_filepath, audio_filepath, last_filename_merged], name="AudioVideoMerge") # Create the thread to merge the audio and video files.
-                        audio_video_merge.start() # Start the merging thread.
-                process_timing("end", "Dashcam/File Merging")
 
             previously_parked = True # Indicate that Predator was parked so that we know that the next loop isn't the first loop of Predator being in parked mode.
 
@@ -595,8 +542,10 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
             if (config["dashcam"]["capture"]["audio"]["enabled"] == True):
                 if (audio_recorder.poll() is None): # Check to see if there is an active audio recorder.
                     audio_recorder.terminate() # Kill the active audio recorder.
-            contours, moving_percentage = detect_motion(frame, background_subtractor) # Run motion analysis on this frame.
             process_timing("end", "Dashcam/Audio Processing")
+            process_timing("start", "Dashcam/Motion Detection")
+            contours, moving_percentage = detect_motion(frame, background_subtractor) # Run motion analysis on this frame.
+            process_timing("end", "Dashcam/Motion Detection")
 
 
             if (moving_percentage > float(config["dashcam"]["parked"]["recording"]["sensitivity"])): # Check to see if there is movement that exceeds the sensitivity threshold.
@@ -613,82 +562,9 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
         else: # If the vehicle is not parked, then run normal video processing.
             update_state("dashcam/normal", instant_framerate)
             previously_parked = False
-            if (utils.get_time() > first_segment_started_time + (segment_number+1)*config["dashcam"]["saving"]["segment_length"]): # Check to see if it is time to start a new segment.
-                process_timing("start", "Dashcam/Calculations")
-                # Handle the start of a new segment.
-                segment_number+=1 # Increment the segment counter.
-                last_video_filepath = video_filepath # Record the file name of the current video segment before updating it.
-                last_audio_filepath = audio_filepath # Record the file name of the current audio segment before updating it.
-                last_filename = file_name # Record the base file name of the current segment before updating.
-
-                calculated_framerate = frames_since_last_segment / (utils.get_time() - segment_start_time) # Calculate the frame-rate of the last segment.
-                process_timing("end", "Dashcam/Calculations")
-                segment_start_time = utils.get_time() # Update the segment start time.
-                file_name = directory + "/predator_dashcam_" + str(round(first_segment_started_time + (segment_number*config["dashcam"]["saving"]["segment_length"]))) + "_" + str(device) + "_" + str(segment_number) + "_N"
-
-                video_filepath = file_name + ".avi" # Update the file path.
-
-                process_timing("start", "Dashcam/Audio Processing")
-                if (config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if audio recording is enabled in the configuration.
-                    audio_recorder.terminate() # Kill the previous segment's audio recorder.
-                    audio_filepath = file_name + "." + str(config["dashcam"]["capture"]["audio"]["extension"])
-                    audio_recorder = subprocess.Popen(["arecord", "-q", "--format=cd", audio_filepath], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Start the next segment's audio recorder.
-                process_timing("end", "Dashcam/Audio Processing")
-
-                output = None # Release the previous video output file.
-
-                process_timing("start", "Dashcam/Calculations")
-                if (calculated_framerate > float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"])): # Check to see if the calculated frame-rate exceeds the maximum allowed frame-rate.
-                    calculated_framerate = float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"]) # Set the frame-rate to the maximum allowed frame-rate.
-                process_timing("end", "Dashcam/Calculations")
-                process_timing("start", "Dashcam/Writing")
-                output = cv2.VideoWriter(video_filepath, cv2.VideoWriter_fourcc(*'XVID'), float(calculated_framerate), (width,  height)) # Update the video output.
-                process_timing("end", "Dashcam/Writing")
-                frames_since_last_segment = 0 # This will count the number of frames in this video segment.
-
-                process_timing("start", "Dashcam/File Merging")
-                if (config["dashcam"]["capture"]["audio"]["merge"] == True and config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if Predator is configured to merge audio and video files.
-                    last_filename_merged = last_filename + ".mkv"
-                    if (os.path.exists(last_audio_filepath) == False):
-                        display_message("The audio file was missing during audio/video merging. It is possible something has gone wrong with recording.", 2)
-                    else:
-                        merge_audio_video(last_video_filepath, last_audio_filepath, last_filename_merged) # Run the audio/video merge.
-                process_timing("end", "Dashcam/File Merging")
-                
-                if (save_this_segment == True): # Now that the new segment has been started, check to see if the segment that was just completed should be saved.
-                    if (config["dashcam"]["capture"]["audio"]["merge"] == True and config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if Predator is configured to merge audio and video files.
-                        if (os.path.exists(last_filename_merged)): # Check to make sure the merged video file actually exists before saving.
-                            save_dashcam_segments(last_filename_merged) # Save the merged video/audio file. At this point "last_filename" is actually the segment that was just completed, since we just started a new segment.
-
-                            # Now that the merged file has been saved, go back and delete the separate files that were saved previously.
-                            base_file = config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"] + "/" + os.path.splitext(os.path.basename(last_filename_merged))[0]
-                            os.system("rm '" + base_file + ".avi'")
-                            os.system("rm '" + base_file + "." + str(config["dashcam"]["capture"]["audio"]["extension"]) + "'")
-                        else: # If the merged video file doesn't exist, it is likely something went wrong with the merging process.
-                            display_message("The merged video/audio file did exist when Predator tried to save it. It is likely the merge process has failed unexpectedly. The separate files are being saved as a fallback.", 3)
-                            dashcam_segment_saving = threading.Thread(target=save_dashcam_segments, args=[last_video_filepath, last_audio_filepath], name="DashcamSegmentSave") # Create the thread to save the dashcam segment. At this point, "last_video_filepath" is actually the completed previous video segment, since we just started a new segment.
-                            dashcam_segment_saving.start() # Start the dashcam segment saving thread.
-                    else: # If audio/video merging is disabled, then save the separate video and audio files.
-                        dashcam_segment_saving = threading.Thread(target=save_dashcam_segments, args=[last_video_filepath], name="DashcamSegmentSave") # Create the thread to save the dashcam segment. At this point, "last_video_filepath" is actually the completed previous video segment, since we just started a new segment.
-                        dashcam_segment_saving.start() # Start the dashcam segment saving thread.
-                        if (config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if audio recording is enabled.
-                            dashcam_segment_saving = threading.Thread(target=save_dashcam_segments, args=[last_audio_filepath], name="DashcamSegmentSave") # Create the thread to save the dashcam segment. At this point, "last_audio_filepath" is actually the completed previous video segment, since we just started a new segment.
-                            dashcam_segment_saving.start() # Start the dashcam segment saving thread.
-                    save_this_segment = False # Reset the segment saving flag.
-
-
-                delete_old_segments() # Handle the erasing of any old dash-cam segments that need to be deleted.
-
-
-            frames_since_last_segment += 1 # Increment the frame counter.
-
 
             frame = apply_dashcam_stamps(frame)
-
-            process_timing("start", "Dashcam/Writing")
-            frame_write_thread = threading.Thread(target=write_frame, args=[frame, output], name="FrameWrite")
-            frame_write_thread.start()
-            process_timing("end", "Dashcam/Writing")
+            write_frame(frame, device)
 
             if (config["developer"]["print_timings"] == True):
                 utils.clear(True)
@@ -711,6 +587,7 @@ def start_dashcam_recording(dashcam_devices, video_width, video_height, director
     for device in dashcam_devices: # Run through each camera device specified in the configuration, and launch an OpenCV recording instance for it.
         dashcam_process.append(threading.Thread(target=capture_dashcam_video, args=[directory, device, video_width, video_height], name="Dashcam" + str(dashcam_devices[device]["index"])))
         dashcam_process[iteration_counter].start()
+
 
         iteration_counter += 1 # Iterate the counter. This value will be used to create unique file names for each recorded video.
         print("Started dashcam recording on " + str(dashcam_devices[device]["index"])) # Inform the user that recording was initiation for this camera device.
@@ -750,11 +627,168 @@ def start_dashcam_recording(dashcam_devices, video_width, video_height, director
 
 
 
-currently_writing_frame = False
-def write_frame(frame, output):
-    global currently_writing_frame
-    while (currently_writing_frame == True):
+frames_to_write = {}
+first_segment_started_time = 0
+def dashcam_output_handler(directory, device, width, height, framerate):
+    global instant_framerate
+    global first_segment_started_time 
+    global frames_since_last_segment
+    global frames_to_write
+
+    if (os.path.isdir(config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"]) == False): # Check to see if the saved dashcam video folder needs to be created.
+        os.system("mkdir -p '" + config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"] + "'") # Create the saved dashcam video directory.
+
+    segment_number = 0 # This variable keeps track of the segment number, and will be incremented each time a new segment is started.
+    segment_start_time = utils.get_time() # This variable keeps track of when the current segment was started. It will be reset each time a new segment is started.
+    if (first_segment_started_time == 0): # Check to see if the first segment start time hasn't yet been updated. Since this is a global variable, another dashcam thread may have already set it.
+        first_segment_started_time = utils.get_time() # This variable keeps track of when the first segment was started.
+
+    file_name = directory + "/predator_dashcam_" + str(round(first_segment_started_time)) + "_" + str(device) + "_" + str(segment_number) + "_N"
+    video_filepath = file_name + ".avi" # Determine the initial video file path.
+    audio_filepath = file_name + "." + str(config["dashcam"]["capture"]["audio"]["extension"]) # Determine the initial audio file path.
+    if (config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if audio recording is enabled in the configuration.
+        audio_recorder = subprocess.Popen(["arecord", "-q", "--format=cd", file_name + "." + str(config["dashcam"]["capture"]["audio"]["extension"])], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Start the next segment's audio recorder.
+    last_video_filepath = "" # Initialize the path of the last video file to just be a blank string.
+    last_audio_filepath = "" # Initialize the path of the last audio file to just be a blank string.
+    last_filename = "" # Initialize the path of the last base filename to just be a blank string.
+
+    save_this_segment = False # This will be set to True when the saving trigger is created. The current and previous dashcam segments are saved immediately when the trigger is created, but this allows the completed segment to be saved once the next segment is started, such that the saved segment doesn't cut off at the moment the user triggered a save.
+
+    process_timing("start", "Dashcam/Calculations")
+    if (framerate > float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"])): # Check to see if the frame-rate benchmark results exceed the maximum allowed frame-rate.
+        framerate = float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"]) # Set the frame-rate to the maximum allowed frame-rate.
+    process_timing("end", "Dashcam/Calculations")
+    output = cv2.VideoWriter(video_filepath, cv2.VideoWriter_fourcc(*'XVID'), float(framerate), (width,  height))
+
+    previously_parked = False # This will be used to keep track of whether or not Predator was in parked mode during the previous loop.
+
+    while True:
         time.sleep(0.001)
-    currently_writing_frame = True
-    output.write(frame)
-    currently_writing_frame = False
+        
+
+
+        # ===== Check to see if any dash-cam segments need to be saved. =====
+        process_timing("start", "Dashcam/Interface Interactions")
+        if (os.path.exists(config["general"]["interface_directory"] + "/" + config["dashcam"]["saving"]["trigger"])): # Check to see if the trigger file exists.
+            if (config["dashcam"]["capture"]["audio"]["merge"] == True and config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if Predator is configured to merge audio and video files.
+                dashcam_segment_saving = threading.Thread(target=save_dashcam_segments, args=[video_filepath], name="DashcamSegmentSave") # Create the thread to save this dashcam segment.
+                dashcam_segment_saving.start() # Start the dashcam segment saving thread.
+                if (config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if audio recording is enabled.
+                    dashcam_segment_saving = threading.Thread(target=save_dashcam_segments, args=[audio_filepath], name="DashcamSegmentSave") # Create the thread to save the current audio segment as a separate file, even though merging is enabled, since the merge won't have been executed yet.
+                    dashcam_segment_saving.start() # Start the dashcam segment saving thread.
+                if (last_filename != ""): # Check to see if a last filename is set before attempting to copy the last merged video file.
+                    dashcam_segment_saving = threading.Thread(target=save_dashcam_segments, args=[str(last_filename + ".mkv")], name="DashcamSegmentSave") # Create the thread to save the last video segment.
+                    dashcam_segment_saving.start() # Start the dashcam segment saving thread.
+            else: # Otherwise, save the last segment as separate audio/video files.
+                dashcam_segment_saving = threading.Thread(target=save_dashcam_segments, args=[video_filepath, last_video_filepath], name="DashcamSegmentSave") # Create the thread to save the current and last video segments.
+                dashcam_segment_saving.start() # Start the dashcam segment saving thread.
+                if (config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if audio recording is enabled.
+                    dashcam_segment_saving = threading.Thread(target=save_dashcam_segments, args=[audio_filepath, last_audio_filepath], name="DashcamSegmentSave") # Create the thread to save the current and last audio segments.
+                    dashcam_segment_saving.start() # Start the dashcam segment saving thread.
+            save_this_segment = True # This flag causes Predator to save this entire segment again when the next segment is started.
+
+        process_timing("end", "Dashcam/Interface Interactions")
+
+
+
+
+        if (parked == True): # Check to see if the vehicle is parked.
+            if (previously_parked == False): # Check to see if this is the first loop in parking mode since the last time normal recording took place.
+                output = None # Release the video output file.
+                process_timing("start", "Dashcam/File Merging")
+                if (config["dashcam"]["capture"]["audio"]["merge"] == True and config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if Predator is configured to merge audio and video files.
+                    last_filename_merged = file_name + ".mkv"
+                    if (os.path.exists(audio_filepath) and os.path.exists(video_filepath)): # Check to make sure there is actually an audio and video file to merge.
+                        audio_video_merge = threading.Thread(target=merge_audio_video, args=[video_filepath, audio_filepath, last_filename_merged], name="AudioVideoMerge") # Create the thread to merge the audio and video files.
+                        audio_video_merge.start() # Start the merging thread.
+                process_timing("end", "Dashcam/File Merging")
+
+            previously_parked = True # Indicate that Predator was parked so that we know that the next loop isn't the first loop of Predator being in parked mode.
+
+            process_timing("start", "Dashcam/Audio Processing")
+            if (config["dashcam"]["capture"]["audio"]["enabled"] == True):
+                if (audio_recorder.poll() is None): # Check to see if there is an active audio recorder.
+                    audio_recorder.terminate() # Kill the active audio recorder.
+            contours, moving_percentage = detect_motion(frame, background_subtractor) # Run motion analysis on this frame.
+            process_timing("end", "Dashcam/Audio Processing")
+
+        else: # If the vehicle is parked, then write to the video file like normal.
+            for frame in frames_to_write[device]: # Iterate through each frame that needs to be written.
+                output.write(frame)
+            frames_to_write[device] = [] # Clear the frame buffer.
+
+            if (utils.get_time() > first_segment_started_time + (segment_number+1)*config["dashcam"]["saving"]["segment_length"]): # Check to see if it is time to start a new segment.
+                frames_since_last_segment[device] = 0 # Reset the global "frames_since_last_segment" variable for this device so the main recording thread knows a new segment has been started.
+                # Handle the start of a new segment.
+                segment_number+=1 # Increment the segment counter.
+                last_video_filepath = video_filepath # Record the file name of the current video segment before updating it.
+                last_audio_filepath = audio_filepath # Record the file name of the current audio segment before updating it.
+                last_filename = file_name # Record the base file name of the current segment before updating.
+
+                segment_start_time = utils.get_time() # Update the segment start time.
+                file_name = directory + "/predator_dashcam_" + str(round(first_segment_started_time + (segment_number*config["dashcam"]["saving"]["segment_length"]))) + "_" + str(device) + "_" + str(segment_number) + "_N"
+
+                video_filepath = file_name + ".avi" # Update the file path.
+
+                process_timing("start", "Dashcam/Audio Processing")
+                if (config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if audio recording is enabled in the configuration.
+                    audio_recorder.terminate() # Kill the previous segment's audio recorder.
+                    audio_filepath = file_name + "." + str(config["dashcam"]["capture"]["audio"]["extension"])
+                    audio_recorder = subprocess.Popen(["arecord", "-q", "--format=cd", audio_filepath], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Start the next segment's audio recorder.
+                process_timing("end", "Dashcam/Audio Processing")
+
+                output = None # Release the previous video output file.
+
+                process_timing("start", "Dashcam/Calculations")
+                calculated_framerate = instant_framerate[device]
+                if (calculated_framerate > float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"])): # Check to see if the calculated frame-rate exceeds the maximum allowed frame-rate.
+                    calculated_framerate = float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"]) # Set the frame-rate to the maximum allowed frame-rate.
+                process_timing("end", "Dashcam/Calculations")
+                process_timing("start", "Dashcam/Writing")
+                output = cv2.VideoWriter(video_filepath, cv2.VideoWriter_fourcc(*'XVID'), float(calculated_framerate), (width,  height)) # Update the video output.
+                process_timing("end", "Dashcam/Writing")
+
+                process_timing("start", "Dashcam/File Merging")
+                if (config["dashcam"]["capture"]["audio"]["merge"] == True and config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if Predator is configured to merge audio and video files.
+                    last_filename_merged = last_filename + ".mkv"
+                    if (os.path.exists(last_audio_filepath) == False):
+                        display_message("The audio file was missing during audio/video merging. It is possible something has gone wrong with recording.", 2)
+                    else:
+                        merge_audio_video(last_video_filepath, last_audio_filepath, last_filename_merged) # Run the audio/video merge.
+                process_timing("end", "Dashcam/File Merging")
+                
+                if (save_this_segment == True): # Now that the new segment has been started, check to see if the segment that was just completed should be saved.
+                    if (config["dashcam"]["capture"]["audio"]["merge"] == True and config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if Predator is configured to merge audio and video files.
+                        if (os.path.exists(last_filename_merged)): # Check to make sure the merged video file actually exists before saving.
+                            save_dashcam_segments(last_filename_merged) # Save the merged video/audio file. At this point "last_filename" is actually the segment that was just completed, since we just started a new segment.
+
+                            # Now that the merged file has been saved, go back and delete the separate files that were saved previously.
+                            base_file = config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"] + "/" + os.path.splitext(os.path.basename(last_filename_merged))[0]
+                            os.system("rm '" + base_file + ".avi'")
+                            os.system("rm '" + base_file + "." + str(config["dashcam"]["capture"]["audio"]["extension"]) + "'")
+                        else: # If the merged video file doesn't exist, it is likely something went wrong with the merging process.
+                            display_message("The merged video/audio file did exist when Predator tried to save it. It is likely the merge process has failed unexpectedly. The separate files are being saved as a fallback.", 3)
+                            dashcam_segment_saving = threading.Thread(target=save_dashcam_segments, args=[last_video_filepath, last_audio_filepath], name="DashcamSegmentSave") # Create the thread to save the dashcam segment. At this point, "last_video_filepath" is actually the completed previous video segment, since we just started a new segment.
+                            dashcam_segment_saving.start() # Start the dashcam segment saving thread.
+                    else: # If audio/video merging is disabled, then save the separate video and audio files.
+                        dashcam_segment_saving = threading.Thread(target=save_dashcam_segments, args=[last_video_filepath], name="DashcamSegmentSave") # Create the thread to save the dashcam segment. At this point, "last_video_filepath" is actually the completed previous video segment, since we just started a new segment.
+                        dashcam_segment_saving.start() # Start the dashcam segment saving thread.
+                        if (config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if audio recording is enabled.
+                            dashcam_segment_saving = threading.Thread(target=save_dashcam_segments, args=[last_audio_filepath], name="DashcamSegmentSave") # Create the thread to save the dashcam segment. At this point, "last_audio_filepath" is actually the completed previous video segment, since we just started a new segment.
+                            dashcam_segment_saving.start() # Start the dashcam segment saving thread.
+                    save_this_segment = False # Reset the segment saving flag.
+
+
+                delete_old_segments() # Handle the erasing of any old dash-cam segments that need to be deleted.
+
+
+
+
+
+
+for device in config["dashcam"]["capture"]["video"]["devices"]:
+    frames_to_write[device] = []
+def write_frame(frame, device):
+    global frames_to_write
+    frames_to_write[device].append(frame)
+
