@@ -113,6 +113,7 @@ for device in config["dashcam"]["capture"]["video"]["devices"]: # Iterate throug
 
 segments_saved_time = {} # This is a dictionary that holds a list of the dashcam segments that have been saved, and the time that they were saved.
 instant_framerate = {} # This will hold the instantaneous frame-rate of each device, which is calculated based on the time between the two most recent frames. This value is expected to flucuate significantly.
+calculated_framerate = {} # This will hold the calculated frame-rate of each device, which is calculated based on the number of frames captured in the previous segment.
 audio_recorders = {} # This will hold each audio recorder process.
 first_segment_started_time = 0
 
@@ -232,6 +233,7 @@ def save_dashcam_segments(file1, file2=""):
 
 def apply_dashcam_stamps(frame, device=""):
     global instant_framerate
+    global calculated_framerate
 
     process_timing("start", "Dashcam/Apply Stamps")
     try:
@@ -254,8 +256,10 @@ def apply_dashcam_stamps(frame, device=""):
     diagnostic_stamp_position = [10, height - 10 - round(30 * config["dashcam"]["stamps"]["size"])] # Determine where the diagnostic overlay stamp should be positioned in the video stream.
     diagnostic_stamp = ""
     if (config["dashcam"]["stamps"]["diagnostic"]["framerate"]["enabled"] == True): # Check to see if the frame-rate stamp is enabled.
-        if (device in instant_framerate): # Only add the frame-rate stamp if there is frame-rate information for this device.
+        if (config["dashcam"]["stamps"]["diagnostic"]["framerate"]["mode"] == "instant" and device in instant_framerate): # Only add the frame-rate stamp if there is frame-rate information for this device.
             diagnostic_stamp = diagnostic_stamp + (str("%." + str(config["dashcam"]["stamps"]["diagnostic"]["framerate"]["precision"]) + "f") % instant_framerate[device]) + "FPS " # Add the current frame-rate to the main stamp.
+        elif (config["dashcam"]["stamps"]["diagnostic"]["framerate"]["mode"] == "average" and device in calculated_framerate): # Only add the frame-rate stamp if there is frame-rate information for this device.
+            diagnostic_stamp = diagnostic_stamp + (str("%." + str(config["dashcam"]["stamps"]["diagnostic"]["framerate"]["precision"]) + "f") % calculated_framerate[device]) + "FPS " # Add the current frame-rate to the main stamp.
 
 
     gps_stamp_position = [10, 30] # Determine where the GPS overlay stamp should be positioned in the video stream.
@@ -326,6 +330,7 @@ def detect_motion(frame, background_subtractor):
 # This function is called as a subprocess of the normal dashcam recording, and is triggered when motion is detected. This function exits when motion is no longer detected (after the motion detection timeout).
 def record_parked_motion(capture, framerate, width, height, device, directory, frame_history):
     global instant_framerate
+    global calculated_framerate
     global parked
     global config
     global audio_recorders
@@ -460,6 +465,7 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
     global frames_since_last_segment
     global dashcam_recording_active
     global instant_framerate
+    global calculated_framerate
     global audio_recorders
     global first_segment_started_time 
     global audio_record_command
@@ -470,9 +476,11 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
 
     debug_message("Opening video stream on '" + device + "'")
 
-    framerate = benchmark_camera_framerate(device) # Benchmark this capture device to determine its initial operating framerate.
+    calculated_framerate[device] = benchmark_camera_framerate(device) # Benchmark this capture device to determine its initial operating framerate.
+    if (calculated_framerate[device] > float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"])): # Check to see if the calculated frame-rate exceeds the maximum allowed frame-rate.
+        calculated_framerate[device] = float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"]) # Set the frame-rate to the maximum allowed frame-rate.
 
-    output_process = threading.Thread(target=dashcam_output_handler, args=[directory, device, width, height, framerate], name="OutputHandler" + str(device))
+    output_process = threading.Thread(target=dashcam_output_handler, args=[directory, device, width, height, calculated_framerate[device]], name="OutputHandler" + str(device))
     output_process.start()
 
     process_timing("start", "Dashcam/Capture Management")
@@ -512,11 +520,12 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
     if (first_segment_started_time == 0): # Check to see if the first segment start time hasn't yet been updated. Since this is a global variable, another dashcam thread may have already set it.
         first_segment_started_time = utils.get_time() # This variable keeps track of when the first segment was started.
     frames_captured = 0
-    frames_since_last_segment[device] = 0
     last_frame_captured = time.time() # This will hold the exact time that the last frame was captured. Here, the value is initialized to the current time before any frames have been captured.
 
     # Initialize the first segment.
     segment_number = 0
+    segment_started_time = time.time() # This value holds the exact time the segment started for sake of frame-rate calculations.
+    frames_since_last_segment[device] = 0
     current_segment_name[device] = directory + "/predator_dashcam_" + str(round(first_segment_started_time)) + "_" + str(device) + "_" + str(segment_number) + "_N"
     process_timing("start", "Dashcam/Audio Processing")
     if (config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if audio recording is enabled in the configuration.
@@ -531,6 +540,10 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
 
         if (utils.get_time() > first_segment_started_time + (segment_number+1)*config["dashcam"]["saving"]["segment_length"]): # Check to see if it is time to start a new segment.
             segment_number+=1
+            calculated_framerate[device] = frames_since_last_segment[device]/(time.time()-segment_started_time) # Calculate the frame-rate of the previous segment.
+            if (calculated_framerate[device] > float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"])): # Check to see if the calculated frame-rate exceeds the maximum allowed frame-rate.
+                calculated_framerate[device] = float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"]) # Set the frame-rate to the maximum allowed frame-rate.
+            segment_started_time = time.time() # This value holds the exact time the segment started for sake of frame-rate calculations.
             frames_since_last_segment[device] = 0 # Reset the global "frames_since_last_segment" variable for this device so the main recording thread knows a new segment has been started.
             current_segment_name[device] = directory + "/predator_dashcam_" + str(round(first_segment_started_time + (segment_number*config["dashcam"]["saving"]["segment_length"]))) + "_" + str(device) + "_" + str(segment_number) + "_N" # Update the current segment name.
 
@@ -561,6 +574,7 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
         process_timing("start", "Dashcam/Video Capture")
         ret, frame = capture.read() # Capture a frame.
         process_timing("end", "Dashcam/Video Capture")
+        frames_since_last_segment[device] += 1 # Increment the number of frames captured since the last segment.
         if not ret: # Check to see if the frame failed to be read.
             display_message("Failed to receive video frame from the '" + device  + "' device. It is possible this device has been disconnected.", 3)
             exit()
@@ -599,7 +613,9 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
                 if (config["dashcam"]["notifications"]["reticulum"]["enabled"] == True and config["dashcam"]["notifications"]["reticulum"]["events"]["motion_detected"]["enabled"] == True): # Check to see if Predator is configured to send motion detection notifications over Reticulum.
                     for destination in config["dashcam"]["notifications"]["reticulum"]["destinations"]: # Iterate over each configured destination.
                         reticulum.lxmf_send_message(str(config["dashcam"]["notifications"]["reticulum"]["instance_name"]) + " has detected motion while parked", destination) # Send a Reticulum LXMF message to this destination.
-                framerate = record_parked_motion(capture, framerate, width, height, device, directory, frame_history) # Run parked motion recording, and update the framerate to the newly calculated framerate.
+                calculated_framerate[device] = record_parked_motion(capture, calculated_framerate[device], width, height, device, directory, frame_history) # Run parked motion recording, and update the framerate to the newly calculated framerate.
+                if (calculated_framerate[device] > float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"])): # Check to see if the calculated frame-rate exceeds the maximum allowed frame-rate.
+                    calculated_framerate[device] = float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"]) # Set the frame-rate to the maximum allowed frame-rate.
                 process_timing("start", "Dashcam/Motion Detection")
                 background_subtractor = cv2.createBackgroundSubtractorMOG2() # Reset the background subtractor after motion is detected.
                 process_timing("end", "Dashcam/Motion Detection")
@@ -674,7 +690,7 @@ def start_dashcam_recording(dashcam_devices, video_width, video_height, director
 
 
 def dashcam_output_handler(directory, device, width, height, framerate):
-    global instant_framerate
+    global calculated_framerate
     global frames_since_last_segment
     global frames_to_write
     global audio_recorders
@@ -739,15 +755,14 @@ def dashcam_output_handler(directory, device, width, height, framerate):
             last_segment_name = previous_loop_segment_name
 
             output = None # Release the previous video output file.
-            output = cv2.VideoWriter(current_segment_name[device] + ".avi", cv2.VideoWriter_fourcc(*'XVID'), float(framerate), (width,  height)) # Start the new video output file.
+            output = cv2.VideoWriter(current_segment_name[device] + ".avi", cv2.VideoWriter_fourcc(*'XVID'), float(calculated_framerate[device]), (width,  height)) # Start the new video output file.
 
             process_timing("start", "Dashcam/Calculations")
-            calculated_framerate = instant_framerate[device]
-            if (calculated_framerate > float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"])): # Check to see if the calculated frame-rate exceeds the maximum allowed frame-rate.
-                calculated_framerate = float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"]) # Set the frame-rate to the maximum allowed frame-rate.
+            if (calculated_framerate[device] > float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"])): # Check to see if the calculated frame-rate exceeds the maximum allowed frame-rate.
+                calculated_framerate[device] = float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"]) # Set the frame-rate to the maximum allowed frame-rate.
             process_timing("end", "Dashcam/Calculations")
             process_timing("start", "Dashcam/Writing")
-            output = cv2.VideoWriter(current_segment_name[device] + ".avi", cv2.VideoWriter_fourcc(*'XVID'), float(calculated_framerate), (width,  height)) # Update the video output.
+            output = cv2.VideoWriter(current_segment_name[device] + ".avi", cv2.VideoWriter_fourcc(*'XVID'), float(calculated_framerate[device]), (width,  height)) # Update the video output.
             process_timing("end", "Dashcam/Writing")
 
 
@@ -799,4 +814,6 @@ def dashcam_output_handler(directory, device, width, height, framerate):
 def write_frame(frame, device):
     global frames_to_write
     frames_to_write[device].append(frame) # Add the frame to the queue of frames to write.
+    if (len(frames_to_write) > int(config["developer"]["dashcam_saving_queue_overflow"])):
+        display_message("The queue of dash-cam frames to save to disk has overflowed on '" + str(device) + "'! It is likely that the capture device is outrunning the storage medium. Consider decreasing the maximum frame-rate.", 2)
 

@@ -270,6 +270,10 @@ This document describes the configuration values found `config.json`.
                 - The first value represents red, the second value represents green, and the third value represents blue.
             - `framerate` contains settings for configuring Predator showing the instantaneous framerate in the video overlay.
                 - `enabled` is a boolean that determines if this overlay is enabled or disabled.
+                - `mode` is a string that determines which method is used to display the frame-rate.
+                    - This value can only be set to one of the following values:
+                        - "instant" is the instantaneous frame-rate, calculated based on the time between the current frame and the previous frame. This value is inaccurate, but updates every frame.
+                        - "average" is the average frame-rate, calculated based on the number of frames captured in the previous segment.
                 - `precision` is an integer number that determines how many decimal places the frame-rate will be displayed to.
         - `gps` contains configuration values for the stamp shown at the top of the frame, containing location information.
             - `color` is a list of three values between 0 and 255 that determines the font cover of the overlay stamp.
@@ -307,3 +311,7 @@ This document describes the configuration values found `config.json`.
     - `print_timings` is a boolean that determines if Predator will print timers showing how much CPU time was spent on each category of process.
         - The timers tracked by this setting don't necessarily represent the true CPU time. Rather, they are intended to keep track of what processes are causing threads to delay. As such, they typically don't keep track of how long sub-threads take the complete, only how long it took to process those threads in the parent thread.
         - When this value is set to `false`, Predator will no longer keep track of timers in the background.
+    - `dashcam_saving_queue_overflow` is a positive integer number that determines how many frames can be stacked up in the queue to be written to disk before a warning is triggered.
+        - If the storage medium being used to store dash-cam videos is particularly slow, the video capture might out-run writing the video to disk.
+        - If the video capture is faster than the video writing, then the queue will continuously grow until video capture is stopped. As such, you can safely set this value to something fairly high without worrying about missing warnings.
+        - Ideally, the queue size will never exceed 1 frame, but it may occasionally reach higher values in between segments.
