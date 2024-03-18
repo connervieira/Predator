@@ -520,8 +520,6 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
     current_segment_name[device] = directory + "/predator_dashcam_" + str(round(first_segment_started_time)) + "_" + str(device) + "_" + str(segment_number) + "_N"
     process_timing("start", "Dashcam/Audio Processing")
     if (config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if audio recording is enabled in the configuration.
-        if (audio_recorders[device].poll() is None): # Check to see if there is an active audio recorder.
-            audio_recorders[device].terminate() # Kill the previous segment's audio recorder.
         audio_filepath = current_segment_name[device] + "." + str(config["dashcam"]["capture"]["audio"]["extension"])
         audio_recorders[device] = subprocess.Popen((audio_record_command + " " + audio_filepath).split(" "), stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Start the next segment's audio recorder.
     process_timing("end", "Dashcam/Audio Processing")
@@ -686,8 +684,6 @@ def dashcam_output_handler(directory, device, width, height, framerate):
 
     segment_number = 0 # This variable keeps track of the segment number, and will be incremented each time a new segment is started.
 
-    if (config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if audio recording is enabled in the configuration.
-        audio_recorders[device] = subprocess.Popen((audio_record_command + " " + current_segment_name[device] + "." + str(config["dashcam"]["capture"]["audio"]["extension"])).split(" "), stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Start the next segment's audio recorder.
     last_video_file = "" # Initialize the path of the last video file to just be a blank string.
     last_audio_file = "" # Initialize the path of the last audio file to just be a blank string.
     last_segment_name = "" # Initialize the path of the last base filename to just be a blank string.
