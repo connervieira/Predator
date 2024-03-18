@@ -19,7 +19,7 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Fix desynced video channels in dash-cam mode.
 - [X] Add GPS demo mode.
 - [X] Add configuration value to set maximum permitted framerate per capture device.
-- [ ] Add frames to queue before writing to disk.
+- [X] Add frames to queue before writing to disk.
 
 
 ## Hypothetical
