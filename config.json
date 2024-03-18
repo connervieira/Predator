@@ -26,8 +26,8 @@
             "debugging_output": true
         },
         "gps": {
-            "enabled": false,
-            "demo_file": "",
+            "enabled": true,
+            "demo_file": "demo.gpx",
             "time_correction": {
                 "enabled": true,
                 "threshold": 10
@@ -195,7 +195,7 @@
                         0
                     ]
                 },
-                "sensitivity": 0.02,
+                "sensitivity": 0.2,
                 "timeout": 5,
                 "buffer": 60
             }

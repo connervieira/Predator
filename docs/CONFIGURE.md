@@ -223,7 +223,7 @@ This document describes the configuration values found `config.json`.
             - `enabled` is a boolean that determines whether or not audio will be recorded at all.
             - `extension` sets the file extension that audio will be saved with.
             - `merge` is a boolean that determines whether or not Predator will merge the separate audio and video files when each segment is done recording.
-    - `parked` contains settings to configure the dashcam's parking behavior.
+    - `parked` contains settings to configure the dashcam's parking behavior. Parking mode is experimental, and not recommended for daily use.
         - `enabled` is a boolean that determines whether Predator will ever go into a parked state.
             - When this value is set to `false` Predator will never enable parked mode, even if the conditions defined in this configuration section are met.
             - For parking mode to be enabled, GPS must also be enabled in the "general" section.
