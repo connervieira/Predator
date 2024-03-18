@@ -262,6 +262,12 @@ This document describes the configuration values found `config.json`.
                 - `enabled` is a boolean value that determines whether Predator will show the current time in the video overlay stamp.
             - `message_1` is a string that is intended to display a short custom message. This is often set to the license plate of the car Predator is installed in.
             - `message_2` is a string that is intended to display a short custom message. This is often set to "Predator", or another name identifying the system the dashcam is running on.
+        - `diagnostic` contains configuration values for the stamp show just above the 'main' stamp on the bottom row, showing system information.
+            - `color` is a list of three values between 0 and 255 that determines the font cover of the overlay stamp.
+                - The first value represents red, the second value represents green, and the third value represents blue.
+            - `framerate` contains settings for configuring Predator showing the instantaneous framerate in the video overlay.
+                - `enabled` is a boolean that determines if this overlay is enabled or disabled.
+                - `precision` is an integer number that determines how many decimal places the frame-rate will be displayed to.
         - `gps` contains configuration values for the stamp shown at the top of the frame, containing location information.
             - `color` is a list of three values between 0 and 255 that determines the font cover of the overlay stamp.
                 - The first value represents red, the second value represents green, and the third value represents blue.

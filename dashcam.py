@@ -166,7 +166,7 @@ def benchmark_camera_framerate(device, frames=5): # This function benchmarks a g
     start_time = utils.get_time() # Record the exact time that the benchmark started.
     for i in range(0, frames): # Run until the specified number of frames have been captured.
         ret, frame = capture.read() # Capture a video frame.
-        frame = apply_dashcam_stamps(frame) # Apply dashcam overlay stamps to the frame.
+        frame = apply_dashcam_stamps(frame, device) # Apply dashcam overlay stamps to the frame.
         if (config["dashcam"]["capture"]["video"]["devices"][device]["flip"]): # Check to see if Predator is convered to flip this capture device's output.
             frame = cv2.rotate(frame, cv2.ROTATE_180) # Flip the frame by 180 degrees.
 
@@ -228,12 +228,16 @@ def save_dashcam_segments(file1, file2=""):
 
 
 
-def apply_dashcam_stamps(frame):
+def apply_dashcam_stamps(frame, device=""):
+    global instant_framerate
+
     process_timing("start", "Dashcam/Apply Stamps")
     try:
         height, width, channels = frame.shape
     except:
         display_message("Failed to determine frame size while applying overlay stamps. It is likely something has gone wrong with video capture.", 3)
+        width = 1280
+        height = 720
 
     main_stamp_position = [10, height - 10] # Determine where the main overlay stamp should be positioned in the video stream.
     main_stamp = ""
@@ -244,6 +248,13 @@ def apply_dashcam_stamps(frame):
     if (config["dashcam"]["stamps"]["main"]["time"]["enabled"] == True): # Check to see if the time stamp is enabled.
         main_stamp = main_stamp + str(datetime.datetime.fromtimestamp(utils.get_time()).strftime("%H:%M:%S")) + " "  # Add the time to the main stamp.
     main_stamp = main_stamp  + "  " + config["dashcam"]["stamps"]["main"]["message_1"] + "  " + config["dashcam"]["stamps"]["main"]["message_2"] # Add the customizable messages to the overlay stamp.
+
+    diagnostic_stamp_position = [10, height - 10 - round(30 * config["dashcam"]["stamps"]["size"])] # Determine where the diagnostic overlay stamp should be positioned in the video stream.
+    diagnostic_stamp = ""
+    if (config["dashcam"]["stamps"]["diagnostic"]["framerate"]["enabled"] == True): # Check to see if the frame-rate stamp is enabled.
+        if (device in instant_framerate): # Only add the frame-rate stamp if there is frame-rate information for this device.
+            diagnostic_stamp = diagnostic_stamp + (str("%." + str(config["dashcam"]["stamps"]["diagnostic"]["framerate"]["precision"]) + "f") % instant_framerate[device]) + "FPS " # Add the current frame-rate to the main stamp.
+
 
     gps_stamp_position = [10, 30] # Determine where the GPS overlay stamp should be positioned in the video stream.
     gps_stamp = "" # Set the GPS to a blank placeholder. Elements will be added to this in the next steps.
@@ -259,10 +270,12 @@ def apply_dashcam_stamps(frame):
 
     # Determine the font color of the stamps from the configuration.
     main_stamp_color = config["dashcam"]["stamps"]["main"]["color"]
+    diagnostic_stamp_color = config["dashcam"]["stamps"]["diagnostic"]["color"]
     gps_stamp_color = config["dashcam"]["stamps"]["gps"]["color"]
 
     # Add the stamps to the video stream.
     cv2.putText(frame, main_stamp, (main_stamp_position[0], main_stamp_position[1]), 2, config["dashcam"]["stamps"]["size"], (main_stamp_color[2], main_stamp_color[1], main_stamp_color[0])) # Add the main overlay stamp to the video stream.
+    cv2.putText(frame, diagnostic_stamp, (diagnostic_stamp_position[0], diagnostic_stamp_position[1]), 2, config["dashcam"]["stamps"]["size"], (diagnostic_stamp_color[2], diagnostic_stamp_color[1], diagnostic_stamp_color[0])) # Add the main overlay stamp to the video stream.
     cv2.putText(frame, gps_stamp, (gps_stamp_position[0], gps_stamp_position[1]), 2, config["dashcam"]["stamps"]["size"], (gps_stamp_color[2], gps_stamp_color[1], gps_stamp_color[0])) # Add the GPS overlay stamp to the video stream.
 
     process_timing("end", "Dashcam/Apply Stamps")
@@ -383,7 +396,7 @@ def record_parked_motion(capture, framerate, width, height, device, directory, f
 
         process_timing("end", "Dashcam/Motion Detection")
 
-        frame = apply_dashcam_stamps(frame) # Apply dashcam overlay stamps to the frame.
+        frame = apply_dashcam_stamps(frame, device) # Apply dashcam overlay stamps to the frame.
 
         process_timing("start", "Dashcam/Writing")
         write_frame(frame, device)
@@ -557,7 +570,7 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
             process_timing("end", "Dashcam/Image Manipulation")
         if (config["dashcam"]["parked"]["recording"]["buffer"] > 0): # Check to see if the frame buffer is greater than 0 before adding frames to the buffer.
             process_timing("start", "Dashcam/Frame Buffer")
-            frame_history.append(apply_dashcam_stamps(frame)) # Add the frame that was just captured to the frame buffer.
+            frame_history.append(apply_dashcam_stamps(frame, device)) # Add the frame that was just captured to the frame buffer.
             if (len(frame_history) > config["dashcam"]["parked"]["recording"]["buffer"]): # Check to see if the frame buffer has exceeded the maximum length.
                 frame_history = frame_history[-config["dashcam"]["parked"]["recording"]["buffer"]:] # Trim the frame buffer to the appropriate length.
             process_timing("end", "Dashcam/Frame Buffer")
@@ -595,7 +608,7 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
             update_state("dashcam/normal", instant_framerate)
             previously_parked_dormant = False
 
-            frame = apply_dashcam_stamps(frame)
+            frame = apply_dashcam_stamps(frame, device)
             write_frame(frame, device)
 
             if (config["developer"]["print_timings"] == True):

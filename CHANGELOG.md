@@ -444,7 +444,9 @@ March 6th, 2024
     - Configuration values that exist in the configuration template file but not in the actual configuration file will show errors.
 - Added performance monitoring to state interface file to allow external programs to see basic performance diagnostics.
 - Updated the way automatic GPS time correction is handled.
-    - Predator will not longer try to apply a time offset when the system time is in the future relative to the GPS time.
+    - Predator will no longer try to apply a time offset when the system time is in the future relative to the GPS time.
     - Predator no longer displays warning about the time being desynced when GPS time correction is disabled.
 - Overhauled dash-cam saving.
     - Frames captured during dash-cam recording are now saved in a separate thread.
+- Added diagnostic stamp, which is capable of display various pieces of technical information.
+    - Added a frame-rate stamp, which shows the instantaneous frame-rate.
