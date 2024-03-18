@@ -160,6 +160,7 @@
             "audio": {
                 "enabled": "bool",
                 "extension": "str",
+                "device": "str",
                 "merge": "bool"
             }
         },
@@ -214,6 +215,13 @@
                 "message_1": "str",
                 "message_2": "str"
             },
+            "diagnostic": {
+                "color": "list",
+                "framerate": {
+                    "enabled": "bool",
+                    "precision": "+int"
+                }
+            },
             "gps": {
                 "color": "list",
                 "location": {
@@ -237,6 +245,7 @@
             "remote_sources": "list"
         },
         "offline": "bool",
-        "kill_plate": "str"
+        "kill_plate": "str",
+        "print_timings": "bool"
     }
 }

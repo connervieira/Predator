@@ -170,21 +170,13 @@
                             "max": 30,
                             "min": 20
                         }
-                    },
-                    "rear": {
-                        "index": 2,
-                        "flip": false,
-                        "codec": "MJPG",
-                        "framerate": {
-                            "max": 30,
-                            "min": 20
-                        }
                     }
                 }
             },
             "audio": {
                 "enabled": true,
                 "extension": "wav",
+                "device": "",
                 "merge": true
             }
         },

@@ -450,3 +450,4 @@ March 6th, 2024
     - Frames captured during dash-cam recording are now saved in a separate thread.
 - Added diagnostic stamp, which is capable of display various pieces of technical information.
     - Added a frame-rate stamp, which shows the instantaneous frame-rate.
+- Added configuration option to use a different audio recording device in dash-cam mode.

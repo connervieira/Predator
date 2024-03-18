@@ -131,6 +131,9 @@ This document describes the configuration values found `config.json`.
             - The `repeat` value should be set to how many times you want the sound effect to be repeated.
                 - To disable a sound from playing, set this to 0.
                 - Under normal circumstances, this value should just be "1", but there might be some cases in which you want to play a particular sound repeatedly.
+            - The `device` determines the name of the device that Predator will use to record audio.
+                - You can get a list of the names of the available sound inputs by running the `arecord -L` command.
+                - Leaving this value as a blank string will cause Predator to use the default audio input determined by `arecord`.
             - The `delay` value determines how long Predator will wait, in seconds, between repetitions, if `reptition` is set to more than 1.
                 - Note that this delay includes the time it takes for the previous instances of the sound effect to play.
                 - For example, if the audio clip you're repeating takes 2 seconds to play, and you want a 1 second delay between audio clips, this setting should be 3 seconds.
