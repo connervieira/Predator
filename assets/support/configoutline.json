@@ -247,6 +247,7 @@
         "offline": "bool",
         "kill_plate": "str",
         "print_timings": "bool",
-        "dashcam_saving_queue_overflow": "+int"
+        "dashcam_saving_queue_overflow": "+int",
+        "dashcam_shortterm_framerate_interval": "+float"
     }
 }

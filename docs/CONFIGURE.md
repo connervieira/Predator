@@ -274,6 +274,7 @@ This document describes the configuration values found `config.json`.
                     - This value can only be set to one of the following values:
                         - "instant" is the instantaneous frame-rate, calculated based on the time between the current frame and the previous frame. This value is inaccurate, but updates every frame.
                         - "average" is the average frame-rate, calculated based on the number of frames captured in the previous segment.
+                        - "hybrid" uses the short-term frame-rate, calculated by average frame-rate over a short period of time.
                 - `precision` is an integer number that determines how many decimal places the frame-rate will be displayed to.
         - `gps` contains configuration values for the stamp shown at the top of the frame, containing location information.
             - `color` is a list of three values between 0 and 255 that determines the font cover of the overlay stamp.
@@ -315,3 +316,6 @@ This document describes the configuration values found `config.json`.
         - If the storage medium being used to store dash-cam videos is particularly slow, the video capture might out-run writing the video to disk.
         - If the video capture is faster than the video writing, then the queue will continuously grow until video capture is stopped. As such, you can safely set this value to something fairly high without worrying about missing warnings.
         - Ideally, the queue size will never exceed 1 frame, but it may occasionally reach higher values in between segments.
+    - `dashcam_shortterm_framerate_interval` is a positive decimal number that determines the interval (in seconds) over which Predator will calculate the short-term frame-rate.
+        - Higher (longer) values will cause the short-term frame-rate to be more accurate, while lower (shorter) values will cause the short-term frame-rate to update more frequently.
+        - This short-term frame-rate is currently only used for visual purposes, and does not effect output files.

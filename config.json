@@ -249,7 +249,7 @@
                 ],
                 "framerate": {
                     "enabled": true,
-                    "mode": "average",
+                    "mode": "hybrid",
                     "precision": 1
                 }
             },
@@ -282,6 +282,7 @@
         "offline": false,
         "kill_plate": "",
         "print_timings": false,
-        "dashcam_saving_queue_overflow": 200
+        "dashcam_saving_queue_overflow": 200,
+        "dashcam_shortterm_framerate_interval": 0.25
     }
 }

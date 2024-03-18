@@ -114,6 +114,13 @@ for device in config["dashcam"]["capture"]["video"]["devices"]: # Iterate throug
 segments_saved_time = {} # This is a dictionary that holds a list of the dashcam segments that have been saved, and the time that they were saved.
 instant_framerate = {} # This will hold the instantaneous frame-rate of each device, which is calculated based on the time between the two most recent frames. This value is expected to flucuate significantly.
 calculated_framerate = {} # This will hold the calculated frame-rate of each device, which is calculated based on the number of frames captured in the previous segment.
+shortterm_framerate = {} # This will hold the short-term frame-rate of each device, which is calculated based on number of frames captured over the previous few seconds.
+for device in config["dashcam"]["capture"]["video"]["devices"]: # Iterate through each device in the configuration.
+    shortterm_framerate[device] = {}
+    shortterm_framerate[device]["start"] = 0
+    shortterm_framerate[device]["frames"] = 0
+    shortterm_framerate[device]["framerate"] = 0
+
 audio_recorders = {} # This will hold each audio recorder process.
 first_segment_started_time = 0
 
@@ -234,6 +241,7 @@ def save_dashcam_segments(file1, file2=""):
 def apply_dashcam_stamps(frame, device=""):
     global instant_framerate
     global calculated_framerate
+    global shortterm_framerate
 
     process_timing("start", "Dashcam/Apply Stamps")
     try:
@@ -260,6 +268,8 @@ def apply_dashcam_stamps(frame, device=""):
             diagnostic_stamp = diagnostic_stamp + (str("%." + str(config["dashcam"]["stamps"]["diagnostic"]["framerate"]["precision"]) + "f") % instant_framerate[device]) + "FPS " # Add the current frame-rate to the main stamp.
         elif (config["dashcam"]["stamps"]["diagnostic"]["framerate"]["mode"] == "average" and device in calculated_framerate): # Only add the frame-rate stamp if there is frame-rate information for this device.
             diagnostic_stamp = diagnostic_stamp + (str("%." + str(config["dashcam"]["stamps"]["diagnostic"]["framerate"]["precision"]) + "f") % calculated_framerate[device]) + "FPS " # Add the current frame-rate to the main stamp.
+        elif (config["dashcam"]["stamps"]["diagnostic"]["framerate"]["mode"] == "hybrid" and device in shortterm_framerate): # Only add the frame-rate stamp if there is frame-rate information for this device.
+            diagnostic_stamp = diagnostic_stamp + (str("%." + str(config["dashcam"]["stamps"]["diagnostic"]["framerate"]["precision"]) + "f") % shortterm_framerate[device]["framerate"]) + "FPS " # Add the current frame-rate to the main stamp.
 
 
     gps_stamp_position = [10, 30] # Determine where the GPS overlay stamp should be positioned in the video stream.
@@ -350,6 +360,7 @@ def record_parked_motion(capture, framerate, width, height, device, directory, f
     frames_captured = 0 # This is a placeholder that will keep track of how many frames are captured in this parked recording.
     capture_start_time = utils.get_time() # This stores the time that this parked recording started.
     last_frame_captured = time.time() # This will hold the exact time that the last frame was captured. Here, the value is initialized to the current time before any frames have been captured.
+    shortterm_framerate[device]["start"] = time.time()
 
     process_timing("start", "Dashcam/Calculations")
     last_alert_minimum_framerate_time = 0 # This value holds the last time a minimum frame-rate alert was displayed. Here the value is initialized.
@@ -366,6 +377,12 @@ def record_parked_motion(capture, framerate, width, height, device, directory, f
 
         if (capture is None or capture.isOpened() == False): # Check to see if the capture failed to open.
             display_message("The video capture on device '" + str(device) + "' was dropped during parked recording", 3)
+
+        if (time.time() - shortterm_framerate[device]["start"] > float(config["developer"]["dashcam_shortterm_framerate_interval"])):
+            shortterm_framerate[device]["framerate"] = shortterm_framerate[device]["frames"] / (time.time() - shortterm_framerate[device]["start"])
+            shortterm_framerate[device]["start"] = time.time()
+            shortterm_framerate[device]["frames"] = 0
+        shortterm_framerate[device]["frames"] += 1
 
         time_since_last_frame = time.time()-last_frame_captured # Calculate the time (in seconds) since the last frame was captured.
         instant_framerate[device] = 1/time_since_last_frame
@@ -466,6 +483,7 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
     global dashcam_recording_active
     global instant_framerate
     global calculated_framerate
+    global shortterm_framerate
     global audio_recorders
     global first_segment_started_time 
     global audio_record_command
@@ -525,6 +543,8 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
     # Initialize the first segment.
     segment_number = 0
     segment_started_time = time.time() # This value holds the exact time the segment started for sake of frame-rate calculations.
+    shortterm_framerate[device]["start"] = time.time()
+    shortterm_framerate[device]["frames"] = 0
     frames_since_last_segment[device] = 0
     current_segment_name[device] = directory + "/predator_dashcam_" + str(round(first_segment_started_time)) + "_" + str(device) + "_" + str(segment_number) + "_N"
     process_timing("start", "Dashcam/Audio Processing")
@@ -556,9 +576,13 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
             process_timing("end", "Dashcam/Audio Processing")
 
 
-
-
         process_timing("start", "Dashcam/Calculations")
+        if (time.time() - shortterm_framerate[device]["start"] > float(config["developer"]["dashcam_shortterm_framerate_interval"])):
+            shortterm_framerate[device]["framerate"] = shortterm_framerate[device]["frames"] / (time.time() - shortterm_framerate[device]["start"])
+            shortterm_framerate[device]["start"] = time.time()
+            shortterm_framerate[device]["frames"] = 0
+        shortterm_framerate[device]["frames"] += 1
+
         time_since_last_frame = time.time()-last_frame_captured # Calculate the time (in seconds) since the last frame was captured.
         instant_framerate[device] = 1/time_since_last_frame
         if (time_since_last_frame > expected_time_since_last_frame_slowest): # Check see if the current frame-rate is below the minimum expected frame-rate.
