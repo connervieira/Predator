@@ -158,7 +158,7 @@ def merge_audio_video(video_file, audio_file, output_file, audio_offset=0):
 def benchmark_camera_framerate(device, frames=5): # This function benchmarks a given camera to determine its framerate.
     global config
 
-    resolution = [config["dashcam"]["capture"]["video"]["resolution"]["width"], config["dashcam"]["capture"]["video"]["resolution"]["height"]] # This determines the resolution that will be used for the video capture device.
+    resolution = [config["dashcam"]["capture"]["video"]["devices"][device]["resolution"]["width"], config["dashcam"]["capture"]["video"]["devices"][device]["resolution"]["height"]] # This determines the resolution that will be used for the video capture device.
     capture = cv2.VideoCapture(config["dashcam"]["capture"]["video"]["devices"][device]["index"]); # Open the video capture device.
     codec = list(config["dashcam"]["capture"]["video"]["devices"][device]["codec"])
     capture.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(codec[0], codec[1], codec[2], codec[3])) # Set the video codec.
@@ -685,7 +685,7 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
 
 
 
-def start_dashcam_recording(dashcam_devices, video_width, video_height, directory, background=False): # This function starts dashcam recording on a given list of dashcam devices.
+def start_dashcam_recording(dashcam_devices, directory, background=False): # This function starts dashcam recording on a given list of dashcam devices.
     dashcam_process = [] # Create a placeholder list to store the dashcam processes.
     iteration_counter = 0 # Set the iteration counter to 0 so that we can increment it for each recording device specified.
     global parked
@@ -694,7 +694,7 @@ def start_dashcam_recording(dashcam_devices, video_width, video_height, director
     dashcam_recording_active = True
     
     for device in dashcam_devices: # Run through each camera device specified in the configuration, and launch an OpenCV recording instance for it.
-        dashcam_process.append(threading.Thread(target=capture_dashcam_video, args=[directory, device, video_width, video_height], name="Dashcam" + str(dashcam_devices[device]["index"])))
+        dashcam_process.append(threading.Thread(target=capture_dashcam_video, args=[directory, device, config["dashcam"]["capture"]["video"]["devices"][device]["resolution"]["width"], config["dashcam"]["capture"]["video"]["devices"][device]["resolution"]["height"]], name="Dashcam" + str(dashcam_devices[device]["index"])))
         dashcam_process[iteration_counter].start()
 
 

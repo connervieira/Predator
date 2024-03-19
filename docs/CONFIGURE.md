@@ -202,9 +202,6 @@ This document describes the configuration values found `config.json`.
                     - This is prevents Predator from erasing too many dashcam segments if something goes wrong with the disk usage analysis.
     - `capture` contains settings related to the capturing of dashcam video.
         - `video` contains settings for configuring Predator's video recording behavior.
-            - `resolution` sets the resolution of the video.
-                - `width` sets the width of the video, measured in pixels.
-                - `height` sets the height of the video, measured in pixels.
             - `devices` is a list that contains the camera devices Predator will use when recording video in dash-cam mode.
                 - `index` is the capture device identifier. This is an integer number, and is typically the same as the number at the end of the `/dev/video` file associated with the device.
                     - For example, if your camera is connected to your system as `/dev/video2`, its index would be `2`.
@@ -219,6 +216,9 @@ This document describes the configuration values found `config.json`.
                     - `min` is the minimum frame-rate (measured in frames per second) that you expect this camera to run at.
                         - If the frame-rate falls below this value, Predator will display a warning.
                         - Adjusting this value has no effect on the actual frame-rate, only the point at which warnings are displayed.
+                - `resolution` sets the resolution of the video captured by this device.
+                    - `width` sets the width of the video, measured in pixels.
+                    - `height` sets the height of the video, measured in pixels.
         - `audio` contains settings for configuring Predator's audio recording behavior.
             - `enabled` is a boolean that determines whether or not audio will be recorded at all.
             - `extension` sets the file extension that audio will be saved with.

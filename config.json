@@ -157,10 +157,6 @@
         },
         "capture": {
             "video": {
-                "resolution": {
-                    "width": 1920,
-                    "height": 1080
-                },
                 "devices": {
                     "main": {
                         "index": 0,
@@ -169,6 +165,10 @@
                         "framerate": {
                             "max": 30,
                             "min": 20
+                        },
+                        "resolution": {
+                            "width": 1920,
+                            "height": 1080
                         }
                     }
                 }
