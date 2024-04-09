@@ -26,7 +26,6 @@ except:
     print("The configuration database couldn't be loaded. It may be corrupted.")
     exit()
 
-
 import utils
 display_message = utils.display_message
 debug_message = utils.debug_message
@@ -575,14 +574,15 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
         if (parked == False): # Only update the segment if Predator is not in parked mode.
             recording_active = True # Indicate the Predator is not actively capturing frames.
             if (force_create_segment == True or utils.get_time() > first_segment_started_time + (segment_number+1)*config["dashcam"]["saving"]["segment_length"]): # Check to see if it is time to start a new segment.
-                if (force_create_segment == False): # Only increment the segment counter if this segment was not forced to be created.
-                    segment_number+=1
                 force_create_segment = False # Reset the segment creation force variable.
                 calculated_framerate[device] = frames_since_last_segment[device]/(time.time()-segment_started_time) # Calculate the frame-rate of the previous segment.
                 if (calculated_framerate[device] > float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"])): # Check to see if the calculated frame-rate exceeds the maximum allowed frame-rate.
                     calculated_framerate[device] = float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"]) # Set the frame-rate to the maximum allowed frame-rate.
-                segment_started_time = time.time() # This value holds the exact time the segment started for sake of frame-rate calculations.
-                frames_since_last_segment[device] = 0 # Reset the global "frames_since_last_segment" variable for this device so the main recording thread knows a new segment has been started.
+                while (utils.get_time() > first_segment_started_time + (segment_number+1)*config["dashcam"]["saving"]["segment_length"]): # Run until the segment number is correct. This prevents a bunch of empty video files from being created when the system time suddenly jumps into the future.
+                    frames_since_last_segment[device] = 0 # Reset the global "frames_since_last_segment" variable for this device so the main recording thread knows a new segment has been started.
+                    segment_started_time = time.time() # This value holds the exact time the segment started for sake of frame-rate calculations.
+                    if (force_create_segment == False): # Only increment the segment counter if this segment was not forced to be created.
+                        segment_number+=1
                 current_segment_name[device] = directory + "/predator_dashcam_" + str(round(first_segment_started_time + (segment_number*config["dashcam"]["saving"]["segment_length"]))) + "_" + str(device) + "_" + str(segment_number) + "_N" # Update the current segment name.
 
                 process_timing("start", "Dashcam/Audio Processing")
@@ -867,9 +867,11 @@ def dashcam_output_handler(directory, device, width, height, framerate):
 
 
 
+
 def write_frame(frame, device):
     global frames_to_write
     frames_to_write[device].append(frame) # Add the frame to the queue of frames to write.
     if (len(frames_to_write) > int(config["developer"]["dashcam_saving_queue_overflow"])):
         display_message("The queue of dash-cam frames to save to disk has overflowed on '" + str(device) + "'! It is likely that the capture device is outrunning the storage medium. Consider decreasing the maximum frame-rate.", 2)
+
 
