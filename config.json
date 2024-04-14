@@ -26,8 +26,8 @@
             "debugging_output": true
         },
         "gps": {
-            "enabled": true,
-            "demo_file": "demo.gpx",
+            "enabled": false,
+            "demo_file": "",
             "time_correction": {
                 "enabled": true,
                 "threshold": 10
@@ -145,7 +145,7 @@
             "trigger": "dashcam_lock_trigger",
             "segment_length": 10,
             "looped_recording": {
-                "mode": "automatic",
+                "mode": "manual",
                 "manual": {
                     "history_length": 1000
                 },
@@ -174,7 +174,7 @@
                 }
             },
             "audio": {
-                "enabled": true,
+                "enabled": false,
                 "extension": "wav",
                 "device": "",
                 "merge": true
