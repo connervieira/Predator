@@ -70,12 +70,6 @@ timezone_offset = -(time.altzone if daylight_savings else time.timezone) # This 
 global_time_offset = 0 
 def get_time():
     global global_time_offset
-
-    with open("/dev/shm/time") as f: # TODO: REMOVE
-        content = float(f.readlines()[0]) # TODO: REMOVE
-        global_time_offset = content # TODO: REMOVE
-    print(global_time_offset) # TODO: REMOVE
-
     adjusted_time = time.time() + global_time_offset
     return adjusted_time
 
