@@ -26,7 +26,6 @@ except:
     print("The configuration database couldn't be loaded. It may be corrupted.")
     exit()
 
-
 import utils
 display_message = utils.display_message
 debug_message = utils.debug_message
@@ -158,7 +157,7 @@ def merge_audio_video(video_file, audio_file, output_file, audio_offset=0):
 def benchmark_camera_framerate(device, frames=5): # This function benchmarks a given camera to determine its framerate.
     global config
 
-    resolution = [config["dashcam"]["capture"]["video"]["resolution"]["width"], config["dashcam"]["capture"]["video"]["resolution"]["height"]] # This determines the resolution that will be used for the video capture device.
+    resolution = [config["dashcam"]["capture"]["video"]["devices"][device]["resolution"]["width"], config["dashcam"]["capture"]["video"]["devices"][device]["resolution"]["height"]] # This determines the resolution that will be used for the video capture device.
     capture = cv2.VideoCapture(config["dashcam"]["capture"]["video"]["devices"][device]["index"]); # Open the video capture device.
     codec = list(config["dashcam"]["capture"]["video"]["devices"][device]["codec"])
     capture.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(codec[0], codec[1], codec[2], codec[3])) # Set the video codec.
@@ -575,14 +574,15 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
         if (parked == False): # Only update the segment if Predator is not in parked mode.
             recording_active = True # Indicate the Predator is not actively capturing frames.
             if (force_create_segment == True or utils.get_time() > first_segment_started_time + (segment_number+1)*config["dashcam"]["saving"]["segment_length"]): # Check to see if it is time to start a new segment.
-                if (force_create_segment == False): # Only increment the segment counter if this segment was not forced to be created.
-                    segment_number+=1
                 force_create_segment = False # Reset the segment creation force variable.
                 calculated_framerate[device] = frames_since_last_segment[device]/(time.time()-segment_started_time) # Calculate the frame-rate of the previous segment.
                 if (calculated_framerate[device] > float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"])): # Check to see if the calculated frame-rate exceeds the maximum allowed frame-rate.
                     calculated_framerate[device] = float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"]) # Set the frame-rate to the maximum allowed frame-rate.
-                segment_started_time = time.time() # This value holds the exact time the segment started for sake of frame-rate calculations.
-                frames_since_last_segment[device] = 0 # Reset the global "frames_since_last_segment" variable for this device so the main recording thread knows a new segment has been started.
+                while (utils.get_time() > first_segment_started_time + (segment_number+1)*config["dashcam"]["saving"]["segment_length"]): # Run until the segment number is correct. This prevents a bunch of empty video files from being created when the system time suddenly jumps into the future.
+                    frames_since_last_segment[device] = 0 # Reset the global "frames_since_last_segment" variable for this device so the main recording thread knows a new segment has been started.
+                    segment_started_time = time.time() # This value holds the exact time the segment started for sake of frame-rate calculations.
+                    if (force_create_segment == False): # Only increment the segment counter if this segment was not forced to be created.
+                        segment_number+=1
                 current_segment_name[device] = directory + "/predator_dashcam_" + str(round(first_segment_started_time + (segment_number*config["dashcam"]["saving"]["segment_length"]))) + "_" + str(device) + "_" + str(segment_number) + "_N" # Update the current segment name.
 
                 process_timing("start", "Dashcam/Audio Processing")
@@ -685,7 +685,7 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
 
 
 
-def start_dashcam_recording(dashcam_devices, video_width, video_height, directory, background=False): # This function starts dashcam recording on a given list of dashcam devices.
+def start_dashcam_recording(dashcam_devices, directory, background=False): # This function starts dashcam recording on a given list of dashcam devices.
     dashcam_process = [] # Create a placeholder list to store the dashcam processes.
     iteration_counter = 0 # Set the iteration counter to 0 so that we can increment it for each recording device specified.
     global parked
@@ -694,7 +694,7 @@ def start_dashcam_recording(dashcam_devices, video_width, video_height, director
     dashcam_recording_active = True
     
     for device in dashcam_devices: # Run through each camera device specified in the configuration, and launch an OpenCV recording instance for it.
-        dashcam_process.append(threading.Thread(target=capture_dashcam_video, args=[directory, device, video_width, video_height], name="Dashcam" + str(dashcam_devices[device]["index"])))
+        dashcam_process.append(threading.Thread(target=capture_dashcam_video, args=[directory, device, config["dashcam"]["capture"]["video"]["devices"][device]["resolution"]["width"], config["dashcam"]["capture"]["video"]["devices"][device]["resolution"]["height"]], name="Dashcam" + str(dashcam_devices[device]["index"])))
         dashcam_process[iteration_counter].start()
 
 
@@ -867,9 +867,11 @@ def dashcam_output_handler(directory, device, width, height, framerate):
 
 
 
+
 def write_frame(frame, device):
     global frames_to_write
     frames_to_write[device].append(frame) # Add the frame to the queue of frames to write.
     if (len(frames_to_write) > int(config["developer"]["dashcam_saving_queue_overflow"])):
         display_message("The queue of dash-cam frames to save to disk has overflowed on '" + str(device) + "'! It is likely that the capture device is outrunning the storage medium. Consider decreasing the maximum frame-rate.", 2)
+
 

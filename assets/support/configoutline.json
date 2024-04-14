@@ -151,10 +151,6 @@
         },
         "capture": {
             "video": {
-                "resolution": {
-                    "width": "+int",
-                    "height": "+int"
-                },
                 "devices": "dict"
             },
             "audio": {

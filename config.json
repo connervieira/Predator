@@ -17,7 +17,7 @@
             "alerts_ignore_validation": true,
             "allow_duplicate_alerts": false,
             "databases": [
-                "https://v0lttech.com/predator/manifest/serve.php?type=hot"
+                "alerts.json"
             ]
         },
         "display": {
@@ -150,17 +150,13 @@
                     "history_length": 1000
                 },
                 "automatic": {
-                    "minimum_free_percentage": 0.25,
+                    "minimum_free_percentage": 0.1,
                     "max_deletions_per_round": 10
                 }
             }
         },
         "capture": {
             "video": {
-                "resolution": {
-                    "width": 1920,
-                    "height": 1080
-                },
                 "devices": {
                     "main": {
                         "index": 0,
@@ -168,7 +164,11 @@
                         "codec": "MJPG",
                         "framerate": {
                             "max": 30,
-                            "min": 20
+                            "min": 10
+                        },
+                        "resolution": {
+                            "width": 1920,
+                            "height": 1080
                         }
                     }
                 }
@@ -184,7 +184,7 @@
             "enabled": false,
             "conditions": {
                 "speed": 1,
-                "time": 5
+                "time": 10
             },
             "recording": {
                 "highlight_motion": {

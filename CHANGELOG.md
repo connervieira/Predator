@@ -435,9 +435,6 @@ March 6th, 2024
 
 *Release date to be determined*
 
-- Added customizable frame-rate restrictions.
-    - Added a per-device configuration value to set a maximum allowed frame-rate. When this frame-rate is exceeded, Predator will throttle dash-cam recording to stay below the limit.
-    - Added a per-device configuration to set a minimum expected frame-rate, below which a warning is displayed. This value does not have any impact on the actual recording frame-rate.
 - Added more descriptive error messages when the interface directory fails to be created.
 - Added comprehensive configuration validation.
     - Predator now checks to see if each value in the configuration matches the expected data type.
@@ -446,8 +443,15 @@ March 6th, 2024
 - Updated the way automatic GPS time correction is handled.
     - Predator will no longer try to apply a time offset when the system time is in the future relative to the GPS time.
     - Predator no longer displays warning about the time being desynced when GPS time correction is disabled.
-- Overhauled dash-cam saving.
-    - Frames captured during dash-cam recording are now saved in a separate thread.
-- Added diagnostic stamp, which is capable of display various pieces of technical information.
-    - Added a frame-rate stamp, which shows the instantaneous frame-rate.
-- Added configuration option to use a different audio recording device in dash-cam mode.
+- Updated dash-cam mode.
+    - Added customizable frame-rate restrictions.
+        - Added a per-device configuration value to set a maximum allowed frame-rate. When this frame-rate is exceeded, Predator will throttle dash-cam recording to stay below the limit.
+        - Added a per-device configuration to set a minimum expected frame-rate, below which a warning is displayed. This value does not have any impact on the actual recording frame-rate.
+    - Overhauled dash-cam saving.
+        - Frames captured during dash-cam recording are now saved in a separate thread.
+        - The file saving back-end now handles sudden time jumps into the future much more reliably.
+            - Instead of creating each segment between the original time and new time, Predator skips to the next segment.
+    - Added diagnostic stamp, which is capable of display various pieces of technical information.
+        - Added a frame-rate stamp, which shows the instantaneous frame-rate.
+    - Added configuration option to use a different audio recording device.
+    - Added per-device resolution configuration.

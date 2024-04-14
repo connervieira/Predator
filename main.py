@@ -1255,7 +1255,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
 
     if (config["dashcam"]["background_recording"] == True): # Check to see if the user has enabled auto dashcam background recording in real-time mode.
         debug_message("Starting background dash-cam recording")
-        dashcam.start_dashcam_recording(config["dashcam"]["capture"]["video"]["devices"], int(config["dashcam"]["capture"]["video"]["resolution"]["width"]), config["dashcam"]["capture"]["video"]["resolution"]["height"], config["general"]["working_directory"], True) # Start the dashcam recording process.
+        dashcam.start_dashcam_recording(config["dashcam"]["capture"]["video"]["devices"], config["general"]["working_directory"], True) # Start the dashcam recording process.
         print("Started background dash-cam recording.")
 
 
@@ -1544,8 +1544,8 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
 # Dash-cam mode
 elif (mode_selection == "3" and config["general"]["modes"]["enabled"]["dashcam"] == True): # The user has set Predator to boot into dash-cam mode.
     debug_message("Started dash-cam mode")
-    print("\nStarting dashcam recording at " + str(config["dashcam"]["capture"]["video"]["resolution"]["width"]) + "x" + str(config["dashcam"]["capture"]["video"]["resolution"]["height"])) # Print information about the recording settings.
-    dashcam.start_dashcam_recording(config["dashcam"]["capture"]["video"]["devices"], int(config["dashcam"]["capture"]["video"]["resolution"]["width"]), config["dashcam"]["capture"]["video"]["resolution"]["height"], config["general"]["working_directory"], False) # Start the dashcam recording process.
+    print("\nStarting dashcam recording")
+    dashcam.start_dashcam_recording(config["dashcam"]["capture"]["video"]["devices"], config["general"]["working_directory"], False) # Start the dashcam recording process.
 
 
 
