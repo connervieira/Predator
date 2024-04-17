@@ -319,3 +319,5 @@ This document describes the configuration values found `config.json`.
     - `dashcam_shortterm_framerate_interval` is a positive decimal number that determines the interval (in seconds) over which Predator will calculate the short-term frame-rate.
         - Higher (longer) values will cause the short-term frame-rate to be more accurate, while lower (shorter) values will cause the short-term frame-rate to update more frequently.
         - This short-term frame-rate is currently only used for visual purposes, and does not effect output files.
+    - `hard_crash_on_error` is a boolean that determines whether Predator will globally exit if an error is encountered. This is useful if you run Predator as an unmonitored headless service, and you want to force it to restart when an error is encountered.
+        - Keep in mind that enabling this configuration option will cause Predator to boot-loop if the problem that caused the error isn't resolved between start-ups.
