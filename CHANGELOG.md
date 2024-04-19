@@ -449,8 +449,10 @@ March 6th, 2024
         - Added a per-device configuration to set a minimum expected frame-rate, below which a warning is displayed. This value does not have any impact on the actual recording frame-rate.
     - Overhauled dash-cam saving.
         - Frames captured during dash-cam recording are now saved in a separate thread.
+    - Improved the reliability of dash-cam operation.
         - The file saving back-end now handles sudden time jumps into the future much more reliably.
             - Instead of creating each segment between the original time and new time, Predator skips to the next segment.
+        - Predator will now attempt to resume recording if the video capture drops on a particular device.
     - Added diagnostic stamp, which is capable of display various pieces of technical information.
         - Added a frame-rate stamp, which shows the instantaneous frame-rate.
     - Added configuration option to use a different audio recording device.

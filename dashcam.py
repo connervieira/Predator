@@ -618,8 +618,28 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
         process_timing("end", "Dashcam/Video Capture")
         frames_since_last_segment[device] += 1 # Increment the number of frames captured since the last segment.
         if not ret: # Check to see if the frame failed to be read.
-            display_message("Failed to receive video frame from the '" + device  + "' device. It is possible this device has been disconnected.", 3)
-            exit()
+            display_message("Failed to receive video frame from the '" + device  + "' device. It is possible this device has been disconnected.", 2)
+            for i in range(1, 12): # Attempt to re-open the capture device several times.
+                time.sleep(5*i) # Wait before re-attempting to open the capture device. The length of time between attempts increases with each attempt.
+                display_message("Attempting to re-open capture on '" + device  + "' device.", 1)
+                process_timing("start", "Dashcam/Capture Management")
+                capture = cv2.VideoCapture(device_id) # Open the video stream.
+                codec = list(config["dashcam"]["capture"]["video"]["devices"][device]["codec"])
+                capture.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(codec[0], codec[1], codec[2], codec[3])) # Set the video codec.
+                capture.set(cv2.CAP_PROP_FPS, 120) # Set the frame-rate to a high value so OpenCV will use the highest frame-rate the capture supports.
+                capture.set(cv2.CAP_PROP_FRAME_WIDTH,width) # Set the video stream width.
+                capture.set(cv2.CAP_PROP_FRAME_HEIGHT,height) # Set the video stream height.
+                process_timing("end", "Dashcam/Capture Management")
+                process_timing("start", "Dashcam/Video Capture")
+                ret, frame = capture.read() # Capture a frame.
+                process_timing("end", "Dashcam/Video Capture")
+                if ret: # Check to see if the frame was successfully read.
+                    display_message("Successfully re-opened capture on the '" + device  + "' capture device.", 1)
+                    break # Exit the loop, now that the capture device has been re-established.
+            if not ret: # Check to see if the frame failed to be read.
+                display_message("Video recording on the '" + device  + "' device has been stopped.", 3)
+                break # If the capture device can't be re-opened, then stop recording on this device.
+
         frames_captured+=1
         if (config["dashcam"]["capture"]["video"]["devices"][device]["flip"]): # Check to see if Predator is convered to flip this capture device's output.
             process_timing("start", "Dashcam/Image Manipulation")
