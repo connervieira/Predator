@@ -443,6 +443,7 @@ March 6th, 2024
 - Updated the way automatic GPS time correction is handled.
     - Predator will no longer try to apply a time offset when the system time is in the future relative to the GPS time.
     - Predator no longer displays warning about the time being desynced when GPS time correction is disabled.
+- Increased the max-depth of the configuration validation process.
 - Updated dash-cam mode.
     - Added customizable frame-rate restrictions.
         - Added a per-device configuration value to set a maximum allowed frame-rate. When this frame-rate is exceeded, Predator will throttle dash-cam recording to stay below the limit.

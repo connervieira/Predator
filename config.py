@@ -116,8 +116,16 @@ def validate_config(config):
                                                 if (type(section6) == dict):
                                                     for key7, section7 in section6.items():
                                                         if (type(section7) == dict):
-                                                            print("The configuration validation function hit a nested configuration outline section that exceeded 7 layers. The normal configuration outline file should never reach this point.")
-                                                            exit()
+                                                            for key8, section8 in section6.items():
+                                                                if (type(section8) == dict):
+                                                                    print("The configuration validation function hit a nested configuration outline section that exceeded 8 layers. The normal configuration outline file should never reach this point.")
+                                                                    exit()
+                                                                else:
+                                                                    try: # Run inside a try block to check if the corresponding value does not exist in the configuration file.
+                                                                        if (check_value(config[key1][key2][key3][key4][key5][key6][key7][key8], section8) == False):
+                                                                            invalid_values.append(key1 + ">" + key2 + ">" + key3 + ">" + key4 + ">" + key5 + ">" + key6 + ">" + key7 + ">" + key8)
+                                                                    except KeyError:
+                                                                        invalid_values.append(key1 + ">" + key2 + ">" + key3 + ">" + key4 + ">" + key5 + ">" + key6 + ">" + key7 + ">" + key8)
                                                         else:
                                                             try: # Run inside a try block to check if the corresponding value does not exist in the configuration file.
                                                                 if (check_value(config[key1][key2][key3][key4][key5][key6][key7], section7) == False):
