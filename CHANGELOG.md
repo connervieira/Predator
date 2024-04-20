@@ -443,6 +443,7 @@ March 6th, 2024
 - Updated the way automatic GPS time correction is handled.
     - Predator will no longer try to apply a time offset when the system time is in the future relative to the GPS time.
     - Predator no longer displays warning about the time being desynced when GPS time correction is disabled.
+    - Predator will now reset the time offset if the system time changes.
 - Increased the max-depth of the configuration validation process.
 - Updated dash-cam mode.
     - Added customizable frame-rate restrictions.
@@ -454,6 +455,7 @@ March 6th, 2024
         - The file saving back-end now handles sudden time jumps into the future much more reliably.
             - Instead of creating each segment between the original time and new time, Predator skips to the next segment.
         - Predator will now attempt to resume recording if the video capture drops on a particular device.
+        - A failure on a single capture device will no longer kill recording on other capture devices.
     - Added diagnostic stamp, which is capable of display various pieces of technical information.
         - Added a frame-rate stamp, which shows the instantaneous frame-rate.
     - Added configuration option to use a different audio recording device.

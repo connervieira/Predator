@@ -87,6 +87,23 @@ def debug_message(message, thread="MainThread"):
         debugging_time_record[thread] = time.time() # Record the current timestamp.
 
 
+import threading
+
+
+def manage_time_offset(): # This function watches the system time, and reset the time offset if the system time changes.
+    global global_time_offset
+    debug_message("Starting time offset management.")
+    while True: # Run forever.
+        start_time = time.time()
+        time.sleep(1) # Wait for 1 second before checking the time again.
+        end_time = time.time()
+        if (abs(end_time - start_time) - 1 > 0.5): # Check to see if the system time changed by more than half a second.
+            global_time_offset = 0 # Reset the global time offset.
+            display_message("The system time appears to have been changed. The global time offset has been reset.", 2)
+time_offset_management_thread = threading.Thread(target=manage_time_offset, name="TimeOffsetManager") # Create the time offset manager thread.
+time_offset_management_thread.start() # Start the time offset.
+
+
 
 process_timers = {}
 def process_timing(action, identifier):
@@ -129,7 +146,6 @@ from xml.dom import minidom # Required for processing GPX data
 if (config["general"]["gps"]["enabled"] == True): # Only import the GPS libraries if GPS settings are enabled.
     from gps import * # Required to access GPS information.
     import gpsd
-import threading
 import signal # Required to time out functions.
 
 
@@ -646,7 +662,8 @@ def get_gps_location():
                 if (config["general"]["gps"]["time_correction"]["enabled"] == True):
                     if (gps_time > 0 and abs(get_time() - gps_time) > config["general"]["gps"]["time_correction"]["threshold"]):
                         if (gps_time - time.time() < 0): # Check to see if the time offset is a negative number (the system time is in the future).
-                            display_message("The local system time is in the future relative to the GPS time by " + str(gps_time - time.time()) + "seconds. This can't be corrected by the GPS time offset, and is indicative of a more in-depth time desync problem.", 2)
+                            if (gps_time - time.time() < -2): # Only display a warning if the time offset is significantly into negative numbers.
+                                display_message("The local system time is in the future relative to the GPS time by " + str(gps_time - time.time()) + "seconds. This can't be corrected by the GPS time offset, and is indicative of a more in-depth time desync problem.", 2)
                         else:
                             global_time_offset = gps_time - time.time()
                             display_message("The local system time differs significantly from the GPS time. Applied time offset of " + str(round(global_time_offset*10**3)/10**3) + " seconds.", 2)
@@ -678,7 +695,7 @@ def convert_speed(speed, unit="mph"):
     elif (unit == "fps"): # Convert the speed to feet per second.
         speed = speed * 3.28084
     else: # If an invalid unit was supplied, then simply return a speed of zero.
-        debug_message("An invalid unit for speed conversion was supplied. The speed could not be converted to the desired format.", 2) # Display a notice that the speed could not be converted.
+        display_message("An invalid unit for speed conversion was supplied. The speed could not be converted to the desired format.", 2) # Display a notice that the speed could not be converted.
         speed = 0 # Set the converted speed to 0 as a placeholder.
 
 
