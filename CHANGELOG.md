@@ -456,7 +456,8 @@ March 6th, 2024
             - Instead of creating each segment between the original time and new time, Predator skips to the next segment.
         - Predator will now attempt to resume recording if the video capture drops on a particular device.
         - A failure on a single capture device will no longer kill recording on other capture devices.
-    - Added diagnostic stamp, which is capable of display various pieces of technical information.
+    - Added diagnostic stamp, which is capable of displaying various pieces of technical information.
         - Added a frame-rate stamp, which shows the instantaneous frame-rate.
     - Added configuration option to use a different audio recording device.
     - Added per-device resolution configuration.
+    - Added the ability to disable capture devices without removing them from the configuration entirely.

@@ -160,6 +160,7 @@
                 "devices": {
                     "main": {
                         "index": 0,
+                        "enabled": true,
                         "flip": false,
                         "codec": "MJPG",
                         "framerate": {

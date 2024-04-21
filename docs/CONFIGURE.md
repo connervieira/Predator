@@ -207,6 +207,7 @@ This document describes the configuration values found `config.json`.
             - `devices` is a list that contains the camera devices Predator will use when recording video in dash-cam mode.
                 - `index` is the capture device identifier. This is an integer number, and is typically the same as the number at the end of the `/dev/video` file associated with the device.
                     - For example, if your camera is connected to your system as `/dev/video2`, its index would be `2`.
+                - `enabled` determines if this capture device is enabled. Changing this to false will disable the capture device.
                 - `flip` is a boolean that determines if this camera's output will be rotated 180 degrees.
                     - This is useful if the camera is mounted upside down.
                 - `codec` is the 4 character codec identifier that will be used to capture video.

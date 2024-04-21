@@ -101,26 +101,30 @@ if (config["dashcam"]["parked"]["enabled"] == True): # Only validate the parking
 
 
 
+
 # Define global variables
 parked = False # Start with parked mode disabled.
 recording_active = False # This value is set to true whenever Predator is actively recording (not dormant/waiting for motion).
 current_segment_name = {} # This stores the name of each capture device thread's segment.
 for device in config["dashcam"]["capture"]["video"]["devices"]: # Iterate through each device in the configuration.
-    current_segment_name[device] = ""
+    if (config["dashcam"]["capture"]["video"]["devices"][device]["enabled"] == True):
+        current_segment_name[device] = ""
 
 frames_to_write = {}
 for device in config["dashcam"]["capture"]["video"]["devices"]: # Iterate through each device in the configuration.
-    frames_to_write[device] = [] # Add this device to the frame buffer.
+    if (config["dashcam"]["capture"]["video"]["devices"][device]["enabled"] == True):
+        frames_to_write[device] = [] # Add this device to the frame buffer.
 
 segments_saved_time = {} # This is a dictionary that holds a list of the dashcam segments that have been saved, and the time that they were saved.
 instant_framerate = {} # This will hold the instantaneous frame-rate of each device, which is calculated based on the time between the two most recent frames. This value is expected to flucuate significantly.
 calculated_framerate = {} # This will hold the calculated frame-rate of each device, which is calculated based on the number of frames captured in the previous segment.
 shortterm_framerate = {} # This will hold the short-term frame-rate of each device, which is calculated based on number of frames captured over the previous few seconds.
 for device in config["dashcam"]["capture"]["video"]["devices"]: # Iterate through each device in the configuration.
-    shortterm_framerate[device] = {}
-    shortterm_framerate[device]["start"] = 0
-    shortterm_framerate[device]["frames"] = 0
-    shortterm_framerate[device]["framerate"] = 0
+    if (config["dashcam"]["capture"]["video"]["devices"][device]["enabled"] == True):
+        shortterm_framerate[device] = {}
+        shortterm_framerate[device]["start"] = 0
+        shortterm_framerate[device]["frames"] = 0
+        shortterm_framerate[device]["framerate"] = 0
 
 audio_recorders = {} # This will hold each audio recorder process.
 first_segment_started_time = 0
@@ -706,6 +710,15 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
 
 
 def start_dashcam_recording(dashcam_devices, directory, background=False): # This function starts dashcam recording on a given list of dashcam devices.
+    at_least_one_enabled_device = False
+    for device in config["dashcam"]["capture"]["video"]["devices"]: # Iterate through each device in the configuration.
+        if (config["dashcam"]["capture"]["video"]["devices"][device]["enabled"] == True): # Check to see if this device is enabled.
+            at_least_one_enabled_device = True
+    if (at_least_one_enabled_device == False):
+        display_message("There are no dashcam capture devices enabled. Dashcam recording will not start.", 3)
+    del at_least_one_enabled_device
+
+
     dashcam_process = [] # Create a placeholder list to store the dashcam processes.
     iteration_counter = 0 # Set the iteration counter to 0 so that we can increment it for each recording device specified.
     global parked
@@ -714,12 +727,13 @@ def start_dashcam_recording(dashcam_devices, directory, background=False): # Thi
     dashcam_recording_active = True
     
     for device in dashcam_devices: # Run through each camera device specified in the configuration, and launch an OpenCV recording instance for it.
-        dashcam_process.append(threading.Thread(target=capture_dashcam_video, args=[directory, device, config["dashcam"]["capture"]["video"]["devices"][device]["resolution"]["width"], config["dashcam"]["capture"]["video"]["devices"][device]["resolution"]["height"]], name="Dashcam" + str(dashcam_devices[device]["index"])))
-        dashcam_process[iteration_counter].start()
+        if (config["dashcam"]["capture"]["video"]["devices"][device]["enabled"] == True):
+            dashcam_process.append(threading.Thread(target=capture_dashcam_video, args=[directory, device, config["dashcam"]["capture"]["video"]["devices"][device]["resolution"]["width"], config["dashcam"]["capture"]["video"]["devices"][device]["resolution"]["height"]], name="Dashcam" + str(dashcam_devices[device]["index"])))
+            dashcam_process[iteration_counter].start()
 
 
-        iteration_counter += 1 # Iterate the counter. This value will be used to create unique file names for each recorded video.
-        print("Started dashcam recording on " + str(dashcam_devices[device]["index"])) # Inform the user that recording was initiation for this camera device.
+            iteration_counter += 1 # Iterate the counter. This value will be used to create unique file names for each recorded video.
+            print("Started dashcam recording on " + str(dashcam_devices[device]["index"])) # Inform the user that recording was initiation for this camera device.
 
     try:
         if (background == False): # If background recording is disabled, then prompt the user to press enter to halt recording.
