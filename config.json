@@ -133,9 +133,10 @@
             "enabled": false,
             "base_url": "http://predatorwled.local/win&A=255",
             "values": {
-                "alert": "[U]&R=255&G=0&B=0",
-                "warning": "[U]&R=255&G=128&B=0",
-                "normal": "[U]&R=0&G=255&B=0"
+                "normal": "[U]&R=0&G=255&B=0",
+                "alpr_alert": "[U]&R=255&G=0&B=0",
+                "alpr_detection": "[U]&R=255&G=128&B=0",
+                "dashcam_save": "[U]&R=255&G=0&B=0"
             }
         }
     },

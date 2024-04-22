@@ -50,6 +50,9 @@ if (config["dashcam"]["saving"]["looped_recording"]["mode"] == "automatic"): # O
 if (config["dashcam"]["notifications"]["reticulum"]["enabled"] == True): # Check to see if Reticulum notifications are enabled.
     import reticulum
 
+import lighting # Import the lighting.py script.
+update_status_lighting = lighting.update_status_lighting # Load the status lighting update function from the lighting script.
+
 
 
 if (config["dashcam"]["saving"]["looped_recording"]["mode"] == "manual"): # Only validate the manual history length if manual looped recording mode is enabled.
@@ -718,6 +721,7 @@ def start_dashcam_recording(dashcam_devices, directory, background=False): # Thi
         display_message("There are no dashcam capture devices enabled. Dashcam recording will not start.", 3)
     del at_least_one_enabled_device
 
+    update_status_lighting("normal") # Initialize the status lighting to normal.
 
     dashcam_process = [] # Create a placeholder list to store the dashcam processes.
     iteration_counter = 0 # Set the iteration counter to 0 so that we can increment it for each recording device specified.
@@ -825,6 +829,7 @@ def dashcam_output_handler(directory, device, width, height, framerate):
                     dashcam_segment_saving = threading.Thread(target=save_dashcam_segments, args=[audio_filepath, last_audio_file], name="DashcamSegmentSave") # Create the thread to save the current and last audio segments.
                     dashcam_segment_saving.start() # Start the dashcam segment saving thread.
             save_this_segment = True # This flag causes Predator to save this entire segment again when the next segment is started.
+            update_status_lighting("dashcam_save") # Run the function to update the status lighting.
 
         process_timing("end", "Dashcam/Interface Interactions")
 
@@ -893,6 +898,7 @@ def dashcam_output_handler(directory, device, width, height, framerate):
                             dashcam_segment_saving = threading.Thread(target=save_dashcam_segments, args=[last_audio_file], name="DashcamSegmentSave") # Create the thread to save the dashcam segment. At this point, "last_audio_file" is actually the completed previous video segment, since we just started a new segment.
                             dashcam_segment_saving.start() # Start the dashcam segment saving thread.
                     save_this_segment = False # Reset the segment saving flag.
+                    update_status_lighting("normal") # Return status lighting to normal.
 
 
                 delete_old_segments() # Handle the erasing of any old dash-cam segments that need to be deleted.

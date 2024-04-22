@@ -1393,7 +1393,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
                         display_shape("square") # Display an ASCII square in the output.
 
                     if (config["realtime"]["status_lighting"]["enabled"] == True): # Check to see if status lighting alerts are enabled in the Predator configuration.
-                        update_status_lighting("warning") # Run the function to update the status lighting.
+                        update_status_lighting("alpr_detection") # Run the function to update the status lighting.
 
 
 
@@ -1456,7 +1456,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
 
         if (len(active_alerts) > 0): # Check to see if there are any active alerts to see if an alert state should be triggered.
             if (config["realtime"]["status_lighting"]["enabled"] == True): # Check to see if status lighting alerts are enabled in the Predator configuration.
-                update_status_lighting("alert") # Run the function to update the status lighting.
+                update_status_lighting("alpr_alert") # Run the function to update the status lighting.
 
             if (config["realtime"]["interface"]["display"]["output_level"] >= 1): # Only display alerts if the configuration specifies to do so.
                 display_alerts(active_alerts) # Display all active alerts.

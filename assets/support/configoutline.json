@@ -127,9 +127,10 @@
             "enabled": "bool",
             "base_url": "str",
             "values": {
-                "alert": "str",
-                "warning": "str",
-                "normal": "str"
+                "normal": "str",
+                "alpr_alert": "str",
+                "alpr_detection": "str",
+                "dashcam_save": "str"
             }
         }
     },

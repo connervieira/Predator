@@ -42,6 +42,9 @@ def update_status_lighting(url_id):
         status_lighting_update_url = str(config["realtime"]["status_lighting"]["values"][url_id]).replace("[U]", str(config["realtime"]["status_lighting"]["base_url"])) # Prepare the URL where a request will be sent in order to update the status lighting.
         if (config["developer"]["offline"] == False): # Check to make sure offline mode is disabled before sending the network request to update the status lighting.
             if (validators.url(status_lighting_update_url)): # Check to make sure the URL ID supplied actually resolves to a valid URL in the configuration database.
-                response = requests.get(status_lighting_update_url, timeout=2)
+                try:
+                    response = requests.get(status_lighting_update_url, timeout=0.5)
+                except:
+                    display_message("Failed to update status lighting. The request timed out.", 3) # Display a warning indicating that the status lighting request timed out.
             else:
                 display_message("Unable to update status lighting. Invalid URL configured for " + url_id, 3) # Display a warning indicating that the URL was invalid, and no network request was sent.

@@ -461,3 +461,4 @@ March 6th, 2024
     - Added configuration option to use a different audio recording device.
     - Added per-device resolution configuration.
     - Added the ability to disable capture devices without removing them from the configuration entirely.
+    - Predator now changes the status light color when a video is being locked.
