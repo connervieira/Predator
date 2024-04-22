@@ -810,7 +810,10 @@ def dashcam_output_handler(directory, device, width, height, framerate):
         time.sleep(0.001)
 
         video_filepath = current_segment_name[device] + ".avi"
-        last_video_file = last_segment_name + ".avi"
+        if (last_segment_name != ""):
+            last_video_file = last_segment_name + ".avi"
+        else:
+            last_video_file = ""
         
 
         # ===== Check to see if any dash-cam segments need to be saved. =====
@@ -895,7 +898,7 @@ def dashcam_output_handler(directory, device, width, height, framerate):
                             dashcam_segment_saving = threading.Thread(target=save_dashcam_segments, args=[last_video_file, last_audio_path], name="DashcamSegmentSave") # Create the thread to save the dashcam segment. At this point, "last_video_file" is actually the completed previous video segment, since we just started a new segment.
                             dashcam_segment_saving.start() # Start the dashcam segment saving thread.
                     else: # If audio/video merging is disabled, then save the separate video and audio files.
-                        dashcam_segment_saving = threading.Thread(target=save_dashcam_segments, args=[last_video_path], name="DashcamSegmentSave") # Create the thread to save the dashcam segment. At this point, "last_video_file" is actually the completed previous video segment, since we just started a new segment. TODO
+                        dashcam_segment_saving = threading.Thread(target=save_dashcam_segments, args=[last_video_path], name="DashcamSegmentSave") # Create the thread to save the dashcam segment. At this point, "last_video_file" is actually the completed previous video segment, since we just started a new segment.
                         dashcam_segment_saving.start() # Start the dashcam segment saving thread.
                         if (config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if audio recording is enabled.
                             dashcam_segment_saving = threading.Thread(target=save_dashcam_segments, args=[last_audio_path], name="DashcamSegmentSave") # Create the thread to save the dashcam segment. At this point, "last_audio_path" is actually the completed previous video segment, since we just started a new segment.
