@@ -808,6 +808,9 @@ def dashcam_output_handler(directory, device, width, height, framerate):
 
     while True:
         time.sleep(0.001)
+
+        video_filepath = current_segment_name[device] + ".avi"
+        last_video_file = last_segment_name + ".avi"
         
 
         # ===== Check to see if any dash-cam segments need to be saved. =====
@@ -841,7 +844,7 @@ def dashcam_output_handler(directory, device, width, height, framerate):
 
 
         if (recording_active == True): # Check to see if recording is active before updating the output.
-            if (previous_loop_segment_name != current_segment_name[device]): # Check to see if the current segment name has changed since the last loop.
+            if (previous_loop_segment_name != current_segment_name[device]): # Check to see if the current segment name has changed since the last loop (meaning a new segment has started).
                 last_segment_name = previous_loop_segment_name
 
                 output = None # Release the previous video output file.
@@ -889,13 +892,13 @@ def dashcam_output_handler(directory, device, width, height, framerate):
                             os.system("rm '" + base_file + "." + str(config["dashcam"]["capture"]["audio"]["extension"]) + "'")
                         else: # If the merged video file doesn't exist, it is likely something went wrong with the merging process.
                             display_message("The merged video/audio file did exist when Predator tried to save it. It is likely the merge process has failed unexpectedly. The separate files are being saved as a fallback.", 3)
-                            dashcam_segment_saving = threading.Thread(target=save_dashcam_segments, args=[last_video_file, last_audio_file], name="DashcamSegmentSave") # Create the thread to save the dashcam segment. At this point, "last_video_file" is actually the completed previous video segment, since we just started a new segment.
+                            dashcam_segment_saving = threading.Thread(target=save_dashcam_segments, args=[last_video_file, last_audio_path], name="DashcamSegmentSave") # Create the thread to save the dashcam segment. At this point, "last_video_file" is actually the completed previous video segment, since we just started a new segment.
                             dashcam_segment_saving.start() # Start the dashcam segment saving thread.
                     else: # If audio/video merging is disabled, then save the separate video and audio files.
-                        dashcam_segment_saving = threading.Thread(target=save_dashcam_segments, args=[last_video_file], name="DashcamSegmentSave") # Create the thread to save the dashcam segment. At this point, "last_video_file" is actually the completed previous video segment, since we just started a new segment.
+                        dashcam_segment_saving = threading.Thread(target=save_dashcam_segments, args=[last_video_path], name="DashcamSegmentSave") # Create the thread to save the dashcam segment. At this point, "last_video_file" is actually the completed previous video segment, since we just started a new segment. TODO
                         dashcam_segment_saving.start() # Start the dashcam segment saving thread.
                         if (config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if audio recording is enabled.
-                            dashcam_segment_saving = threading.Thread(target=save_dashcam_segments, args=[last_audio_file], name="DashcamSegmentSave") # Create the thread to save the dashcam segment. At this point, "last_audio_file" is actually the completed previous video segment, since we just started a new segment.
+                            dashcam_segment_saving = threading.Thread(target=save_dashcam_segments, args=[last_audio_path], name="DashcamSegmentSave") # Create the thread to save the dashcam segment. At this point, "last_audio_path" is actually the completed previous video segment, since we just started a new segment.
                             dashcam_segment_saving.start() # Start the dashcam segment saving thread.
                     save_this_segment = False # Reset the segment saving flag.
                     update_status_lighting("normal") # Return status lighting to normal.
