@@ -462,3 +462,4 @@ March 6th, 2024
     - Added per-device resolution configuration.
     - Added the ability to disable capture devices without removing them from the configuration entirely.
     - Predator now changes the status light color when a video is being locked.
+    - Added standalone tool for triggering dashcam saving via a GPIO input.
