@@ -77,6 +77,20 @@ This document describes the configuration values found `config.json`.
             - Under normal circumstances, all of these settings should be left as 'true', in order to enable full functionality of Predator, but there may be certain situations in which is useful to block certain modes from starting.
                 - This setting is not intended to a be a security feature. It's completely trivial to bypass this setting by simply modifying the configuration file directly.
                 - If you never plan to use a particular operating mode, disabling it might decrease Predator's loading time by preventing unnecessary libraries from being loaded.
+    - `status_lighting` contains settings for configuring Predator's status light interfacing capabilities.
+        - `status_lighting_enabled` is a boolean value that determines whether or not Predator will attempt to make use of LED status lights
+        - `status_lighting_base_url`
+            - This is the base part of the URL that Predator will send requests to in order to update the status lighting.
+            - By default, this setting is set to the default router IP address of the "WLED" lighting controller software. However, you should be able to modify it to fit any lighting controller software that supports GET network requests.
+            - This is that value that precedes the `status_lighting_values` entries explained below.
+        - `status_lighting_values`
+            - These are individual values that will be appended to the `status_lighting_base_url` setting described above in order to form the URL that Predator will send a request to.
+            - This is where you specify what RGB colors Predator will use for each status indication.
+                - The `normal` status is used when Predator is running, and no event has occurred.
+                - The `alpr_alert` status is relevant in real-time mode, and is used when Predator detects a license plate in an alert database.
+                - The `alpr_detection` status is relevant in real-time mode, and used when Predator detects any valid license plate.
+                - The `dashcam_save` status is relevant to dash-cam mode, and is triggered when a dashcam video file is saved using the dashcam lock trigger file.
+                    - The lighting will remain in the "dashcam_save" status until the segment has ended, and Predator returns to normal, unlocked recording.
 - `management` contains configuration values related to management mode.
     - `disk_statistics` is a boolean that enables and disables the disk statistics feature of management mode.
         - Setting this to `false` disables disk statistics, and eliminates the need for the 'psutil' Python package to be installed.
@@ -163,18 +177,6 @@ This document describes the configuration values found `config.json`.
             - Example: `"http://server.tld:8032"`
         - `token` is a string that specifies the Gotify application token that Predator will attempt to use to send notifications through the specified Gotify server.
             - Example: `"AJrhgGs83mL22kZ"`
-    - `status_lighting` contains settings for configuring Predator's status light interfacing capabilities.
-        - `status_lighting_enabled` is a boolean value that determines whether or not Predator will attempt to make use of LED status lights
-        - `status_lighting_base_url`
-            - This is the base part of the URL that Predator will send requests to in order to update the status lighting.
-            - By default, this setting is set to the default router IP address of the "WLED" lighting controller software. However, you should be able to modify it to fit any lighting controller software that supports GET network requests.
-            - This is that value that precedes the `status_lighting_values` entries explained below.
-        - `status_lighting_values`
-            - These are individual values that will be appended to the `status_lighting_base_url` setting described above in order to form the URL that Predator will send a request to.
-            - This is where you specify what RGB colors Predator will use for each status indication.
-                - The "alert" status is used when Predator detects a license plate in an alert database.
-                - The "notice" status is used when Predator detects any valid license plate.
-                - The "normal" status is used when Predator is running, and hasn't detected any license plates in the past processing cycle.
 - `dashcam` contains configuration values related to dash-cam mode.
     - `saving` contains settings related to "locking" dashcam video during important events.
         - `directory` is a string that sets the name of the directory where Predator will store locked dashcam video segments.

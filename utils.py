@@ -137,7 +137,7 @@ def process_timing(action, identifier):
 import subprocess # Required for starting some shell commands
 import sys
 if (config["developer"]["offline"] == False): # Only import networking libraries if offline mode is turned off.
-    if (config["realtime"]["status_lighting"]["enabled"] == True or config["realtime"]["push_notifications"]["enabled"] == True or len(config["general"]["alerts"]["databases"]) > 0):
+    if (config["general"]["status_lighting"]["enabled"] == True or config["realtime"]["push_notifications"]["enabled"] == True or len(config["general"]["alerts"]["databases"]) > 0):
         import requests # Required to make network requests
         import validators # Required to validate URLs
 import re # Required to use Regex

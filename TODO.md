@@ -22,7 +22,8 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Add frames to queue before writing to disk.
 - [X] Add the ability to disable dashcam capture devices from the configuration.
 - [X] Fix dashcam saving when the first segment is saved.
-- [ ] Move status lighting configuration to general section.
+- [X] Move status lighting configuration to general section.
+- [ ] Test different output saving intervals.
 
 
 ## Hypothetical

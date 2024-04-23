@@ -74,7 +74,7 @@ if (config["general"]["modes"]["enabled"]["dashcam"] == True or config["dashcam"
 
 
 if (config["developer"]["offline"] == False): # Only import networking libraries if offline mode is turned off.
-    if (config["realtime"]["status_lighting"]["enabled"] == True or config["realtime"]["push_notifications"]["enabled"] == True or len(config["general"]["alerts"]["databases"]) > 0): # Only import networking libraries if they are necessary.
+    if (config["realtime"]["general"]["enabled"] == True or config["realtime"]["push_notifications"]["enabled"] == True or len(config["general"]["alerts"]["databases"]) > 0): # Only import networking libraries if they are necessary.
         debug_message("Loading networking libraries")
         import requests # Required to make network requests.
         import validators # Required to validate URLs.
@@ -100,7 +100,7 @@ debug_message("Validated configuration values")
 if (config["developer"]["offline"] == True): # If offline mode is enabled, then disable all network based features.
     config["realtime"]["push_notifications"]["enabled"] = False
     config["realtime"]["push_notifications"]["server"] = "" # This is redundant, since 'realtime>push_notifications>enabled' is disabled, but it serves as a backup.
-    config["realtime"]["status_lighting"]["enabled"] = False
+    config["general"]["status_lighting"]["enabled"] = False
     config["developer"]["remote_sources"] = []
 
 
@@ -1285,7 +1285,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
         new_plates_detected = [] # This variable will be used to determine whether or not a plate was detected this round. If no plate is detected, this will remain blank. If a plate is detected, it will change to be that plate. This is used to determine whether or not the database of detected plates needs to updated.
 
         # Reset the status lighting to normal before processing the license plate data from ALPR.
-        if (config["realtime"]["status_lighting"]["enabled"] == True): # Check to see if status lighting alerts are enabled in the Predator configuration.
+        if (config["general"]["status_lighting"]["enabled"] == True): # Check to see if status lighting alerts are enabled in the Predator configuration.
             update_status_lighting("normal") # Run the function to update the status lighting.
 
 
@@ -1392,7 +1392,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
                     if (config["realtime"]["interface"]["display"]["shape_alerts"] == True): # Check to see if the user has enabled shape notifications.
                         display_shape("square") # Display an ASCII square in the output.
 
-                    if (config["realtime"]["status_lighting"]["enabled"] == True): # Check to see if status lighting alerts are enabled in the Predator configuration.
+                    if (config["general"]["status_lighting"]["enabled"] == True): # Check to see if status lighting alerts are enabled in the Predator configuration.
                         update_status_lighting("alpr_detection") # Run the function to update the status lighting.
 
 
@@ -1455,7 +1455,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
 
 
         if (len(active_alerts) > 0): # Check to see if there are any active alerts to see if an alert state should be triggered.
-            if (config["realtime"]["status_lighting"]["enabled"] == True): # Check to see if status lighting alerts are enabled in the Predator configuration.
+            if (config["general"]["status_lighting"]["enabled"] == True): # Check to see if status lighting alerts are enabled in the Predator configuration.
                 update_status_lighting("alpr_alert") # Run the function to update the status lighting.
 
             if (config["realtime"]["interface"]["display"]["output_level"] >= 1): # Only display alerts if the configuration specifies to do so.
