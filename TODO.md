@@ -24,6 +24,10 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Fix dashcam saving when the first segment is saved.
 - [X] Move status lighting configuration to general section.
 - [ ] Test different output saving intervals.
+- [ ] Test background dash-cam recording.
+- [ ] Test dashcam saving with audio recording.
+    - [ ] Test when merging is enabled.
+    - [ ] Test when merging is disabled.
 
 
 ## Hypothetical
