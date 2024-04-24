@@ -134,7 +134,8 @@ first_segment_started_time = 0
 
 audio_record_command = "arecord --format=cd"
 if (config["dashcam"]["capture"]["audio"]["device"] != ""): # Check to see if a custom device has been set.
-    audio_record_command += "--device\"" + str(config["dashcam"]["capture"]["audio"]["device"]) + "\""
+    audio_record_command += " --device=\"" + str(config["dashcam"]["capture"]["audio"]["device"]) + "\""
+print(audio_record_command)
 
 
 
