@@ -40,6 +40,16 @@
                 "realtime": "bool",
                 "dashcam": "bool"
             }
+        },
+        "status_lighting": {
+            "enabled": "bool",
+            "base_url": "str",
+            "values": {
+                "normal": "str",
+                "alpr_alert": "str",
+                "alpr_detection": "str",
+                "dashcam_save": "str"
+            }
         }
     },
     "management": {
@@ -122,16 +132,6 @@
             "enabled": "bool",
             "server": "str",
             "token": "str"
-        },
-        "status_lighting": {
-            "enabled": "bool",
-            "base_url": "str",
-            "values": {
-                "normal": "str",
-                "alpr_alert": "str",
-                "alpr_detection": "str",
-                "dashcam_save": "str"
-            }
         }
     },
     "dashcam": {

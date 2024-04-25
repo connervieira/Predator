@@ -74,7 +74,7 @@ if (config["general"]["modes"]["enabled"]["dashcam"] == True or config["dashcam"
 
 
 if (config["developer"]["offline"] == False): # Only import networking libraries if offline mode is turned off.
-    if (config["realtime"]["general"]["enabled"] == True or config["realtime"]["push_notifications"]["enabled"] == True or len(config["general"]["alerts"]["databases"]) > 0): # Only import networking libraries if they are necessary.
+    if (config["general"]["status_lighting"]["enabled"] == True or config["realtime"]["push_notifications"]["enabled"] == True or len(config["general"]["alerts"]["databases"]) > 0): # Only import networking libraries if they are necessary.
         debug_message("Loading networking libraries")
         import requests # Required to make network requests.
         import validators # Required to validate URLs.
