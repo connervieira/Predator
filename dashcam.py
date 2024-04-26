@@ -810,10 +810,13 @@ def dashcam_output_handler(directory, device, width, height, framerate):
         time.sleep(0.001)
 
         video_filepath = current_segment_name[device] + ".avi"
+        audio_filepath = current_segment_name[device] + "." + config["dashcam"]["capture"]["audio"]["extension"]
         if (last_segment_name != ""):
             last_video_file = last_segment_name + ".avi"
+            last_audio_file = last_segment_name + "." + config["dashcam"]["capture"]["audio"]["extension"]
         else:
             last_video_file = ""
+            last_audio_file = ""
         
 
         # ===== Check to see if any dash-cam segments need to be saved. =====
