@@ -397,11 +397,11 @@ def record_parked_motion(capture, framerate, width, height, device, directory, f
         if (capture is None or capture.isOpened() == False): # Check to see if the capture failed to open.
             display_message("The video capture on device '" + str(device) + "' was dropped during parked recording", 3)
 
-        if (time.time() - shortterm_framerate[device]["start"] > float(config["developer"]["dashcam_shortterm_framerate_interval"])):
-            shortterm_framerate[device]["framerate"] = shortterm_framerate[device]["frames"] / (time.time() - shortterm_framerate[device]["start"])
-            shortterm_framerate[device]["start"] = time.time()
-            shortterm_framerate[device]["frames"] = 0
-        shortterm_framerate[device]["frames"] += 1
+        if (time.time() - shortterm_framerate[device]["start"] > float(config["developer"]["dashcam_shortterm_framerate_interval"])): # Check to see if enough time has passed since the last short-term framerate update was made.
+            shortterm_framerate[device]["framerate"] = shortterm_framerate[device]["frames"] / (time.time() - shortterm_framerate[device]["start"]) # Calculate the short-term frame-rate.
+            shortterm_framerate[device]["start"] = time.time() # Reset the timer.
+            shortterm_framerate[device]["frames"] = 0 # Reset the number of frames.
+        shortterm_framerate[device]["frames"] += 1 # Increment the number of frames since the last reading.
 
         time_since_last_frame = time.time()-last_frame_captured # Calculate the time (in seconds) since the last frame was captured.
         instant_framerate[device] = 1/time_since_last_frame

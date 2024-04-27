@@ -3,15 +3,15 @@
 
 # This is a stand-alone script that will create the dashcam save trigger file when a GPIO event occurs. This script is only useful when Predator is operating in dash-cam mode, but it doesn't necessarily depend on it to function. In other words, this script can be started as a separate service, before Predator starts.
 
-gpio_pin = 3 # This is the number of the pin that will be monitored for button presses.
-
-
+gpio_pins = [17, 22, 27] # These are the pins that will be monitored for button presses.
 
 
 import os # Required to interact with certain operating system functions
 import json # Required to process JSON data
-import cv2
 import time
+
+from gpiozero import Button
+from signal import pause
 
 base_directory = str(os.path.dirname(os.path.realpath(__file__)))
 try:
@@ -30,13 +30,18 @@ if (os.path.isdir(config["general"]["interface_directory"]) == False): # Check t
     os.system("mkdir -p '" + str(config["general"]["interface_directory"]) + "'")
 
 
-from gpiozero import Button
-from signal import pause
-
-button = Button(gpio_pin)
-
+last_trigger_time = 0
 def create_trigger_file():
-    os.system("touch '" + trigger_file_location + "'")
+    global last_trigger_time
+    if (time.time() - last_trigger_time > 1): # Check to see if at least 1 second has passed since the last dash-cam save trigger.
+        os.system("touch '" + trigger_file_location + "'")
+    last_trigger_time = time.time()
 
-button.when_pressed = create_trigger_file
+
+buttons = []
+for pin in gpio_pins:
+    buttons.append(Button(pin))
+for button in buttons:
+    button.when_pressed = create_trigger_file
+
 pause()
