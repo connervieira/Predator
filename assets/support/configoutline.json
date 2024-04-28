@@ -216,7 +216,11 @@
                 "color": "list",
                 "framerate": {
                     "enabled": "bool",
+                    "mode": ["instant", "average", "hybrid"],
                     "precision": "+int"
+                },
+                "state": {
+                    "enabled": "bool"
                 }
             },
             "gps": {

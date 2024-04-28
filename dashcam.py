@@ -245,11 +245,12 @@ def save_dashcam_segments(file1, file2=""):
 
 
 
-
 def apply_dashcam_stamps(frame, device=""):
     global instant_framerate
     global calculated_framerate
     global shortterm_framerate
+    global saving_active
+    global parked
 
     process_timing("start", "Dashcam/Apply Stamps")
     try:
@@ -278,6 +279,18 @@ def apply_dashcam_stamps(frame, device=""):
             diagnostic_stamp = diagnostic_stamp + (str("%." + str(config["dashcam"]["stamps"]["diagnostic"]["framerate"]["precision"]) + "f") % calculated_framerate[device]) + "FPS " # Add the current frame-rate to the main stamp.
         elif (config["dashcam"]["stamps"]["diagnostic"]["framerate"]["mode"] == "hybrid" and device in shortterm_framerate): # Only add the frame-rate stamp if there is frame-rate information for this device.
             diagnostic_stamp = diagnostic_stamp + (str("%." + str(config["dashcam"]["stamps"]["diagnostic"]["framerate"]["precision"]) + "f") % shortterm_framerate[device]["framerate"]) + "FPS " # Add the current frame-rate to the main stamp.
+    if (config["dashcam"]["stamps"]["diagnostic"]["state"]["enabled"] == True): # Check to see if the state overlay stamp is enabled.
+        current_state = utils.get_current_state()
+        if (parked == False):
+            if (saving_active == False):
+                diagnostic_stamp = diagnostic_stamp + "NN"
+            elif (saving_active == True):
+                diagnostic_stamp = diagnostic_stamp + "NS"
+        elif (parked == True):
+            if (current_state["mode"] == "dashcam/parked_dormant"):
+                diagnostic_stamp = diagnostic_stamp + "PD"
+            elif (current_state["mode"] == "dashcam/parked_active"):
+                diagnostic_stamp = diagnostic_stamp + "PA"
 
 
     gps_stamp_position = [10, 30] # Determine where the GPS overlay stamp should be positioned in the video stream.
@@ -362,11 +375,6 @@ def record_parked_motion(capture, framerate, width, height, device, directory, f
     background_subtractor = cv2.createBackgroundSubtractorMOG2() # Initialize the background subtractor for motion detection.
     process_timing("end", "Dashcam/Detection Motion")
 
-    process_timing("start", "Dashcam/Writing")
-    for frame in frame_history: # Iterate through each frame in the frame history.
-        write_frame(frame, device)
-    process_timing("end", "Dashcam/Writing")
-
 
     current_segment_name[device] = directory + "/predator_dashcam_" + str(round(utils.get_time())) + "_" + str(device) + "_0_P"
 
@@ -375,6 +383,12 @@ def record_parked_motion(capture, framerate, width, height, device, directory, f
         audio_filepath = current_segment_name[device] + "." + str(config["dashcam"]["capture"]["audio"]["extension"])
         audio_recorders[device] = subprocess.Popen((audio_record_command + " " + audio_filepath).split(" "), stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Start the next segment's audio recorder.
     process_timing("end", "Dashcam/Audio Processing")
+
+
+    process_timing("start", "Dashcam/Writing")
+    for frame in frame_history: # Iterate through each frame in the frame history.
+        write_frame(frame, device)
+    process_timing("end", "Dashcam/Writing")
 
     frames_captured = 0 # This is a placeholder that will keep track of how many frames are captured in this parked recording.
     capture_start_time = utils.get_time() # This stores the time that this parked recording started.
@@ -776,12 +790,14 @@ def start_dashcam_recording(dashcam_devices, directory, background=False): # Thi
 
 
 
+saving_active = False # This is a flag that will be changed to true when a dashcam segment save is triggered, and will be returned to false when the segment to save finishes. This is only used to update the corresponding overlay stamp.
 def dashcam_output_handler(directory, device, width, height, framerate):
     global calculated_framerate
     global frames_since_last_segment
     global frames_to_write
     global audio_recorders
     global recording_active
+    global saving_active
 
     if (os.path.isdir(config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"]) == False): # Check to see if the saved dashcam video folder needs to be created.
         os.system("mkdir -p '" + config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"] + "'") # Create the saved dashcam video directory.
@@ -807,7 +823,7 @@ def dashcam_output_handler(directory, device, width, height, framerate):
     output = cv2.VideoWriter(current_segment_name[device] + ".avi", cv2.VideoWriter_fourcc(*'XVID'), float(framerate), (width,  height)) # Initialize the first video output.
 
     while True:
-        time.sleep(0.001)
+        time.sleep(0.01)
 
         video_filepath = current_segment_name[device] + ".avi"
         audio_filepath = current_segment_name[device] + "." + config["dashcam"]["capture"]["audio"]["extension"]
@@ -838,17 +854,13 @@ def dashcam_output_handler(directory, device, width, height, framerate):
                     dashcam_segment_saving = threading.Thread(target=save_dashcam_segments, args=[audio_filepath, last_audio_file], name="DashcamSegmentSave") # Create the thread to save the current and last audio segments.
                     dashcam_segment_saving.start() # Start the dashcam segment saving thread.
             save_this_segment = True # This flag causes Predator to save this entire segment again when the next segment is started.
+            saving_active = True
             update_status_lighting("dashcam_save") # Run the function to update the status lighting.
 
         process_timing("end", "Dashcam/Interface Interactions")
 
 
-
-        for frame in frames_to_write[device]: # Iterate through each frame that needs to be written.
-            output.write(frame)
-        frames_to_write[device] = [] # Clear the frame buffer.
-
-
+        # ===== Handle the updating of the output file =====
         if (recording_active == True): # Check to see if recording is active before updating the output.
             if (previous_loop_segment_name != current_segment_name[device]): # Check to see if the current segment name has changed since the last loop (meaning a new segment has started).
                 last_segment_name = previous_loop_segment_name
@@ -897,7 +909,7 @@ def dashcam_output_handler(directory, device, width, height, framerate):
                             os.system("rm '" + base_file + ".avi'")
                             os.system("rm '" + base_file + "." + str(config["dashcam"]["capture"]["audio"]["extension"]) + "'")
                         else: # If the merged video file doesn't exist, it is likely something went wrong with the merging process.
-                            display_message("The merged video/audio file did exist when Predator tried to save it. It is likely the merge process has failed unexpectedly. The separate files are being saved as a fallback.", 3)
+                            display_message("The merged video/audio file did exist when Predator tried to save it. It is likely the merge process has failed unexpectedly. The separate files are being saved as a fallback.", 2)
                             dashcam_segment_saving = threading.Thread(target=save_dashcam_segments, args=[last_video_file, last_audio_path], name="DashcamSegmentSave") # Create the thread to save the dashcam segment. At this point, "last_video_file" is actually the completed previous video segment, since we just started a new segment.
                             dashcam_segment_saving.start() # Start the dashcam segment saving thread.
                     else: # If audio/video merging is disabled, then save the separate video and audio files.
@@ -907,11 +919,20 @@ def dashcam_output_handler(directory, device, width, height, framerate):
                             dashcam_segment_saving = threading.Thread(target=save_dashcam_segments, args=[last_audio_path], name="DashcamSegmentSave") # Create the thread to save the dashcam segment. At this point, "last_audio_path" is actually the completed previous video segment, since we just started a new segment.
                             dashcam_segment_saving.start() # Start the dashcam segment saving thread.
                     save_this_segment = False # Reset the segment saving flag.
+                    saving_active = False
                     update_status_lighting("normal") # Return status lighting to normal.
 
 
                 delete_old_segments() # Handle the erasing of any old dash-cam segments that need to be deleted.
+
             previous_loop_segment_name = current_segment_name[device] # Updated the previous segment name to be the current name, since we are about to restart the loop.
+
+
+        # ===== Check to see if any frames need to be written =====
+        for frame in frames_to_write[device]: # Iterate through each frame that needs to be written.
+            output.write(frame)
+        frames_to_write[device] = [] # Clear the frame buffer.
+
 
 
 

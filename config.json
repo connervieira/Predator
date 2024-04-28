@@ -199,7 +199,7 @@
                 },
                 "sensitivity": 0.2,
                 "timeout": 5,
-                "buffer": 60
+                "buffer": 30
             }
         },
         "notifications": {
@@ -253,6 +253,9 @@
                     "enabled": true,
                     "mode": "hybrid",
                     "precision": 1
+                },
+                "state": {
+                    "enabled": true
                 }
             },
             "gps": {

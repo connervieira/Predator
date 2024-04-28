@@ -23,20 +23,20 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Add the ability to disable dashcam capture devices from the configuration.
 - [X] Fix dashcam saving when the first segment is saved.
 - [X] Move status lighting configuration to general section.
+- [X] Add individual resolution configuration for dashcam capture devices.
+- [X] Add status light interfacing to dashcam mode.
+- [X] Test dashcam saving with audio recording.
+    - [X] Test when merging is enabled.
+    - [ ] Test when merging is disabled.
 - [ ] Test different output saving intervals.
 - [ ] Test background dash-cam recording.
-- [ ] Test dashcam saving with audio recording.
-    - [ ] Test when merging is enabled.
-    - [ ] Test when merging is disabled.
+- [ ] Add more stamp options to dash-cam mode.
+    - [ ] Add custom relay status stamps through GPIO.
+    - [X] Add dash-cam operation mode stamp.
+- [ ] Add remote motion detection alerts for dashcam mode via Reticulum.
 
 
 ## Hypothetical
 
 Features in this section may be added in the future, but are not actively planned.
 
-- [ ] Add more stamp options to dash-cam mode.
-    - [ ] Add custom relay status stamps through GPIO.
-    - [ ] Add dash-cam operation mode stamp.
-- [ ] Add individual resolution configuration for dashcam capture devices.
-- [ ] Add status light interfacing to dashcam mode.
-- [ ] Add remote motion detection alerts for dashcam mode via Reticulum.

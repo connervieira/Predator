@@ -281,6 +281,13 @@ This document describes the configuration values found `config.json`.
                         - "average" is the average frame-rate, calculated based on the number of frames captured in the previous segment.
                         - "hybrid" uses the short-term frame-rate, calculated by average frame-rate over a short period of time.
                 - `precision` is an integer number that determines how many decimal places the frame-rate will be displayed to.
+            - `state` contains settings for configuring if/how Predator shows the current operating mode as an overlay stamp.
+                - `enabled` is a boolean that determines if this overlay stamp is enabled.
+                - When enabled, this overlay stamp adds one of the following values to the overlay stamp:
+                    - "NN" for normal recording.
+                    - "NS" for normal recording when the current segment is being saved to the event folder.
+                    - "PD" for parked recording while the system is dormant, and waiting for motion to trigger recording.
+                    - "PA" for parked recording while the system is actively recording an event.
         - `gps` contains configuration values for the stamp shown at the top of the frame, containing location information.
             - `color` is a list of three values between 0 and 255 that determines the font cover of the overlay stamp.
                 - The first value represents red, the second value represents green, and the third value represents blue.

@@ -456,8 +456,11 @@ March 6th, 2024
             - Instead of creating each segment between the original time and new time, Predator skips to the next segment.
         - Predator will now attempt to resume recording if the video capture drops on a particular device.
         - A failure on a single capture device will no longer kill recording on other capture devices.
+        - Predator now shows a warning instead of an error when the merged audio/video file is missing at the end of a saved segment.
+            - This occurs when the audio recording process fails, and doesn't necessarily mean that the video capture has encountered a fatal problem.
     - Added diagnostic stamp, which is capable of displaying various pieces of technical information.
         - Added a frame-rate stamp, which shows the instantaneous frame-rate.
+        - Added a state stamp, which shows Predator's current operating mode.
     - Added configuration option to use a different audio recording device.
     - Added per-device resolution configuration.
     - Added the ability to disable capture devices without removing them from the configuration entirely.

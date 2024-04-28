@@ -330,19 +330,19 @@ if (config["general"]["interface_directory"] != ""): # Check to see if the inter
     state_file_location = config["general"]["interface_directory"] + "/state.json"
     save_to_file(state_file_location, "{}") # Save a blank placeholder dictionary to the state log file.
 
-gps_state = 0
+current_state = {}
 def update_state(mode, performance={}): # This is the function that is called to issue a state update.
+    global current_state
+    current_state["mode"] = mode
+    current_state["performance"] = performance
     if (config["general"]["interface_directory"] != ""): # Check to see if the interface directory is enabled.
-        global gps_state
-        current_state = {}
-        current_state["mode"] = mode
-        current_state["gps"] = gps_state
-        current_state["performance"] = performance
         state_update_thread = threading.Thread(target=update_state_file, args=[current_state], name="InterfaceStateUpdate")
         state_update_thread.start()
-
 def update_state_file(current_state): # This is the function that actually issues a status update to disk.
     save_to_file(state_file_location, json.dumps(current_state)) # Save the modified state to the disk as JSON data.
+def get_current_state():
+    global current_state
+    return current_state
 
 
 
@@ -627,7 +627,7 @@ elif (config["general"]["gps"]["enabled"] == True): # Check to see if GPS is ena
     gpsd.connect() # Connect to the GPS daemon.
 def get_gps_location():
     global gps_demo_gpx_data
-    global gps_state
+    global current_state
     global global_time_offset
     if (config["general"]["gps"]["enabled"] == True): # Check to see if GPS is enabled.
         if (len(config["general"]["gps"]["demo_file"]) > 0): # Check to see if there is a demo file set.
@@ -638,7 +638,7 @@ def get_gps_location():
             try:
                 gps_data_packet = gpsd.get_current() # Query the GPS for the most recent information.
 
-                gps_state = gps_data_packet.mode 
+                current_state["gps"] = gps_data_packet.mode 
                 if (gps_data_packet.mode >= 2): # Check to see if the GPS has a 2D fix yet.
                     try:
                         gps_time = datetime.datetime.strptime(str(gps_data_packet.time)[:-1]+"000" , '%Y-%m-%dT%H:%M:%S.%f').astimezone().timestamp() + timezone_offset # Determine the local Unix timestamp from the GPS timestamp.
