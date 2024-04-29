@@ -27,19 +27,18 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Add status light interfacing to dashcam mode.
 - [X] Test dashcam saving with audio recording.
     - [X] Test when merging is enabled.
-    - [ ] Test when merging is disabled.
-- [ ] Test different output saving intervals.
-- [ ] Test background dash-cam recording.
-- [ ] Add more stamp options to dash-cam mode.
-    - [ ] Add custom relay status stamps through GPIO.
-    - [X] Add dash-cam operation mode stamp.
-- [ ] Add remote motion detection alerts for dashcam mode via Reticulum.
+    - [X] Test when merging is disabled.
+- [X] Test different output saving intervals.
+- [X] Test background dash-cam recording.
+- [X] Add remote motion detection alerts for dashcam mode via Reticulum.
 - [X] Test configuration updates.
     - [X] Test config file reconciliation behavior.
     - [X] Test config behavior from sub-directories.
+- [X] Add dash-cam operation mode stamp.
 
 
 ## Hypothetical
 
 Features in this section may be added in the future, but are not actively planned.
 
+- [ ] Add custom relay status stamps through GPIO.
