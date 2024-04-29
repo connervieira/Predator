@@ -34,9 +34,9 @@ These are the features actively planned for Predator and are likely to be added 
     - [ ] Add custom relay status stamps through GPIO.
     - [X] Add dash-cam operation mode stamp.
 - [ ] Add remote motion detection alerts for dashcam mode via Reticulum.
-- [ ] Test configuration updates.
-    - [ ] Test config file reconciliation behavior.
-    - [ ] Test config behavior from sub-directories.
+- [X] Test configuration updates.
+    - [X] Test config file reconciliation behavior.
+    - [X] Test config behavior from sub-directories.
 
 
 ## Hypothetical

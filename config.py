@@ -11,6 +11,7 @@
 
 import os # Required to interact with certain operating system functions
 import json # Required to process JSON data
+import time
 
 
 config_default_filepath = "./assets/support/configdefault.json"
@@ -32,7 +33,9 @@ if (os.path.exists(config_active_filepath) == False): # Check to see if the acti
     fh.close()
 
 import utils
+style = utils.style
 debug_message = utils.debug_message
+display_message = utils.display_message
 is_json = utils.is_json
 save_to_file = utils.save_to_file
 
@@ -42,7 +45,7 @@ def load_config(file_override=""):
         configuration_file_path = file_override
     else:
         if (os.path.exists(config_active_filepath) == True): # Check to see if the configuration file exists in the default location.
-            configuration_file_path = predator_root_directory + "/config.json"
+            configuration_file_path = config_active_filepath
         else: # The configuration file couldn't be located. Assassin can't continue to load.
             config = {} # Set the configuration to a blank placeholder dictionary.
             print("The configuration file could not be located from " + str(os.path.realpath(__file__)))
@@ -210,7 +213,7 @@ def del_nested_value(index, data):
     elif (len(index) == 10):
         del data[index[0]][index[1]][index[2]][index[3]][index[4]][index[5]][index[6]][index[7]][index[8]][index[9]]
     else:
-        display_notice("The del_nested_value() function was called with an index of unexpected length", 3)
+        display_message("The del_nested_value() function was called with an index of unexpected length", 3)
 
     return data
 
@@ -236,7 +239,7 @@ def set_nested_value(index, data, value):
     elif (len(index) == 10):
         data[index[0]][index[1]][index[2]][index[3]][index[4]][index[5]][index[6]][index[7]][index[8]][index[9]] = value
     else:
-        display_notice("The set_nested_value() function was called with an index of unexpected length", 3)
+        display_message("The set_nested_value() function was called with an index of unexpected length", 3)
 
     return data
 
@@ -301,7 +304,7 @@ def highest_different_index(config_active, config_default, index): # This functi
             elif (len(index) == 10):
                 test = config_active[index[0]][index[1]][index[2]][index[3]][index[4]][index[5]][index[6]][index[7]][index[8]][index[9]]
             else:
-                display_notice("The highest_different_index() function was called with an index of unexpected length", 3)
+                display_message("The highest_different_index() function was called with an index of unexpected length", 3)
 
             if (last_index != ""):
                 index.append(last_index)
@@ -351,17 +354,21 @@ def update_config():
     extra_values = check_defaults_extra(config_default, config_active)
 
     if (len(missing_values) > 0):
-        print("The following values were present in the default configuration, but not the active configuration. They may have been added in an update. The default values have been inserted into the active configuration.")
+        print(style.yellow + "The following values were present in the default configuration, but not the active configuration. They may have been added in an update. The default values have been inserted into the active configuration." + style.end)
         for value in missing_values:
             print("    " + '>'.join(map(str, value)))
+        print(style.faint + "Continuing in 5 seconds" + style.end)
+        time.sleep(5)
 
     if (len(extra_values) > 0):
-        print("The following values were present in the active configuration, but not the default configuration. They may have been removed in an update. These values have been removed from the active configuration.")
+        print(style.yellow + "The following values were present in the active configuration, but not the default configuration. They may have been removed in an update. These values have been removed from the active configuration." + style.end)
         for value in extra_values:
             index = highest_different_index(config_default, config_active, value)
             if (get_nested_value(index, config_active) != None): # Check to see if this index hasn't already been removed.
                 print("    " + '>'.join(map(str, index)))
                 config_active = del_nested_value(index, config_active)
+        print(style.faint + "Continuing in 5 seconds" + style.end)
+        time.sleep(5)
     save_to_file(config_active_filepath, json.dumps(config_active, indent=4))
 
 

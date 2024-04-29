@@ -137,10 +137,13 @@ def process_timing(action, identifier):
 
 import subprocess # Required for starting some shell commands
 import sys
-if (config["developer"]["offline"] == False): # Only import networking libraries if offline mode is turned off.
-    if (config["general"]["status_lighting"]["enabled"] == True or config["realtime"]["push_notifications"]["enabled"] == True or len(config["general"]["alerts"]["databases"]) > 0):
-        import requests # Required to make network requests
-        import validators # Required to validate URLs
+try:
+    if (config["developer"]["offline"] == False): # Only import networking libraries if offline mode is turned off.
+        if (config["general"]["status_lighting"]["enabled"] == True or config["realtime"]["push_notifications"]["enabled"] == True or len(config["general"]["alerts"]["databases"]) > 0):
+            import requests # Required to make network requests
+            import validators # Required to validate URLs
+except:
+    print("Failed to determine if network features are enabled in the configuration.")
 import re # Required to use Regex
 import datetime # Required for converting between timestamps and human readable date/time information
 from xml.dom import minidom # Required for processing GPX data
@@ -165,7 +168,8 @@ if (config["general"]["interface_directory"] != ""): # Check to see if the inter
 # Define the function that will be used to clear the screen.
 def clear(force=False):
     if (config["general"]["display"]["debugging_output"] == False or force == True): # Only clear the console if the debugging output configuration value is disabled.
-        os.system("clear")
+        if ("--headless" not in sys.argv): # Only clear the console if Predator is not operating in headless mode.
+            os.system("clear")
 
 
 
