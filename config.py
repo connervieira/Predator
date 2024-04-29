@@ -12,22 +12,37 @@
 import os # Required to interact with certain operating system functions
 import json # Required to process JSON data
 
-assassin_root_directory = str(os.path.dirname(os.path.realpath(__file__)))
+
+config_default_filepath = "./assets/support/configdefault.json"
+config_outline_filepath = "./assets/support/configoutline.json"
+config_active_filepath = "./config.json"
+
+if (os.path.exists("./config.json") == False):
+    if (os.path.exists("../config.json") == True):
+        config_active_filepath = "../config.json"
+        config_default_filepath = "../assets/support/configdefault.json"
+        config_outline_filepath = "../assets/support/configoutline.json"
+
+if (os.path.exists(config_active_filepath) == False): # Check to see if the active config filed doesn't exit.
+    # Copy the default config file as the active config file.
+    with open(config_default_filepath) as configuration_file: config_default= configuration_file.read()
+
+    fh = open(config_active_filepath, 'w')
+    fh.write(config_default)
+    fh.close()
 
 import utils
 debug_message = utils.debug_message
 is_json = utils.is_json
-
+save_to_file = utils.save_to_file
 
 
 def load_config(file_override=""):
     if (file_override != ""):
         configuration_file_path = file_override
     else:
-        if (os.path.exists(str(assassin_root_directory + "/config.json")) == True): # Check to see if the configuration file exists in the default location.
-            configuration_file_path = assassin_root_directory + "/config.json"
-        elif (os.path.exists(str(assassin_root_directory + "/../config.json")) == True): # Check to see if the configuration file exists in the parent directory. This may occur if this script is being used in a subfolder of Assassin.
-            configuration_file_path = assassin_root_directory + "/../config.json"
+        if (os.path.exists(config_active_filepath) == True): # Check to see if the configuration file exists in the default location.
+            configuration_file_path = predator_root_directory + "/config.json"
         else: # The configuration file couldn't be located. Assassin can't continue to load.
             config = {} # Set the configuration to a blank placeholder dictionary.
             print("The configuration file could not be located from " + str(os.path.realpath(__file__)))
@@ -41,7 +56,6 @@ def load_config(file_override=""):
         config = {} # Set the configuration to a blank placeholder dictionary.
         print("The configuration file found at " + configuration_file_path + " does not appear to be valid JSON.")
         exit()
-
 
     return config # Return the loaded configuration information.
 
@@ -98,7 +112,7 @@ def check_value(value, template):
 
 
 def validate_config(config):
-    config_outline = load_config("./assets/support/configoutline.json")
+    config_outline = load_config(config_outline_filepath)
 
     invalid_values = []
 
@@ -173,5 +187,184 @@ def validate_config(config):
 
 
 
-config = load_config() # Execute the configuration loading.
 
+def del_nested_value(index, data):
+    if (len(index) == 1):
+        del data[index[0]]
+    elif (len(index) == 2):
+        del data[index[0]][index[1]]
+    elif (len(index) == 3):
+        del data[index[0]][index[1]][index[2]]
+    elif (len(index) == 4):
+        del data[index[0]][index[1]][index[2]][index[3]]
+    elif (len(index) == 5):
+        del data[index[0]][index[1]][index[2]][index[3]][index[4]]
+    elif (len(index) == 6):
+        del data[index[0]][index[1]][index[2]][index[3]][index[4]][index[5]]
+    elif (len(index) == 7):
+        del data[index[0]][index[1]][index[2]][index[3]][index[4]][index[5]][index[6]]
+    elif (len(index) == 8):
+        del data[index[0]][index[1]][index[2]][index[3]][index[4]][index[5]][index[6]][index[7]]
+    elif (len(index) == 9):
+        del data[index[0]][index[1]][index[2]][index[3]][index[4]][index[5]][index[6]][index[7]][index[8]]
+    elif (len(index) == 10):
+        del data[index[0]][index[1]][index[2]][index[3]][index[4]][index[5]][index[6]][index[7]][index[8]][index[9]]
+    else:
+        display_notice("The del_nested_value() function was called with an index of unexpected length", 3)
+
+    return data
+
+def set_nested_value(index, data, value):
+    if (len(index) == 1):
+        data[index[0]] = value
+    elif (len(index) == 2):
+        data[index[0]][index[1]] = value
+    elif (len(index) == 3):
+        data[index[0]][index[1]][index[2]] = value
+    elif (len(index) == 4):
+        data[index[0]][index[1]][index[2]][index[3]] = value
+    elif (len(index) == 5):
+        data[index[0]][index[1]][index[2]][index[3]][index[4]] = value
+    elif (len(index) == 6):
+        data[index[0]][index[1]][index[2]][index[3]][index[4]][index[5]] = value
+    elif (len(index) == 7):
+        data[index[0]][index[1]][index[2]][index[3]][index[4]][index[5]][index[6]] = value
+    elif (len(index) == 8):
+        data[index[0]][index[1]][index[2]][index[3]][index[4]][index[5]][index[6]][index[7]] = value
+    elif (len(index) == 9):
+        data[index[0]][index[1]][index[2]][index[3]][index[4]][index[5]][index[6]][index[7]][index[8]] = value
+    elif (len(index) == 10):
+        data[index[0]][index[1]][index[2]][index[3]][index[4]][index[5]][index[6]][index[7]][index[8]][index[9]] = value
+    else:
+        display_notice("The set_nested_value() function was called with an index of unexpected length", 3)
+
+    return data
+
+
+def get_nested_value(index, data):
+    if (type(data) == dict and len(index) > 0):
+        if (index[0] in data): # Check to see if this key exists in the data.
+            next_data = data[index[0]]
+            return get_nested_value(index[1:], next_data)
+        else:
+            return None
+    else:
+        return data
+
+def print_nested_array(data, index=[]):
+    if (type(data) == dict):
+        for key, section in data.items():
+            new_index = index.copy()
+            new_index.append(key)
+            print_nested_array(section, new_index)
+    else:
+        for key in index:
+            print(str(key) + ">", end='')
+        print(str(data))
+
+def check_defaults_changed(config_defaults, config_active, index=[]):
+    if (type(config_defaults) == dict):
+        for key, section in config_defaults.items():
+            new_index = index.copy()
+            new_index.append(key)
+            check_defaults_changed(section, config_active, new_index)
+    else:
+        config_active_value = get_nested_value(index, config_active)
+        if (config_defaults != config_active_value): # Check to see if this value in the active configuration has been changed from the default.
+            print("The following configuration value has been changed from the default: ", end='')
+            for key in index:
+                print(str(key) + ">", end='')
+            print("") # Print a line break
+
+def highest_different_index(config_active, config_default, index): # This function recursive moves to higher and higher level indexes until one that exists in both the default config and active config is found.
+    last_index = ""
+    for i in range(0, len(index)): # Run once for each level of the index.
+        try:
+            if (len(index) == 1):
+                test = config_active[index[0]]
+            elif (len(index) == 2):
+                test = config_active[index[0]][index[1]]
+            elif (len(index) == 3):
+                test = config_active[index[0]][index[1]][index[2]]
+            elif (len(index) == 4):
+                test = config_active[index[0]][index[1]][index[2]][index[3]]
+            elif (len(index) == 5):
+                test = config_active[index[0]][index[1]][index[2]][index[3]][index[4]]
+            elif (len(index) == 6):
+                test = config_active[index[0]][index[1]][index[2]][index[3]][index[4]][index[5]]
+            elif (len(index) == 7):
+                test = config_active[index[0]][index[1]][index[2]][index[3]][index[4]][index[5]][index[6]]
+            elif (len(index) == 8):
+                test = config_active[index[0]][index[1]][index[2]][index[3]][index[4]][index[5]][index[6]][index[7]]
+            elif (len(index) == 9):
+                test = config_active[index[0]][index[1]][index[2]][index[3]][index[4]][index[5]][index[6]][index[7]][index[8]]
+            elif (len(index) == 10):
+                test = config_active[index[0]][index[1]][index[2]][index[3]][index[4]][index[5]][index[6]][index[7]][index[8]][index[9]]
+            else:
+                display_notice("The highest_different_index() function was called with an index of unexpected length", 3)
+
+            if (last_index != ""):
+                index.append(last_index)
+            return index
+        except KeyError:
+            last_index = index[-1]
+            del index[-1] # Move one level up from the index.
+
+    return []
+
+
+# This function checks for values that exist in the default config that aren't present in the active config.
+def check_defaults_missing(config_defaults, config_active, index=[], missing_values=[]):
+    if (type(config_defaults) == dict):
+        for key, section in config_defaults.items():
+            new_index = index.copy()
+            new_index.append(key)
+            config_active, missing_values = check_defaults_missing(section, config_active, new_index, missing_values)
+    else:
+        config_active_value = get_nested_value(index, config_active)
+        if (config_active_value == None):
+            index_to_set = highest_different_index(config_active, config_defaults, index)
+            default_value = get_nested_value(index_to_set, load_config(config_default_filepath))
+            config_active = set_nested_value(index_to_set, config_active, default_value)
+            missing_values.append(index)
+    return config_active, missing_values
+
+# This function checks for values that exist on the active config that aren't present in the default config.
+def check_defaults_extra(config_defaults, config_active, index=[], extra_values=[]):
+    if (type(config_active) == dict):
+        for key, section in config_active.items():
+            new_index = index.copy()
+            new_index.append(key)
+            extra_values = check_defaults_extra(config_defaults, section, new_index)
+    else:
+        config_default_value = get_nested_value(index, config_defaults)
+        if (config_default_value == None):
+            extra_values.append(index)
+    return extra_values
+
+# This function checks the active config file against the default config file, and attempts to reconcile any differences. Irreconcileable differences will cause Predator to exit, and a notice will be displayed.
+def update_config():
+    config_default = load_config(config_default_filepath)
+    config_active = load_config(config_active_filepath)
+
+    config_active, missing_values = check_defaults_missing(config_default, config_active)
+    extra_values = check_defaults_extra(config_default, config_active)
+
+    if (len(missing_values) > 0):
+        print("The following values were present in the default configuration, but not the active configuration. They may have been added in an update. The default values have been inserted into the active configuration.")
+        for value in missing_values:
+            print("    " + '>'.join(map(str, value)))
+
+    if (len(extra_values) > 0):
+        print("The following values were present in the active configuration, but not the default configuration. They may have been removed in an update. These values have been removed from the active configuration.")
+        for value in extra_values:
+            index = highest_different_index(config_default, config_active, value)
+            if (get_nested_value(index, config_active) != None): # Check to see if this index hasn't already been removed.
+                print("    " + '>'.join(map(str, index)))
+                config_active = del_nested_value(index, config_active)
+    save_to_file(config_active_filepath, json.dumps(config_active, indent=4))
+
+
+
+update_config()
+config = load_config() # Execute the configuration loading.

@@ -327,7 +327,7 @@ This document describes the configuration values found `config.json`.
     - `dashcam_saving_queue_overflow` is a positive integer number that determines how many frames can be stacked up in the queue to be written to disk before a warning is triggered.
         - If the storage medium being used to store dash-cam videos is particularly slow, the video capture might out-run writing the video to disk.
         - If the video capture is faster than the video writing, then the queue will continuously grow until video capture is stopped. As such, you can safely set this value to something fairly high without worrying about missing warnings.
-        - Ideally, the queue size will never exceed 1 frame, but it may occasionally reach higher values in between segments.
+        - Ideally, the queue size will never exceed 1 frame during normal recording, but it may occasionally reach higher values in between segments. However, if buffered parked recording is enabled, then the size of the frame queue will briefly match the size of the frame buffer. As such, you should make sure this value is set higher than the parked recording frame buffer configuration value.
     - `dashcam_shortterm_framerate_interval` is a positive decimal number that determines the interval (in seconds) over which Predator will calculate the short-term frame-rate.
         - Higher (longer) values will cause the short-term frame-rate to be more accurate, while lower (shorter) values will cause the short-term frame-rate to update more frequently.
         - This short-term frame-rate is currently only used for visual purposes, and does not effect output files.
