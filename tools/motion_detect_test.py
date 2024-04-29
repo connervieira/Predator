@@ -16,7 +16,12 @@ except:
     print("The configuration database couldn't be loaded. It may be corrupted.")
     exit()
 
-device = "external"
+device = "main"
+
+if (device not in config["dashcam"]["capture"]["video"]["devices"]):
+    print("The specified device does not exist in the configuration. Be sure to change the 'device' variable in the motion_detect_test.py file to the device you want to test.")
+    exit()
+
 resolution = [config["dashcam"]["capture"]["video"]["devices"][device]["resolution"]["width"], config["dashcam"]["capture"]["video"]["devices"][device]["resolution"]["height"]] # This determines the resolution that will be used for the video capture device.
 capture = cv2.VideoCapture(config["dashcam"]["capture"]["video"]["devices"][device]["index"]); # Open the video capture device.
 codec = list(config["dashcam"]["capture"]["video"]["devices"][device]["codec"])
