@@ -53,6 +53,11 @@ if (config["dashcam"]["notifications"]["reticulum"]["enabled"] == True): # Check
 import lighting # Import the lighting.py script.
 update_status_lighting = lighting.update_status_lighting # Load the status lighting update function from the lighting script.
 
+for stamp in config["dashcam"]["stamps"]["relay"]["triggers"]: # Check to see if there are any GPIO relay stamps active.
+    if (config["dashcam"]["stamps"]["relay"]["triggers"][stamp]["enabled"] == True): # Check to see if at least one relay stamp is enabled.
+        from gpiozero import Button # Import GPIOZero
+        break # Exit the loop, since GPIOZero has already been imported.
+
 
 
 if (config["dashcam"]["saving"]["looped_recording"]["mode"] == "manual"): # Only validate the manual history length if manual looped recording mode is enabled.
@@ -244,6 +249,11 @@ def save_dashcam_segments(file1, file2=""):
     process_timing("end", "Dashcam/File Maintenance")
 
 
+relay_triggers = {}
+for stamp in config["dashcam"]["stamps"]["relay"]["triggers"]:
+    if (config["dashcam"]["stamps"]["relay"]["triggers"][stamp]["enabled"] == True): # Check to see if this relay stamp is enabled.
+        relay_trigger[stamp] = Button(int(config["dashcam"]["stamps"]["relay"]["triggers"][stamp]["pin"]))
+
 
 def apply_dashcam_stamps(frame, device=""):
     global instant_framerate
@@ -291,6 +301,21 @@ def apply_dashcam_stamps(frame, device=""):
                 diagnostic_stamp = diagnostic_stamp + "PD"
             elif (current_state["mode"] == "dashcam/parked_active"):
                 diagnostic_stamp = diagnostic_stamp + "PA"
+
+
+    if (config["dashcam"]["stamps"]["relay"]["enabled"] == True): # Check to see if relay stamp features are enabled before processing the relay stamp.
+        stamp_number = 0
+        for stamp in config["dashcam"]["stamps"]["relay"]["triggers"]:
+            if (config["dashcam"]["stamps"]["relay"]["triggers"][stamp]["enabled"] == True): # Check to see if this relay stamp is enabled.
+                if (relay_trigger[stamp].is_pressed): # Check to see if the relay is triggered.
+                    relay_stamp_color = config["dashcam"]["stamps"]["relay"]["color"]["on"]
+                else:
+                    relay_stamp_color = config["dashcam"]["stamps"]["relay"]["color"]["off"]
+                relay_stamp = config["dashcam"]["stamps"]["relay"]["triggers"][stamp]["text"] # Set the relay stamp text to a blank placeholder. Elements will be added to this in the next steps.
+                (label_width, label_height), baseline = cv2.getTextSize(relay_stamp, 2, config["dashcam"]["stamps"]["size"], 1)
+                relay_stamp_position = [width - 10 - label_width, (30 * stamp_number) + round(30 * config["dashcam"]["stamps"]["size"])] # Determine where the diagnostic overlay stamp should be positioned in the video stream.
+                cv2.putText(frame, relay_stamp, (relay_stamp_position[0], relay_stamp_position[1]), 2, config["dashcam"]["stamps"]["size"], (relay_stamp_color[2], relay_stamp_color[1], relay_stamp_color[0])) # Add the relay overlay stamp to the video stream.
+                stamp_number += 1
 
 
     gps_stamp_position = [10, 30] # Determine where the GPS overlay stamp should be positioned in the video stream.

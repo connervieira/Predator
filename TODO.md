@@ -34,11 +34,12 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Test configuration updates.
     - [X] Test config file reconciliation behavior.
     - [X] Test config behavior from sub-directories.
-- [X] Add dash-cam operation mode stamp.
-
+- [X] Add more dash-cam stamps.
+    - [X] Add dash-cam operation mode stamp.
+    - [X] Add custom relay status stamps through GPIO.
+- [X] Add default config support for values that involve adding entries.
 
 ## Hypothetical
 
 Features in this section may be added in the future, but are not actively planned.
 
-- [ ] Add custom relay status stamps through GPIO.

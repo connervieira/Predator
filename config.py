@@ -316,33 +316,37 @@ def highest_different_index(config_active, config_default, index): # This functi
     return []
 
 
+ignore_indexes = [["realtime", "image", "camera", "devices"], ["dashcam", "stamps", "relay", "triggers"], ["dashcam", "capture", "video", "devices"]] # Configure values specified here will not be checked by the check_defaults_missing() and check_defaults_extra() functions.
+
 # This function checks for values that exist in the default config that aren't present in the active config.
 def check_defaults_missing(config_defaults, config_active, index=[], missing_values=[]):
-    if (type(config_defaults) == dict):
-        for key, section in config_defaults.items():
-            new_index = index.copy()
-            new_index.append(key)
-            config_active, missing_values = check_defaults_missing(section, config_active, new_index, missing_values)
-    else:
-        config_active_value = get_nested_value(index, config_active)
-        if (config_active_value == None):
-            index_to_set = highest_different_index(config_active, config_defaults, index)
-            default_value = get_nested_value(index_to_set, load_config(config_default_filepath))
-            config_active = set_nested_value(index_to_set, config_active, default_value)
-            missing_values.append(index)
+    if (index not in ignore_indexes): # Only continue if the specified index is not ignored.
+        if (type(config_defaults) == dict):
+            for key, section in config_defaults.items():
+                new_index = index.copy()
+                new_index.append(key)
+                config_active, missing_values = check_defaults_missing(section, config_active, new_index, missing_values)
+        else:
+            config_active_value = get_nested_value(index, config_active)
+            if (config_active_value == None):
+                index_to_set = highest_different_index(config_active, config_defaults, index)
+                default_value = get_nested_value(index_to_set, load_config(config_default_filepath))
+                config_active = set_nested_value(index_to_set, config_active, default_value)
+                missing_values.append(index)
     return config_active, missing_values
 
 # This function checks for values that exist on the active config that aren't present in the default config.
 def check_defaults_extra(config_defaults, config_active, index=[], extra_values=[]):
-    if (type(config_active) == dict):
-        for key, section in config_active.items():
-            new_index = index.copy()
-            new_index.append(key)
-            extra_values = check_defaults_extra(config_defaults, section, new_index)
-    else:
-        config_default_value = get_nested_value(index, config_defaults)
-        if (config_default_value == None):
-            extra_values.append(index)
+    if (index not in ignore_indexes): # Only continue if the specified index is not ignored.
+        if (type(config_active) == dict):
+            for key, section in config_active.items():
+                new_index = index.copy()
+                new_index.append(key)
+                extra_values = check_defaults_extra(config_defaults, section, new_index)
+        else:
+            config_default_value = get_nested_value(index, config_defaults)
+            if (config_default_value == None):
+                extra_values.append(index)
     return extra_values
 
 # This function checks the active config file against the default config file, and attempts to reconcile any differences. Irreconcileable differences will cause Predator to exit, and a notice will be displayed.

@@ -223,6 +223,14 @@
                     "enabled": "bool"
                 }
             },
+            "relay": {
+                "enabled": "bool",
+                "colors": {
+                    "on": "list",
+                    "off": "list"
+                },
+                "triggers": "dict"
+            },
             "gps": {
                 "color": "list",
                 "location": {

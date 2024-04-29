@@ -227,9 +227,9 @@
             "size": 0.8,
             "main": {
                 "color": [
-                    255,
-                    255,
-                    255
+                    0,
+                    0,
+                    0
                 ],
                 "unix_time": {
                     "enabled": false
@@ -256,6 +256,29 @@
                 },
                 "state": {
                     "enabled": true
+                }
+            },
+            "relay": {
+                "enabled": true,
+                "colors": {
+                    "on": [
+                        255,
+                        0,
+                        0
+                    ],
+                    "off": [
+                        0,
+                        0,
+                        0
+                    ]
+                },
+                "triggers": {
+                    "horn": {
+                        "enabled": true,
+                        "pin": 0,
+                        "invert": false,
+                        "text": "HORN"
+                    }
                 }
             },
             "gps": {
