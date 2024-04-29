@@ -431,7 +431,11 @@ March 6th, 2024
 - Warnings now wait for user input before continuing, just like errors.
 
 
-## Version 10.1
+## Version 11.0
+
+### Reliability Update
+
+This update focuses on improving the reliability of Predator, especially when operating in dash-cam mode.
 
 *Release date to be determined*
 
@@ -467,3 +471,5 @@ March 6th, 2024
     - Predator now changes the status light color when a video is being locked.
     - Added standalone tool for triggering dashcam saving via a GPIO input.
 - Moved the status lighting configuration to the "general" section.
+- Updated configuration back-end.
+    - Predator can now automatically update the configuration file between versions when configuration values are added or removed.

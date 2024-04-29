@@ -14,6 +14,8 @@ This is the most technical step in updating Predator. There are a few different 
 
 ### Automatic (Recommended)
 
+Predator versions 12.0 and later can automatically reconcile differences between the existing configuration file and the default configuration from the new version. To use this feature, simply update Predator, leaving your existing `config.json` file in place. On first start-up, Predator will compare the active configuration file with the version's default, and reconcile differences. Values that only exist in the active configuration will be removed. Values that only exist in the default configuration file will be added to the active configuration.
+
 ### Refresh
 
 The most reliable way to update your configuration is to simply replace it with the default `assets/support/configdefault.json` file from the new version of Predator, and manually copy over the important values from your old configuration file. This method makes it much less likely that you'll accidentally use an incompatible configuration file.
