@@ -369,7 +369,8 @@ def update_config():
                 config_active = del_nested_value(index, config_active)
         print(style.faint + "Continuing in 5 seconds" + style.end)
         time.sleep(5)
-    save_to_file(config_active_filepath, json.dumps(config_active, indent=4))
+    if (config_active != load_config(config_active_filepath)): # Check to see if the configuration has been modified.
+        save_to_file(config_active_filepath, json.dumps(config_active, indent=4)) # Save the updated configuration.
 
 
 
