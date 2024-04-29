@@ -97,9 +97,10 @@ def manage_time_offset(): # This function watches the system time, and reset the
         start_time = time.time()
         time.sleep(1) # Wait for 1 second before checking the time again.
         end_time = time.time()
-        if (abs(end_time - start_time) - 1 > 0.5): # Check to see if the system time changed by more than half a second.
-            global_time_offset = 0 # Reset the global time offset.
-            display_message("The system time appears to have been changed. The global time offset has been reset.", 2)
+        difference_time = (end_time - start_time) - 1
+        if (abs(difference_time) > 0.5): # Check to see if the system time changed by more than half a second.
+            global_time_offset = global_time_offset - difference_time # Reset the global time offset.
+            display_message("The system time appears to have been changed. The global time offset has been updated.", 2)
 time_offset_management_thread = threading.Thread(target=manage_time_offset, name="TimeOffsetManager") # Create the time offset manager thread.
 time_offset_management_thread.start() # Start the time offset.
 

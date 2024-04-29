@@ -12,9 +12,11 @@ After downloading the new version of Predator, you should check its documentatio
 
 This is the most technical step in updating Predator. There are a few different ways to go about moving your configuration to a different version of Predator.
 
-### Refresh (Recommended)
+### Automatic (Recommended)
 
-The easiest (and recommended) way to update your configuration is to simply replace it with the default `config.json` file from the new version of Predator, and manually copy over the important values from your old configuration file. This method makes it much less likely that you'll accidentally use an incompatible configuration file.
+### Refresh
+
+The most reliable way to update your configuration is to simply replace it with the default `assets/support/configdefault.json` file from the new version of Predator, and manually copy over the important values from your old configuration file. This method makes it much less likely that you'll accidentally use an incompatible configuration file.
 
 ### Brute Force
 
