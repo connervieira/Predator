@@ -259,12 +259,12 @@
                 }
             },
             "relay": {
-                "enabled": true,
+                "enabled": false,
                 "colors": {
                     "on": [
                         255,
-                        0,
-                        0
+                        128,
+                        128
                     ],
                     "off": [
                         0,
@@ -274,7 +274,7 @@
                 },
                 "triggers": {
                     "horn": {
-                        "enabled": true,
+                        "enabled": false,
                         "pin": 0,
                         "invert": false,
                         "text": "HORN"

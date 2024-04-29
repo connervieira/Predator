@@ -252,7 +252,7 @@ def save_dashcam_segments(file1, file2=""):
 relay_triggers = {}
 for stamp in config["dashcam"]["stamps"]["relay"]["triggers"]:
     if (config["dashcam"]["stamps"]["relay"]["triggers"][stamp]["enabled"] == True): # Check to see if this relay stamp is enabled.
-        relay_trigger[stamp] = Button(int(config["dashcam"]["stamps"]["relay"]["triggers"][stamp]["pin"]))
+        relay_triggers[stamp] = Button(int(config["dashcam"]["stamps"]["relay"]["triggers"][stamp]["pin"]))
 
 
 def apply_dashcam_stamps(frame, device=""):
@@ -307,10 +307,10 @@ def apply_dashcam_stamps(frame, device=""):
         stamp_number = 0
         for stamp in config["dashcam"]["stamps"]["relay"]["triggers"]:
             if (config["dashcam"]["stamps"]["relay"]["triggers"][stamp]["enabled"] == True): # Check to see if this relay stamp is enabled.
-                if (relay_trigger[stamp].is_pressed): # Check to see if the relay is triggered.
-                    relay_stamp_color = config["dashcam"]["stamps"]["relay"]["color"]["on"]
+                if (relay_triggers[stamp].is_pressed): # Check to see if the relay is triggered.
+                    relay_stamp_color = config["dashcam"]["stamps"]["relay"]["colors"]["on"]
                 else:
-                    relay_stamp_color = config["dashcam"]["stamps"]["relay"]["color"]["off"]
+                    relay_stamp_color = config["dashcam"]["stamps"]["relay"]["colors"]["off"]
                 relay_stamp = config["dashcam"]["stamps"]["relay"]["triggers"][stamp]["text"] # Set the relay stamp text to a blank placeholder. Elements will be added to this in the next steps.
                 (label_width, label_height), baseline = cv2.getTextSize(relay_stamp, 2, config["dashcam"]["stamps"]["size"], 1)
                 relay_stamp_position = [width - 10 - label_width, (30 * stamp_number) + round(30 * config["dashcam"]["stamps"]["size"])] # Determine where the diagnostic overlay stamp should be positioned in the video stream.
