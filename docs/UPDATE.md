@@ -33,4 +33,4 @@ If you run into problems, and want to completely reset Predator and start fresh,
 
 1. Erase the contents of the working directory (as defined in `config.json` under `general>working_directory`).
 2. Erase the contents of the interface directory (as defined in `config.json` under `general>interface_directory`).
-3. Replace the `config.json` file with the default `config.json` file that comes with the new version of Predator.
+3. Replace the `config.json` file with the default `assets/support/configdefault.json` file that comes with the new version of Predator.
