@@ -43,6 +43,11 @@ for time in plate_log.keys():
     human_date = datetime.datetime.fromtimestamp(float(time)).strftime('%Y-%m-%d %H:%M:%S')
     for plate in plate_log[time]["plates"].keys():
         csv_line = human_date + "," + plate
+        if (len(plate_log[time]["plates"][plate]["alerts"]) > 0): # Check to see if this plate was associated with any alerts.
+            csv_line = csv_line + ",true"
+        else:
+            csv_line = csv_line + ",false"
+        csv_line = csv_line + "," + str(plate_log[time]["location"]["lat"]) + "," + str(plate_log[time]["location"]["lon"])
         csv_contents += csv_line + "\n"
 
 print(csv_contents)
