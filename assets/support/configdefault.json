@@ -144,6 +144,8 @@
         "saving": {
             "directory": "saved_dashcam",
             "trigger": "dashcam_lock_trigger",
+            "trigger_gpio": {
+            },
             "segment_length": 60,
             "looped_recording": {
                 "mode": "manual",

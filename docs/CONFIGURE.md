@@ -185,7 +185,11 @@ This document describes the configuration values found `config.json`.
         - `trigger` is the name of a file inside the interface directory that will trigger Predator to save the current and previous dashcam segments.
             - To trigger a save, create this file in the interface directory. Predator will save the video then automatically remove the trigger file.
             - When this file is created, Predator will immediately save the previous and current dashcam video segments. Once the current segment is done recording, Predator will re-save it, such that the saved video doesn't cut off at the moment the saved was triggered.
-                - If Predator is terminated between the initial save and the second save, only video captured after the save trigger shouldn't be saved.
+                - If Predator is terminated between the initial save and the second save, only video captured after the save trigger won't be saved.
+        - `trigger_gpio` contains GPIO pins that will be monitored for button presses to create the dashcam save trigger file.
+            - This allows hardwired buttons to trigger dashcam video saves.
+            - Each entry in this configuration section uses the GPIO pin number as a key, and contains the following values:
+                - `name` is a human friendly name for the pin, and can be set to any plain text string.
         - `segment_length` is a number that sets how many seconds long each video segment will be before another segment is created.
         - `looped_recording` contains settings that control how and when Predator will erase old dashcam segments to make space for new ones.
             - `mode` determines the method by which Predator determines how to erase old files. This can only be set to one of 3 strings:

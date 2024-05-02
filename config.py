@@ -316,7 +316,7 @@ def highest_different_index(config_active, config_default, index): # This functi
     return []
 
 
-ignore_indexes = [["realtime", "image", "camera", "devices"], ["dashcam", "stamps", "relay", "triggers"], ["dashcam", "capture", "video", "devices"]] # Configure values specified here will not be checked by the check_defaults_missing() and check_defaults_extra() functions.
+ignore_indexes = [["realtime", "image", "camera", "devices"], ["dashcam", "saving", "trigger_gpio"], ["dashcam", "stamps", "relay", "triggers"], ["dashcam", "capture", "video", "devices"]] # Configure values specified here will not be checked by the check_defaults_missing() and check_defaults_extra() functions.
 
 # This function checks for values that exist in the default config that aren't present in the active config.
 def check_defaults_missing(config_defaults, config_active, index=[], missing_values=[]):
@@ -358,14 +358,14 @@ def update_config():
     extra_values = check_defaults_extra(config_default, config_active)
 
     if (len(missing_values) > 0):
-        print(style.yellow + "The following values were present in the default configuration, but not the active configuration. They may have been added in an update. The default values have been inserted into the active configuration." + style.end)
+        print(style.yellow + "The following values were present in the default configuration, but not the active configuration. They may have been added in an update. The default values will be inserted into the active configuration." + style.end)
         for value in missing_values:
             print("    " + '>'.join(map(str, value)))
         print(style.faint + "Continuing in 5 seconds" + style.end)
         time.sleep(5)
 
     if (len(extra_values) > 0):
-        print(style.yellow + "The following values were present in the active configuration, but not the default configuration. They may have been removed in an update. These values have been removed from the active configuration." + style.end)
+        print(style.yellow + "The following values were present in the active configuration, but not the default configuration. They may have been removed in an update. These values will be removed from the active configuration." + style.end)
         for value in extra_values:
             index = highest_different_index(config_default, config_active, value)
             if (get_nested_value(index, config_active) != None): # Check to see if this index hasn't already been removed.

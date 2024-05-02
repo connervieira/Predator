@@ -138,6 +138,7 @@
         "saving": {
             "directory": "str",
             "trigger": "str",
+            "trigger_gpio": "dict",
             "segment_length": "+float",
             "looped_recording": {
                 "mode": ["automatic", "manual"],

@@ -9,6 +9,7 @@ gpio_pins = [17, 22, 27] # These are the pins that will be monitored for button 
 import os # Required to interact with certain operating system functions
 import json # Required to process JSON data
 import time
+import threading
 
 from gpiozero import Button
 from signal import pause
@@ -28,20 +29,38 @@ trigger_file_location = config["general"]["interface_directory"] + "/" + config[
 trigger_file_location = trigger_file_location.replace("//", "/") # Remove any duplicate slashes in the file path.
 if (os.path.isdir(config["general"]["interface_directory"]) == False): # Check to see if the interface directory has not yet been created.
     os.system("mkdir -p '" + str(config["general"]["interface_directory"]) + "'")
+    os.system("chmod -R 777 '" + str(config["general"]["interface_directory"]) + "'")
 
 
-last_trigger_time = 0
 def create_trigger_file():
-    global last_trigger_time
-    if (time.time() - last_trigger_time > 1): # Check to see if at least 1 second has passed since the last dash-cam save trigger.
-        os.system("touch '" + trigger_file_location + "'")
-    last_trigger_time = time.time()
+    os.system("touch '" + trigger_file_location + "'")
+
+def watch_button(pin, hold_time=0.2, event=create_trigger_file):
+    print("Watching pin " + str(pin))
+    button = Button(pin)
+
+    time_pressed = 0
+    last_triggered = 0
+    while True:
+        if (button.is_pressed and time_pressed == 0): # Check to see if the button was just pressed.
+            print("Pressed" + str(pin))
+            time_pressed = time.time()
+        elif (button.is_pressed and time.time() - time_pressed < hold_time): # Check to see if the button is being held, but the time threshold hasn't been reached.
+            pass
+            #print("Holding")
+        elif (button.is_pressed and time.time() - time_pressed >= hold_time): # Check to see if the button is being held, and the time threshold has been reached.
+            if (time.time() - last_triggered > 1):
+                print("Triggered " + str(pin))
+                event()
+            last_triggered = time.time()
+        elif (button.is_pressed == False): # If the button is not pressed, reset the timer.
+            time_pressed = 0
+
+        time.sleep(0.02)
 
 
-buttons = []
+button_watch_threads = {}
 for pin in gpio_pins:
-    buttons.append(Button(pin))
-for button in buttons:
-    button.when_pressed = create_trigger_file
+    button_watch_threads[pin] = threading.Thread(target=watch_button, args=[pin], name="ButtonWatch" + str(pin))
+    button_watch_threads[pin].start()
 
-pause()

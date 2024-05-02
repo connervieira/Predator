@@ -53,10 +53,15 @@ if (config["dashcam"]["notifications"]["reticulum"]["enabled"] == True): # Check
 import lighting # Import the lighting.py script.
 update_status_lighting = lighting.update_status_lighting # Load the status lighting update function from the lighting script.
 
+must_import_gpiozero = False
 for stamp in config["dashcam"]["stamps"]["relay"]["triggers"]: # Check to see if there are any GPIO relay stamps active.
     if (config["dashcam"]["stamps"]["relay"]["triggers"][stamp]["enabled"] == True): # Check to see if at least one relay stamp is enabled.
-        from gpiozero import Button # Import GPIOZero
+        must_import_gpiozero = True
         break # Exit the loop, since GPIOZero has already been imported.
+if (len(config["dashcam"]["saving"]["trigger_gpio"]) > 0):
+    must_import_gpiozero = True
+if (must_import_gpiozero == True):
+    from gpiozero import Button # Import GPIOZero
 
 
 
@@ -142,6 +147,41 @@ if (config["dashcam"]["capture"]["audio"]["device"] != ""): # Check to see if a 
     audio_record_command += " --device=\"" + str(config["dashcam"]["capture"]["audio"]["device"]) + "\""
 
 
+
+
+
+
+trigger_file_location = config["general"]["interface_directory"] + "/" + config["dashcam"]["saving"]["trigger"] # Define the path of the dashcam lock trigger file.
+trigger_file_location = trigger_file_location.replace("//", "/") # Remove any duplicate slashes in the file path.
+
+last_trigger_file_created = 0
+def create_trigger_file():
+    global last_trigger_file_created
+    if (time.time() - last_trigger_file_created < 1):
+        if (os.path.isdir(config["general"]["interface_directory"]) == False): # Check to see if the interface directory has not yet been created.
+            os.system("mkdir -p '" + str(config["general"]["interface_directory"]) + "'")
+            os.system("chmod -R 777 '" + str(config["general"]["interface_directory"]) + "'")
+        os.system("touch '" + trigger_file_location + "'")
+    else:
+        print("Supressed duplicate trigger file")
+    last_strigger_file_created
+
+def watch_button(pin, hold_time=0.2, event=create_trigger_file):
+    print("Watching pin " + str(pin))
+    button = Button(pin)
+    time_pressed = 0
+    last_triggered = 0
+    while True:
+        if (button.is_pressed and time_pressed == 0): # Check to see if the button was just pressed.
+            print("Pressed" + str(pin))
+            time_pressed = time.time()
+        elif (button.is_pressed and time.time() - time_pressed >= hold_time): # Check to see if the button is being held, and the time threshold has been reached.
+            print("Triggered " + str(pin))
+            event()
+        elif (button.is_pressed == False): # If the button is not pressed, reset the timer.
+            time_pressed = 0
+
+        time.sleep(hold_time/10)
 
 
 
@@ -761,6 +801,13 @@ def start_dashcam_recording(dashcam_devices, directory, background=False): # Thi
     del at_least_one_enabled_device
 
     update_status_lighting("normal") # Initialize the status lighting to normal.
+
+
+
+    button_watch_threads = {}
+    for pin in config["dashcam"]["saving"]["trigger_gpio"]:
+        button_watch_threads[int(pin)] = threading.Thread(target=watch_button, args=[int(pin)], name="ButtonWatch" + str(pin))
+        button_watch_threads[int(pin)].start()
 
     dashcam_process = [] # Create a placeholder list to store the dashcam processes.
     iteration_counter = 0 # Set the iteration counter to 0 so that we can increment it for each recording device specified.
