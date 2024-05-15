@@ -17,7 +17,7 @@
             "alerts_ignore_validation": true,
             "allow_duplicate_alerts": false,
             "databases": [
-                "alerts.json"
+                "https://v0lttech.com/predator/manifest/serve.php?type=hot"
             ]
         },
         "display": {

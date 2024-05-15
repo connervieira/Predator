@@ -476,3 +476,5 @@ This update focuses on improving the reliability of Predator, especially when op
 - Moved the status lighting configuration to the "general" section.
 - Updated configuration back-end.
     - Predator can now automatically update the configuration file between versions when configuration values are added or removed.
+- Added an initial start-up sequence, where Predator shows some basic information before the normal start-up.
+    - Predator now creates a file named `install.json` containing some basic install information on the first start-up.

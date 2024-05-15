@@ -28,16 +28,9 @@ config = load_config()
 
 predator_root_directory = str(os.path.dirname(os.path.realpath(__file__))) # This variable determines the folder path of the root Predator directory. This should usually automatically recognize itself, but it if it doesn't, you can change it manually.
 
-
-
-
 import time # Required to add delays and handle dates/times.
 import sys # Required to read command line arguments.
-import re # Required to use Regex.
-import datetime # Required for converting between timestamps and human readable date/time information.
-import fnmatch # Required to use wildcards to check strings.
-
-
+import signal # Required to kill Predator.
 
 import utils # Import the utils.py scripts.
 style = utils.style # Load the style from the utils script.
@@ -64,14 +57,15 @@ update_state = utils.update_state # Load the function to issue state updates to 
 log_plates = utils.log_plates # Load the function to issue ALPR results to the interface directory.
 log_alerts = utils.log_alerts # Load the function to issue active alerts to the interface directory.
 
+import re # Required to use Regex.
+import datetime # Required for converting between timestamps and human readable date/time information.
+import fnmatch # Required to use wildcards to check strings.
+
 if (config["general"]["modes"]["enabled"]["realtime"] == True):
     import alprstream
 
 if (config["general"]["modes"]["enabled"]["dashcam"] == True or config["dashcam"]["background_recording"] == True): # Check to see if OpenCV is needed.
     import dashcam
-
-
-
 
 if (config["developer"]["offline"] == False): # Only import networking libraries if offline mode is turned off.
     if (config["general"]["status_lighting"]["enabled"] == True or config["realtime"]["push_notifications"]["enabled"] == True or len(config["general"]["alerts"]["databases"]) > 0): # Only import networking libraries if they are necessary.
@@ -82,6 +76,51 @@ if (config["developer"]["offline"] == False): # Only import networking libraries
 if (config["management"]["disk_statistics"] == True): # Only import the disk statistic library if it is enabled in the configuration.
     debug_message("Loading system utility library")
     import psutil # Required to get disk usage information
+
+
+
+if (os.path.exists(predator_root_directory + "/install.json") == False): # Check to see if the install information file hasn't yet been created. This will be the case on the first start-up.
+    import uuid
+    install_data = {"first_start_time": int(time.time()), "id": str(uuid.uuid4())}
+    clear()
+    print(style.bold + style.red + "Predator - First Start" + style.end)
+    print(style.italic + "This wizard is only displayed on the first start of Predator.")
+    print("To reset so this message is displayed again, remove the `install.json` file inside the main install directory." + style.end)
+    input(style.faint + "Press enter to continue..." + style.end)
+
+    print("")
+    clear()
+    print(style.bold + style.red + "Commercial Support" + style.end)
+    print(style.bold + "V0LT offers the following commercial support services for Predator:" + style.end)
+    print("  * Custom software modifications")
+    print("  * Pre-assembled hardware products and kits")
+    print("  * One-on-one technical support")
+    print("  * Server hosting")
+    print("    - Remotely-managed hot-lists and ignore-lists")
+    print("    - Compiled data reports")
+    print("    - Remote ALPR processing")
+    
+    print()
+    print("To learn more, don't hesitate to get in contact: " + style.underline + "https://v0lttech.com/contact.php\n" + style.end)
+    input(style.faint + "Press enter to continue..." + style.end)
+
+    print("")
+    clear()
+    print(style.bold + style.red + "Warranty" + style.end)
+    print("While Predator is designed to be as reliable and consistent as possible, it comes with absolutely no warranty, it should not be used in a context where failure could cause harm to people or property.")
+    print("For more information, see the `SECURITY.md` document.")
+    input(style.faint + "Press enter to continue..." + style.end)
+
+    with open(predator_root_directory + "/install.json", 'w') as file:
+        json.dump(install_data, file)
+    del install_data
+
+    print("")
+    clear()
+    print("The initial start-up process has completed. Predator will now return to the normal start-up sequence.")
+    input(style.faint + "Press enter to continue..." + style.end)
+
+
 
 
 debug_message("Loading ignore lists")
