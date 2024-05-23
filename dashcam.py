@@ -361,14 +361,15 @@ def apply_dashcam_stamps(frame, device=""):
     gps_stamp_position = [10, 30] # Determine where the GPS overlay stamp should be positioned in the video stream.
     gps_stamp = "" # Set the GPS to a blank placeholder. Elements will be added to this in the next steps.
     if (config["general"]["gps"]["enabled"] == True): # Check to see if GPS features are enabled before processing the GPS stamp.
-        current_location = get_gps_location() # Get the current location.
-        
-        if (config["dashcam"]["stamps"]["gps"]["location"]["enabled"] == True): # Check to see if the GPS location stamp is enabled.
-            gps_stamp = gps_stamp + "(" + str(f'{current_location[0]:.5f}') + ", " + str(f'{current_location[1]:.5f}') + ")  " # Add the current coordinates to the GPS stamp.
-        if (config["dashcam"]["stamps"]["gps"]["altitude"]["enabled"] == True): # Check to see if the GPS altitude stamp is enabled.
-            gps_stamp = gps_stamp + str(round(current_location[3])) + "m  " # Add the current altitude to the GPS stamp.
-        if (config["dashcam"]["stamps"]["gps"]["speed"]["enabled"] == True): # Check to see if the GPS speed stamp is enabled.
-            gps_stamp = gps_stamp + str(round(convert_speed(current_location[2],config["dashcam"]["stamps"]["gps"]["speed"]["unit"])*10)/10) + config["dashcam"]["stamps"]["gps"]["speed"]["unit"] + "  " # Add the current speed to the GPS stamp.
+        if (config["dashcam"]["stamps"]["gps"]["location"]["enabled"] == True or config["dashcam"]["stamps"]["gps"]["altitude"]["enabled"] == True or config["dashcam"]["stamps"]["gps"]["speed"]["enabled"] == True): # Check to see if at least one of the GPS stamps is enabled.
+            current_location = get_gps_location() # Get the current location.
+            
+            if (config["dashcam"]["stamps"]["gps"]["location"]["enabled"] == True): # Check to see if the GPS location stamp is enabled.
+                gps_stamp = gps_stamp + "(" + str(f'{current_location[0]:.5f}') + ", " + str(f'{current_location[1]:.5f}') + ")  " # Add the current coordinates to the GPS stamp.
+            if (config["dashcam"]["stamps"]["gps"]["altitude"]["enabled"] == True): # Check to see if the GPS altitude stamp is enabled.
+                gps_stamp = gps_stamp + str(round(current_location[3])) + "m  " # Add the current altitude to the GPS stamp.
+            if (config["dashcam"]["stamps"]["gps"]["speed"]["enabled"] == True): # Check to see if the GPS speed stamp is enabled.
+                gps_stamp = gps_stamp + str(round(convert_speed(current_location[2],config["dashcam"]["stamps"]["gps"]["speed"]["unit"])*10)/10) + config["dashcam"]["stamps"]["gps"]["speed"]["unit"] + "  " # Add the current speed to the GPS stamp.
 
     # Determine the font color of the stamps from the configuration.
     main_stamp_color = config["dashcam"]["stamps"]["main"]["color"]
