@@ -182,6 +182,12 @@ This document describes the configuration values found `config.json`.
         - `directory` is a string that sets the name of the directory where Predator will store locked dashcam video segments.
             - This directory is placed into the working directory.
             - Example: `"saved_dashcam_video"`
+        - `file` contains settings for configuring the output video files.
+            - `codec` is the codec used to encode video. Below are common video codecs:
+                - "XVID" is used for'.avi' files, and is the default option.
+                - "MP4V" is used for '.mp4' files, and is great for video player compatability.
+                    - Note that this codec will often result in the current vidoe segment being lost in the event of a sudden power loss.
+            - `extension` is the video file extension.
         - `trigger` is the name of a file inside the interface directory that will trigger Predator to save the current and previous dashcam segments.
             - To trigger a save, create this file in the interface directory. Predator will save the video then automatically remove the trigger file.
             - When this file is created, Predator will immediately save the previous and current dashcam video segments. Once the current segment is done recording, Predator will re-save it, such that the saved video doesn't cut off at the moment the saved was triggered.
