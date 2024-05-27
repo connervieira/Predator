@@ -137,6 +137,10 @@
     "dashcam": {
         "saving": {
             "directory": "str",
+            "file": {
+                "codec": "str",
+                "extension": "str"
+            },
             "trigger": "str",
             "trigger_gpio": "dict",
             "segment_length": "+float",

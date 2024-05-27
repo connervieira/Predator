@@ -893,15 +893,16 @@ def dashcam_output_handler(directory, device, width, height, framerate):
         time.sleep(0.01)
 
     previous_loop_segment_name = current_segment_name[device] # Initialize to be the same.
-    output = cv2.VideoWriter(current_segment_name[device] + ".avi", cv2.VideoWriter_fourcc(*'XVID'), float(framerate), (width,  height)) # Initialize the first video output.
+    output_codec = list(config["dashcam"]["saving"]["file"]["codec"])
+    output = cv2.VideoWriter(current_segment_name[device] + "." + config["dashcam"]["saving"]["file"]["extension"], cv2.VideoWriter_fourcc(output_codec[0], output_codec[1], output_codec[2], output_codec[3]), float(framerate), (width,  height)) # Initialize the first video output.
 
     while True:
         time.sleep(0.01)
 
-        video_filepath = current_segment_name[device] + ".avi"
+        video_filepath = current_segment_name[device] + "." + config["dashcam"]["saving"]["file"]["extension"]
         audio_filepath = current_segment_name[device] + "." + config["dashcam"]["capture"]["audio"]["extension"]
         if (last_segment_name != ""):
-            last_video_file = last_segment_name + ".avi"
+            last_video_file = last_segment_name + "." + config["dashcam"]["saving"]["file"]["extension"]
             last_audio_file = last_segment_name + "." + config["dashcam"]["capture"]["audio"]["extension"]
         else:
             last_video_file = ""
@@ -939,18 +940,18 @@ def dashcam_output_handler(directory, device, width, height, framerate):
                 last_segment_name = previous_loop_segment_name
 
                 output = None # Release the previous video output file.
-                output = cv2.VideoWriter(current_segment_name[device] + ".avi", cv2.VideoWriter_fourcc(*'XVID'), float(calculated_framerate[device]), (width,  height)) # Start the new video output file.
+                output = cv2.VideoWriter(current_segment_name[device] + "." + config["dashcam"]["saving"]["file"]["extension"], cv2.VideoWriter_fourcc(output_codec[0], output_codec[1], output_codec[2], output_codec[3]), float(calculated_framerate[device]), (width,  height)) # Start the new video output file.
 
                 process_timing("start", "Dashcam/Calculations")
                 if (calculated_framerate[device] > float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"])): # Check to see if the calculated frame-rate exceeds the maximum allowed frame-rate.
                     calculated_framerate[device] = float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"]) # Set the frame-rate to the maximum allowed frame-rate.
                 process_timing("end", "Dashcam/Calculations")
                 process_timing("start", "Dashcam/Writing")
-                output = cv2.VideoWriter(current_segment_name[device] + ".avi", cv2.VideoWriter_fourcc(*'XVID'), float(calculated_framerate[device]), (width,  height)) # Update the video output.
+                output = cv2.VideoWriter(current_segment_name[device] + "." + config["dashcam"]["saving"]["file"]["extension"], cv2.VideoWriter_fourcc(output_codec[0], output_codec[1], output_codec[2], output_codec[3]), float(calculated_framerate[device]), (width,  height)) # Update the video output.
                 process_timing("end", "Dashcam/Writing")
 
 
-                last_video_path = last_segment_name + ".avi"
+                last_video_path = last_segment_name + "." + config["dashcam"]["saving"]["file"]["extension"]
                 last_audio_path = last_segment_name + "." + str(config["dashcam"]["capture"]["audio"]["extension"])
 
 
@@ -979,7 +980,7 @@ def dashcam_output_handler(directory, device, width, height, framerate):
 
                             # Now that the merged file has been saved, go back and delete the separate files that were saved to the locked folder previously.
                             base_file = config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"] + "/" + os.path.splitext(os.path.basename(last_filename_merged))[0]
-                            os.system("rm '" + base_file + ".avi'")
+                            os.system("rm '" + base_file + "." + config["dashcam"]["saving"]["file"]["extension"] + "'")
                             os.system("rm '" + base_file + "." + str(config["dashcam"]["capture"]["audio"]["extension"]) + "'")
                         else: # If the merged video file doesn't exist, it is likely something went wrong with the merging process.
                             display_message("The merged video/audio file did exist when Predator tried to save it. It is likely the merge process has failed unexpectedly. The separate files are being saved as a fallback.", 2)

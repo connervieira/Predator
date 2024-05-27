@@ -143,6 +143,10 @@
     "dashcam": {
         "saving": {
             "directory": "saved_dashcam",
+            "file": {
+                "codec": "XVID",
+                "extension": "avi"
+            },
             "trigger": "dashcam_lock_trigger",
             "trigger_gpio": {
             },
