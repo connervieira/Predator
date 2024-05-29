@@ -27,7 +27,8 @@
             "time_correction": {
                 "enabled": "bool",
                 "threshold": "+float"
-            }
+            },
+            "lazy_polling_interval": "+float"
         },
         "object_recognition": {
             "enabled": "bool"

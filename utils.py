@@ -682,6 +682,24 @@ def get_gps_location():
         display_message("The `get_gps_location` function was called, even though GPS is disabled. This is a bug, and should never occur.", 2)
         return 0.0000, 0.0000, 0.0, 0.0, 0.0, 0, 0 # Return a default placeholder location.
 
+most_recent_gps_location = [0.0, 0.0, 0.0, 0.0, 0.0, 0, 0]
+gps_daemon_running = False
+def get_gps_location_lazy(): # This function gets the most recent GPS location from the lazy GPS monitor.
+    global gps_daemon_running
+    if (gps_daemon_running == False): # Check to see if the GPS daemon is not running.
+        gps_daemon = threading.Thread(target=gps_daemon, name="LazyGPSDaemon") # Create the lazy GPS manager thread.
+        gps_daemon.start() # Start the GPS daemon thread.
+    return most_recent_gps_location
+def gps_daemon():
+    global gps_daemon_running
+    global most_recent_gps_location
+    try:
+        while True:
+            time.sleep(float(config["general"]["gps"]["lazy_polling_interval"])) # Wait before polling the GPS again.
+            most_recent_gps_location = get_gps_location()
+    finally:
+        gps_daemon_running = False
+
 
 
 

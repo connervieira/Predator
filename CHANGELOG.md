@@ -463,12 +463,16 @@ This update focuses on improving the reliability of Predator, especially when op
         - A failure on a single capture device will no longer kill recording on other capture devices.
         - Predator now shows a warning instead of an error when the merged audio/video file is missing at the end of a saved segment.
             - This occurs when the audio recording process fails, and doesn't necessarily mean that the video capture has encountered a fatal problem.
-    - Added more dash-cam stamp options.
-        - Added diagnostic stamp, which is capable of displaying various pieces of technical information.
-            - Added a frame-rate stamp, which shows the instantaneous frame-rate.
-            - Added a state stamp, which shows Predator's current operating mode.
-        - Added support for GPIO-based relay stamps.
-            - Predator can display custom stamps that change color based on the state of a GPIO pin. This allows for vehicle integrated overlay stamps, such has the horn, warning lights, or brakes.
+    - Updated dash-cam overlay stamps.
+        - Added more dash-cam stamp options.
+            - Added diagnostic stamp, which is capable of displaying various pieces of technical information.
+                - Added a frame-rate stamp, which shows the instantaneous frame-rate.
+                - Added a state stamp, which shows Predator's current operating mode.
+            - Added support for GPIO-based relay stamps.
+                - Predator can display custom stamps that change color based on the state of a GPIO pin. This allows for vehicle integrated overlay stamps, such has the horn, warning lights, or brakes.
+        - Improved the GPS overlay stamp.
+            - The GPS query now uses a "lazy" method, which trades data recency for response time.
+                - This significantly improves frame-rate by reducing the time Predator spends waiting for a GPS response.
     - Added configuration option to use a different audio recording device.
     - Added per-device resolution configuration.
     - Added the ability to disable capture devices without removing them from the configuration entirely.

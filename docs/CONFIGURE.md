@@ -61,6 +61,10 @@ This document describes the configuration values found `config.json`.
                 - This function can only apply time correction if the system time has fallen behind the real time. It can't make corrections if the system time is in the future.
                 - This feature may lead to unexpected behavior. For sake of stability, you should always try to resolve time desync problems at the source. Consider this feature a temporary fix.
             - `threshold` is the amount of time, measured in seconds, that the system time has to drift from the GPS time before Predator will issue a warning and apply a time offset.
+        - `lazy_polling_interval` is a floating point number that determines the number of seconds between GPS polls when the GPS is operating in "lazy" mode.
+            - Lazy mode is used when response time is more important than data recency.
+                - Lazy mode is mainly used for the dash-cam overlay stamp.
+            - This interval should generally correspond to the maximum refresh rate of your GPS. For example, if your GPS, can only refresh a 1Hz, you should set this to 1 (for 1 second). A 10 Hz GPS might use 0.1 (0.1 seconds between polls, or 10 polls per second).
     - `object_recognition` contains settings related to Predator's object recognition capabilities.
         - `enabled` is a boolean that determines whether or not object recognition is enabled globally.
             - Setting this to `false` removes Predator's dependency on Tensorflow.

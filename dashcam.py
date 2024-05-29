@@ -362,7 +362,7 @@ def apply_dashcam_stamps(frame, device=""):
     gps_stamp = "" # Set the GPS to a blank placeholder. Elements will be added to this in the next steps.
     if (config["general"]["gps"]["enabled"] == True): # Check to see if GPS features are enabled before processing the GPS stamp.
         if (config["dashcam"]["stamps"]["gps"]["location"]["enabled"] == True or config["dashcam"]["stamps"]["gps"]["altitude"]["enabled"] == True or config["dashcam"]["stamps"]["gps"]["speed"]["enabled"] == True): # Check to see if at least one of the GPS stamps is enabled.
-            current_location = get_gps_location() # Get the current location.
+            current_location = get_gps_location_lazy() # Get the most recent location.
             
             if (config["dashcam"]["stamps"]["gps"]["location"]["enabled"] == True): # Check to see if the GPS location stamp is enabled.
                 gps_stamp = gps_stamp + "(" + str(f'{current_location[0]:.5f}') + ", " + str(f'{current_location[1]:.5f}') + ")  " # Add the current coordinates to the GPS stamp.

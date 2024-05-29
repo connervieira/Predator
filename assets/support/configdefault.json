@@ -31,7 +31,8 @@
             "time_correction": {
                 "enabled": true,
                 "threshold": 10
-            }
+            },
+            "lazy_polling_interval": 1.0
         },
         "object_recognition": {
             "enabled": false
