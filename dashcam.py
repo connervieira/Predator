@@ -31,6 +31,7 @@ display_message = utils.display_message
 debug_message = utils.debug_message
 process_timing = utils.process_timing
 get_gps_location = utils.get_gps_location
+get_gps_location_lazy = utils.get_gps_location_lazy
 heartbeat = utils.heartbeat
 update_state = utils.update_state
 convert_speed = utils.convert_speed

@@ -684,21 +684,23 @@ def get_gps_location():
 
 most_recent_gps_location = [0.0, 0.0, 0.0, 0.0, 0.0, 0, 0]
 gps_daemon_running = False
-def get_gps_location_lazy(): # This function gets the most recent GPS location from the lazy GPS monitor.
-    global gps_daemon_running
-    if (gps_daemon_running == False): # Check to see if the GPS daemon is not running.
-        gps_daemon = threading.Thread(target=gps_daemon, name="LazyGPSDaemon") # Create the lazy GPS manager thread.
-        gps_daemon.start() # Start the GPS daemon thread.
-    return most_recent_gps_location
 def gps_daemon():
+    debug_message("Starting lazy GPS daemon")
     global gps_daemon_running
     global most_recent_gps_location
     try:
         while True:
-            time.sleep(float(config["general"]["gps"]["lazy_polling_interval"])) # Wait before polling the GPS again.
+            debug_message("Fetching lazy GPS location")
             most_recent_gps_location = get_gps_location()
+            time.sleep(float(config["general"]["gps"]["lazy_polling_interval"])) # Wait before polling the GPS again.
     finally:
         gps_daemon_running = False
+def get_gps_location_lazy(): # This function gets the most recent GPS location from the lazy GPS monitor.
+    global gps_daemon_running
+    if (gps_daemon_running == False): # Check to see if the GPS daemon is not running.
+        gps_daemon_thread = threading.Thread(target=gps_daemon, name="LazyGPSDaemon") # Create the lazy GPS manager thread.
+        gps_daemon_thread.start() # Start the GPS daemon thread.
+    return most_recent_gps_location
 
 
 
