@@ -38,7 +38,8 @@ These are the features actively planned for Predator and are likely to be added 
     - [X] Add dash-cam operation mode stamp.
     - [X] Add custom relay status stamps through GPIO.
 - [X] Add default config support for values that involve adding entries.
-- [ ] Improve the efficiency of the GPS stamp.
+- [X] Improve the efficiency of the GPS stamp.
+- [ ] Check to see if old dashcam video files actually exist before deleting them.
 
 ## Hypothetical
 
