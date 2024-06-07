@@ -675,7 +675,6 @@ def get_gps_location():
 
                 return position[0], position[1], speed, altitude, heading, satellites, gps_time
             except Exception as exception:
-                gps_connection_active = False
                 display_message("A GPS error occurred: " + str(exception), 2)
                 return 0.0000, 0.0000, 0.0, 0.0, 0.0, 0, 0 # Return a default placeholder location.
     else: # If GPS is disabled, then this function should never be called, but return a placeholder position regardless.
@@ -683,24 +682,17 @@ def get_gps_location():
         return 0.0000, 0.0000, 0.0, 0.0, 0.0, 0, 0 # Return a default placeholder location.
 
 most_recent_gps_location = [0.0, 0.0, 0.0, 0.0, 0.0, 0, 0]
-gps_daemon_running = False
 def gps_daemon():
     debug_message("Starting lazy GPS daemon")
-    global gps_daemon_running
     global most_recent_gps_location
-    try:
-        while True:
-            debug_message("Fetching lazy GPS location")
-            most_recent_gps_location = get_gps_location()
-            time.sleep(float(config["general"]["gps"]["lazy_polling_interval"])) # Wait before polling the GPS again.
-    finally:
-        gps_daemon_running = False
+    while True:
+        debug_message("Fetching lazy GPS location")
+        most_recent_gps_location = get_gps_location()
+        time.sleep(float(config["general"]["gps"]["lazy_polling_interval"])) # Wait before polling the GPS again.
 def get_gps_location_lazy(): # This function gets the most recent GPS location from the lazy GPS monitor.
-    global gps_daemon_running
-    if (gps_daemon_running == False): # Check to see if the GPS daemon is not running.
-        gps_daemon_thread = threading.Thread(target=gps_daemon, name="LazyGPSDaemon") # Create the lazy GPS manager thread.
-        gps_daemon_thread.start() # Start the GPS daemon thread.
     return most_recent_gps_location
+gps_daemon_thread = threading.Thread(target=gps_daemon, name="LazyGPSDaemon") # Create the lazy GPS manager thread.
+gps_daemon_thread.start() # Start the GPS daemon thread.
 
 
 
