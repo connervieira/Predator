@@ -119,6 +119,10 @@
             }
         },
         "saving": {
+            "remote_alert_sources": {
+                "enabled": "bool",
+                "directory": "str"
+            },
             "license_plates": {
                 "enabled": "bool",
                 "file": "str",

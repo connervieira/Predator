@@ -483,3 +483,5 @@ This update focuses on improving the reliability of Predator, especially when op
     - Predator can now automatically update the configuration file between versions when configuration values are added or removed.
 - Added an initial start-up sequence, where Predator shows some basic information before the normal start-up.
     - Predator now creates a file named `install.json` containing some basic install information on the first start-up.
+- Remote alert database sources can now be cached.
+    - This allows Predator to continue using entries from a remote alert database even when the source goes offline.

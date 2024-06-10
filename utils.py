@@ -144,6 +144,8 @@ try:
             import validators # Required to validate URLs
 except:
     print("Failed to determine if network features are enabled in the configuration.")
+if (len(config["general"]["alerts"]["databases"]) > 0):
+    import hashlib
 import re # Required to use Regex
 import datetime # Required for converting between timestamps and human readable date/time information
 from xml.dom import minidom # Required for processing GPX data
@@ -691,8 +693,9 @@ def gps_daemon():
         time.sleep(float(config["general"]["gps"]["lazy_polling_interval"])) # Wait before polling the GPS again.
 def get_gps_location_lazy(): # This function gets the most recent GPS location from the lazy GPS monitor.
     return most_recent_gps_location
-gps_daemon_thread = threading.Thread(target=gps_daemon, name="LazyGPSDaemon") # Create the lazy GPS manager thread.
-gps_daemon_thread.start() # Start the GPS daemon thread.
+if (config["general"]["gps"]["enabled"] == True): # Only start the GPS polling thread if the GPS is enabled.
+    gps_daemon_thread = threading.Thread(target=gps_daemon, name="LazyGPSDaemon") # Create the lazy GPS manager thread.
+    gps_daemon_thread.start() # Start the GPS daemon thread.
 
 
 
@@ -782,42 +785,69 @@ def display_alerts(active_alerts):
 
 
 
-# This function compiles the provided list of sources into a single complete alert dictionary.
-def load_alert_database(sources, project_directory):
+
+# The following functions are responsible for loading alert database.
+def load_alert_database_remote(source, cache_directory):
+    debug_message("Loading remote database source.")
+    if (config["realtime"]["saving"]["remote_alert_sources"] == True):
+        source_hash = hashlib.md5(source.encode()).hexdigest()
+    if (config["developer"]["offline"] == False): # Check to see if offline mode is disabled.
+        try:
+            raw_download_data = requests.get(source, timeout=6).text # Save the raw text data from the URL to a variable.
+        except:
+            raw_download_data = "{}"
+            display_message("The license plate alert database from " + source + " could not be loaded.", 2)
+            if (config["realtime"]["saving"]["remote_alert_sources"] == True):
+                if (os.path.exists(cache_directory + "/" + source_hash + ".json")): # Check to see if the cached file exists.
+                    debug_message("Attempting to load locally cached data for this remote source.")
+                    return load_alert_database_local(cache_directory + "/" + source_hash + ".json") # Load the locally cached file.
+        processed_download_data = str(raw_download_data) # Convert the downloaded data to a string.
+        try:
+            alert_database = json.loads(processed_download_data) # Load the alert database as JSON data.
+            if (config["realtime"]["saving"]["remote_alert_sources"] == True):
+                if (os.path.isdir(cache_directory) == False):
+                    os.system("mkdir -p '" + str(cache_directory) + "'")
+                save_to_file(cache_directory + "/" + source_hash + ".json", json.dumps(alert_database))
+        except:
+            alert_database = {}
+            display_message("The license plate alert database returned by the remote source " + source + " doesn't appear to be compatible JSON data. This source has not been loaded.", 2)
+    else: # Predator is in offline mode, but a remote alert database source was specified.
+        alert_database = {} # Set the alert database to an empty dictionary.
+        display_message("A remote alert database source " + source + " was specified, but Predator is in offline mode. This source has not been loaded.", 2)
+
+    return alert_database
+
+def load_alert_database_local(source):
+    debug_message("Loading local database source.")
+    if (os.path.exists(source)): # Check to see if the database specified by the user actually exists.
+        f = open(source, "r") # Open the user-specified database file.
+        file_contents = f.read() # Read the file.
+        if (file_contents[0] == "{"): # Check to see if the first character in the file indicates that this alert database is a JSON database.
+            alert_database = json.loads(file_contents) # Load the alert database as JSON data.
+        else:
+            alert_database = {}
+            display_message("The alert database specified at " + source + " does appear to contain compatible JSON data. This source has not been loaded.", 3)
+        f.close() # Close the file.
+    else: # If the alert database specified by the user does not exist, alert the user of the error.
+        alert_database = {}
+        display_message("The alert database specified at " + source + " does not exist. This source has not been loaded.", 3)
+
+    return alert_database
+
+def load_alert_database(sources, project_directory): # This function compiles the provided list of sources into a single complete alert dictionary.
+    cache_directory = project_directory + "/" + config["realtime"]["saving"]["remote_alert_sources"]["directory"]
     debug_message("Loading license plate alert list")
     complete_alert_database = {} # Set the complete alert database to a placeholder dictionary.
     for source in sources: # Iterate through each source in the list of sources.
         if (validators.url(source)): # Check to see if the user supplied a URL as their alert database.
-            if (config["developer"]["offline"] == False): # Check to see if offline mode is disabled.
-                try:
-                    raw_download_data = requests.get(source, timeout=6).text # Save the raw text data from the URL to a variable.
-                except:
-                    raw_download_data = ""
-                processed_download_data = str(raw_download_data) # Convert the downloaded data to a string.
-                try:
-                    alert_database = json.loads(processed_download_data) # Load the alert database as JSON data.
-                except:
-                    alert_database = {}
-                    display_message("The license plate alert database returned by the remote source " + source + " doesn't appear to be compatible JSON data. This source has not been loaded.", 2)
-            else: # Predator is in offline mode, but a remote alert database source was specified.
-                alert_database = {} # Set the alert database to an empty dictionary.
-                display_message("A remote alert database source " + source + " was specified, but Predator is in offline mode. This source has not been loaded.", 2)
+            alert_database = load_alert_database_remote(source, cache_directory)
         else: # The input the user supplied doesn't appear to be a URL, so assume it is a file.
-            if (os.path.exists(project_directory + "/" + source)): # Check to see if the database specified by the user actually exists.
-                f = open(project_directory + "/" + source, "r") # Open the user-specified database file.
-                file_contents = f.read() # Read the file.
-                if (file_contents[0] == "{"): # Check to see if the first character in the file indicates that this alert database is a JSON database.
-                    alert_database = json.loads(file_contents) # Load the alert database as JSON data.
-                else:
-                    alert_database = {}
-                    display_message("The alert database specified at " + project_directory + "/" + source + " does appear to contain compatible JSON data. This source has not been loaded.", 3)
-                f.close() # Close the file.
-            else: # If the alert database specified by the user does not exist, alert the user of the error.
-                alert_database = {}
-                display_message("The alert database specified at " + project_directory + "/" + source + " does not exist. This source has not been loaded.", 3)
+            alert_database = load_alert_database_local(project_directory + "/" + source)
 
         for rule in alert_database: # Iterate over each rule in this database.
             complete_alert_database[rule] = alert_database[rule] # Add this rule to the complete alert database.
+
+    print(complete_alert_database)
 
     return complete_alert_database
 
