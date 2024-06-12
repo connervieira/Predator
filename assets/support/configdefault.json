@@ -319,6 +319,7 @@
         "print_timings": false,
         "dashcam_saving_queue_overflow": 2000,
         "dashcam_shortterm_framerate_interval": 0.25,
-        "hard_crash_on_error": false
+        "hard_crash_on_error": false,
+        "identify_to_remote_sources": true
     }
 }
