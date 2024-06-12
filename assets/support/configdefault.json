@@ -125,6 +125,10 @@
             }
         },
         "saving": {
+            "remote_alert_sources": {
+                "enabled": true,
+                "directory": "remote_sources_cache"
+            },
             "license_plates": {
                 "enabled": true,
                 "file": "plate_history.json",
