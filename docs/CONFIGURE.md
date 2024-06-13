@@ -347,3 +347,5 @@ This document describes the configuration values found `config.json`.
         - This short-term frame-rate is currently only used for visual purposes, and does not effect output files.
     - `hard_crash_on_error` is a boolean that determines whether Predator will globally exit if an error is encountered. This is useful if you run Predator as an unmonitored headless service, and you want to force it to restart when an error is encountered.
         - Keep in mind that enabling this configuration option will cause Predator to boot-loop if the problem that caused the error isn't resolved between start-ups.
+    - `identify_to_remote_sources` determines whether Predator will attach its randomly generated identifier when fetching hot-lists from remote sources. This is helpful to allow administrators of remote hot-list sources to see how many clients are using their server.
+        - If you don't control the servers in your remote hot-list sources, you may consider disabling this feature to make it more difficult to identify you.
