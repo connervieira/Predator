@@ -113,8 +113,8 @@ if (os.path.exists(predator_root_directory + "/install.json") == False): # Check
     print("")
     clear()
     print(style.bold + style.red + "Privacy" + style.end)
-    print("Predator does not share telemetry or usage data with V0LT, or any other entity. However, by default, Predator will attach a random identifier to requests made to remote license plate list sources (as configured under `general>alerts>databases`). This identifier allows administrators of servers hosting license plate lists to roughly count how many clients are using their lists. If you're concerned about the administrator of one of your remote license plate lists using this unique identifier to derive information about how often you use Predator, you can disable this functionality using the `developer>identify_to_remote_sources` configuration value.")
-    print("For more information, see the `CONFIGURE.md` document.")
+    print("Predator does not share telemetry or usage data with V0LT, or any other entity. However, by default, Predator will attach a random identifier to requests made to remote license plate list sources (as configured under `general>alerts>databases`). This identifier allows administrators of servers hosting license plate lists to roughly count how many clients are using their lists. If you're concerned about the administrator of one of your remote license plate lists using this unique identifier to derive information about how often you use Predator (based on when you fetch their lists), you can disable this functionality using the `developer>identify_to_remote_sources` configuration value.")
+    print("For more information, see the `docs/CONFIGURE.md` document.")
     input(style.faint + "Press enter to continue..." + style.end)
 
 
