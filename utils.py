@@ -851,8 +851,6 @@ def load_alert_database(sources, project_directory): # This function compiles th
         for rule in alert_database: # Iterate over each rule in this database.
             complete_alert_database[rule] = alert_database[rule] # Add this rule to the complete alert database.
 
-    print(complete_alert_database)
-
     return complete_alert_database
 
 
