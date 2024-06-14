@@ -547,7 +547,9 @@ def delete_old_segments():
         if (len(dashcam_files) > int(config["dashcam"]["saving"]["looped_recording"]["manual"]["history_length"])): # Check to see if the current number of dashcam segments in the working directory is higher than the configured history length.
             videos_to_delete = dashcam_files[0:len(dashcam_files) - int(config["dashcam"]["saving"]["looped_recording"]["manual"]["history_length"])] # Create a list of all of the videos that need to be deleted.
             for video in videos_to_delete: # Iterate through each video that needs to be deleted.
-                os.system("timeout 5 rm '" + config["general"]["working_directory"] + "/" + video + "'") # Delete the dashcam segment.
+                video_file = config["general"]["working_directory"] + "/" + video
+                if (os.path.exists(video_file)): # Check to see if this video file still exists (it hasn't been deleted by another thread).
+                    os.system("timeout 5 rm '" + video_file + "'") # Delete the dashcam segment.
     elif (config["dashcam"]["saving"]["looped_recording"]["mode"] == "automatic"): # Check to see if looped recording is in automatic mode.
         free_disk_percentage = psutil.disk_usage(path=config["general"]["working_directory"]).free / psutil.disk_usage(path=config["general"]["working_directory"]).total # Calculate the initial free disk percentage.
         videos_deleted_this_round = 0 # This is a placeholder that will be incremented for each video deleted in the following step.

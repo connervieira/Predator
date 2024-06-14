@@ -478,6 +478,8 @@ This update focuses on improving the reliability of Predator, especially when op
     - Added the ability to disable capture devices without removing them from the configuration entirely.
     - Predator now changes the status light color when a video is being locked.
     - Dashcam video save events can now be triggered using buttons via GPIO pins.
+    - Improved looped recording.
+        - Each thread now checks to see if old segments have already been deleted before deleting them themselves.
 - Updated status lighting.
     - Moved the status lighting configuration to the "general" section.
     - Network requests are only made to update the status lighting if it has changed since the last update.
