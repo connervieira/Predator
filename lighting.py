@@ -40,7 +40,7 @@ current_status_light_id = ""
 def update_status_lighting(url_id):
     global current_status_light_id
     debug_message("Updating status lighting")
-    if (url_id !== current_status_light_id): # Check to see if the status light URL ID is different from the current state of the lights.
+    if (url_id != current_status_light_id): # Check to see if the status light URL ID is different from the current state of the lights.
         current_status_light_id = url_id
         if (config["general"]["status_lighting"]["enabled"] == True): # Only update the status lighting if it is enabled in the configuration.
             status_lighting_update_url = str(config["general"]["status_lighting"]["values"][url_id]).replace("[U]", str(config["general"]["status_lighting"]["base_url"])) # Prepare the URL where a request will be sent in order to update the status lighting.
