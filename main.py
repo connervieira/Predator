@@ -117,6 +117,13 @@ if (os.path.exists(predator_root_directory + "/install.json") == False): # Check
     print("For more information, see the `docs/CONFIGURE.md` document.")
     input(style.faint + "Press enter to continue..." + style.end)
 
+    print("")
+    clear()
+    print(style.bold + style.red + "Funding" + style.end)
+    print("Predator is completely free to use, and doesn't contain monetization like advertising or sponsorships. If you find the project to be useful, please consider supporting it financially.")
+    print("For more information, see `https://v0lttech.com/donate.php`.")
+    input(style.faint + "Press enter to continue..." + style.end)
+
 
     with open(predator_root_directory + "/install.json", 'w') as file:
         json.dump(install_data, file)
