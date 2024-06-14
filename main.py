@@ -99,7 +99,6 @@ if (os.path.exists(predator_root_directory + "/install.json") == False): # Check
     print("    - Remotely-managed hot-lists and ignore-lists")
     print("    - Compiled data reports")
     print("    - Remote ALPR processing")
-    
     print()
     print("To learn more, don't hesitate to get in contact: " + style.underline + "https://v0lttech.com/contact.php\n" + style.end)
     input(style.faint + "Press enter to continue..." + style.end)
@@ -110,6 +109,14 @@ if (os.path.exists(predator_root_directory + "/install.json") == False): # Check
     print("While Predator is designed to be as reliable and consistent as possible, it comes with absolutely no warranty, it should not be used in a context where failure could cause harm to people or property.")
     print("For more information, see the `SECURITY.md` document.")
     input(style.faint + "Press enter to continue..." + style.end)
+
+    print("")
+    clear()
+    print(style.bold + style.red + "Privacy" + style.end)
+    print("Predator does not share telemetry or usage data with V0LT, or any other entity. However, by default, Predator will attach a random identifier to requests made to remote license plate list sources (as configured under `general>alerts>databases`). This identifier allows administrators of servers hosting license plate lists to roughly count how many clients are using their lists. If you're concerned about the administrator of one of your remote license plate lists using this unique identifier to derive information about how often you use Predator, you can disable this functionality using the `developer>identify_to_remote_sources` configuration value.")
+    print("For more information, see the `CONFIGURE.md` document.")
+    input(style.faint + "Press enter to continue..." + style.end)
+
 
     with open(predator_root_directory + "/install.json", 'w') as file:
         json.dump(install_data, file)
