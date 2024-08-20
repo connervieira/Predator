@@ -40,6 +40,7 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Add default config support for values that involve adding entries.
 - [X] Improve the efficiency of the GPS stamp.
 - [X] Check to see if old dashcam video files actually exist before deleting them.
+- [ ] Test GPS behavior.
 
 ## Hypothetical
 
