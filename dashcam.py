@@ -186,6 +186,18 @@ def watch_button(pin, hold_time=0.2, event=create_trigger_file):
 
 
 
+
+#======= TODO
+button_watch_threads = {}
+for pin in gpio_pins:
+    button_watch_threads[pin] = threading.Thread(target=watch_button, args=[pin], name="ButtonWatch" + str(pin))
+    button_watch_threads[pin].start()
+
+#=======
+
+
+
+
 def merge_audio_video(video_file, audio_file, output_file, audio_offset=0):
     debug_message("Merging audio and video files")
 
@@ -291,9 +303,9 @@ def save_dashcam_segments(file1, file2=""):
 
 
 relay_triggers = {}
-for stamp in config["dashcam"]["stamps"]["relay"]["triggers"]:
+for stamp in config["dashcam"]["stamps"]["relay"]["triggers"]: # Iterate over reach configured relay trigger.
     if (config["dashcam"]["stamps"]["relay"]["triggers"][stamp]["enabled"] == True): # Check to see if this relay stamp is enabled.
-        relay_triggers[stamp] = Button(int(config["dashcam"]["stamps"]["relay"]["triggers"][stamp]["pin"]))
+        relay_triggers[stamp] = Button(int(config["dashcam"]["stamps"]["relay"]["triggers"][stamp]["pin"])) # Add this button to the list of relays being monitored.
 
 
 def apply_dashcam_stamps(frame, device=""):
@@ -806,12 +818,10 @@ def start_dashcam_recording(dashcam_devices, directory, background=False): # Thi
 
     update_status_lighting("normal") # Initialize the status lighting to normal.
 
-
-
-    button_watch_threads = {}
-    for pin in config["dashcam"]["saving"]["trigger_gpio"]:
-        button_watch_threads[int(pin)] = threading.Thread(target=watch_button, args=[int(pin)], name="ButtonWatch" + str(pin))
-        button_watch_threads[int(pin)].start()
+    button_watch_threads = {} # This will hold the processes watching each GPIO that will trigger a dashcam save.
+    for pin in config["dashcam"]["saving"]["trigger_gpio"]: # Iterate through each dashcam save GPIO trigger.
+        button_watch_threads[int(pin)] = threading.Thread(target=watch_button, args=[int(pin)], name="ButtonWatch" + str(pin)) # Create a thread to monitor this pin.
+        button_watch_threads[int(pin)].start() # Start the thread to monitor the pin.
 
     dashcam_process = [] # Create a placeholder list to store the dashcam processes.
     iteration_counter = 0 # Set the iteration counter to 0 so that we can increment it for each recording device specified.
