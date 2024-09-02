@@ -158,14 +158,12 @@ trigger_file_location = trigger_file_location.replace("//", "/") # Remove any du
 last_trigger_file_created = 0
 def create_trigger_file():
     global last_trigger_file_created
-    if (time.time() - last_trigger_file_created < 1):
+    if (time.time() - last_trigger_file_created > 1): # Check to see if the time that has passed since the last trigger file is more than 1 second.
         if (os.path.isdir(config["general"]["interface_directory"]) == False): # Check to see if the interface directory has not yet been created.
             os.system("mkdir -p '" + str(config["general"]["interface_directory"]) + "'")
             os.system("chmod -R 777 '" + str(config["general"]["interface_directory"]) + "'")
         os.system("touch '" + trigger_file_location + "'")
-    else:
-        print("Supressed duplicate trigger file")
-    last_strigger_file_created
+        last_trigger_file_created = time.time()
 
 def watch_button(pin, hold_time=0.2, event=create_trigger_file):
     print("Watching pin " + str(pin))
@@ -178,6 +176,7 @@ def watch_button(pin, hold_time=0.2, event=create_trigger_file):
             time_pressed = time.time()
         elif (button.is_pressed and time.time() - time_pressed >= hold_time): # Check to see if the button is being held, and the time threshold has been reached.
             print("Triggered " + str(pin))
+            last_triggered = 0
             event()
         elif (button.is_pressed == False): # If the button is not pressed, reset the timer.
             time_pressed = 0

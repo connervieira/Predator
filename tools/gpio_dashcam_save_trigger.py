@@ -43,14 +43,14 @@ def watch_button(pin, hold_time=0.2, event=create_trigger_file):
     last_triggered = 0
     while True:
         if (button.is_pressed and time_pressed == 0): # Check to see if the button was just pressed.
-            print("Pressed" + str(pin))
+            #print("Pressed" + str(pin))
             time_pressed = time.time()
         elif (button.is_pressed and time.time() - time_pressed < hold_time): # Check to see if the button is being held, but the time threshold hasn't been reached.
             pass
             #print("Holding")
         elif (button.is_pressed and time.time() - time_pressed >= hold_time): # Check to see if the button is being held, and the time threshold has been reached.
             if (time.time() - last_triggered > 1):
-                print("Triggered " + str(pin))
+                #print("Triggered " + str(pin))
                 event()
             last_triggered = time.time()
         elif (button.is_pressed == False): # If the button is not pressed, reset the timer.
