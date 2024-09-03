@@ -9,9 +9,15 @@ If you're already familiar with Predator, and you just want a quick set-up guide
 
 1. Install Linux packages: `sudo apt-get install ffmpeg mpg321 gpsd gpsd-clients imagemagick fswebcam libhdf5-dev build-essential`
 2. Install Python packages: `pip3 install pytz validators requests gps gpsd-py3 opencv-python cvlib tensorflow keras silence-tensorflow psutil rns lxmf gpiozero`
-    - If you see an "externally managed environment" error while installing Python packages, consider creating a virtual environment by running the following command in the Predator directory: `python3 -m venv .venv; source .venv/bin/activate`
-        - In the future, you will need to manually start the virtual environment by navigating to the Predator directory and running the following command: `source .venv/bin/activate`
-        - Note that depending on a virtual environment is likely to cause issues if you want to run Predator through Optic, Cortex, or another front-end interface, since these interfaces run outside of the virtual environment. In this case, you should try to install the required Python packages through your operating system's default package manager.
+    - If you see an "externally managed environment" error while installing Python packages, consider one of the following solutions:
+        - If you're installing Predator on a system dedicated to it's use (such as a computer installed in a vehicle), you can override this warning and force install the packages (at the risk of breaking your install) using by adding the `--break-system-packages` flag to the installation command.
+            - It's worth mentioning that during testing, using the `--break-system-packages` flag while installing Predator has never caused any noticable system issues on any common Debian-based Linux distribution (Ubuntu, Mint, Raspberry Pi OS, etc.). However, you should still exercise caution when using it, especially if you aren't using a fresh Python installation.
+        - If you're focused on developing or modifying Predator, try creating a virtual environment for sake of consistency. This method is very reliable, but will often cause issues if you intend to integrate Predator with external interfaces in production (like V0LT Optic or V0LT Cortex), since these interfaces are unable to run Predator as part of a virtual environment.
+            - You can create a virtual environment by navigating to the Predator directory, and running the following command: `python3 -m venv .venv`
+            - After creating the virtual environment, activate it by running the `source .venv/bin/activate` command.
+            - Next, install all required Python packages.
+            - Finally, run Predator. In the future, you'll need to re-activate the virtual environment every time you run Predator.
+        - The most time consuming solution is to install the required packages through your default package manager. Most packages will just be named after the original Python package, with "python3-" appended to the beginning. For example, the `gpiozero` package can be installed with the `sudo apt install python3-gpiozero` command. However, some packages may not follow this naming scheme, and you might need to manually search for them.
 3. Install an ALPR engine, like [Phantom](https://v0lttech.com/phantom.php).
 4. Configure Predator, as described in the [CONFIGURE.md](CONFIGURE.md) file.
 
