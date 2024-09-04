@@ -2,7 +2,7 @@
     "general": {
         "working_directory": "/home/pi/Software/Support/Predator/Working/",
         "interface_directory": "/dev/shm/PredatorInterface/",
-        "alpr": {
+        "nlpr": {
             "engine": "phantom",
             "validation": {
                 "guesses": 15,
@@ -310,7 +310,10 @@
                 }
             }
         },
-        "background_recording": false
+        "alpr": {
+            "enabled": false,
+            "devices": []
+        }
     },
     "developer": {
         "ignore_list": {

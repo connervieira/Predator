@@ -318,8 +318,13 @@ This document describes the configuration values found `config.json`.
                         - `"mps"` for meters-per-second
                         - `"fps"` for feet-per-second
                         - `"knot"` for knots
-    - `background_recording` is a boolean that determines whether dashcam video will be recorded in the background while using real-time mode.
-        - Note that Predator can only use each recording device for one task at a time, so if you run real-time mode with background recording enabled, you'll need to specify two different devices by changing `realtime>image>camera>devices` and `dashcam>capture>video>devices`.
+        - `alpr` contains settings for controlling if and how Predator runs ALPR in the background while dashcam recording.
+            - `enabled` is a boolean that determines if Predator will run ALPR in the background on dashcam threads.
+                - When set to `false`, dashcam recording will continue as normal without ALPR.
+                - When set to `true`, dashcam recording will run with ALPR analysis on a separate thread.
+            - `devices` is a list that contains device IDs from the `dashcam>capture>video>devices` section of the configuration that will be used in ALPR.
+                - Only devices specified in this list will run ALPR.
+                - If you have a capture device that will never realistically see a license plate (for example, an interior facing camera), you should omit it from this value to reduce unnecssary processing load.
 - `developer` contains technical configuration values that developers and experienced users might be interested in.
     - `ignore_list` contains settings for configuring a list of license plates that Predator will ignore.
         - `enabled` is a boolean that determines whether custom ignore lists are enabled or disabled.

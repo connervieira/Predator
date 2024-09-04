@@ -186,17 +186,6 @@ def watch_button(pin, hold_time=0.2, event=create_trigger_file):
 
 
 
-#======= TODO
-button_watch_threads = {}
-for pin in gpio_pins:
-    button_watch_threads[pin] = threading.Thread(target=watch_button, args=[pin], name="ButtonWatch" + str(pin))
-    button_watch_threads[pin].start()
-
-#=======
-
-
-
-
 def merge_audio_video(video_file, audio_file, output_file, audio_offset=0):
     debug_message("Merging audio and video files")
 
@@ -436,7 +425,7 @@ def detect_motion(frame, background_subtractor):
 
 
 
-# This function is called as a subprocess of the normal dashcam recording, and is triggered when motion is detected. This function exits when motion is no longer detected (after the motion detection timeout).
+# This function is called as a subprocess of the parked dashcam recording, and is triggered when motion is detected. This function exits when motion is no longer detected (after the motion detection timeout), and returns to dormant parked mode.
 def record_parked_motion(capture, framerate, width, height, device, directory, frame_history):
     global instant_framerate
     global calculated_framerate
@@ -586,18 +575,21 @@ def delete_old_segments():
 
 
 
+# This is the actual dashcam recording function. This function captures video.
 dashcam_recording_active = False
 frames_since_last_segment = {}
+current_frame_data = {} # This will hold the most recent frame captured by each camera.
 def capture_dashcam_video(directory, device="main", width=1280, height=720):
     global frames_since_last_segment
-    global dashcam_recording_active
+    global dashcam_recording_active # This is a variable that is used to globally control dashcam recording.
     global instant_framerate
     global calculated_framerate
     global shortterm_framerate
     global audio_recorders
     global first_segment_started_time 
     global audio_record_command
-    global recording_active
+    global recording_active # This is a global variable that indicates whether Predator is actively capturing frames, or is dormant.
+    global current_frame_data
 
     device_id = config["dashcam"]["capture"]["video"]["devices"][device]["index"]
 
@@ -640,14 +632,14 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
     last_alert_minimum_framerate_time = 0 # This value holds the last time a minimum frame-rate alert was displayed. Here the value is initialized.
 
     if (float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["min"]) == 0): # Check to see if the minimum frame-rate is 0.
-        expected_time_since_last_frame_slowest = 100
+        expected_time_since_last_frame_slowest = 100 # Set the slowest expected frame time to an arbitrarily high value.
     else:
         expected_time_since_last_frame_slowest = 1/float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["min"]) # Calculate the longest expected time between two frames.
     expected_time_since_last_frame_fastest = 1/float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"]) # Calculate the shortest expected time between two frames.
     process_timing("end", "Dashcam/Calculations")
 
     if (first_segment_started_time == 0): # Check to see if the first segment start time hasn't yet been updated. Since this is a global variable, another dashcam thread may have already set it.
-        first_segment_started_time = utils.get_time() # This variable keeps track of when the first segment was started.
+        first_segment_started_time = utils.get_time() # This variable keeps track of when the first segment was started. It is shared between threads.
     frames_captured = 0
     last_frame_captured = time.time() # This will hold the exact time that the last frame was captured. Here, the value is initialized to the current time before any frames have been captured.
 
@@ -673,7 +665,7 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
             first_segment_started_time = utils.get_time() # Here the first segment start time is re-initialized after it was reset by parked mode.
 
         if (parked == False): # Only update the segment if Predator is not in parked mode.
-            recording_active = True # Indicate the Predator is not actively capturing frames.
+            recording_active = True # Indicate the Predator is actively capturing frames.
             if (force_create_segment == True or utils.get_time() > first_segment_started_time + (segment_number+1)*config["dashcam"]["saving"]["segment_length"]): # Check to see if it is time to start a new segment.
                 force_create_segment = False # Reset the segment creation force variable.
                 calculated_framerate[device] = frames_since_last_segment[device]/(time.time()-segment_started_time) # Calculate the frame-rate of the previous segment.
@@ -747,6 +739,10 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
             frame = cv2.rotate(frame, cv2.ROTATE_180) # Flip the frame by 180 degrees.
             process_timing("end", "Dashcam/Image Manipulation")
 
+        process_timing("start", "Dashcam/Capture Management")
+        current_frame_data[device] = frame # Set the current frame for this device as the frame after rotation has been applied, but before overlay stamps.
+        process_timing("end", "Dashcam/Capture Management")
+
         process_timing("start", "Dashcam/Frame Buffer")
         if (config["dashcam"]["parked"]["recording"]["buffer"] > 0): # Check to see if the frame buffer is greater than 0 before adding frames to the buffer.
             frame_history.append(apply_dashcam_stamps(frame, device)) # Add the frame that was just captured to the frame buffer.
@@ -762,7 +758,7 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
             segment_number = 0 # Reset the segment number.
             first_segment_started_time = 0 # Reset the first segment start time.
             force_create_segment = True # Force the segment manager to start a new segment the next time it is called (when Predator exits parked mode)
-            recording_active = False
+            recording_active = False # Indicate that Predator is not actively capturing frames.
 
             previously_parked_dormant  = True # Indicate that Predator was parked so that we know that the next loop isn't the first loop of Predator being in parked mode.
 
@@ -800,12 +796,20 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
                 utils.clear(True)
                 print(json.dumps(process_timing("dump", ""), indent=4))
 
-
     capture.release()
-    cv2.destroyAllWindows()
 
 
 
+# This function runs in a seperate thread from the main dashcam capture, and will intermittently grab the most recent frame, and run ALPR on it.
+def background_alpr(device):
+    global current_frame_data
+    while dashcam_recording_active: # TODO
+        cv2.imshow("Frame", current_frame_data[device])
+        cv2.waitkey(0)
+
+
+
+# This function is responsible for starting the dashcam recording process. It calls the true dashcam recording function as a subprocess.
 def start_dashcam_recording(dashcam_devices, directory, background=False): # This function starts dashcam recording on a given list of dashcam devices.
     at_least_one_enabled_device = False
     for device in config["dashcam"]["capture"]["video"]["devices"]: # Iterate through each device in the configuration.
@@ -818,14 +822,15 @@ def start_dashcam_recording(dashcam_devices, directory, background=False): # Thi
     update_status_lighting("normal") # Initialize the status lighting to normal.
 
     button_watch_threads = {} # This will hold the processes watching each GPIO that will trigger a dashcam save.
-    for pin in config["dashcam"]["saving"]["trigger_gpio"]: # Iterate through each dashcam save GPIO trigger.
-        button_watch_threads[int(pin)] = threading.Thread(target=watch_button, args=[int(pin)], name="ButtonWatch" + str(pin)) # Create a thread to monitor this pin.
-        button_watch_threads[int(pin)].start() # Start the thread to monitor the pin.
+    if (config["dashcam"]["stamps"]["relay"] == True):
+        for pin in config["dashcam"]["saving"]["trigger_gpio"]: # Iterate through each dashcam save GPIO trigger.
+            button_watch_threads[int(pin)] = threading.Thread(target=watch_button, args=[int(pin)], name="ButtonWatch" + str(pin)) # Create a thread to monitor this pin.
+            button_watch_threads[int(pin)].start() # Start the thread to monitor the pin.
 
     dashcam_process = [] # Create a placeholder list to store the dashcam processes.
     iteration_counter = 0 # Set the iteration counter to 0 so that we can increment it for each recording device specified.
     global parked
-    global recording_active
+    global recording_active # This is a global variable that indicates whether Predator is actively capturing frames, or is dormant.
     global dashcam_recording_active
     dashcam_recording_active = True
     
@@ -856,7 +861,7 @@ def start_dashcam_recording(dashcam_devices, directory, background=False): # Thi
                         if (config["dashcam"]["notifications"]["reticulum"]["enabled"] == True and config["dashcam"]["notifications"]["reticulum"]["events"]["parking_mode_enabled"]["enabled"] == True): # Check to see if Predator is configured to parking mode activation notifications over Reticulum.
                             for destination in config["dashcam"]["notifications"]["reticulum"]["destinations"]: # Iterate over each configured destination.
                                 reticulum.lxmf_send_message(str(config["dashcam"]["notifications"]["reticulum"]["instance_name"]) + " has entered parked mode.", destination) # Send a Reticulum LXMF message to this destination.
-                        recording_active = True # Indicate the Predator is not actively capturing frames.
+                        recording_active = True # Indicate the Predator is actively capturing frames.
                     parked = True # Enter parked mode.
                 else:
                     if (parked == True): # Check to see if Predator wasn't already out of parked mode.
@@ -881,7 +886,7 @@ def dashcam_output_handler(directory, device, width, height, framerate):
     global frames_since_last_segment
     global frames_to_write
     global audio_recorders
-    global recording_active
+    global recording_active # This is a global variable that indicates whether Predator is actively capturing frames, or is dormant.
     global saving_active
 
     if (os.path.isdir(config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"]) == False): # Check to see if the saved dashcam video folder needs to be created.

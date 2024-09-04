@@ -255,7 +255,10 @@
                 }
             }
         },
-        "background_recording": "bool"
+        "alpr": {
+            "enabled": "bool",
+            "devices": "list"
+        }
     },
     "developer": {
         "ignore_list": {
