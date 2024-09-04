@@ -32,7 +32,7 @@ This is the installation process for Predator and all of its dependencies. This 
     - Required:
         - `pytz`: Required to manage timezones.
     - Highly recommended:
-        - `validators` and `requests`: Required to network functionality, like push notifications, status light interfacing, remove alert lists, and more.
+        - `validators` and `requests`: Required to network functionality, like push notifications, status light interfacing, remote alert lists, and more.
     - Recommended:
         - `gps`, `geopy`, and `gpsd-py3`: Required to enable GPS features.
             - These packages are not required for reading GPX files, and are only necessary for interacting with live GPS devices.
