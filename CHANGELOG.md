@@ -452,6 +452,7 @@ This update focuses on unifying Predator's different modes to allow multipurpose
 - Updated dash-cam mode.
     - Added customizable frame-rate restrictions.
         - Added a per-device configuration value to set a maximum allowed frame-rate. When this frame-rate is exceeded, Predator will throttle dash-cam recording to stay below the limit.
+            - A threshold can be set to allow Predator to round up to the maximum framerate if it is within a small difference.
         - Added a per-device configuration to set a minimum expected frame-rate, below which a warning is displayed. This value does not have any impact on the actual recording frame-rate.
     - Overhauled dash-cam saving.
         - Frames captured during dash-cam recording are now saved in a separate thread.
@@ -480,9 +481,13 @@ This update focuses on unifying Predator's different modes to allow multipurpose
     - Dashcam video save events can now be triggered using buttons via GPIO pins.
     - Improved looped recording.
         - Each thread now checks to see if old segments have already been deleted before deleting them themselves.
+    - Added optional background ALPR to dash-cam mode.
+        - The user can now configure Predator to conduct ALPR in the background while simultaneously capturing video.
+        - Removed the old "background recording" functionality in real-time mode, and it's corresponding configuration value.
 - Updated status lighting.
     - Moved the status lighting configuration to the "general" section.
     - Network requests are only made to update the status lighting if it has changed since the last update.
+        - This means that the status lighting can be turned off, and it will only turn back on when an update is made.
 - Updated configuration back-end.
     - Predator can now automatically update the configuration file between versions when configuration values are added or removed.
 - Added an initial start-up sequence, where Predator shows some basic information before the normal start-up.
@@ -490,6 +495,3 @@ This update focuses on unifying Predator's different modes to allow multipurpose
 - Remote alert database sources can now be cached.
     - This allows Predator to continue using entries from a remote alert database even when the source goes offline.
 - Migrated most of the ALPR processing to a dedicated file for sake of organization.
-- Added optional background ALPR to dash-cam mode.
-    - The user can now configure Predator to conduct ALPR in the background while simultaneously capturing video.
-    - Removed the old "background recording" functionality in real-time mode, and it's corresponding configuration value.

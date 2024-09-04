@@ -915,7 +915,7 @@ def dashcam_output_handler(directory, device, width, height, framerate):
     save_this_segment = False # This will be set to True when the saving trigger is created. The current and previous dashcam segments are saved immediately when the trigger is created, but this allows the completed segment to be saved once the next segment is started, such that the saved segment doesn't cut off at the moment the user triggered a save.
 
     process_timing("start", "Dashcam/Calculations")
-    if (framerate + 0.2 >= float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"])): # Check to see if the frame-rate benchmark is within 0.2FPS of the maximum allowed framerate.
+    if (framerate + config["dashcam"]["saving"]["framerate_snap"] >= float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"])): # Check to see if the frame-rate benchmark is within 0.2FPS of the maximum allowed framerate.
         framerate = float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"]) # Set the frame-rate to the maximum allowed frame-rate.
     process_timing("end", "Dashcam/Calculations")
 
@@ -973,7 +973,7 @@ def dashcam_output_handler(directory, device, width, height, framerate):
                 output = cv2.VideoWriter(current_segment_name[device] + "." + config["dashcam"]["saving"]["file"]["extension"], cv2.VideoWriter_fourcc(output_codec[0], output_codec[1], output_codec[2], output_codec[3]), float(calculated_framerate[device]), (width,  height)) # Start the new video output file.
 
                 process_timing("start", "Dashcam/Calculations")
-                if (calculated_framerate[device] > float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"])): # Check to see if the calculated frame-rate exceeds the maximum allowed frame-rate.
+                if (calculated_framerate[device] + config["dashcam"]["saving"]["framerate_snap"] >= float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"])): # Check to see if the frame-rate benchmark is within 0.2FPS of the maximum allowed framerate.
                     calculated_framerate[device] = float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"]) # Set the frame-rate to the maximum allowed frame-rate.
                 process_timing("end", "Dashcam/Calculations")
                 process_timing("start", "Dashcam/Writing")

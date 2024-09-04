@@ -166,7 +166,7 @@
                     "max_deletions_per_round": 10
                 }
             },
-            "framerate_snap": 0.5
+            "framerate_snap": 0.1
         },
         "capture": {
             "video": {
