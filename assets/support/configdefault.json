@@ -2,7 +2,7 @@
     "general": {
         "working_directory": "/home/pi/Software/Support/Predator/Working/",
         "interface_directory": "/dev/shm/PredatorInterface/",
-        "nlpr": {
+        "alpr": {
             "engine": "phantom",
             "validation": {
                 "guesses": 15,
@@ -165,7 +165,8 @@
                     "minimum_free_percentage": 0.1,
                     "max_deletions_per_round": 10
                 }
-            }
+            },
+            "framerate_snap": 0.5
         },
         "capture": {
             "video": {
@@ -312,6 +313,7 @@
         },
         "alpr": {
             "enabled": false,
+            "interval": 2,
             "devices": []
         }
     },

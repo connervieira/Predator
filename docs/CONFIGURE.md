@@ -218,6 +218,10 @@ This document describes the configuration values found `config.json`.
                     - Disk usage includes the entire disk, not just the Predator working directory.
                 - `max_deletions_per_round` is an integer number that determines the maximum number of files that Predator will delete at a time.
                     - This is prevents Predator from erasing too many dashcam segments if something goes wrong with the disk usage analysis.
+        - `framerate_snap` is a floating point number that determines the distance from the maximum framerate, above which the output file's framerate will "snap" to the maximum.
+            - For example, if this value is set to 0.2, then a file recorded at 29.85 with a maximum configured framerate of 30fps will round up to the 30fps limit, since the difference between 30 and 29.85 is less than 0.2.
+            - This is useful for enforcing consistent video playback framerate, even with slight variation.
+            - Setting this to higher values will reduce the accuracy of the playback speed. Videos may play back faster than they were recorded.
     - `capture` contains settings related to the capturing of dashcam video.
         - `video` contains settings for configuring Predator's video recording behavior.
             - `devices` is a list that contains the camera devices Predator will use when recording video in dash-cam mode.

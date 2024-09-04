@@ -158,7 +158,8 @@
                     "minimum_free_percentage": "+float",
                     "max_deletions_per_round": "+int"
                 }
-            }
+            },
+            "framerate_snap": "+float"
         },
         "capture": {
             "video": {
@@ -257,6 +258,7 @@
         },
         "alpr": {
             "enabled": "bool",
+            "interval": "+float",
             "devices": "list"
         }
     },

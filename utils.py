@@ -393,6 +393,15 @@ def display_message(message, level=1):
 
 
 
+
+def is_number(value):
+    try:
+        value = float(value)
+        return True
+    except ValueError:
+        return False
+
+
 # Define the function used to prompt the user for input.
 def prompt(message, optional=True, input_type=str, default=""):
     if ("--headless" in sys.argv): # Check to see if the headless flag exists in the command line arguments.
@@ -861,3 +870,6 @@ def sizeof_fmt(num, suffix='B'):
             return "%3.1f %s%s" % (num, unit, suffix)
         num /= 1024.0
     return "%.1f %s%s" % (num, 'Yi', suffix)
+
+def wait_for_input():
+    prompt("Press enter to continue")

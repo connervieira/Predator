@@ -62,9 +62,9 @@ import datetime # Required for converting between timestamps and human readable 
 import fnmatch # Required to use wildcards to check strings.
 
 if (config["general"]["modes"]["enabled"]["realtime"] == True):
-    import alprstream
+    import alpr
 
-if (config["general"]["modes"]["enabled"]["dashcam"] == True or config["dashcam"]["background_recording"] == True): # Check to see if OpenCV is needed.
+if (config["general"]["modes"]["enabled"]["dashcam"] == True): # Check to see if OpenCV is needed.
     import dashcam
 
 if (config["developer"]["offline"] == False): # Only import networking libraries if offline mode is turned off.
@@ -886,31 +886,18 @@ elif (mode_selection == "1" and config["general"]["modes"]["enabled"]["prerecord
         alpr_frames[frame] = {} # Set the license plate recognition information for this frame to an empty list as a placeholder.
 
         # Run license plate analysis on this frame.
-        if (config["general"]["alpr"]["engine"] == "phantom"): # Check to see if the configuration indicates that the Phantom ALPR engine should be used.
-            analysis_command = "alpr -n " + str(config["general"]["alpr"]["guesses"]) + " " + config["general"]["working_directory"] + "/frames/" + frame # Set up the Phantom ALPR command.
-            reading_output = str(os.popen(analysis_command).read()) # Run the command, and record the raw output string.
-            reading_output = json.loads(reading_output) # Convert the JSON string from the command output to actual JSON data that Python can manipulate.
-            if ("error" in reading_output): # Check to see if there were errors.
-                print("Phantom ALPR encountered an error: " + reading_output["error"]) # Display the ALPR error.
-                reading_output["results"] = [] # Set the results of the reading output to a blank placeholder list.
-        elif (config["general"]["alpr"]["engine"] == "openalpr"): # Check to see if the configuration indicates that the OpenALPR engine should be used.
-            analysis_command = "alpr -j -n " + str(config["general"]["alpr"]["guesses"]) + " " + config["general"]["working_directory"] + "/frames/" + frame # Set up the OpenALPR command.
-            reading_output = str(os.popen(analysis_command).read()) # Run the command, and record the raw output string.
-            reading_output = json.loads(reading_output) # Convert the JSON string from the command output to actual JSON data that Python can manipulate.
-        else: # If the configured ALPR engine is unknown, then return an error.
-            display_message("The configured ALPR engine is not recognized.", 3)
+        reading_output = alpr.run_alpr(config["general"]["working_directory"] + "/frames/" + frame)
 
         # Organize all of the detected license plates and their list of potential guess candidates to a dictionary to make them easier to manipulate.
         all_current_plate_guesses = {} # Create an empty place-holder dictionary that will be used to store all of the potential plates and their guesses.
         plate_index = 0 # Reset the plate index counter to 0 before the loop.
         for detected_plate in reading_output["results"]: # Iterate through each potential plate detected by the ALPR command.
-            all_current_plate_guesses[plate_index] = [] # Create an empty list for this plate so we can add all the potential plate guesses to it in the next step.
+            all_current_plate_guesses[plate_index] = {} # Create an empty dictionary for this plate so we can add all the potential plate guesses to it in the next step.
             for plate_guess in detected_plate["candidates"]: # Iterate through each plate guess candidate for each potential plate detected.
-                all_current_plate_guesses[plate_index].append(plate_guess["plate"]) # Add the current plate guess candidate to the list of plate guesses.
+                all_current_plate_guesses[plate_index][plate_guess["plate"]] = plate_guess["confidence"] # Add the current plate guess candidate to the list of plate guesses.
             plate_index+=1 # Increment the plate index counter.
 
         if (len(all_current_plate_guesses) > 0): # Only add license plate data to the current frame if data actually exists to add in the first place.
-            #alpr_frames[frame] = all_current_plate_guesses[0] # Collect the information for only the first plate detected by ALPR.
             alpr_frames[frame] = all_current_plate_guesses # Record all of the detected plates for this frame.
 
     print("Done.\n")
@@ -946,9 +933,9 @@ elif (mode_selection == "1" and config["general"]["modes"]["enabled"]["prerecord
     # Handle formatting validation.
     for frame in alpr_frames: # Iterate through each frame of video in the database of scanned plates.
         validated_alpr_frames[frame] = {} # Set the validated license plate recognition information for this frame to an empty list as a placeholder.
-        for plate in alpr_frames[frame].keys(): # Iterate through each plate detected per frame.
+        for plate in alpr_frames[frame]: # Iterate through each plate detected per frame.
             for guess in alpr_frames[frame][plate]: # Iterate through each guess for each plate.
-                if (all_current_plate_guesses[individual_detected_plate][plate_guess] >= float(config["general"]["alpr"]["validation"]["confidence"])): # Check to make sure this plate's confidence is higher than the minimum threshold set in the configuration.
+                if (alpr_frames[frame][plate][guess] >= float(config["general"]["alpr"]["validation"]["confidence"])): # Check to make sure this plate's confidence is higher than the minimum threshold set in the configuration.
                     if any(validate_plate(guess, format_template) for format_template in config["general"]["alpr"]["validation"]["license_plate_format"]) or "" in config["general"]["alpr"]["validation"]["license_plate_format"]: # Check to see if this plate passes validation.
                         if (plate not in validated_alpr_frames[frame]): # Check to see if this plate hasn't been added to the validated information yet.
                             validated_alpr_frames[frame][plate] = [] # Add the plate to the validated information as a blank placeholder list.
@@ -1290,32 +1277,13 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
 
     # Load the license plate history file.
     if (config["realtime"]["saving"]["license_plates"]["enabled"] == True): # Check to see if the license plate logging file name is not empty. If the file name is empty, then license plate logging will be disabled.
-        debug_message("Loading license plate history")
-        plate_log_file_location = config["general"]["working_directory"] + "/" + config["realtime"]["saving"]["license_plates"]["file"]
-        if (os.path.exists(plate_log_file_location) == False): # If the plate log file doesn't exist, create it.
-            save_to_file(plate_log_file_location, "{}") # Save a blank placeholder dictionary to the plate log file.
-
-        plate_log_file = open(plate_log_file_location, "r") # Open the plate log file for reading.
-        plate_log_file_contents = plate_log_file.read() # Read the raw contents of the plate file as a string.
-        plate_log_file.close() # Close the plate log file.
-
-        if (is_json(plate_log_file_contents) == True): # If the plate file contains valid JSON data, then load it.
-            plate_log = json.loads(plate_log_file_contents) # Read and load the plate log from the file contents.
-        else: # If the plate log file doesn't contain valid JSON data, then load a blank placeholder in it's place.
-            plate_log = json.loads("{}") # Load a blank placeholder dictionary.
-
-
-
-    if (config["dashcam"]["background_recording"] == True): # Check to see if the user has enabled auto dashcam background recording in real-time mode.
-        debug_message("Starting background dash-cam recording")
-        dashcam.start_dashcam_recording(config["dashcam"]["capture"]["video"]["devices"], config["general"]["working_directory"], True) # Start the dashcam recording process.
-        print("Started background dash-cam recording.")
+        plate_log = alpr.load_alpr_log()
 
 
     # Load the license plate alert database.
     alert_database = load_alert_database(config["general"]["alerts"]["databases"], config["general"]["working_directory"])
 
-    alprstream.start_alpr_stream() # Start the ALPR stream.
+    alpr.start_alpr_stream() # Start the ALPR stream.
 
     detected_license_plates = [] # Create an empty list that will hold each license plate detected by Predator during this session.
 
@@ -1346,7 +1314,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
         # Fetch the latest plates in the queue from the ALPR stream.
         debug_message("Fetching ALPR results")
         reading_output = {}
-        reading_output["results"] = alprstream.alpr_get_queued_plates() 
+        reading_output["results"] = alpr.alpr_get_queued_plates() 
 
 
 

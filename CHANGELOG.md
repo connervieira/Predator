@@ -433,9 +433,9 @@ March 6th, 2024
 
 ## Version 11.0
 
-### Reliability Update
+### Unification Update
 
-This update focuses on improving the reliability of Predator, especially when operating in dash-cam mode.
+This update focuses on unifying Predator's different modes to allow multipurpose functionality. Additional, this update emphasizes improving the reliability of Predator, especially when operating in dash-cam mode.
 
 *Release date to be determined*
 
@@ -489,3 +489,7 @@ This update focuses on improving the reliability of Predator, especially when op
     - Predator now creates a file named `install.json` containing some basic install information on the first start-up.
 - Remote alert database sources can now be cached.
     - This allows Predator to continue using entries from a remote alert database even when the source goes offline.
+- Migrated most of the ALPR processing to a dedicated file for sake of organization.
+- Added optional background ALPR to dash-cam mode.
+    - The user can now configure Predator to conduct ALPR in the background while simultaneously capturing video.
+    - Removed the old "background recording" functionality in real-time mode, and it's corresponding configuration value.

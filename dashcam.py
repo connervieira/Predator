@@ -51,6 +51,9 @@ if (config["dashcam"]["saving"]["looped_recording"]["mode"] == "automatic"): # O
 if (config["dashcam"]["notifications"]["reticulum"]["enabled"] == True): # Check to see if Reticulum notifications are enabled.
     import reticulum
 
+if (config["dashcam"]["alpr"]["enabled"] == True): # Check to see if background ALPR processing is enabled.
+    import alpr
+
 import lighting # Import the lighting.py script.
 update_status_lighting = lighting.update_status_lighting # Load the status lighting update function from the lighting script.
 
@@ -803,9 +806,14 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
 # This function runs in a seperate thread from the main dashcam capture, and will intermittently grab the most recent frame, and run ALPR on it.
 def background_alpr(device):
     global current_frame_data
-    while dashcam_recording_active: # TODO
-        cv2.imshow("Frame", current_frame_data[device])
-        cv2.waitkey(0)
+    while dashcam_recording_active: # Run until dashcam capture finishes.
+        if (device in current_frame_data):
+            temporary_image_filepath = config["general"]["interface_directory"] + "/DashcamALPR_" + str(device) + ".jpg" # Determine where this frame will be temporarily saved for processing.
+            cv2.imwrite(temporary_image_filepath, current_frame_data[device]) # Write this frame to the interface directory.
+            alpr_results = alpr.run_alpr(temporary_image_filepath) # Run ALPR on the frame.
+            if (len(alpr_results["results"]) > 0): # Check to see if at least one plate was detected.
+                print(alpr_results) # TODO: Handle ALPR results.
+            time.sleep(float(config["dashcam"]["alpr"]["interval"]))
 
 
 
@@ -827,7 +835,8 @@ def start_dashcam_recording(dashcam_devices, directory, background=False): # Thi
             button_watch_threads[int(pin)] = threading.Thread(target=watch_button, args=[int(pin)], name="ButtonWatch" + str(pin)) # Create a thread to monitor this pin.
             button_watch_threads[int(pin)].start() # Start the thread to monitor the pin.
 
-    dashcam_process = [] # Create a placeholder list to store the dashcam processes.
+    dashcam_capture_process = [] # Create a placeholder to store the dashcam recording processes.
+    dashcam_alpr_process = {} # Create a placeholder to store the dashcam ALPR processes.
     iteration_counter = 0 # Set the iteration counter to 0 so that we can increment it for each recording device specified.
     global parked
     global recording_active # This is a global variable that indicates whether Predator is actively capturing frames, or is dormant.
@@ -836,8 +845,12 @@ def start_dashcam_recording(dashcam_devices, directory, background=False): # Thi
     
     for device in dashcam_devices: # Run through each camera device specified in the configuration, and launch an OpenCV recording instance for it.
         if (config["dashcam"]["capture"]["video"]["devices"][device]["enabled"] == True):
-            dashcam_process.append(threading.Thread(target=capture_dashcam_video, args=[directory, device, config["dashcam"]["capture"]["video"]["devices"][device]["resolution"]["width"], config["dashcam"]["capture"]["video"]["devices"][device]["resolution"]["height"]], name="Dashcam" + str(dashcam_devices[device]["index"])))
-            dashcam_process[iteration_counter].start()
+            dashcam_capture_process.append(threading.Thread(target=capture_dashcam_video, args=[directory, device, config["dashcam"]["capture"]["video"]["devices"][device]["resolution"]["width"], config["dashcam"]["capture"]["video"]["devices"][device]["resolution"]["height"]], name="DashcamCapture" + str(dashcam_devices[device]["index"])))
+            dashcam_capture_process[iteration_counter].start()
+            if (config["dashcam"]["alpr"]["enabled"] == True): # Check to see if background ALPR processing is enabled.
+                if (device in config["dashcam"]["alpr"]["devices"]): # Check to see if this device is in the list of devices to run ALPR on.
+                    dashcam_alpr_process[iteration_counter] = threading.Thread(target=background_alpr, args=[device], name="DashcamALPR" + str(dashcam_devices[device]["index"]))
+                    dashcam_alpr_process[iteration_counter].start()
 
 
             iteration_counter += 1 # Iterate the counter. This value will be used to create unique file names for each recorded video.
@@ -902,7 +915,7 @@ def dashcam_output_handler(directory, device, width, height, framerate):
     save_this_segment = False # This will be set to True when the saving trigger is created. The current and previous dashcam segments are saved immediately when the trigger is created, but this allows the completed segment to be saved once the next segment is started, such that the saved segment doesn't cut off at the moment the user triggered a save.
 
     process_timing("start", "Dashcam/Calculations")
-    if (framerate > float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"])): # Check to see if the frame-rate benchmark results exceed the maximum allowed frame-rate.
+    if (framerate + 0.2 >= float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"])): # Check to see if the frame-rate benchmark is within 0.2FPS of the maximum allowed framerate.
         framerate = float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"]) # Set the frame-rate to the maximum allowed frame-rate.
     process_timing("end", "Dashcam/Calculations")
 
