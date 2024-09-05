@@ -495,3 +495,4 @@ This update focuses on unifying Predator's different modes to allow multipurpose
 - Remote alert database sources can now be cached.
     - This allows Predator to continue using entries from a remote alert database even when the source goes offline.
 - Migrated most of the ALPR processing to a dedicated file for sake of organization.
+- The "detected plate" notification sound now plays regardless of the console output level.

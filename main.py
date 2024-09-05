@@ -43,15 +43,12 @@ display_message = utils.display_message # Load the message display function from
 process_gpx = utils.process_gpx # Load the GPX processing function from the utils script.
 save_to_file = utils.save_to_file # Load the file saving function from the utils script.
 add_to_file = utils.add_to_file # Load the file appending function from the utils script.
-validate_plate = utils.validate_plate # Load the plate validation function from the utils script.
 display_shape = utils.display_shape # Load the shape displaying function from the utils script.
 countdown = utils.countdown # Load the timer countdown function from the utils script.
 get_gps_location = utils.get_gps_location # Load the function to get the current GPS location.
 convert_speed = utils.convert_speed # Load the function used to convert speeds from meters per second to other units.
 display_number = utils.display_number # Load the function used to display numbers as large ASCII font.
 closest_key = utils.closest_key # Load the function used to find the closest entry in a dictionary to a given number.
-display_alerts = utils.display_alerts # Load the function used to display license plate alerts given the dictionary of alerts.
-load_alert_database = utils.load_alert_database # Load the function used to load license plate alert databases.
 heartbeat = utils.heartbeat # Load the function to issue heartbeats to the interface directory.
 update_state = utils.update_state # Load the function to issue state updates to the interface directory.
 log_plates = utils.log_plates # Load the function to issue ALPR results to the interface directory.
@@ -63,6 +60,8 @@ import fnmatch # Required to use wildcards to check strings.
 
 if (config["general"]["modes"]["enabled"]["realtime"] == True):
     import alpr
+    display_alerts = alpr.display_alerts # Load the function used to display license plate alerts given the dictionary of alerts.
+    load_alert_database = alpr.load_alert_database # Load the function used to load license plate alert databases.
 
 if (config["general"]["modes"]["enabled"]["dashcam"] == True): # Check to see if OpenCV is needed.
     import dashcam
@@ -88,7 +87,6 @@ if (os.path.exists(predator_root_directory + "/install.json") == False): # Check
     print("To reset so this message is displayed again, remove the `install.json` file inside the main install directory." + style.end)
     input(style.faint + "Press enter to continue..." + style.end)
 
-    print("")
     clear()
     print(style.bold + style.red + "Commercial Support" + style.end)
     print(style.bold + "V0LT offers the following commercial support services for Predator:" + style.end)
@@ -103,21 +101,19 @@ if (os.path.exists(predator_root_directory + "/install.json") == False): # Check
     print("To learn more, don't hesitate to get in contact: " + style.underline + "https://v0lttech.com/contact.php\n" + style.end)
     input(style.faint + "Press enter to continue..." + style.end)
 
-    print("")
     clear()
     print(style.bold + style.red + "Warranty" + style.end)
     print("While Predator is designed to be as reliable and consistent as possible, it comes with absolutely no warranty, it should not be used in a context where failure could cause harm to people or property.")
     print("For more information, see the `SECURITY.md` document.")
     input(style.faint + "Press enter to continue..." + style.end)
 
-    print("")
     clear()
     print(style.bold + style.red + "Privacy" + style.end)
     print("Predator does not share telemetry or usage data with V0LT, or any other entity. However, by default, Predator will attach a random identifier to requests made to remote license plate list sources (as configured under `general>alerts>databases`). This identifier allows administrators of servers hosting license plate lists to roughly count how many clients are using their lists. If you're concerned about the administrator of one of your remote license plate lists using this unique identifier to derive information about how often you use Predator (based on when you fetch their lists), you can disable this functionality using the `developer>identify_to_remote_sources` configuration value.")
+    print("Additionally, by default, Predator will fetch a hardcoded ignore list from the V0LT website. Once again, this functionality does not send any identifiable information or telemetry data. To disable this functionality, either enable the `developer>offline` configuration value to disable all network requests, or remove the hardcoded ignore list from `ignore.py`.")
     print("For more information, see the `docs/CONFIGURE.md` document.")
     input(style.faint + "Press enter to continue..." + style.end)
 
-    print("")
     clear()
     print(style.bold + style.red + "Funding" + style.end)
     print("Predator is completely free to use, and doesn't contain monetization like advertising or sponsorships. If you find the project to be useful, please consider supporting it financially.")
@@ -936,7 +932,7 @@ elif (mode_selection == "1" and config["general"]["modes"]["enabled"]["prerecord
         for plate in alpr_frames[frame]: # Iterate through each plate detected per frame.
             for guess in alpr_frames[frame][plate]: # Iterate through each guess for each plate.
                 if (alpr_frames[frame][plate][guess] >= float(config["general"]["alpr"]["validation"]["confidence"])): # Check to make sure this plate's confidence is higher than the minimum threshold set in the configuration.
-                    if any(validate_plate(guess, format_template) for format_template in config["general"]["alpr"]["validation"]["license_plate_format"]) or "" in config["general"]["alpr"]["validation"]["license_plate_format"]: # Check to see if this plate passes validation.
+                    if any(alpr.validate_plate(guess, format_template) for format_template in config["general"]["alpr"]["validation"]["license_plate_format"]) or "" in config["general"]["alpr"]["validation"]["license_plate_format"]: # Check to see if this plate passes validation.
                         if (plate not in validated_alpr_frames[frame]): # Check to see if this plate hasn't been added to the validated information yet.
                             validated_alpr_frames[frame][plate] = [] # Add the plate to the validated information as a blank placeholder list.
                         validated_alpr_frames[frame][plate].append(guess) # Since this plate guess failed the validation test, delete it from the list of guesses.
@@ -1387,7 +1383,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
                         print ("    Plate guesses:")
                     for plate_guess in all_current_plate_guesses[individual_detected_plate]: # Iterate through each plate and grab the first plate that matches the plate formatting guidelines as the 'detected plate'.
                         if (all_current_plate_guesses[individual_detected_plate][plate_guess] >= float(config["general"]["alpr"]["validation"]["confidence"])): # Check to make sure this plate's confidence is higher than the minimum threshold set in the configuration.
-                            if any([validate_plate(plate_guess, format_template) for format_template in config["general"]["alpr"]["validation"]["license_plate_format"]]): # Check to see whether or not the plate passes the validation based on the format specified by the user.
+                            if any([alpr.validate_plate(plate_guess, format_template) for format_template in config["general"]["alpr"]["validation"]["license_plate_format"]]): # Check to see whether or not the plate passes the validation based on the format specified by the user.
                                 detected_plate = plate_guess # Grab the validated plate as the 'detected plate'.
                                 successfully_found_plate = True # The plate was successfully validated, so indicate that a plate was successfully found this round.
                                 if (config["realtime"]["interface"]["display"]["show_validation"] == True): # Only print the validated plate if the configuration says to do so.
@@ -1441,10 +1437,11 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
         if (config["realtime"]["interface"]["display"]["output_level"] >= 3): # Only display this status message if the output level indicates to do so.
             print("Displaying detected license plates...")
 
+        for plate in new_plates_detected:
+            play_sound("notification")
         if (config["realtime"]["interface"]["display"]["output_level"] >= 2): # Only display this status message if the output level indicates to do so.
             print("Plates detected: " + str(len(new_plates_detected))) # Display the number of license plates detected this round.
             for plate in new_plates_detected:
-                play_sound("notification")
                 print("    Detected plate: " + plate) # Print the detected plate.
 
 
@@ -1532,7 +1529,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
 
                     plate_log[current_time]["plates"][plate]["alerts"] = list(dict.fromkeys(plate_log[current_time]["plates"][plate]["alerts"])) # De-duplicate the 'alerts' list for this plate.
 
-                save_to_file(plate_log_file_location, json.dumps(plate_log)) # Save the modified plate log to the disk as JSON data.
+                save_to_file(config["general"]["working_directory"] + "/" + config["realtime"]["saving"]["license_plates"]["file"], json.dumps(plate_log)) # Save the modified plate log to the disk as JSON data.
 
 
 

@@ -13,6 +13,7 @@
 
 import os # Required to interact with certain operating system functions
 import json # Required to process JSON data
+import fnmatch # Required to use wildcards to check strings.
 
 predator_root_directory = str(os.path.dirname(os.path.realpath(__file__))) # This variable determines the folder path of the root Predator directory. This should usually automatically recognize itself, but it if it doesn't, you can change it manually.
 
@@ -35,6 +36,7 @@ get_gps_location_lazy = utils.get_gps_location_lazy
 heartbeat = utils.heartbeat
 update_state = utils.update_state
 convert_speed = utils.convert_speed
+save_to_file = utils.save_to_file
 
 import threading
 import time
@@ -804,16 +806,136 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
 
 
 # This function runs in a seperate thread from the main dashcam capture, and will intermittently grab the most recent frame, and run ALPR on it.
+if (config["realtime"]["saving"]["license_plates"]["enabled"] == True): # Check to see if the license plate logging file name is not empty. If the file name is empty, then license plate logging will be disabled.
+    plate_log = alpr.load_alpr_log()
 def background_alpr(device):
     global current_frame_data
+    if (config["realtime"]["saving"]["license_plates"]["enabled"] == True): # Check to see if the license plate logging file name is not empty. If the file name is empty, then license plate logging will be disabled.
+        global plate_log
+
     while dashcam_recording_active: # Run until dashcam capture finishes.
         if (device in current_frame_data):
+            debug_message("Running ALPR")
             temporary_image_filepath = config["general"]["interface_directory"] + "/DashcamALPR_" + str(device) + ".jpg" # Determine where this frame will be temporarily saved for processing.
             cv2.imwrite(temporary_image_filepath, current_frame_data[device]) # Write this frame to the interface directory.
             alpr_results = alpr.run_alpr(temporary_image_filepath) # Run ALPR on the frame.
+
+            debug_message("Validating plates")
+            detected_plates_valid = [] # This will hold all of the plates that pass the validation sequence.
+            detected_plates_all = [] # This will hold all plates detected, regardless of validation.
             if (len(alpr_results["results"]) > 0): # Check to see if at least one plate was detected.
-                print(alpr_results) # TODO: Handle ALPR results.
-            time.sleep(float(config["dashcam"]["alpr"]["interval"]))
+                for result in alpr_results["results"]:
+                    guesses_valid = {} # This is a temporary dictionary that will hold the valid guesses before they are added to the complete list of detected plates.
+                    guesses_all = {} # This is a temporary dictionary that will hold all guesses before they are added to the complete list of detected plates.
+                    for candidate in result["candidates"]:
+                        if (candidate["confidence"] >= float(config["general"]["alpr"]["validation"]["confidence"])): # Check to make sure this plate exceeds the minimum confidence threshold.
+                            if any(alpr.validate_plate(candidate["plate"], format_template) for format_template in config["general"]["alpr"]["validation"]["license_plate_format"]) or len(config["general"]["alpr"]["validation"]["license_plate_format"]) == 0: # Check to see if this plate passes validation.
+                                guesses_valid[candidate["plate"]] = candidate["confidence"] # Add this plate to the list of valid guesses.
+                        guesses_all[candidate["plate"]] = candidate["confidence"] # Add this plate to the list of valid guesses.
+
+                    if (len(guesses_valid) == 0): # If there are no valid guesses, then check to see if "best_effort" mode is enabled.
+                        if (config["general"]["alpr"]["validation"]["best_effort"] == True): # Check to see if "best_effort" is enabled.
+                            guesses_valid[result["candidates"][0]["plate"]] = result["candidates"][0]["confidence"] # Add the most likely plate to the valid guesses.
+
+                    if (len(guesses_valid) > 0): # Check to see if there is at least one valid guess.
+                        detected_plates_valid.append(guesses_valid) # Add the valid guesses as a new plate.
+                    if (len(guesses_all) > 0): # Check to see if there is at least one guess.
+                        detected_plates_all.append(guesses_all) # Add the guesses as a new plate.
+                    del guesses_valid
+                    del guesses_all
+
+
+            debug_message("Checking for alerts")
+            if (config["general"]["alerts"]["alerts_ignore_validation"]):
+                plates_to_check_alerts = detected_plates_all
+            else:
+                plates_to_check_alerts = detected_plates_valid
+            alert_database = alpr.load_alert_database(config["general"]["alerts"]["databases"], config["general"]["working_directory"]) # Load the license plate alert database.
+            active_alerts = {} # This is an empty placeholder that will hold all of the active alerts. 
+            if (len(alert_database) > 0): # Only run alert processing if the alert database isn't empty.
+                for rule in alert_database: # Run through every plate in the alert plate database supplied by the user.
+                    for plate in plates_to_check_alerts: # Iterate through each of the plates detected this round, regardless of whether or not they were validated.
+                        for guess in plate: # Run through each of the plate guesses generated by ALPR, regardless of whether or not they are valid according to the plate formatting guideline.
+                            if (fnmatch.fnmatch(guess, rule)): # Check to see this detected plate guess matches this particular plate in the alert database, taking wildcards into account.
+                                active_alerts[guess] = {}
+                                active_alerts[guess]["rule"] = rule # Add this plate to the active alerts dictionary with the rule that triggered it.
+                                if ("name" in alert_database[rule]):
+                                    active_alerts[guess]["name"] = alert_database[rule]["name"]
+                                if ("description" in alert_database[rule]):
+                                    active_alerts[guess]["description"] = alert_database[rule]["description"]
+                                if (config["general"]["alerts"]["allow_duplicate_alerts"] == False):
+                                    break # Break the loop if an alert is found for this guess, in order to avoid triggering multiple alerts for each guess of the same plate.
+
+
+
+            # Save detected license plates to file.
+            if (config["realtime"]["saving"]["license_plates"]["enabled"] == True): # Check to see if license plate history saving is enabled.
+                debug_message("Saving license plate history")
+
+                if (len(detected_plates_all) > 0): # Only save the license plate history for this round if 1 or more plates were detected.
+                    current_time = time.time() # Get the current timestamp.
+
+                    plate_log[current_time] = {} # Initialize an entry in the plate history log using the current time.
+
+                    if (config["realtime"]["gps"]["alpr_location_tagging"] == True): # Check to see if the configuration value for geotagging license plate detections has been enabled.
+                        if (config["general"]["gps"]["enabled"] == True): # Check to see if GPS functionality is enabled.
+                            current_location = get_gps_location() # Get the current location.
+                        else:
+                            current_location = [0.0, 0.0] # Grab a placeholder for the current location, since GPS functionality is disabled.
+
+                        plate_log[current_time]["location"] = {"lat": current_location[0],"lon": current_location[1]} # Add the current location to the plate history log entry.
+
+                    plate_log[current_time]["plates"] = {}
+
+                    for plate in detected_plates_all: # Iterate though each plate detected this round.
+                        top_plate = list(plate.keys())[0]
+                        if (config["realtime"]["saving"]["license_plates"]["save_guesses"] == True): # Only initialize the plate's guesses to the log if Predator is configured to do so.
+                            plate_log[current_time]["plates"][top_plate] = {"alerts": [], "guesses": {}} # Initialize this plate in the plate log.
+                        else:
+                            plate_log[current_time]["plates"][top_plate] = {"alerts": []} # Initialize this plate in the plate log.
+                        for guess in plate: # Iterate through each guess in this plate.
+                            if (guess in active_alerts): # Check to see if this guess matches one of the active alerts.
+                                plate_log[current_time]["plates"][top_plate]["alerts"].append(active_alerts[guess]) # Add the rule that triggered the alert to a separate list.
+                            if (config["realtime"]["saving"]["license_plates"]["save_guesses"] == True): # Only add this guess to the log if Predator is configured to do so.
+                                plate_log[current_time]["plates"][top_plate]["guesses"][guess] = plate[guess] # Add this guess to the log, with its confidence level.
+
+                    save_to_file(config["general"]["working_directory"] + "/" + config["realtime"]["saving"]["license_plates"]["file"], json.dumps(plate_log)) # Save the modified plate log to the disk as JSON data.
+
+
+
+            # Issue interface directory updates.
+            if (config["general"]["interface_directory"] != ""): # Check to see if the interface directory is enabled.
+                debug_message("Issuing interface updates")
+                heartbeat() # Issue a status heartbeat.
+
+                # Reformat the plates to the format expected by the interface directory.
+                plates_to_save_to_interface = {}
+                for plate in detected_plates_valid:
+                    top_plate = list(plate.keys())[0]
+                    plates_to_save_to_interface[top_plate] = {}
+                    for guess in plate:
+                        plates_to_save_to_interface[top_plate][guess] = plate[guess]
+
+                utils.log_plates(plates_to_save_to_interface) # Update the list of recently detected license plates.
+                utils.log_alerts(active_alerts) # Update the list of active alerts.
+
+
+            # Display alerts.
+            alpr.display_alerts(active_alerts) # Display active alerts.
+            for plate in detected_plates_valid:
+                utils.play_sound("notification")
+            for alert in active_alerts: # Run once for each active alert.
+                if (config["realtime"]["push_notifications"]["enabled"] == True): # Check to see if the user has Gotify notifications enabled.
+                    debug_message("Issuing alert push notification")
+                    os.system("curl -X POST '" + config["realtime"]["push_notifications"]["server"] + "/message?token=" + config["realtime"]["push_notifications"]["token"] + "' -F 'title=Predator' -F 'message=A license plate in an alert database has been detected: " + detected_plate + "' > /dev/null 2>&1 &") # Send a push notification using Gotify.
+
+                if (config["realtime"]["interface"]["display"]["shape_alerts"] == True): # Check to see if the user has enabled shape notifications.
+                    utils.display_shape("triangle") # Display an ASCII triangle in the output.
+
+                utils.play_sound("alert") # Play the alert sound, if configured to do so.
+
+
+            time.sleep(float(config["dashcam"]["alpr"]["interval"])) # Sleep (if configured to do so) before starting the next processing loop.
 
 
 

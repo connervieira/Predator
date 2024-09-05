@@ -322,7 +322,7 @@ This document describes the configuration values found `config.json`.
                         - `"mps"` for meters-per-second
                         - `"fps"` for feet-per-second
                         - `"knot"` for knots
-        - `alpr` contains settings for controlling if and how Predator runs ALPR in the background while dashcam recording.
+        - `alpr` contains settings for controlling if and how Predator runs ALPR in the background while dashcam recording. Note that this feature will not run ALPR at the same performance as the dedicated real-time ALPR mode.
             - `enabled` is a boolean that determines if Predator will run ALPR in the background on dashcam threads.
                 - When set to `false`, dashcam recording will continue as normal without ALPR.
                 - When set to `true`, dashcam recording will run with ALPR analysis on a separate thread.

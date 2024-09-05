@@ -479,23 +479,6 @@ def play_sound(sound_id):
 
 
 
-# This function validates a license plate given a template.
-def validate_plate(plate, template):
-    plate_valid = True # By default, the plate is valid, until we find a character that doesn't align.
-
-    if (len(template) == len(plate)): # Make sure the template and plate are the same length. If so, continue with validation. Otherwise, automatically invalidate the plate, and skip the rest of the validation process.
-        for x in range(len(template)):
-            if (template[x].isalpha() == plate[x].isalpha() or template[x].isnumeric() == plate[x].isnumeric()): # If this character is alphabetical in both the template and plate, or if this character is numeric in both the template and plate, then this character is valid.
-                # This character is valid, so don't change anything.
-                pass
-            else:
-                # This character doesn't match between the template and plate, so mark the plate as invalid.
-                plate_valid = False
-    else:
-        plate_valid = False
-
-    return plate_valid # Return the results of the plate validation
-
 
 
 
@@ -776,91 +759,6 @@ def closest_key(array, search_key):
             current_best = [key, difference] # Make this entry the current best.
 
     return current_best # Return the closest found entry.
-
-
-
-
-# This function is used to display a list of provided license plate alerts.
-def display_alerts(active_alerts):
-    for alert in active_alerts: # Iterate through each active alert.
-        # Display an alert that is starkly different from the rest of the console output.
-        print(style.yellow + style.bold)
-        print("===================")
-        print("ALERT HIT - " + str(alert))
-        if ("rule" in active_alerts[alert]): # Check to see if a rule exists for this alert plate. This should always be the case, but it's worth checking for sake of stability.
-            print("Rule: " + str(active_alerts[alert]["rule"])) # Display the rule that triggered this alert.
-        if ("name" in active_alerts[alert]): # Check to see if a name exists for this alert plate.
-            print("Name: " + str(active_alerts[alert]["name"])) # Display this alert plate's name.
-        if ("description" in active_alerts[alert]): # Check to see if a name exists for this alert plate.
-            print("Description: " + str(active_alerts[alert]["description"])) # Display this alert plate's description.
-        print("===================")
-        print(style.end + style.end)
-
-
-
-
-# The following functions are responsible for loading alert database.
-def load_alert_database_remote(source, cache_directory):
-    debug_message("Loading remote database source.")
-    if (config["realtime"]["saving"]["remote_alert_sources"] == True):
-        source_hash = hashlib.md5(source.encode()).hexdigest()
-    if (config["developer"]["offline"] == False): # Check to see if offline mode is disabled.
-        try:
-            raw_download_data = requests.get(source, timeout=6).text # Save the raw text data from the URL to a variable.
-        except:
-            raw_download_data = "{}"
-            display_message("The license plate alert database from " + source + " could not be loaded.", 2)
-            if (config["realtime"]["saving"]["remote_alert_sources"] == True):
-                if (os.path.exists(cache_directory + "/" + source_hash + ".json")): # Check to see if the cached file exists.
-                    debug_message("Attempting to load locally cached data for this remote source.")
-                    return load_alert_database_local(cache_directory + "/" + source_hash + ".json") # Load the locally cached file.
-        processed_download_data = str(raw_download_data) # Convert the downloaded data to a string.
-        try:
-            alert_database = json.loads(processed_download_data) # Load the alert database as JSON data.
-            if (config["realtime"]["saving"]["remote_alert_sources"] == True):
-                if (os.path.isdir(cache_directory) == False):
-                    os.system("mkdir -p '" + str(cache_directory) + "'")
-                save_to_file(cache_directory + "/" + source_hash + ".json", json.dumps(alert_database))
-        except:
-            alert_database = {}
-            display_message("The license plate alert database returned by the remote source " + source + " doesn't appear to be compatible JSON data. This source has not been loaded.", 2)
-    else: # Predator is in offline mode, but a remote alert database source was specified.
-        alert_database = {} # Set the alert database to an empty dictionary.
-        display_message("A remote alert database source " + source + " was specified, but Predator is in offline mode. This source has not been loaded.", 2)
-
-    return alert_database
-
-def load_alert_database_local(source):
-    debug_message("Loading local database source.")
-    if (os.path.exists(source)): # Check to see if the database specified by the user actually exists.
-        f = open(source, "r") # Open the user-specified database file.
-        file_contents = f.read() # Read the file.
-        if (file_contents[0] == "{"): # Check to see if the first character in the file indicates that this alert database is a JSON database.
-            alert_database = json.loads(file_contents) # Load the alert database as JSON data.
-        else:
-            alert_database = {}
-            display_message("The alert database specified at " + source + " does appear to contain compatible JSON data. This source has not been loaded.", 3)
-        f.close() # Close the file.
-    else: # If the alert database specified by the user does not exist, alert the user of the error.
-        alert_database = {}
-        display_message("The alert database specified at " + source + " does not exist. This source has not been loaded.", 3)
-
-    return alert_database
-
-def load_alert_database(sources, project_directory): # This function compiles the provided list of sources into a single complete alert dictionary.
-    cache_directory = project_directory + "/" + config["realtime"]["saving"]["remote_alert_sources"]["directory"]
-    debug_message("Loading license plate alert list")
-    complete_alert_database = {} # Set the complete alert database to a placeholder dictionary.
-    for source in sources: # Iterate through each source in the list of sources.
-        if (validators.url(source)): # Check to see if the user supplied a URL as their alert database.
-            alert_database = load_alert_database_remote(source, cache_directory)
-        else: # The input the user supplied doesn't appear to be a URL, so assume it is a file.
-            alert_database = load_alert_database_local(project_directory + "/" + source)
-
-        for rule in alert_database: # Iterate over each rule in this database.
-            complete_alert_database[rule] = alert_database[rule] # Add this rule to the complete alert database.
-
-    return complete_alert_database
 
 
 
