@@ -483,6 +483,9 @@ This update emphasizes improving the reliability of Predator, especially when op
     - Added optional background ALPR to dash-cam mode.
         - The user can now configure Predator to conduct ALPR in the background while simultaneously capturing video.
         - Removed the old "background recording" functionality in real-time mode, and it's corresponding configuration value.
+    - Added video playback frame-rate "snapping", such that the video frame-rate round up to the max if it is within a certain distance of the max.
+        - For example, a video recorded at 29.85fps with a maximum configured limit of 30fps can be rounded up to 30fps for sake of consistency.
+        - This means that minor fluctations in frame-rate will not cause the frame-rate to change from file to file.
 - Updated status lighting.
     - Moved the status lighting configuration to the "general" section.
     - Network requests are only made to update the status lighting if it has changed since the last update.
