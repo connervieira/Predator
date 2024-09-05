@@ -433,9 +433,9 @@ March 6th, 2024
 
 ## Version 11.0
 
-### Unification Update
+### Refinement Update
 
-This update focuses on unifying Predator's different modes to allow multipurpose functionality. Additional, this update emphasizes improving the reliability of Predator, especially when operating in dash-cam mode.
+This update emphasizes improving the reliability of Predator, especially when operating in dash-cam mode. This update also expands the functionality of dash-cam mode to allow simultaneous dash-cam recording and ALPR analysis.
 
 *Release date to be determined*
 
@@ -448,7 +448,6 @@ This update focuses on unifying Predator's different modes to allow multipurpose
     - Predator will no longer try to apply a time offset when the system time is in the future relative to the GPS time.
     - Predator no longer displays warning about the time being desynced when GPS time correction is disabled.
     - Predator will now reset the time offset if the system time changes.
-- Increased the max-depth of the configuration validation process.
 - Updated dash-cam mode.
     - Added customizable frame-rate restrictions.
         - Added a per-device configuration value to set a maximum allowed frame-rate. When this frame-rate is exceeded, Predator will throttle dash-cam recording to stay below the limit.
@@ -488,11 +487,14 @@ This update focuses on unifying Predator's different modes to allow multipurpose
     - Moved the status lighting configuration to the "general" section.
     - Network requests are only made to update the status lighting if it has changed since the last update.
         - This means that the status lighting can be turned off, and it will only turn back on when an update is made.
+    - Changed the default `dashcam_save` status light color to blue, to avoid confusion with `alpr_alert`.
 - Updated configuration back-end.
+    - Increased the max-depth of the configuration validation process.
     - Predator can now automatically update the configuration file between versions when configuration values are added or removed.
 - Added an initial start-up sequence, where Predator shows some basic information before the normal start-up.
     - Predator now creates a file named `install.json` containing some basic install information on the first start-up.
-- Remote alert database sources can now be cached.
-    - This allows Predator to continue using entries from a remote alert database even when the source goes offline.
-- Migrated most of the ALPR processing to a dedicated file for sake of organization.
+- Updated the ALPR handler.
+    - Remote alert database sources can now be cached.
+        - This allows Predator to continue using entries from a remote alert database even when the source goes offline.
+    - Migrated most of the ALPR processing to a dedicated file for sake of organization.
 - The "detected plate" notification sound now plays regardless of the console output level.

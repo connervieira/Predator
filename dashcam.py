@@ -810,6 +810,7 @@ if (config["realtime"]["saving"]["license_plates"]["enabled"] == True): # Check 
     plate_log = alpr.load_alpr_log()
 def background_alpr(device):
     global current_frame_data
+    global saving_active # This variable is used to determine which value the status lighting should be returned to after a plate detection.
     if (config["realtime"]["saving"]["license_plates"]["enabled"] == True): # Check to see if the license plate logging file name is not empty. If the file name is empty, then license plate logging will be disabled.
         global plate_log
 
@@ -922,8 +923,18 @@ def background_alpr(device):
 
             # Display alerts.
             alpr.display_alerts(active_alerts) # Display active alerts.
-            for plate in detected_plates_valid:
-                utils.play_sound("notification")
+            if (config["general"]["status_lighting"]["enabled"] == True): # Check to see if status lighting alerts are enabled in the Predator configuration.
+                if (len(active_alerts) > 0): # Check to see if there are active alerts.
+                    update_status_lighting("alpr_alert") # Run the function to update the status lighting.
+                elif (len(detected_plates_valid) > 0):
+                    update_status_lighting("alpr_detection") # Run the function to update the status lighting.
+                else:
+                    if (saving_active == True):
+                        update_status_lighting("dashcam_save") # Since the current dashcam segment is being saved, return to the corresponding status lighting value.
+                    else:
+                        update_status_lighting("normal")
+            for plate in detected_plates_valid: # Run once for each detected plate.
+                utils.play_sound("notification") # Play the "new plate detected" sound.
             for alert in active_alerts: # Run once for each active alert.
                 if (config["realtime"]["push_notifications"]["enabled"] == True): # Check to see if the user has Gotify notifications enabled.
                     debug_message("Issuing alert push notification")
@@ -1146,7 +1157,7 @@ def dashcam_output_handler(directory, device, width, height, framerate):
                             dashcam_segment_saving.start() # Start the dashcam segment saving thread.
                     save_this_segment = False # Reset the segment saving flag.
                     saving_active = False
-                    update_status_lighting("normal") # Return status lighting to normal.
+                    update_status_lighting("normal") # Return status lighting to normal since a new segment has been started.
 
 
                 delete_old_segments() # Handle the erasing of any old dash-cam segments that need to be deleted.
