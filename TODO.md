@@ -44,8 +44,8 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Finish video framerate snapping.
 - [ ] Test the new ALPR system.
     - [X] Test pre-recorded mode.
-    - [ ] Test real-time mode.
-    - [ ] Test dash-cam mode.
+    - [X] Test real-time mode.
+    - [X] Test dash-cam mode.
 
 ## Hypothetical
 
