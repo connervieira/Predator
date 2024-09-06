@@ -501,3 +501,5 @@ This update emphasizes improving the reliability of Predator, especially when op
         - This allows Predator to continue using entries from a remote alert database even when the source goes offline.
     - Migrated most of the ALPR processing to a dedicated file for sake of organization.
 - The "detected plate" notification sound now plays regardless of the console output level.
+- Alerts in real-time mode are now played at the end of the processing cycle.
+    - Previously, interface updates would have to wait for the audio alerts to finish playing.

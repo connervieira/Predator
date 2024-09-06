@@ -1383,7 +1383,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
                         print ("    Plate guesses:")
                     for plate_guess in all_current_plate_guesses[individual_detected_plate]: # Iterate through each plate and grab the first plate that matches the plate formatting guidelines as the 'detected plate'.
                         if (all_current_plate_guesses[individual_detected_plate][plate_guess] >= float(config["general"]["alpr"]["validation"]["confidence"])): # Check to make sure this plate's confidence is higher than the minimum threshold set in the configuration.
-                            if any(alpr.validate_plate(plate_guess, format_template) for format_template in config["general"]["alpr"]["validation"]["license_plate_format"]]): # Check to see whether or not the plate passes the validation based on the format specified by the user.
+                            if any(alpr.validate_plate(plate_guess, format_template) for format_template in config["general"]["alpr"]["validation"]["license_plate_format"]): # Check to see whether or not the plate passes the validation based on the format specified by the user.
                                 detected_plate = plate_guess # Grab the validated plate as the 'detected plate'.
                                 successfully_found_plate = True # The plate was successfully validated, so indicate that a plate was successfully found this round.
                                 if (config["realtime"]["interface"]["display"]["show_validation"] == True): # Only print the validated plate if the configuration says to do so.
@@ -1472,27 +1472,6 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
                         active_alerts[plate]["rule"] = rule # Add the rule that triggered this alert to the alert information.
 
 
-        if (len(active_alerts) > 0): # Check to see if there are any active alerts to see if an alert state should be triggered.
-            if (config["general"]["status_lighting"]["enabled"] == True): # Check to see if status lighting alerts are enabled in the Predator configuration.
-                update_status_lighting("alpr_alert") # Run the function to update the status lighting.
-
-            if (config["realtime"]["interface"]["display"]["output_level"] >= 1): # Only display alerts if the configuration specifies to do so.
-                display_alerts(active_alerts) # Display all active alerts.
-
-            for alert in active_alerts: # Run once for each active alert.
-                if (config["realtime"]["push_notifications"]["enabled"] == True): # Check to see if the user has Gotify notifications enabled.
-                    debug_message("Issuing alert push notification")
-                    os.system("curl -X POST '" + config["realtime"]["push_notifications"]["server"] + "/message?token=" + config["realtime"]["push_notifications"]["token"] + "' -F 'title=Predator' -F 'message=A license plate in an alert database has been detected: " + detected_plate + "' > /dev/null 2>&1 &") # Send a push notification using Gotify.
-
-                if (config["realtime"]["interface"]["display"]["shape_alerts"] == True): # Check to see if the user has enabled shape notifications.
-                    display_shape("triangle") # Display an ASCII triangle in the output.
-
-                play_sound("alert") # Play the alert sound, if configured to do so.
-
-        if (config["realtime"]["interface"]["display"]["output_level"] >= 3): # Only display this status message if the output level indicates to do so.
-            print("Done.\n----------")
-
-
 
 
         # Save detected license plates to file.
@@ -1544,6 +1523,28 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
             log_alerts(active_alerts) # Update the list of active alerts.
             if (config["realtime"]["interface"]["display"]["output_level"] >= 3): # Only display this status message if the output level indicates to do so.
                 print("Done.\n----------")
+
+
+
+        if (len(active_alerts) > 0): # Check to see if there are any active alerts to see if an alert state should be triggered.
+            if (config["general"]["status_lighting"]["enabled"] == True): # Check to see if status lighting alerts are enabled in the Predator configuration.
+                update_status_lighting("alpr_alert") # Run the function to update the status lighting.
+
+            if (config["realtime"]["interface"]["display"]["output_level"] >= 1): # Only display alerts if the configuration specifies to do so.
+                display_alerts(active_alerts) # Display all active alerts.
+
+            for alert in active_alerts: # Run once for each active alert.
+                if (config["realtime"]["push_notifications"]["enabled"] == True): # Check to see if the user has Gotify notifications enabled.
+                    debug_message("Issuing alert push notification")
+                    os.system("curl -X POST '" + config["realtime"]["push_notifications"]["server"] + "/message?token=" + config["realtime"]["push_notifications"]["token"] + "' -F 'title=Predator' -F 'message=A license plate in an alert database has been detected: " + detected_plate + "' > /dev/null 2>&1 &") # Send a push notification using Gotify.
+
+                if (config["realtime"]["interface"]["display"]["shape_alerts"] == True): # Check to see if the user has enabled shape notifications.
+                    display_shape("triangle") # Display an ASCII triangle in the output.
+
+                play_sound("alert") # Play the alert sound, if configured to do so.
+
+        if (config["realtime"]["interface"]["display"]["output_level"] >= 3): # Only display this status message if the output level indicates to do so.
+            print("Done.\n----------")
 
 
 
