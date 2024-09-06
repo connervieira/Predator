@@ -932,7 +932,7 @@ elif (mode_selection == "1" and config["general"]["modes"]["enabled"]["prerecord
         for plate in alpr_frames[frame]: # Iterate through each plate detected per frame.
             for guess in alpr_frames[frame][plate]: # Iterate through each guess for each plate.
                 if (alpr_frames[frame][plate][guess] >= float(config["general"]["alpr"]["validation"]["confidence"])): # Check to make sure this plate's confidence is higher than the minimum threshold set in the configuration.
-                    if any(alpr.validate_plate(guess, format_template) for format_template in config["general"]["alpr"]["validation"]["license_plate_format"]) or "" in config["general"]["alpr"]["validation"]["license_plate_format"]: # Check to see if this plate passes validation.
+                    if any(alpr.validate_plate(candidate["plate"], format_template) for format_template in config["general"]["alpr"]["validation"]["license_plate_format"]) or len(config["general"]["alpr"]["validation"]["license_plate_format"]) == 0: # Check to see if this plate passes validation.
                         if (plate not in validated_alpr_frames[frame]): # Check to see if this plate hasn't been added to the validated information yet.
                             validated_alpr_frames[frame][plate] = [] # Add the plate to the validated information as a blank placeholder list.
                         validated_alpr_frames[frame][plate].append(guess) # Since this plate guess failed the validation test, delete it from the list of guesses.
@@ -1375,7 +1375,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
 
                 # Run validation according to the configuration on the plate(s) detected.
                 if (len(config["general"]["alpr"]["validation"]["license_plate_format"]) == 0): # If the user didn't supply a license plate format, then skip license plate validation.
-                    detected_plate = str(list(all_current_plate_guesses[individual_detected_plate].keys())[1]) # Grab the most likely detected plate as the 'detected plate'.
+                    detected_plate = str(list(all_current_plate_guesses[individual_detected_plate].keys())[1]) # Grab the most likely detected plate as the 'detected plate'. TODO: Determine why this is a 1 and not a 0.
                     successfully_found_plate = True # Plate validation wasn't needed, so the fact that a plate existed at all means a valid plate was detected. Indicate that a plate was successfully found this round.
 
                 else: # If the user did supply a license plate format, then check all of the results against the formatting example.
@@ -1383,7 +1383,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
                         print ("    Plate guesses:")
                     for plate_guess in all_current_plate_guesses[individual_detected_plate]: # Iterate through each plate and grab the first plate that matches the plate formatting guidelines as the 'detected plate'.
                         if (all_current_plate_guesses[individual_detected_plate][plate_guess] >= float(config["general"]["alpr"]["validation"]["confidence"])): # Check to make sure this plate's confidence is higher than the minimum threshold set in the configuration.
-                            if any([alpr.validate_plate(plate_guess, format_template) for format_template in config["general"]["alpr"]["validation"]["license_plate_format"]]): # Check to see whether or not the plate passes the validation based on the format specified by the user.
+                            if any(alpr.validate_plate(plate_guess, format_template) for format_template in config["general"]["alpr"]["validation"]["license_plate_format"]]): # Check to see whether or not the plate passes the validation based on the format specified by the user.
                                 detected_plate = plate_guess # Grab the validated plate as the 'detected plate'.
                                 successfully_found_plate = True # The plate was successfully validated, so indicate that a plate was successfully found this round.
                                 if (config["realtime"]["interface"]["display"]["show_validation"] == True): # Only print the validated plate if the configuration says to do so.
