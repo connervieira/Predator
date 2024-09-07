@@ -806,8 +806,9 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
 
 
 # This function runs in a seperate thread from the main dashcam capture, and will intermittently grab the most recent frame, and run ALPR on it.
-if (config["realtime"]["saving"]["license_plates"]["enabled"] == True): # Check to see if the license plate logging file name is not empty. If the file name is empty, then license plate logging will be disabled.
-    plate_log = alpr.load_alpr_log()
+if (config["dashcam"]["alpr"]["enabled"] == True): # Check to see if background ALPR processing is enabled.
+    if (config["realtime"]["saving"]["license_plates"]["enabled"] == True): # Check to see if the license plate logging file name is not empty. If the file name is empty, then license plate logging will be disabled.
+        plate_log = alpr.load_alpr_log()
 def background_alpr(device):
     global current_frame_data
     global saving_active # This variable is used to determine which value the status lighting should be returned to after a plate detection.
