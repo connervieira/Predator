@@ -60,12 +60,13 @@ import lighting # Import the lighting.py script.
 update_status_lighting = lighting.update_status_lighting # Load the status lighting update function from the lighting script.
 
 must_import_gpiozero = False
-for stamp in config["dashcam"]["stamps"]["relay"]["triggers"]: # Check to see if there are any GPIO relay stamps active.
-    if (config["dashcam"]["stamps"]["relay"]["triggers"][stamp]["enabled"] == True): # Check to see if at least one relay stamp is enabled.
-        must_import_gpiozero = True
-        break # Exit the loop, since GPIOZero has already been imported.
 if (len(config["dashcam"]["saving"]["trigger_gpio"]) > 0):
     must_import_gpiozero = True
+for stamp in config["dashcam"]["stamps"]["relay"]["triggers"]: # Check to see if there are any GPIO relay stamps active.
+    if (must_import_gpiozero == True):
+        break # Exit the loop, since GPIOZero has already been imported.
+    if (config["dashcam"]["stamps"]["relay"]["triggers"][stamp]["enabled"] == True): # Check to see if at least one relay stamp is enabled.
+        must_import_gpiozero = True
 if (must_import_gpiozero == True):
     from gpiozero import Button # Import GPIOZero
 
@@ -171,16 +172,16 @@ def create_trigger_file():
         last_trigger_file_created = time.time()
 
 def watch_button(pin, hold_time=0.2, event=create_trigger_file):
-    print("Watching pin " + str(pin))
+    debug_message("Watching pin " + str(pin))
     button = Button(pin)
     time_pressed = 0
     last_triggered = 0
     while True:
         if (button.is_pressed and time_pressed == 0): # Check to see if the button was just pressed.
-            print("Pressed" + str(pin))
+            debug_message("Pressed" + str(pin))
             time_pressed = time.time()
         elif (button.is_pressed and time.time() - time_pressed >= hold_time): # Check to see if the button is being held, and the time threshold has been reached.
-            print("Triggered " + str(pin))
+            debug_message("Triggered " + str(pin))
             last_triggered = 0
             event()
         elif (button.is_pressed == False): # If the button is not pressed, reset the timer.
@@ -964,10 +965,9 @@ def start_dashcam_recording(dashcam_devices, directory, background=False): # Thi
     update_status_lighting("normal") # Initialize the status lighting to normal.
 
     button_watch_threads = {} # This will hold the processes watching each GPIO that will trigger a dashcam save.
-    if (config["dashcam"]["stamps"]["relay"] == True):
-        for pin in config["dashcam"]["saving"]["trigger_gpio"]: # Iterate through each dashcam save GPIO trigger.
-            button_watch_threads[int(pin)] = threading.Thread(target=watch_button, args=[int(pin)], name="ButtonWatch" + str(pin)) # Create a thread to monitor this pin.
-            button_watch_threads[int(pin)].start() # Start the thread to monitor the pin.
+    for pin in config["dashcam"]["saving"]["trigger_gpio"]: # Iterate through each dashcam save GPIO trigger.
+        button_watch_threads[int(pin)] = threading.Thread(target=watch_button, args=[int(pin)], name="ButtonWatch" + str(pin)) # Create a thread to monitor this pin.
+        button_watch_threads[int(pin)].start() # Start the thread to monitor the pin.
 
     dashcam_capture_process = [] # Create a placeholder to store the dashcam recording processes.
     dashcam_alpr_process = {} # Create a placeholder to store the dashcam ALPR processes.
