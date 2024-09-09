@@ -932,7 +932,7 @@ elif (mode_selection == "1" and config["general"]["modes"]["enabled"]["prerecord
         for plate in alpr_frames[frame]: # Iterate through each plate detected per frame.
             for guess in alpr_frames[frame][plate]: # Iterate through each guess for each plate.
                 if (alpr_frames[frame][plate][guess] >= float(config["general"]["alpr"]["validation"]["confidence"])): # Check to make sure this plate's confidence is higher than the minimum threshold set in the configuration.
-                    if any(alpr.validate_plate(candidate["plate"], format_template) for format_template in config["general"]["alpr"]["validation"]["license_plate_format"]) or len(config["general"]["alpr"]["validation"]["license_plate_format"]) == 0: # Check to see if this plate passes validation.
+                    if any(alpr.validate_plate(guess, format_template) for format_template in config["general"]["alpr"]["validation"]["license_plate_format"]) or len(config["general"]["alpr"]["validation"]["license_plate_format"]) == 0: # Check to see if this plate passes validation.
                         if (plate not in validated_alpr_frames[frame]): # Check to see if this plate hasn't been added to the validated information yet.
                             validated_alpr_frames[frame][plate] = [] # Add the plate to the validated information as a blank placeholder list.
                         validated_alpr_frames[frame][plate].append(guess) # Since this plate guess failed the validation test, delete it from the list of guesses.
