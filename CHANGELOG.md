@@ -486,6 +486,9 @@ This update emphasizes improving the reliability of Predator, especially when op
     - Added video playback frame-rate "snapping", such that the video frame-rate round up to the max if it is within a certain distance of the max.
         - For example, a video recorded at 29.85fps with a maximum configured limit of 30fps can be rounded up to 30fps for sake of consistency.
         - This means that minor fluctations in frame-rate will not cause the frame-rate to change from file to file.
+    - Improved the dashcam output handler.
+        - Fixed a bug where Predator would initialize new video segments twice.
+        - The output handler will now finish writing the list of frames to write before exiting when Predator is terminated, then release the output.
 - Updated status lighting.
     - Moved the status lighting configuration to the "general" section.
     - Network requests are only made to update the status lighting if it has changed since the last update.
@@ -500,6 +503,15 @@ This update emphasizes improving the reliability of Predator, especially when op
     - Remote alert database sources can now be cached.
         - This allows Predator to continue using entries from a remote alert database even when the source goes offline.
     - Migrated most of the ALPR processing to a dedicated file for sake of organization.
-- The "detected plate" notification sound now plays regardless of the console output level.
-- Alerts in real-time mode are now played at the end of the processing cycle.
-    - Previously, interface updates would have to wait for the audio alerts to finish playing.
+- Updated real-time mode.
+    - The "detected plate" notification sound now plays regardless of the console output level.
+    - Alerts in real-time mode are now played at the end of the processing cycle.
+        - Previously, interface updates would have to wait for the audio alerts to finish playing.
+- Updated pre-recorded mode.
+    - Improved how Predator handles comma-separated video file names.
+        - Video file names now have any trailing or leading whitespace removed after separation.
+- Improved how Predator exits.
+    - Fixed the "Quit" options in pre-recorded and management mode.
+        - Previously, the time offset manager thread would keep Predator alive after using the "Quit" option.
+    - All threads now watch a global variable, and will exit when it is changed.
+        - This means the user can simply press Ctrl+C once, and all threads will clean up and exit.

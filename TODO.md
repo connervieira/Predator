@@ -42,10 +42,11 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Check to see if old dashcam video files actually exist before deleting them.
 - [X] Test GPS behavior.
 - [X] Finish video framerate snapping.
-- [ ] Test the new ALPR system.
+- [X] Test the new ALPR system.
     - [X] Test pre-recorded mode.
     - [X] Test real-time mode.
     - [X] Test dash-cam mode.
+- [ ] Implement pre-recorded dashcam sidecar mode.
 
 ## Hypothetical
 

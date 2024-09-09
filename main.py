@@ -14,10 +14,12 @@
 
 
 print("Loading Predator...")
-
+import global_variables
+global_variables.init()
 
 import os # Required to interact with certain operating system functions
 import json # Required to process JSON data
+
 
 
 import config
@@ -327,7 +329,7 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
 
 
 
-    while True:
+    while global_variables.predator_running:
         clear()
         print("Please select an option")
         print("0. Quit")
@@ -337,9 +339,8 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
 
         selection = prompt("Selection: ", optional=False, input_type=str)
 
-        if (selection == "0"): # The user has selected to quit Predator.
-            break # Break the 'while true' loop to terminate Predator.
-
+        if (selection == "0"): # The user has selected the "Quit" option.
+            global_variables.predator_running = False
         elif (selection == "1"): # The user has selected the "File Management" option.
             print("    Please select an option")
             print("    0. Back")
@@ -757,508 +758,519 @@ elif (mode_selection == "1" and config["general"]["modes"]["enabled"]["prerecord
     debug_message("Started pre-recorded mode")
     debug_message("Taking user preferences")
     working_directory_input = prompt("Working directory (Default " + config["general"]["working_directory"] + "): ", optional=True, input_type=str)
-    if (working_directory_input == ""): # If the user leaves the 
+    if (working_directory_input == ""): # If the user leaves the working directory blank, use the default.
         working_directory_input = config["general"]["working_directory"]
     while (os.path.exists(working_directory_input) == False): # Run forever until the user enters a working directory that exists.
         display_message("The specified working directory doesn't seem to exist.", 2)
         working_directory_input = prompt("Working directory (Default " + config["general"]["working_directory"] + "): ", optional=True, input_type=str)
-    config["general"]["working_directory"] = working_directory_input
-
-    video = prompt("Video file name(s): ", optional=False, input_type=str)
-
-    framerate = prompt("Frame analysis interval (Default '1.0'): ", optional=True, input_type=float, default=1.0)
-
-    current_formats = ', '.join(config["general"]["alpr"]["validation"]["license_plate_format"])
-    license_plate_format_input = prompt(f"License plate format, separated by commas (Default '{current_formats}'): ", optional=True, input_type=str)
-    if (license_plate_format_input == ""): # If the user leaves the license plate format input blank, then use the default.
-        license_plate_format_input = current_formats
-    # Convert and store the input string as a list of formats
-    config["general"]["alpr"]["validation"]["license_plate_format"] = [format.strip() for format in license_plate_format_input.split(',')]
-
-    video_start_time = prompt("Video starting time (YYYY-mm-dd HH:MM:SS): ", optional=True, input_type=str) # Ask the user when the video recording started so we can correlate it's frames to a GPX file.
-    if (video_start_time != ""):
-        gpx_file = prompt("GPX file name: ", optional=True, input_type=str)
-        if (gpx_file != ""):
-            while (os.path.exists(config["general"]["working_directory"] + "/" + gpx_file) == False): # Check to see if the GPX file name supplied by the user actually exists in the working directory.
-                display_message("The specified GPX file does not appear to exists.", 2)
-                gpx_file = prompt("GPX file name: ", optional=False, input_type=str)
+    config["general"]["working_directory"] = working_directory_input # Apply an override to the configured working directory.
+    del working_directory_input # Remove the working directory input now that it is no longer needed.
+    working_directory_contents = os.listdir(config["general"]["working_directory"]) # Get the contents of the working directory.
+    dashcam_videos = [] # This is a placeholder that will hold all Predator dashcam videos found in the working directory.
+    for file in working_directory_contents:
+        if (file[0:len("predator_dashcam_")] == "predator_dashcam_"):
+            dashcam_videos.append(file)
+    if (len(dashcam_videos) > 3):
+        print("There appears to be several Predator dashcam videos in the working directory. Would you like to generate side-car files for these videos?")
+        sidecar_mode = prompt("Enable side-car mode (Y/N): ", optional=False, input_type=bool)
     else:
-        gpx_file = ""
+        sidecar_mode = False
+
+    if (sidecar_mode == True):
+        print("Sidecar mode")
+        print(dashcam_videos) # TODO
+        global_variables.predator_running = False
+    elif (sidecar_mode == False):
+        video = prompt("Video file name(s): ", optional=False, input_type=str)
+
+        frame_interval = prompt("Frame analysis interval (Default '1.0'): ", optional=True, input_type=float, default=1.0)
+
+        current_formats = ', '.join(config["general"]["alpr"]["validation"]["license_plate_format"])
+        license_plate_format_input = prompt(f"License plate format, separated by commas (Default '{current_formats}'): ", optional=True, input_type=str)
+        if (license_plate_format_input == ""): # If the user leaves the license plate format input blank, then use the default.
+            license_plate_format_input = current_formats
+        # Convert and store the input string as a list of formats
+        config["general"]["alpr"]["validation"]["license_plate_format"] = [format.strip() for format in license_plate_format_input.split(',')]
+
+        video_start_time = prompt("Video starting time (YYYY-mm-dd HH:MM:SS): ", optional=True, input_type=str) # Ask the user when the video recording started so we can correlate it's frames to a GPX file.
+        if (video_start_time != ""):
+            gpx_file = prompt("GPX file name: ", optional=True, input_type=str)
+            if (gpx_file != ""):
+                while (os.path.exists(config["general"]["working_directory"] + "/" + gpx_file) == False): # Check to see if the GPX file name supplied by the user actually exists in the working directory.
+                    display_message("The specified GPX file does not appear to exists.", 2)
+                    gpx_file = prompt("GPX file name: ", optional=False, input_type=str)
+        else:
+            gpx_file = ""
 
 
 
-    debug_message("Processing user preferences")
-    if (video_start_time == ""): # If the video_start_time preference was left blank, then default to 0.
-        video_start_time = 0
-    else:
-        try:
-            video_start_time = round(time.mktime(datetime.datetime.strptime(video_start_time, "%Y-%m-%d %H:%M:%S").timetuple())) # Convert the video_start_time human readable date and time into a Unix timestamp.
-        except:
-            display_message("The video starting time specified doesn't appear to be valid. The starting time has been reset to 0. GPX correlation will almost certainly fail.", 3)
+        debug_message("Processing user preferences")
+        if (video_start_time == ""): # If the video_start_time preference was left blank, then default to 0.
             video_start_time = 0
+        else:
+            try:
+                video_start_time = round(time.mktime(datetime.datetime.strptime(video_start_time, "%Y-%m-%d %H:%M:%S").timetuple())) # Convert the video_start_time human readable date and time into a Unix timestamp.
+            except:
+                display_message("The video starting time specified doesn't appear to be valid. The starting time has been reset to 0. GPX correlation will almost certainly fail.", 3)
+                video_start_time = 0
 
 
-    if (video[0] == "*"): # Check to see if the first character is a wildcard.
-        video_list_command = "ls " + config["general"]["working_directory"] + "/" + video + " | tr '\n' ','";
-        videos = str(os.popen(video_list_command).read())[:-1].split(",") # Run the command, and record the raw output string.
-        for key, video in enumerate(videos):
-            videos[key] = os.path.basename(video)
- 
-    else:
-        videos = video.split(", ") # Split the video input into a list, based on the position of commas.
-    for video in videos: # Iterate through each video specified by the user.
-        if (os.path.exists(config["general"]["working_directory"] + "/" + video) == False): # Check to see if each video file name supplied by the user actually exists in the working directory.
-            display_message("The video file " + str(video) + " entered doesn't seem to exist in the working directory. Predator will almost certainly fail.", 3) # Inform the user that this video file couldn't be found.
-
-
-
-    clear() # Clear the console output
-
-    
-
-
-    # Split the supplied video(s) into individual frames based on the user's input.
-    debug_message("Splitting video into discrete frames")
-    video_counter = 0 # Create a placeholder counter that will be incremented by 1 for each video. This will be appended to the file names of the video frames to keep frames from different videos separate.
-    print("Splitting video into discrete images...")
-    if (os.path.exists(config["general"]["working_directory"] + "/frames/")): # Check to see the frames directory already exists.
-        os.system("rm -r " + config["general"]["working_directory"] + "/frames") # Remove the frames directory.
-
-    for video in videos: # Iterate through each video specified by the user.
-        video_counter+=1 # Increment the video counter by 1.
-        frame_split_command = "mkdir " + config["general"]["working_directory"] + "/frames; ffmpeg -i " + config["general"]["working_directory"] + "/" + video + " -r " + str(1/framerate) + " " + config["general"]["working_directory"] + "/frames/video" + str(video_counter) + "output%04d.png -loglevel quiet" # Set up the FFMPEG command that will be used to split each video into individual frames.
-        os.system(frame_split_command) # Execute the FFMPEG command to split the video into individual frames.
+        if (video[0] == "*"): # Check to see if the first character is a wildcard.
+            video_list_command = "ls " + config["general"]["working_directory"] + "/" + video + " | tr '\n' ','";
+            videos = str(os.popen(video_list_command).read())[:-1].split(",") # Run the command, and record the raw output string.
+            for key, video in enumerate(videos):
+                videos[key] = os.path.basename(video)
      
-    print("Done.\n")
-
-
-
-    # Gather all of the individual frames generated previously.
-    debug_message("Collecting discrete frames")
-    print("Gathering generated frames...")
-    frames = os.listdir(config["general"]["working_directory"] + "/frames") # Get all of the files in the folder designated for individual frames.
-    frames.sort() # Sort the list alphabetically.
-    print("Done.\n")
-
-
-
-    # Crop the individual frames to make license plate recognition more efficient and accurate.
-    if (config["prerecorded"]["image"]["processing"]["cropping"]["enabled"] == True): # Check to see if cropping is enabled in pre-recorded mode.
-        debug_message("Cropping discrete frames")
-        print("Cropping individual frames...")
-        crop_script_path = predator_root_directory + "/crop_image" # Path to the cropping script in the Predator directory.
-        for frame in frames:
-            os.system(crop_script_path + " " + config["general"]["working_directory"] + "/frames/" + frame + " " + str(config["prerecorded"]["image"]["processing"]["cropping"]["left_margin"]) + " " + str(config["prerecorded"]["image"]["processing"]["cropping"]["right_margin"]) + " " + str(config["prerecorded"]["image"]["processing"]["cropping"]["top_margin"]) + " " + str(config["prerecorded"]["image"]["processing"]["cropping"]["bottom_margin"]))
-        print("Done.\n")
-
-
-
-    # If enabled, count how many objects are in each frame.
-    if (config["general"]["object_recognition"]["enabled"] == True):
-        debug_message("Running object recognition")
-        print("Running object recognition...")
-        time.sleep(1) # Wait for a short period of time to allow the images to finish saving.
-        object_count = {} # Create an empty dictionary that will hold each frame and the object recognition counts.
-        for frame in frames: # Iterate through each frame.
-            object_count[frame] = {} # Initial the dictionary for this frame.
-            frame_path = config["general"]["working_directory"] + "/frames/" + frame # Set the file path of the current frame.
-            image = cv2.imread(frame_path) # Load the frame.
-            object_recognition_bounding_box, object_recognition_labels, object_recognition_confidence = cv.detect_common_objects(image) # Analyze the image.
-            for object_recognized in object_recognition_labels: # Iterate through each object recognized.
-                if (object_recognized in object_count[frame]):
-                    object_count[frame][object_recognized]+=1
-                else:
-                    object_count[frame][object_recognized] = 1
-
-        print("Done.\n")
-
-
-
-    # Analyze each individual frame, and collect possible plate IDs.
-    debug_message("Running ALPR")
-    print("Scanning for license plates...")
-    alpr_frames = {} # Create an empty dictionary that will hold each frame and the potential license plates IDs.
-    for frame in frames: # Iterate through each frame of video.
-        alpr_frames[frame] = {} # Set the license plate recognition information for this frame to an empty list as a placeholder.
-
-        # Run license plate analysis on this frame.
-        reading_output = alpr.run_alpr(config["general"]["working_directory"] + "/frames/" + frame)
-
-        # Organize all of the detected license plates and their list of potential guess candidates to a dictionary to make them easier to manipulate.
-        all_current_plate_guesses = {} # Create an empty place-holder dictionary that will be used to store all of the potential plates and their guesses.
-        plate_index = 0 # Reset the plate index counter to 0 before the loop.
-        for detected_plate in reading_output["results"]: # Iterate through each potential plate detected by the ALPR command.
-            all_current_plate_guesses[plate_index] = {} # Create an empty dictionary for this plate so we can add all the potential plate guesses to it in the next step.
-            for plate_guess in detected_plate["candidates"]: # Iterate through each plate guess candidate for each potential plate detected.
-                all_current_plate_guesses[plate_index][plate_guess["plate"]] = plate_guess["confidence"] # Add the current plate guess candidate to the list of plate guesses.
-            plate_index+=1 # Increment the plate index counter.
-
-        if (len(all_current_plate_guesses) > 0): # Only add license plate data to the current frame if data actually exists to add in the first place.
-            alpr_frames[frame] = all_current_plate_guesses # Record all of the detected plates for this frame.
-
-    print("Done.\n")
-
-
-
-
-
-    # Check the possible plate IDs and validate based on general plate formatting specified by the user.
-    debug_message("Validating ALPR results")
-    print("Validating license plates...")
-    validated_alpr_frames = {} # This is a placeholder variable that will be used to store the validated ALPR information for each frame.
-
-    # Handle ignore list processing.
-    for frame in alpr_frames: # Iterate through each frame of video in the database of scanned plates.
-        validated_alpr_frames[frame] = {} # Set the validated license plate recognition information for this frame to an empty list as a placeholder.
-        for plate in alpr_frames[frame].keys(): # Iterate through each plate detected per frame.
-            for guess in alpr_frames[frame][plate]: # Iterate through each guess for each plate.
-                for ignore_plate in ignore_list: # Iterate through each plate in the ignore list.
-                    if (fnmatch.fnmatch(guess, ignore_plate)): # Check to see if this guess matches a plate in the ignore list.
-                        alpr_frames[frame][plate] = [] # Remove this plate from the ALPR dictionary.
-                        break # Break the loop, since this entire plate, including all of its guesses, has just been removed.
-                    if (fnmatch.fnmatch(guess, config["developer"]["kill_plate"]) and config["developer"]["kill_plate"] != ""): # Check to see if this plate matches the kill plate, and if a kill plate is set.
-                        exit() # Terminate the program.
-
-    # Remove any empty plates.
-    for frame in alpr_frames: # Iterate through each frame of video in the database of scanned plates.
-        plates = list(alpr_frames[frame].keys())
-        for plate in plates:
-            if (len(alpr_frames[frame][plate]) <= 0):
-                del alpr_frames[frame][plate]
-
-    # Handle formatting validation.
-    for frame in alpr_frames: # Iterate through each frame of video in the database of scanned plates.
-        validated_alpr_frames[frame] = {} # Set the validated license plate recognition information for this frame to an empty list as a placeholder.
-        for plate in alpr_frames[frame]: # Iterate through each plate detected per frame.
-            for guess in alpr_frames[frame][plate]: # Iterate through each guess for each plate.
-                if (alpr_frames[frame][plate][guess] >= float(config["general"]["alpr"]["validation"]["confidence"])): # Check to make sure this plate's confidence is higher than the minimum threshold set in the configuration.
-                    if any(alpr.validate_plate(guess, format_template) for format_template in config["general"]["alpr"]["validation"]["license_plate_format"]) or len(config["general"]["alpr"]["validation"]["license_plate_format"]) == 0: # Check to see if this plate passes validation.
-                        if (plate not in validated_alpr_frames[frame]): # Check to see if this plate hasn't been added to the validated information yet.
-                            validated_alpr_frames[frame][plate] = [] # Add the plate to the validated information as a blank placeholder list.
-                        validated_alpr_frames[frame][plate].append(guess) # Since this plate guess failed the validation test, delete it from the list of guesses.
-
-    print("Done.\n")
-
-
-
-    # Run through the data for each frame, and save only the first (most likely) license plate to the list of detected plates.
-    debug_message("Organizing ALPR results")
-    print("Collecting most likely plate per guess...")
-    plates_detected = [] # Create an empty list that the detected plates will be added to.
-    for frame in validated_alpr_frames: # Iterate through all frames.
-        for plate in validated_alpr_frames[frame]: # Iterate through all plates detected this frame.
-            if (len(validated_alpr_frames[frame][plate]) > 0): # Check to see if this plate has any guesses associated with it.
-                plates_detected.append(validated_alpr_frames[frame][plate][0]) # Add the first guess for this plate to this list of plates detected.
-    print("Done.\n")
-
-
-
-
-    # De-duplicate the list of license plates detected.
-    print("De-duplicating detected license plates...")
-    plates_detected = list(dict.fromkeys(plates_detected))
-    print("Done.\n")
-
-
-
-
-
-    debug_message("Checking for alerts")
-    print("Checking for alerts...")
-    alert_database = load_alert_database(config["general"]["alerts"]["databases"], config["general"]["working_directory"]) # Load the license plate alert database.
-    active_alerts = {} # This is an empty placeholder that will hold all of the active alerts. 
-    if (len(alert_database) > 0): # Only run alert processing if the alert database isn't empty.
-        for rule in alert_database: # Run through every plate in the alert plate database supplied by the user.
-            for frame in alpr_frames: # Iterate through each frame of video in the raw ALPR data.
-                if (config["general"]["alerts"]["alerts_ignore_validation"] == True): # If the user has enabled alerts that ignore license plate validation, then use the unvalidated ALPR information.
-                    alpr_frames_to_scan = alpr_frames
-                else: # If the user hasn't enabled alerts that ignore license plate validation, then use the validated ALPR information.
-                    alpr_frames_to_scan = validated_alpr_frames
-
-                for plate in alpr_frames_to_scan[frame]: # Iterate through each of the plates detected this round, regardless of whether or not they were validated.
-                    for guess in alpr_frames_to_scan[frame][plate]: # Run through each of the plate guesses generated by ALPR, regardless of whether or not they are valid according to the plate formatting guideline.
-                        if (fnmatch.fnmatch(guess, rule)): # Check to see this detected plate guess matches this particular plate in the alert database, taking wildcards into account.
-                            active_alerts[guess] = alert_database[rule] # Add this plate to the active alerts dictionary.
-                            active_alerts[guess]["rule"] = rule # Add the rule that triggered this alert to the alert information.
-                            active_alerts[guess]["frame"] = frame # Add the rule that triggered this alert to the alert information.
-                            if (config["general"]["alerts"]["allow_duplicate_alerts"] == False):
-                                break # Break the loop if an alert is found for this guess, in order to avoid triggering multiple alerts for each guess of the same plate.
-
-    display_alerts(active_alerts) # Display all active alerts.
-    print("Done.\n")
-
-
-
-    # Correlate the detected license plates with a GPX file.
-    frame_locations = {} # Create a blank database that will be used during the process
-    if (gpx_file != ""): # Check to make sure the user actually supplied a GPX file.
-        debug_message("Correlated location data")
-        print("Processing location data...")
-        decoded_gpx_data = process_gpx(config["general"]["working_directory"] + "/" + gpx_file) # Decode the data from the GPX file.
-        iteration = 0 # Set the iteration counter to 0 so we can add one to it each frame we iterate through.
-        for element in alpr_frames: # Iterate through each frame.
-            iteration+=1 # Add one to the iteration counter.
-            frame_timestamp = video_start_time + (iteration * framerate) # Calculate the timestamp of this frame.
-
-            if (frame_timestamp in decoded_gpx_data): # Check to see if the exact timestamp for this frame exists in the GPX data.
-                frame_locations[frame_timestamp] = [decoded_gpx_data[frame_timestamp], alpr_frames[element]]
-            else: # If the exact timestamp doesn't exist, try to find a nearby timestamp.
-                closest_gpx_entry = closest_key(decoded_gpx_data, frame_timestamp)
-
-                if (closest_gpx_entry[1] < config["prerecorded"]["max_gpx_time_difference"]): # Check to see if the closest GPX entry is inside the maximum configured range.
-                    frame_locations[frame_timestamp] = [decoded_gpx_data[closest_gpx_entry[0]], alpr_frames[element]]
-                else: # Otherwise, indicate that a corresponding location couldn't be found.
-                    frame_locations[frame_timestamp] = [{"lat": 0.0, "lon": 0.0}, alpr_frames[element]] # Set this location of this frame to latitude and longitude 0.0 as a placeholder.
-                    display_message("There is no GPX data matching the timestamp of frame " + element + ". The closest location stamp is " + str(closest_gpx_entry[1]) + " seconds away. Does the GPX file specified line up with the video?", 3)
-
-        print("Done.\n")
-
-
-
-
-    # Analysis has been completed. Next, the user will choose what to do with the analysis data.
-
-
-    utils.wait_for_input()
-
-    debug_message("Starting menu loop")
-    while True: # Run the pre-recorded mode menu in a loop forever until the user exits.
-        clear()
-
-        # Show the main menu for handling data collected in pre-recorded mode.
-        print("Please select an option")
-        print("0. Quit")
-        print("1. Manage license plate data")
-        if (config["general"]["object_recognition"]["enabled"] == True): # Check to see if object recognition is enabled before displaying the object recognition option.
-            print("2. Manage object recognition data")
         else:
-            print(style.faint + "2. Manage object recognition data" + style.end)
-        if (gpx_file != ""): # Check to see if a GPX correlation is enabled before displaying the position data option.
-            print("3. Manage position data")
-        else:
-            print(style.faint + "3. Manage position data" + style.end)
-        print("4. View session statistics")
-        selection = prompt("Selection: ", optional=False, input_type=str)
+            videos = video.split(",") # Split the video input into a list, based on the position of commas.
+        for number, video in enumerate(videos): # Iterate through each video specified by the user.
+            videos[number] = video.strip()
+            if (os.path.exists(config["general"]["working_directory"] + "/" + video) == False): # Check to see if each video file name supplied by the user actually exists in the working directory.
+                display_message("The video file " + str(video) + " entered doesn't seem to exist in the working directory. Predator will almost certainly fail.", 3) # Inform the user that this video file couldn't be found.
 
 
-        if (selection == "0"): # If the user selects option 0 on the main menu, then exit Predator.
-            print("Shutting down...")
-            break
+        clear() # Clear the console output
 
-        elif (selection == "1"): # If the user selects option 1 on the main menu, then load the license plate data viewing menu.
-            print("    Please select an option")
-            print("    0. Back")
-            print("    1. View data")
-            print("    2. Export data")
-            selection = prompt("    Selection: ", optional=False, input_type=str)
+        
 
-            if (selection == "1"): # The user has opened the license plate data viewing menu.
-                print("        Please select an option")
-                print("        0. Back")
-                print("        1. View as Python data")
-                print("        2. View as list")
-                print("        3. View as CSV")
-                print("        4. View as JSON data")
-            
-                selection = prompt("        Selection: ", optional=False, input_type=str)
 
-                if (selection == "0"):
-                    print("Returning to main menu.")
-                elif (selection == "1"): # The user has selected to view license plate data as Python data.
-                    print(str(plates_detected))
-                elif (selection == "2"): # The user has selected to view license plate data as a list.
-                    for plate in plates_detected:
-                        print(plate)
-                elif (selection == "3"): # The user has selected to view license plate data as CSV data.
-                    csv_data = ""
-                    for plate in plates_detected: # Iterate through each of the plates detected.
-                        csv_data = csv_data + plate + ","
-                    print(csv_data[:-1]) # Print the CSV data without the last character, since it will always be a comma.
-                elif (selection == "4"): # The user has selected to view license plate data as raw JSON data.
-                    print("            Please select an option")
-                    print("            0. Back")
-                    print("            1. View all")
-                    print("            2. View validated")
-                    print("            3. View alerts")
-                
-                    selection = prompt("            Selection: ", optional=False, input_type=str)
+        # Split the supplied video(s) into individual frames based on the user's input.
+        debug_message("Splitting video into discrete frames")
+        video_counter = 0 # Create a placeholder counter that will be incremented by 1 for each video. This will be appended to the file names of the video frames to keep frames from different videos separate.
+        print("Splitting video into discrete images...")
+        if (os.path.exists(config["general"]["working_directory"] + "/frames/")): # Check to see the frames directory already exists.
+            os.system("rm -r " + config["general"]["working_directory"] + "/frames") # Remove the frames directory.
 
-                    if (selection == "0"):
-                        print("Returning to main menu.")
-                    elif (selection == "1"): # The user has selected to view all license plate data as JSON.
-                        print(json.dumps(alpr_frames))
-                    elif (selection == "2"): # The user has selected to view validated license plate data as JSON.
-                        print(json.dumps(validated_alpr_frames))
-                    elif (selection == "3"): # The user has selected to view validated license plate data as JSON.
-                        print(json.dumps(active_alerts))
+        for video in videos: # Iterate through each video specified by the user.
+            video_counter+=1 # Increment the video counter by 1.
+            frame_split_command = "mkdir " + config["general"]["working_directory"] + "/frames; ffmpeg -i " + config["general"]["working_directory"] + "/" + video + " -r " + str(1/frame_interval) + " " + config["general"]["working_directory"] + "/frames/video" + str(video_counter) + "output%04d.png -loglevel quiet" # Set up the FFMPEG command that will be used to split each video into individual frames.
+            os.system(frame_split_command) # Execute the FFMPEG command to split the video into individual frames.
+         
+        print("Done.\n")
+
+
+
+        # Gather all of the individual frames generated previously.
+        debug_message("Collecting discrete frames")
+        print("Gathering generated frames...")
+        frames = os.listdir(config["general"]["working_directory"] + "/frames") # Get all of the files in the folder designated for individual frames.
+        frames.sort() # Sort the list alphabetically.
+        print("Done.\n")
+
+
+
+        # Crop the individual frames to make license plate recognition more efficient and accurate.
+        if (config["prerecorded"]["image"]["processing"]["cropping"]["enabled"] == True): # Check to see if cropping is enabled in pre-recorded mode.
+            debug_message("Cropping discrete frames")
+            print("Cropping individual frames...")
+            crop_script_path = predator_root_directory + "/crop_image" # Path to the cropping script in the Predator directory.
+            for frame in frames:
+                os.system(crop_script_path + " " + config["general"]["working_directory"] + "/frames/" + frame + " " + str(config["prerecorded"]["image"]["processing"]["cropping"]["left_margin"]) + " " + str(config["prerecorded"]["image"]["processing"]["cropping"]["right_margin"]) + " " + str(config["prerecorded"]["image"]["processing"]["cropping"]["top_margin"]) + " " + str(config["prerecorded"]["image"]["processing"]["cropping"]["bottom_margin"]))
+            print("Done.\n")
+
+
+
+        # If enabled, count how many objects are in each frame.
+        if (config["general"]["object_recognition"]["enabled"] == True):
+            debug_message("Running object recognition")
+            print("Running object recognition...")
+            time.sleep(1) # Wait for a short period of time to allow the images to finish saving.
+            object_count = {} # Create an empty dictionary that will hold each frame and the object recognition counts.
+            for frame in frames: # Iterate through each frame.
+                object_count[frame] = {} # Initial the dictionary for this frame.
+                frame_path = config["general"]["working_directory"] + "/frames/" + frame # Set the file path of the current frame.
+                image = cv2.imread(frame_path) # Load the frame.
+                object_recognition_bounding_box, object_recognition_labels, object_recognition_confidence = cv.detect_common_objects(image) # Analyze the image.
+                for object_recognized in object_recognition_labels: # Iterate through each object recognized.
+                    if (object_recognized in object_count[frame]):
+                        object_count[frame][object_recognized]+=1
                     else:
-                        display_message("Invalid selection.", 2)
-                else:
-                    display_message("Invalid selection.", 2)
+                        object_count[frame][object_recognized] = 1
 
-            elif (selection == "2"): # The user has opened the license plate data exporting menu.
-                print("        Please select an option")
-                print("        0. Back")
-                print("        1. Export as Python data")
-                print("        2. Export as list")
-                print("        3. Export as CSV")
-                print("        4. Export as JSON")
-                selection = prompt("        Selection: ", optional=False, input_type=str)
-
-                export_data = "" # Create a blank variable to store the export data.
-
-                if (selection == "0"):
-                    print("Returning to main menu.")
-                elif (selection == "1"): # The user has selected to export license plate data as Python data.
-                    export_data = str(plates_detected)
-                    save_to_file(config["general"]["working_directory"] + "/pre_recorded_license_plate_export.txt", export_data) # Save to disk.
-                elif (selection == "2"): # The user has selected to export license plate data as a list.
-                    for plate in plates_detected:
-                        export_data = export_data + plate + "\n"
-                    save_to_file(config["general"]["working_directory"] + "/pre_recorded_license_plate_export.txt", export_data) # Save to disk.
-                elif (selection == "3"): # The user has selected to export license plate data as CSV data.
-                    for plate in plates_detected:
-                        export_data = export_data + plate + ",\n"
-                    save_to_file(config["general"]["working_directory"] + "/pre_recorded_license_plate_export.csv", export_data) # Save to disk.
-                elif (selection == "4"): # The user has selected to export license plate data as JSON data.
-                    print("            Please select an option")
-                    print("            0. Back")
-                    print("            1. Export all")
-                    print("            2. Export validated")
-                    print("            3. Export alerts")
-                
-                    selection = prompt("            Selection: ", optional=False, input_type=str)
-
-                    if (selection == "0"):
-                        print("Returning to main menu.")
-                    elif (selection == "1"): # The user has selected to export all license plate data as JSON.
-                        save_to_file(config["general"]["working_directory"] + "/pre_recorded_license_plate_export.json", json.dumps(alpr_frames)) # Save the raw license plate analysis data to disk.
-                    elif (selection == "2"): # The user has selected to export validated license plate data as JSON.
-                        save_to_file(config["general"]["working_directory"] + "/pre_recorded_license_plate_export.json", json.dumps(validated_alpr_frames)) # Save the validated license plate analysis data to disk.
-                    elif (selection == "3"): # The user has selected to alert license plate data as JSON.
-                        save_to_file(config["general"]["working_directory"] + "/pre_recorded_license_plate_export.json", json.dumps(active_alerts)) # Save detected license plate alerts to disk.
-                    else:
-                        display_message("Invalid selection.", 2)
-                else:
-                    display_message("Invalid selection.", 2)
-
-            utils.wait_for_input()
+            print("Done.\n")
 
 
-        elif (selection == "2"): # The user has selected to manage object recognition data.
-            if (config["general"]["object_recognition"]["enabled"] == True):
-                print("    Please select an option")
-                print("    0. Back")
-                print("    1. View data")
-                print("    2. Export data")
-                selection = prompt("    Selection: ", optional=False, input_type=str)
 
-                if (selection == "1"): # The user has selected to view object recognition data.
-                    print("        Please select an option")
-                    print("        0. Back")
-                    print("        1. View as Python data")
-                    print("        2. View as JSON data")
-                    selection = prompt("        Selection: ", optional=False, input_type=str)
+        # Analyze each individual frame, and collect possible plate IDs.
+        debug_message("Running ALPR")
+        print("Scanning for license plates...")
+        alpr_frames = {} # Create an empty dictionary that will hold each frame and the potential license plates IDs.
+        for frame in frames: # Iterate through each frame of video.
+            alpr_frames[frame] = {} # Set the license plate recognition information for this frame to an empty list as a placeholder.
 
-                    if (selection == "0"):
-                        print("Returning to main menu.")
-                    elif (selection == "1"):
-                        print(object_count)
-                    elif (selection == "2"):
-                        print(json.dumps(object_count, indent=4))
-                    else:
-                        display_message("Invalid selection.", 2)
+            # Run license plate analysis on this frame.
+            reading_output = alpr.run_alpr(config["general"]["working_directory"] + "/frames/" + frame)
 
-                elif (selection == "2"): # The user has selected to export object recognition data.
-                    print("        Please select an option")
-                    print("        0. Back")
-                    print("        1. Export as Python data")
-                    print("        2. Export as JSON data")
-                    selection = prompt("Selection: ", optional=False, input_type=str)
+            # Organize all of the detected license plates and their list of potential guess candidates to a dictionary to make them easier to manipulate.
+            all_current_plate_guesses = {} # Create an empty place-holder dictionary that will be used to store all of the potential plates and their guesses.
+            plate_index = 0 # Reset the plate index counter to 0 before the loop.
+            for detected_plate in reading_output["results"]: # Iterate through each potential plate detected by the ALPR command.
+                all_current_plate_guesses[plate_index] = {} # Create an empty dictionary for this plate so we can add all the potential plate guesses to it in the next step.
+                for plate_guess in detected_plate["candidates"]: # Iterate through each plate guess candidate for each potential plate detected.
+                    all_current_plate_guesses[plate_index][plate_guess["plate"]] = plate_guess["confidence"] # Add the current plate guess candidate to the list of plate guesses.
+                plate_index+=1 # Increment the plate index counter.
 
-                    if (selection == "0"):
-                        print("Returning to main menu.")
-                    elif (selection == "1"):
-                        save_to_file(config["general"]["working_directory"] + "/pre_recorded_object_detection_export.txt", str(object_count)) # Save to disk.
-                    elif (selection == "2"):
-                        save_to_file(config["general"]["working_directory"] + "/pre_recorded_object_detection_export.json", json.dumps(object_count, indent=4)) # Save to disk.
-                    else:
-                        display_message("Invalid selection.", 2)
+            if (len(all_current_plate_guesses) > 0): # Only add license plate data to the current frame if data actually exists to add in the first place.
+                alpr_frames[frame] = all_current_plate_guesses # Record all of the detected plates for this frame.
 
-                else: # The user has selected an invalid option in the object recognition data management menu.
-                    display_message("Invalid selection.", 2)
-
-            else: # The user has selected the object recognition data management menu, but object recognition has been disabled.
-                display_message("Object recognition has been disabled. There is no object recognition data to manage.", 2)
-
-            utils.wait_for_input()
+        print("Done.\n")
 
 
-        elif (selection == "3"): # The user has selected to manage GPX location information.
-            if (gpx_file != ""): # Check to see if a GPX file was provided for analysis.
-                print("    Please select an option")
-                print("    0. Back")
-                print("    1. View data")
-                print("    2. Export data")
-                selection = prompt("    Selection: ", optional=False, input_type=str)
 
-                if (selection == "0"):
-                    print("Returning to main menu.")
-                elif (selection == "1"): # The user has selected to view GPX location information.
-                    print("        Please select an option")
-                    print("        0. Back")
-                    print("        1. View as Python data")
-                    print("        2. View as JSON data")
-                    selection = prompt("        Selection: ", optional=False, input_type=str)
 
-                    if (selection == 0):
-                        print("Returning to main menu.")
-                    elif (selection == "1"):
-                        print(frame_locations)
-                    elif (selection == "2"):
-                        print(json.dumps(frame_locations, indent=4))
-                    else:
-                        display_message("Invalid selection.", 2)
 
-                elif (selection == "2"): # The user has selected to export GPX location information.
-                    print("        Please select an option")
-                    print("        0. Back")
-                    print("        1. Export as Python data")
-                    print("        2. Export as JSON data")
-                    selection = prompt("        Selection: ", optional=False, input_type=str)
+        # Check the possible plate IDs and validate based on general plate formatting specified by the user.
+        debug_message("Validating ALPR results")
+        print("Validating license plates...")
+        validated_alpr_frames = {} # This is a placeholder variable that will be used to store the validated ALPR information for each frame.
 
-                    if (selection == 0):
-                        print("Returning to main menu.")
-                    elif (selection == "1"):
-                        save_to_file(config["general"]["working_directory"] + "/pre_recorded_location_data_export.txt", frame_locations) # Save to disk.
-                    elif (selection == "2"):
-                        save_to_file(config["general"]["working_directory"] + "/pre_recorded_location_data_export.json", json.dumps(frame_locations, indent=4)) # Save to disk.
-                    else:
-                        display_message("Invalid selection.", 2)
+        # Handle ignore list processing.
+        for frame in alpr_frames: # Iterate through each frame of video in the database of scanned plates.
+            validated_alpr_frames[frame] = {} # Set the validated license plate recognition information for this frame to an empty list as a placeholder.
+            for plate in alpr_frames[frame].keys(): # Iterate through each plate detected per frame.
+                for guess in alpr_frames[frame][plate]: # Iterate through each guess for each plate.
+                    for ignore_plate in ignore_list: # Iterate through each plate in the ignore list.
+                        if (fnmatch.fnmatch(guess, ignore_plate)): # Check to see if this guess matches a plate in the ignore list.
+                            alpr_frames[frame][plate] = [] # Remove this plate from the ALPR dictionary.
+                            break # Break the loop, since this entire plate, including all of its guesses, has just been removed.
+                        if (fnmatch.fnmatch(guess, config["developer"]["kill_plate"]) and config["developer"]["kill_plate"] != ""): # Check to see if this plate matches the kill plate, and if a kill plate is set.
+                            exit() # Terminate the program.
 
-                else:
-                    display_message("Invalid selection.", 2)
+        # Remove any empty plates.
+        for frame in alpr_frames: # Iterate through each frame of video in the database of scanned plates.
+            plates = list(alpr_frames[frame].keys())
+            for plate in plates:
+                if (len(alpr_frames[frame][plate]) <= 0):
+                    del alpr_frames[frame][plate]
 
+        # Handle formatting validation.
+        for frame in alpr_frames: # Iterate through each frame of video in the database of scanned plates.
+            validated_alpr_frames[frame] = {} # Set the validated license plate recognition information for this frame to an empty list as a placeholder.
+            for plate in alpr_frames[frame]: # Iterate through each plate detected per frame.
+                for guess in alpr_frames[frame][plate]: # Iterate through each guess for each plate.
+                    if (alpr_frames[frame][plate][guess] >= float(config["general"]["alpr"]["validation"]["confidence"])): # Check to make sure this plate's confidence is higher than the minimum threshold set in the configuration.
+                        if any(alpr.validate_plate(guess, format_template) for format_template in config["general"]["alpr"]["validation"]["license_plate_format"]) or len(config["general"]["alpr"]["validation"]["license_plate_format"]) == 0: # Check to see if this plate passes validation.
+                            if (plate not in validated_alpr_frames[frame]): # Check to see if this plate hasn't been added to the validated information yet.
+                                validated_alpr_frames[frame][plate] = [] # Add the plate to the validated information as a blank placeholder list.
+                            validated_alpr_frames[frame][plate].append(guess) # Since this plate guess failed the validation test, delete it from the list of guesses.
+
+        print("Done.\n")
+
+
+
+        # Run through the data for each frame, and save only the first (most likely) license plate to the list of detected plates.
+        debug_message("Organizing ALPR results")
+        print("Collecting most likely plate per guess...")
+        plates_detected = [] # Create an empty list that the detected plates will be added to.
+        for frame in validated_alpr_frames: # Iterate through all frames.
+            for plate in validated_alpr_frames[frame]: # Iterate through all plates detected this frame.
+                if (len(validated_alpr_frames[frame][plate]) > 0): # Check to see if this plate has any guesses associated with it.
+                    plates_detected.append(validated_alpr_frames[frame][plate][0]) # Add the first guess for this plate to this list of plates detected.
+        print("Done.\n")
+
+
+
+
+        # De-duplicate the list of license plates detected.
+        print("De-duplicating detected license plates...")
+        plates_detected = list(dict.fromkeys(plates_detected))
+        print("Done.\n")
+
+
+
+
+
+        debug_message("Checking for alerts")
+        print("Checking for alerts...")
+        alert_database = load_alert_database(config["general"]["alerts"]["databases"], config["general"]["working_directory"]) # Load the license plate alert database.
+        active_alerts = {} # This is an empty placeholder that will hold all of the active alerts. 
+        if (len(alert_database) > 0): # Only run alert processing if the alert database isn't empty.
+            for rule in alert_database: # Run through every plate in the alert plate database supplied by the user.
+                for frame in alpr_frames: # Iterate through each frame of video in the raw ALPR data.
+                    if (config["general"]["alerts"]["alerts_ignore_validation"] == True): # If the user has enabled alerts that ignore license plate validation, then use the unvalidated ALPR information.
+                        alpr_frames_to_scan = alpr_frames
+                    else: # If the user hasn't enabled alerts that ignore license plate validation, then use the validated ALPR information.
+                        alpr_frames_to_scan = validated_alpr_frames
+
+                    for plate in alpr_frames_to_scan[frame]: # Iterate through each of the plates detected this round, regardless of whether or not they were validated.
+                        for guess in alpr_frames_to_scan[frame][plate]: # Run through each of the plate guesses generated by ALPR, regardless of whether or not they are valid according to the plate formatting guideline.
+                            if (fnmatch.fnmatch(guess, rule)): # Check to see this detected plate guess matches this particular plate in the alert database, taking wildcards into account.
+                                active_alerts[guess] = alert_database[rule] # Add this plate to the active alerts dictionary.
+                                active_alerts[guess]["rule"] = rule # Add the rule that triggered this alert to the alert information.
+                                active_alerts[guess]["frame"] = frame # Add the rule that triggered this alert to the alert information.
+                                if (config["general"]["alerts"]["allow_duplicate_alerts"] == False):
+                                    break # Break the loop if an alert is found for this guess, in order to avoid triggering multiple alerts for each guess of the same plate.
+
+        display_alerts(active_alerts) # Display all active alerts.
+        print("Done.\n")
+
+
+
+        # Correlate the detected license plates with a GPX file.
+        frame_locations = {} # Create a blank database that will be used during the process
+        if (gpx_file != ""): # Check to make sure the user actually supplied a GPX file.
+            debug_message("Correlated location data")
+            print("Processing location data...")
+            decoded_gpx_data = process_gpx(config["general"]["working_directory"] + "/" + gpx_file) # Decode the data from the GPX file.
+            iteration = 0 # Set the iteration counter to 0 so we can add one to it each frame we iterate through.
+            for element in alpr_frames: # Iterate through each frame.
+                iteration+=1 # Add one to the iteration counter.
+                frame_timestamp = video_start_time + (iteration * frame_interval) # Calculate the timestamp of this frame.
+
+                if (frame_timestamp in decoded_gpx_data): # Check to see if the exact timestamp for this frame exists in the GPX data.
+                    frame_locations[frame_timestamp] = [decoded_gpx_data[frame_timestamp], alpr_frames[element]]
+                else: # If the exact timestamp doesn't exist, try to find a nearby timestamp.
+                    closest_gpx_entry = closest_key(decoded_gpx_data, frame_timestamp)
+
+                    if (closest_gpx_entry[1] < config["prerecorded"]["max_gpx_time_difference"]): # Check to see if the closest GPX entry is inside the maximum configured range.
+                        frame_locations[frame_timestamp] = [decoded_gpx_data[closest_gpx_entry[0]], alpr_frames[element]]
+                    else: # Otherwise, indicate that a corresponding location couldn't be found.
+                        frame_locations[frame_timestamp] = [{"lat": 0.0, "lon": 0.0}, alpr_frames[element]] # Set this location of this frame to latitude and longitude 0.0 as a placeholder.
+                        display_message("There is no GPX data matching the timestamp of frame " + element + ". The closest location stamp is " + str(closest_gpx_entry[1]) + " seconds away. Does the GPX file specified line up with the video?", 3)
+
+            print("Done.\n")
+
+
+
+
+        # Analysis has been completed. Next, the user will choose what to do with the analysis data.
+
+
+        utils.wait_for_input()
+
+        debug_message("Starting menu loop")
+        while global_variables.predator_running: # Run the pre-recorded mode menu in a loop forever until the user exits.
+            clear()
+
+            # Show the main menu for handling data collected in pre-recorded mode.
+            print("Please select an option")
+            print("0. Quit")
+            print("1. Manage license plate data")
+            if (config["general"]["object_recognition"]["enabled"] == True): # Check to see if object recognition is enabled before displaying the object recognition option.
+                print("2. Manage object recognition data")
             else:
-                display_message("GPX processing has been disabled since a GPX file wasn't provided. There is no GPX location data to manage.", 2)
-
-            utils.wait_for_input()
-
-
-        elif (selection == "4"): # If the user selects option 4 on the main menu, then show the statistics for this session.
-            print("    Frames analyzed: " + str(len(alpr_frames))) # Show how many frames of video were analyzed.
-            print("    Plates found: " + str(len(plates_detected))) # Show how many unique plates were detected.
-            print("    Videos analyzed: " + str(len(videos))) # Show how many videos were analyzed.
-            print("    Alerts detected: " + str(len(active_alerts))) # Show how many videos were analyzed.
-            utils.wait_for_input()
+                print(style.faint + "2. Manage object recognition data" + style.end)
+            if (gpx_file != ""): # Check to see if a GPX correlation is enabled before displaying the position data option.
+                print("3. Manage position data")
+            else:
+                print(style.faint + "3. Manage position data" + style.end)
+            print("4. View session statistics")
+            selection = prompt("Selection: ", optional=False, input_type=str)
 
 
-        else: # If the user selects an unrecognized option on the main menu for pre-recorded mode, then show a warning.
-            display_message("Invalid selection.", 2)
-            utils.wait_for_input()
+            if (selection == "0"):
+                global_variables.predator_running = False
+            elif (selection == "1"): # If the user selects option 1 on the main menu, then load the license plate data viewing menu.
+                print("    Please select an option")
+                print("    0. Back")
+                print("    1. View data")
+                print("    2. Export data")
+                selection = prompt("    Selection: ", optional=False, input_type=str)
+
+                if (selection == "1"): # The user has opened the license plate data viewing menu.
+                    print("        Please select an option")
+                    print("        0. Back")
+                    print("        1. View as Python data")
+                    print("        2. View as list")
+                    print("        3. View as CSV")
+                    print("        4. View as JSON data")
+                
+                    selection = prompt("        Selection: ", optional=False, input_type=str)
+
+                    if (selection == "0"):
+                        print("Returning to main menu.")
+                    elif (selection == "1"): # The user has selected to view license plate data as Python data.
+                        print(str(plates_detected))
+                    elif (selection == "2"): # The user has selected to view license plate data as a list.
+                        for plate in plates_detected:
+                            print(plate)
+                    elif (selection == "3"): # The user has selected to view license plate data as CSV data.
+                        csv_data = ""
+                        for plate in plates_detected: # Iterate through each of the plates detected.
+                            csv_data = csv_data + plate + ","
+                        print(csv_data[:-1]) # Print the CSV data without the last character, since it will always be a comma.
+                    elif (selection == "4"): # The user has selected to view license plate data as raw JSON data.
+                        print("            Please select an option")
+                        print("            0. Back")
+                        print("            1. View all")
+                        print("            2. View validated")
+                        print("            3. View alerts")
+                    
+                        selection = prompt("            Selection: ", optional=False, input_type=str)
+
+                        if (selection == "0"):
+                            print("Returning to main menu.")
+                        elif (selection == "1"): # The user has selected to view all license plate data as JSON.
+                            print(json.dumps(alpr_frames))
+                        elif (selection == "2"): # The user has selected to view validated license plate data as JSON.
+                            print(json.dumps(validated_alpr_frames))
+                        elif (selection == "3"): # The user has selected to view validated license plate data as JSON.
+                            print(json.dumps(active_alerts))
+                        else:
+                            display_message("Invalid selection.", 2)
+                    else:
+                        display_message("Invalid selection.", 2)
+
+                elif (selection == "2"): # The user has opened the license plate data exporting menu.
+                    print("        Please select an option")
+                    print("        0. Back")
+                    print("        1. Export as Python data")
+                    print("        2. Export as list")
+                    print("        3. Export as CSV")
+                    print("        4. Export as JSON")
+                    selection = prompt("        Selection: ", optional=False, input_type=str)
+
+                    export_data = "" # Create a blank variable to store the export data.
+
+                    if (selection == "0"):
+                        print("Returning to main menu.")
+                    elif (selection == "1"): # The user has selected to export license plate data as Python data.
+                        export_data = str(plates_detected)
+                        save_to_file(config["general"]["working_directory"] + "/pre_recorded_license_plate_export.txt", export_data) # Save to disk.
+                    elif (selection == "2"): # The user has selected to export license plate data as a list.
+                        for plate in plates_detected:
+                            export_data = export_data + plate + "\n"
+                        save_to_file(config["general"]["working_directory"] + "/pre_recorded_license_plate_export.txt", export_data) # Save to disk.
+                    elif (selection == "3"): # The user has selected to export license plate data as CSV data.
+                        for plate in plates_detected:
+                            export_data = export_data + plate + ",\n"
+                        save_to_file(config["general"]["working_directory"] + "/pre_recorded_license_plate_export.csv", export_data) # Save to disk.
+                    elif (selection == "4"): # The user has selected to export license plate data as JSON data.
+                        print("            Please select an option")
+                        print("            0. Back")
+                        print("            1. Export all")
+                        print("            2. Export validated")
+                        print("            3. Export alerts")
+                    
+                        selection = prompt("            Selection: ", optional=False, input_type=str)
+
+                        if (selection == "0"):
+                            print("Returning to main menu.")
+                        elif (selection == "1"): # The user has selected to export all license plate data as JSON.
+                            save_to_file(config["general"]["working_directory"] + "/pre_recorded_license_plate_export.json", json.dumps(alpr_frames)) # Save the raw license plate analysis data to disk.
+                        elif (selection == "2"): # The user has selected to export validated license plate data as JSON.
+                            save_to_file(config["general"]["working_directory"] + "/pre_recorded_license_plate_export.json", json.dumps(validated_alpr_frames)) # Save the validated license plate analysis data to disk.
+                        elif (selection == "3"): # The user has selected to alert license plate data as JSON.
+                            save_to_file(config["general"]["working_directory"] + "/pre_recorded_license_plate_export.json", json.dumps(active_alerts)) # Save detected license plate alerts to disk.
+                        else:
+                            display_message("Invalid selection.", 2)
+                    else:
+                        display_message("Invalid selection.", 2)
+
+                utils.wait_for_input()
 
 
+            elif (selection == "2"): # The user has selected to manage object recognition data.
+                if (config["general"]["object_recognition"]["enabled"] == True):
+                    print("    Please select an option")
+                    print("    0. Back")
+                    print("    1. View data")
+                    print("    2. Export data")
+                    selection = prompt("    Selection: ", optional=False, input_type=str)
 
+                    if (selection == "1"): # The user has selected to view object recognition data.
+                        print("        Please select an option")
+                        print("        0. Back")
+                        print("        1. View as Python data")
+                        print("        2. View as JSON data")
+                        selection = prompt("        Selection: ", optional=False, input_type=str)
+
+                        if (selection == "0"):
+                            print("Returning to main menu.")
+                        elif (selection == "1"):
+                            print(object_count)
+                        elif (selection == "2"):
+                            print(json.dumps(object_count, indent=4))
+                        else:
+                            display_message("Invalid selection.", 2)
+
+                    elif (selection == "2"): # The user has selected to export object recognition data.
+                        print("        Please select an option")
+                        print("        0. Back")
+                        print("        1. Export as Python data")
+                        print("        2. Export as JSON data")
+                        selection = prompt("Selection: ", optional=False, input_type=str)
+
+                        if (selection == "0"):
+                            print("Returning to main menu.")
+                        elif (selection == "1"):
+                            save_to_file(config["general"]["working_directory"] + "/pre_recorded_object_detection_export.txt", str(object_count)) # Save to disk.
+                        elif (selection == "2"):
+                            save_to_file(config["general"]["working_directory"] + "/pre_recorded_object_detection_export.json", json.dumps(object_count, indent=4)) # Save to disk.
+                        else:
+                            display_message("Invalid selection.", 2)
+
+                    else: # The user has selected an invalid option in the object recognition data management menu.
+                        display_message("Invalid selection.", 2)
+
+                else: # The user has selected the object recognition data management menu, but object recognition has been disabled.
+                    display_message("Object recognition has been disabled. There is no object recognition data to manage.", 2)
+
+                utils.wait_for_input()
+
+
+            elif (selection == "3"): # The user has selected to manage GPX location information.
+                if (gpx_file != ""): # Check to see if a GPX file was provided for analysis.
+                    print("    Please select an option")
+                    print("    0. Back")
+                    print("    1. View data")
+                    print("    2. Export data")
+                    selection = prompt("    Selection: ", optional=False, input_type=str)
+
+                    if (selection == "0"):
+                        print("Returning to main menu.")
+                    elif (selection == "1"): # The user has selected to view GPX location information.
+                        print("        Please select an option")
+                        print("        0. Back")
+                        print("        1. View as Python data")
+                        print("        2. View as JSON data")
+                        selection = prompt("        Selection: ", optional=False, input_type=str)
+
+                        if (selection == 0):
+                            print("Returning to main menu.")
+                        elif (selection == "1"):
+                            print(frame_locations)
+                        elif (selection == "2"):
+                            print(json.dumps(frame_locations, indent=4))
+                        else:
+                            display_message("Invalid selection.", 2)
+
+                    elif (selection == "2"): # The user has selected to export GPX location information.
+                        print("        Please select an option")
+                        print("        0. Back")
+                        print("        1. Export as Python data")
+                        print("        2. Export as JSON data")
+                        selection = prompt("        Selection: ", optional=False, input_type=str)
+
+                        if (selection == 0):
+                            print("Returning to main menu.")
+                        elif (selection == "1"):
+                            save_to_file(config["general"]["working_directory"] + "/pre_recorded_location_data_export.txt", frame_locations) # Save to disk.
+                        elif (selection == "2"):
+                            save_to_file(config["general"]["working_directory"] + "/pre_recorded_location_data_export.json", json.dumps(frame_locations, indent=4)) # Save to disk.
+                        else:
+                            display_message("Invalid selection.", 2)
+
+                    else:
+                        display_message("Invalid selection.", 2)
+
+                else:
+                    display_message("GPX processing has been disabled since a GPX file wasn't provided. There is no GPX location data to manage.", 2)
+
+                utils.wait_for_input()
+
+
+            elif (selection == "4"): # If the user selects option 4 on the main menu, then show the statistics for this session.
+                print("    Frames analyzed: " + str(len(alpr_frames))) # Show how many frames of video were analyzed.
+                print("    Plates found: " + str(len(plates_detected))) # Show how many unique plates were detected.
+                print("    Videos analyzed: " + str(len(videos))) # Show how many videos were analyzed.
+                print("    Alerts detected: " + str(len(active_alerts))) # Show how many videos were analyzed.
+                utils.wait_for_input()
+
+
+            else: # If the user selects an unrecognized option on the main menu for pre-recorded mode, then show a warning.
+                display_message("Invalid selection.", 2)
+                utils.wait_for_input()
 
 
 
@@ -1562,10 +1574,16 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
 
 # Dash-cam mode
 elif (mode_selection == "3" and config["general"]["modes"]["enabled"]["dashcam"] == True): # The user has set Predator to boot into dash-cam mode.
-    debug_message("Started dash-cam mode")
     print("\nStarting dashcam recording")
-    dashcam.start_dashcam_recording(config["dashcam"]["capture"]["video"]["devices"], config["general"]["working_directory"], False) # Start the dashcam recording process.
-
+    dashcam.start_dashcam_recording(config["dashcam"]["capture"]["video"]["devices"], config["general"]["working_directory"]) # Start the dashcam recording process.
+    debug_message("Started dash-cam mode")
+    try:
+        print("Press Ctrl+C to exit")
+        while global_variables.predator_running:
+            time.sleep(1)
+    except:
+        global_variables.predator_running = False
+        display_message("Dashcam recording halted.", 1)
 
 
 
@@ -1573,3 +1591,5 @@ elif (mode_selection == "3" and config["general"]["modes"]["enabled"]["dashcam"]
 
 else: # The user has selected an unrecognized mode.
     display_message("The selected mode is invalid.", 3) # Display an error message indicating that the selected mode isn't recognized.
+
+

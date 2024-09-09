@@ -17,6 +17,7 @@
 
 
 
+import global_variables
 
 import os # Required to interact with certain operating system functions
 import json # Required to process JSON data
@@ -93,7 +94,7 @@ import threading
 def manage_time_offset(): # This function watches the system time, and reset the time offset if the system time changes.
     global global_time_offset
     debug_message("Starting time offset management.")
-    while True: # Run forever.
+    while global_variables.predator_running: # Run forever.
         start_time = time.time()
         time.sleep(1) # Wait for 1 second before checking the time again.
         end_time = time.time()
@@ -443,9 +444,9 @@ def prompt(message, optional=True, input_type=str, default=""):
 
     elif (input_type == bool):
         if (len(user_input) > 0):
-            if (user_input[0].lower() == "y" or user_input[0].lower() == "t"):
+            if (user_input[0].lower() == "y" or user_input[0].lower() == "t" or user_input[0].lower() == "1"):
                 user_input = True
-            elif (user_input[0].lower() == "n" or user_input[0].lower() == "f"):
+            elif (user_input[0].lower() == "n" or user_input[0].lower() == "f" or user_input[0].lower() == "0"):
                 user_input = False
 
         while (type(user_input) != bool): # Run repeatedly until the input is a boolean.
