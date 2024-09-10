@@ -294,12 +294,26 @@ def generate_dashcam_sidecar_files(working_directory, dashcam_files):
             command_output, command_error = alpr_process.communicate()
             command_output = command_output.splitlines()
             if (len(command_output) == video_frame_count): # Check to make sure the number of frames analyzed is the same as the frame count.
-                analysis_results = [] # This will hold the analysis results for this video file.
-                for frame in command_output: # Iterate through each frame's analysis results from the commmand output.
-                    frame = json.loads(frame)
-                    print(frame) # TODO REMOVE
-                    for result in frame["results"]:
-                        frame_results = {} # This will hold the analysis results for this frame.
+                analysis_results = {} # This will hold the analysis results for this video file.
+                for frame_number, frame_data in enumerate(command_output): # Iterate through each frame's analysis results from the commmand output.
+                    frame_data = json.loads(frame_data)
+                    frame_results = {} # This will hold the analysis results for this frame.
+                    for result in frame_data["results"]: # Iterate through each plate detected in this frame.
+                        top_guess = "" # This will be set to the top plate from the guesses, based on the validation rules.
+                        for guess in result["candidates"]: # Iterate through each guess for this plate in order from most to least likely.
+                            if (guess["confidence"] >= float(config["general"]["alpr"]["validation"]["confidence"])): # Check to see if this guess exceeds the minimum confidence value.
+                                if any(validate_plate(guess["plate"], format_template) for format_template in config["general"]["alpr"]["validation"]["license_plate_format"]) or len(config["general"]["alpr"]["validation"]["license_plate_format"]) == 0: # Check to see if this plate passes validation.
+                                    top_guess = guess["plate"] # This will be set to the top plate from the guesses, based on the validation rules.
+                                    break # Exit the loop, since all subsequent guesses will have a lower confidence.
+                        if (top_guess == ""): # Check to see if there weren't any valid guesses for this plate.
+                            if (config["general"]["alpr"]["validation"]["best_effort"]): # Check to see if `best_effort` mode is enabled.
+                                top_guess = result["candidates"][0]["plate"] # Use the most likely plate as the top guess.
+                        if (top_guess != ""): # Check to see if the top guess is set for this plate.
+                            frame_results[top_guess] = {} # Initialize this plate in the dictionary of plates for this frame.
+                            frame_results[top_guess]["coordinates"] = result["coordinates"] # Add the position of this plate in the image. TODO: Convert to bounding box.
+                    if (len(frame_results) > 0): # Check to see if there is at least one result for this frame.
+                        analysis_results[frame_number] = frame_results # Add this frame's data to the full analysis results.
+                save_to_file(sidecar_filepath, json.dumps(analysis_results, indent=4)) # Save the analysis results for this file to the side-car file.
                 print("    Analysis complete")
             else:
                 print("    The number of frames in the video does not match the number of frames analyzed.")
