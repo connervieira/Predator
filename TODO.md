@@ -47,6 +47,7 @@ These are the features actively planned for Predator and are likely to be added 
     - [X] Test real-time mode.
     - [X] Test dash-cam mode.
 - [ ] Implement pre-recorded dashcam sidecar mode.
+- [ ] Implement revised process exiting for real-time mode.
 
 ## Hypothetical
 

@@ -268,3 +268,39 @@ def load_alert_database(sources, project_directory): # This function compiles th
             complete_alert_database[rule] = alert_database[rule] # Add this rule to the complete alert database.
 
     return complete_alert_database
+
+
+# This function will generate sidecar files containing ALPR information for each video recorded by Predator in dash-cam mode.
+def generate_dashcam_sidecar_files(working_directory, dashcam_files):
+    global config
+    for file in dashcam_files:
+        file_basename = os.path.splitext(file)[0] # Get the base name of this video file, with no extension.
+        print("Analyzing: " + file)
+        sidecar_filepath = working_directory + "/" + file_basename + ".json"
+        if (os.path.isfile(sidecar_filepath) == True): # This to see if there is already a side-car file associated with this video.
+            print("    This file has already be analyzed.")
+        else: # Otherwise, this file needs to be analyzed.
+            if (config["general"]["alpr"]["engine"] == "phantom"): # Check to see if the configure ALPR engine is Phantom.
+                alpr_command = ["alpr", "-n", str(config["general"]["alpr"]["validation"]["guesses"]),  working_directory + "/" + file] # Set up the OpenALPR command.
+            if (config["general"]["alpr"]["engine"] == "openalpr"): # Check to see if the configure ALPR engine is OpenALPR.
+                alpr_command = ["alpr", "-j", "-n", str(config["general"]["alpr"]["validation"]["guesses"]),  working_directory + "/" + file] # Set up the OpenALPR command.
+
+            video_frame_count_command = "ffprobe -select_streams v -show_streams " + working_directory + "/" + file + " 2>/dev/null | grep nb_frames | sed -e 's/nb_frames=//'" # Define the commmand to count the frames in the video.
+            video_frame_count_process = subprocess.Popen(video_frame_count_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True) # Execute the command to count the frames in the video.
+            video_frame_count, command_error = video_frame_count_process.communicate() # Fetch the results of the frame count command.
+            video_frame_count = int(video_frame_count) # Convert the frame count to an integer.
+
+            alpr_process = subprocess.Popen(alpr_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True) # Execute the ALPR command.
+            command_output, command_error = alpr_process.communicate()
+            command_output = command_output.splitlines()
+            if (len(command_output) == video_frame_count): # Check to make sure the number of frames analyzed is the same as the frame count.
+                analysis_results = [] # This will hold the analysis results for this video file.
+                for frame in command_output: # Iterate through each frame's analysis results from the commmand output.
+                    frame = json.loads(frame)
+                    print(frame) # TODO REMOVE
+                    for result in frame["results"]:
+                        frame_results = {} # This will hold the analysis results for this frame.
+                print("    Analysis complete")
+            else:
+                print("    The number of frames in the video does not match the number of frames analyzed.")
+                print("    Skipping analysis")

@@ -770,6 +770,7 @@ elif (mode_selection == "1" and config["general"]["modes"]["enabled"]["prerecord
     for file in working_directory_contents:
         if (file[0:len("predator_dashcam_")] == "predator_dashcam_"):
             dashcam_videos.append(file)
+        
     if (len(dashcam_videos) > 3):
         print("There appears to be several Predator dashcam videos in the working directory. Would you like to generate side-car files for these videos?")
         sidecar_mode = prompt("Enable side-car mode (Y/N): ", optional=False, input_type=bool)
@@ -777,8 +778,9 @@ elif (mode_selection == "1" and config["general"]["modes"]["enabled"]["prerecord
         sidecar_mode = False
 
     if (sidecar_mode == True):
-        print("Sidecar mode")
-        print(dashcam_videos) # TODO
+        print("\nRunning side-car file generation...")
+        alpr.generate_dashcam_sidecar_files(config["general"]["working_directory"], dashcam_videos)
+        print("Generation complete")
         global_variables.predator_running = False
     elif (sidecar_mode == False):
         video = prompt("Video file name(s): ", optional=False, input_type=str)
