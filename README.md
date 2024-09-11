@@ -48,7 +48,34 @@ Real-time mode allows Predator to detect license plates and objects in real-time
 Dash-cam mode allows Predator to record video without running any analysis or computer-vision processing.
 
 
-## General Features
+
+## Use Cases
+
+Predator is an extremely customizable platform designed to fit a wide variety of niche use cases. Here are some examples that highlight what Predator is capable of.
+
+### Custom Dashcam
+
+Predator allows technically minded users to build their own dash-cam to their specifications. Whether you want a clean and concealed install, or an advanced multi-channel setup, Predator gives you more flexibility than any other dash-cam platform.
+
+### AMBER Alert Detection
+
+Predator's ALPR capabilities make it easy to set up alerts for license plates. When an AMBER alert is issued in your area, adding the associated license plate to your ALPR hot-list allows you to help rescue missing children without needing to distract your attention from driving.
+
+### Corporate/Law Enforcement Vehicle Cameras
+
+Predator's advanced dash-cam capabilities enable features that are useful to enterprise users with unique needs. Predator's customizable video overlays allow you to review the speed and location of a vehicle, as well as custom relay triggers that can monitor actions like braking, horn use, warning lights, and sirens.
+
+### Prerecorded Video Analysis
+
+In addition to real-time computer vision analysis, Predator is capable of analyzing prerecorded video from any source with license plate identification and object recognition. When using Predator's built-in dash-cam capabilities, prerecorded mode allows you to automatically analyze previously recorded dash-cam video with just a few button presses.
+
+### Vehicle Security
+
+While dash-cam mode offers plenty of useful features while driving, Predator also comes with parking protection functionality, where the camera remains dormant until an event is detected.
+
+
+
+## Features
 
 ### Completely Private
 
@@ -92,7 +119,7 @@ Predator is designed to be safe, regardless of the installation context. It's ea
 
 ### Full Dashcam
 
-Predator comes with a fully featured dash-cam mode, allowing for customizable ecording without processing license plates. Dash-cam videos can later be processed by Predator in pre-recorded mode if desired. Predator's dash-cam mode allows for multi-channel recording, provided the hardware supports it, making it easy to simultaneously record multiple angles using multiple cameras.
+Predator comes with a fully featured dash-cam mode, allowing for customizable recording without processing license plates. Dash-cam videos can later be processed by Predator in pre-recorded mode if desired. Predator's dash-cam mode allows for multi-channel recording, provided the hardware supports it, making it easy to simultaneously record multiple angles using multiple cameras.
 
 ### Headless Ready
 
@@ -110,7 +137,7 @@ Predator's extreme customizability can be a bit overwhelming to new users. For t
 
 While it shouldn't be fully relied upon for safety critical tasks, Predator is designed to be extremely dependable regardless. When configured appropriately, steps are taken to decrease the likelihood that Predator will false negative due mistakes in the analysis.
 
-### Adaptive Framerate
+### Adaptive Frame-rate
 
 Predator automatically adapts to changing lighting conditions in both real-time and dashcam mode by allowing the frame-rate to change dynamically over time. Predator automatically detects frame-rate changes, and updates the playback speed of saved video files accordingly.
 
