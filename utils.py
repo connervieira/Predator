@@ -772,3 +772,25 @@ def sizeof_fmt(num, suffix='B'):
 
 def wait_for_input():
     prompt("Press enter to continue")
+
+
+# This function takes the corners of a plate identified by the ALPR engine (
+# Example input: [{"x": 737, "y": 188}, {"x": 795, "y": 189}, {"x": 795, "y": 219}, {"x": 736, "y": 217}]
+# Example output: {"x", 737, "y": 188, "w": 59, "h": 31}
+def convert_corners_to_bounding_box(corners):
+    if (len(corners) == 4): # Check to see if the number of corners is the expected length.
+        all_x = [] # This will hold all X coordinates.
+        all_y = [] # This will hold all Y coordinates.
+        for corner in corners:
+            all_x.append(int(corner["x"]))
+            all_y.append(int(corner["y"]))
+        
+        bounding_box = {
+            "x": int(min(all_x)),
+            "y": int(min(all_y)),
+            "w": int(max(all_x) - min(all_x)),
+            "h": int(max(all_y) - min(all_y)),
+        }
+        return bounding_box
+    else: # The number of corners is not the expected length.
+        return False

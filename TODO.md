@@ -46,11 +46,11 @@ These are the features actively planned for Predator and are likely to be added 
     - [X] Test pre-recorded mode.
     - [X] Test real-time mode.
     - [X] Test dash-cam mode.
-- [ ] Implement pre-recorded dash-cam side-car mode.
+- [X] Implement pre-recorded dash-cam side-car mode.
     - [X] Implement file generation.
-    - [ ] Convert plate corners to bounding box.
-    - [ ] Create file viewer.
-- [ ] Implement revised process exiting for real-time mode.
+    - [X] Convert plate corners to bounding box.
+    - [X] Create file viewer.
+- [X] Implement revised process exiting for real-time mode.
 
 ## Hypothetical
 

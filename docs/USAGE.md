@@ -50,12 +50,19 @@ This section describes the initial start-up process of Predator.
         - First, you'll be asked to set the working directory. Simply create an empty folder, then place your video(s) into it. Specify the absolute path to this folder here.
             - Leave this option blank to use the default value.
             - Example: `/home/pi/Downloads/MyProjectFolder`
-        - Next, you'll be asked to enter the file name(s) of the video(s) you want to analyze. Video(s) should be placed in the working directory you just specified. If you have multiple video files, you can enter them as a comma-separated list. If you want to scan an entire directory, Use a `*` wildcard as the first character.
+        - Next, if your working directory contains Predator dash-cam video, you'll be prompted to enter side-car mode. If not, this dialog will be skipped.
+            - Side-car mode will analyze each frame of all dash-cam videos, and generate a side-car file containing ALPR data. Side-car data can be played back using the `tools/video_sidecar_player.py` script.
+            - If you select "Y" to enable side-car mode, Predator will immediately begin analyzing all dash-cam videos that don't already have side-car files.
+                - This process make take a very long time, since every frame of every video is analyzed.
+            - If you select "N" to skip side-car mode, then set-up process will continue with the next dialog.
+        - Provided you haven't selected side-car mode, you'll next be asked to enter the file name(s) of the video(s) you want to analyze. Video(s) should be placed in the working directory you just specified. If you have multiple video files, you can enter them as a comma-separated list. If you want to scan an entire directory, Use a `*` wildcard as the first character.
             - Example 1: `MyVideo.mp4`
             - Example 2: `MyFirstVideo.mp4, MySecondVideo.mp4`
             - Example 3: `*.mp4`
+            - Example 4: `*_video.avi`
         - Next, you'll be asked how many seconds you want to wait between frames for analysis. Since it would be inefficient to process every single frame of video, this value is used to only take frames every N seconds. You can think of this value as "only process a frame every N seconds of video".
-            - Example: `2` will take a frame to process every 2 seconds of video. This would break up a 10 second video into 5 frames.
+            - Example: `2` will take a frame to process every 2 seconds of video. This would break up a 10 second video into 5 frames for analysis.
+            - Note that setting this value to something excessively small (for example, below 0.0333 for a 30fps video) may cause the same frame to be analyzed multiple times.
             - Leave this option blank to use the default value.
         - Next, you'll be asked for a license plate format example. Filling out this value is highly recommended, since it will greatly reduce the number of incorrectly read plates. If this is left blank, no formatting validation will be used.
             - This value can be set to any alphanumeric string. For example, if all the plates in your state have 3 letters followed by 4 numbers, you could set this value to "AAA0000" or "ABC1234". Both values will work the exact same way. Predator only looks at the type of each character, not the character itself.

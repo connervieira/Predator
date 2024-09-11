@@ -11,6 +11,7 @@
 
 
 
+import global_variables
 import csv
 import os
 import time
@@ -74,7 +75,7 @@ def alpr_stream(device):
 def alpr_stream_maintainer(): # This function runs an endless loop that maintains
     global queued_plate_reads
     last_message_received = utils.get_time() + 5 # This variable holds the time that the last ALPR message was received. Initialize it to a time a few seconds into the future to allow the ALPR process extra time to start before a warning is displayed.
-    while True:
+    while global_variables.predator_running:
         debug_message("Starting ALPR stream maintainance cycle")
         time.sleep(0.3) # Delay for a short period of time before each loop so that the ALPR stream has time to output some results.
         stream_file = open(alpr_stream_file_location) # Open the ALPR stream file.
@@ -310,7 +311,7 @@ def generate_dashcam_sidecar_files(working_directory, dashcam_files):
                                 top_guess = result["candidates"][0]["plate"] # Use the most likely plate as the top guess.
                         if (top_guess != ""): # Check to see if the top guess is set for this plate.
                             frame_results[top_guess] = {} # Initialize this plate in the dictionary of plates for this frame.
-                            frame_results[top_guess]["coordinates"] = result["coordinates"] # Add the position of this plate in the image. TODO: Convert to bounding box.
+                            frame_results[top_guess]["coordinates"] = utils.convert_corners_to_bounding_box(result["coordinates"]) # Add the position of this plate in the image. TODO: Convert to bounding box.
                     if (len(frame_results) > 0): # Check to see if there is at least one result for this frame.
                         analysis_results[frame_number] = frame_results # Add this frame's data to the full analysis results.
                 save_to_file(sidecar_filepath, json.dumps(analysis_results, indent=4)) # Save the analysis results for this file to the side-car file.
