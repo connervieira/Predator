@@ -45,13 +45,13 @@ Real-time mode allows Predator to detect license plates and objects in real-time
 
 ### Dash-cam Mode (3)
 
-Dash-cam mode allows Predator to record video without running any analysis or computer-vision processing.
+Dash-cam mode allows Predator to record video like a traditional dash-cam, with customizable overlays and video processing.
 
 
 
 ## Use Cases
 
-Predator is an extremely customizable platform designed to fit a wide variety of niche use cases. Here are some examples that highlight what Predator is capable of.
+Predator is an extremely customizable platform designed to fit a wide variety of use cases. Here are some examples that highlight what Predator is capable of.
 
 ### Custom Dashcam
 
@@ -103,7 +103,7 @@ Predator is extremely customizable, making it easy to fit into any use case. Whe
 
 ### Mobile Ready
 
-Predator is designed to support low-energy-usage hardware such that it can be easily installed in a vehicle. A single USB port is enough to power an entire Predator system.
+Predator is designed to support low-energy-usage hardware such that it can be easily installed in a vehicle. A single USB port is often enough to power an entire Predator system.
 
 ### Location Aware
 
@@ -111,11 +111,11 @@ Predator supports GPX files to allow for correlating license plates detected in 
 
 ### Customizable Alerts
 
-Predator supports customizable real-time alerts, allowing the user to be notified when a license plate matching one on a list is detected through audible sound alerts, visual cues, and push notifications!
+Predator supports customizable real-time alerts, allowing the user to be notified when a license plate matching a hot-list is detected via audible sound alerts, visual cues, and push notifications!
 
 ### Distraction Free
 
-Predator is designed to be safe, regardless of the installation context. It's easy to configure Predator to completely hands (and eyes) free, ensuring that you don't have to look away from the road when Predator runs in a mobile context.
+Predator is designed to be safe, regardless of the installation context. It's easy to configure Predator to completely hands (and eyes) free, ensuring that you don't have to look away from the road when Predator runs in a vehicle.
 
 ### Full Dashcam
 
@@ -148,6 +148,14 @@ Predator supports automatic parking dashcam functionality, where recording stops
 ### Buffered Recording
 
 In dash-cam mode, when parking mode is active, Predator will keep a video buffer of customizable length at all times. This means that Predator can go "back in time" when motion is detected, and save the last few seconds of video retroactively.
+
+### Multi-Channel Recording
+
+Predator's dash-cam recording capabilities support an arbitrary number of video channels. As long as you have sufficient processing power and /O bandwidth, Predator allows you to connect as many cameras as you want. Even if you exceed your device's processing capabilities, Predator will continue recording at a lower frame-rate to ensure you don't miss any important events.
+
+### GPIO Integration
+
+Predator supports GPIO features that allow you to customize your install with physical buttons and relays. Predator can be configured to save dash-cam video with a GPIO circuit is closed, or even display the state of a relay in a dash-cam overlay.
 
 
 ## Screenshots
