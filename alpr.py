@@ -311,7 +311,7 @@ def generate_dashcam_sidecar_files(working_directory, dashcam_files):
                                 top_guess = result["candidates"][0]["plate"] # Use the most likely plate as the top guess.
                         if (top_guess != ""): # Check to see if the top guess is set for this plate.
                             frame_results[top_guess] = {} # Initialize this plate in the dictionary of plates for this frame.
-                            frame_results[top_guess]["coordinates"] = utils.convert_corners_to_bounding_box(result["coordinates"]) # Add the position of this plate in the image. TODO: Convert to bounding box.
+                            frame_results[top_guess]["coordinates"] = utils.convert_corners_to_bounding_box(result["coordinates"]) # Add the position of this plate in the image.
                     if (len(frame_results) > 0): # Check to see if there is at least one result for this frame.
                         analysis_results[frame_number] = frame_results # Add this frame's data to the full analysis results.
                 save_to_file(sidecar_filepath, json.dumps(analysis_results, indent=4)) # Save the analysis results for this file to the side-car file.
