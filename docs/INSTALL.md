@@ -10,7 +10,7 @@ If you're already familiar with Predator, and you just want a quick set-up guide
 1. Install Linux packages: `sudo apt-get install ffmpeg mpg321 gpsd gpsd-clients imagemagick fswebcam libhdf5-dev build-essential`
 2. Install Python packages: `pip3 install pytz validators requests gps gpsd-py3 opencv-python cvlib tensorflow keras silence-tensorflow psutil rns lxmf gpiozero`
     - If you see an "externally managed environment" error while installing Python packages, consider one of the following solutions:
-        - If you're installing Predator on a system dedicated to it's use (such as a computer installed in a vehicle), you can override this warning and force install the packages (at the risk of breaking your install) using by adding the `--break-system-packages` flag to the installation command.
+        - If you're installing Predator on a system dedicated to its use (such as a computer installed in a vehicle), you can override this warning and force install the packages (at the risk of breaking your install) using by adding the `--break-system-packages` flag to the installation command.
             - It's worth mentioning that during testing, using the `--break-system-packages` flag while installing Predator has never caused any noticable system issues on any common Debian-based Linux distribution (Ubuntu, Mint, Raspberry Pi OS, etc.). However, you should still exercise caution when using it, especially if you aren't using a fresh Python installation.
         - If you're focused on developing or modifying Predator, try creating a virtual environment for sake of consistency. This method is very reliable, but will often cause issues if you intend to integrate Predator with external interfaces in production (like V0LT Optic or V0LT Cortex), since these interfaces are unable to run Predator as part of a virtual environment.
             - You can create a virtual environment by navigating to the Predator directory, and running the following command: `python3 -m venv .venv`
@@ -32,27 +32,28 @@ This is the installation process for Predator and all of its dependencies. This 
     - Required:
         - `pytz`: Required to manage timezones.
     - Highly recommended:
-        - `validators` and `requests`: Required to network functionality, like push notifications, status light interfacing, remote alert lists, and more.
+        - `validators` and `requests`: Required for network functionality, like push notifications, status light interfacing, remote alert lists, and more.
     - Recommended:
         - `gps`, `geopy`, and `gpsd-py3`: Required to enable GPS features.
             - These packages are not required for reading GPX files, and are only necessary for interacting with live GPS devices.
-        - `opencv-python`, `cvlib`, `tensorflow`, `keras`, `silence-tensorflow`: Required for object recognition features and dash-cam video capture.
-            - These packages are not required for basic license plate recognition.
+        - `opencv-python`, `cvlib`: Required for dash-cam recording.
+            - These packages are also required for object recognition (but not license plate recognition).
     - Optional:
         - `psutil`: Required to process disk usage information in management mode and dash-cam mode.
         - `lxmf`, `rns`: Required to send offline parking notifications over the Reticulum stack.
         - `gpiozero`: Required to trigger events using GPIO inputs.
+        - `tensorflow`, `keras`, `silence-tensorflow`: Required for object recognition features.
 - System packages: `sudo apt-get install ffmpeg mpg321 gpsd gpsd-clients imagemagick fswebcam`
     - Highly recommended:
         - `ffmpeg`: Required for audio/video merging in dash-cam mode, and video processing in pre-recorded mode.
         - `imagemagick`: Required for manipulating still frames of video in pre-recorded mode.
     - Recommended:
         - `mpg321`: Required to play audio alerts.
-        - `gpsd` and `gpsd-clients`: Required to receive and process live GPS data.
+        - `gpsd`, `gpsd-clients`: Required to receive and process live GPS data.
             - It may also be necessary to start GPSD. You can test to see if GPSD is working properly using the `cgps` command.
     - Optional:
         - `fswebcam`: Useful for troubleshooting camera problems.
-            - Predator does not depend on FSWebcam, but it can be a useful tool for capturing still images from connected cameras.
+            - Predator does not depend on FSWebcam, but it can be a useful tool for capturing still images from connected cameras for testing.
 
 
 ### ALPR Engine
