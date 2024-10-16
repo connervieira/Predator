@@ -17,7 +17,7 @@
             "alerts_ignore_validation": true,
             "allow_duplicate_alerts": false,
             "databases": [
-                "https://v0lttech.com/predator/manifest/serve.php?type=hot"
+                "https://v0lttech.com/predator/manifest/serve.php?type=hot&user=cvieira&list=emergencyhotlist"
             ]
         },
         "display": {
