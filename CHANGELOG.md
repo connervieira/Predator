@@ -497,6 +497,7 @@ This update emphasizes improving the reliability of Predator, especially when op
 - Updated configuration back-end.
     - Increased the max-depth of the configuration validation process.
     - Predator can now automatically update the configuration file between versions when configuration values are added or removed.
+    - Improve the reliability of the configuration file location when starting Predator from an external tool, like Assassin.
 - Added an initial start-up sequence, where Predator shows some basic information before the normal start-up.
     - Predator now creates a file named `install.json` containing some basic install information on the first start-up.
 - Updated the ALPR handler.
