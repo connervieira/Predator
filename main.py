@@ -62,7 +62,6 @@ import fnmatch # Required to use wildcards to check strings.
 if (config["general"]["modes"]["enabled"]["realtime"] == True):
     import alpr
     display_alerts = alpr.display_alerts # Load the function used to display license plate alerts given the dictionary of alerts.
-    load_alert_database = alpr.load_alert_database # Load the function used to load license plate alert databases.
 
 if (config["general"]["modes"]["enabled"]["dashcam"] == True): # Check to see if OpenCV is needed.
     import dashcam
@@ -983,7 +982,7 @@ elif (mode_selection == "1" and config["general"]["modes"]["enabled"]["prerecord
 
         debug_message("Checking for alerts")
         print("Checking for alerts...")
-        alert_database = load_alert_database(config["general"]["alerts"]["databases"], config["general"]["working_directory"]) # Load the license plate alert database.
+        alert_database = alpr.load_alert_database(config["general"]["alerts"]["databases"], config["general"]["working_directory"]) # Load the license plate alert database.
         active_alerts = {} # This is an empty placeholder that will hold all of the active alerts. 
         if (len(alert_database) > 0): # Only run alert processing if the alert database isn't empty.
             for rule in alert_database: # Run through every plate in the alert plate database supplied by the user.
@@ -1290,7 +1289,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
 
 
     # Load the license plate alert database.
-    alert_database = load_alert_database(config["general"]["alerts"]["databases"], config["general"]["working_directory"])
+    alert_database = alpr.load_alert_database(config["general"]["alerts"]["databases"], config["general"]["working_directory"])
 
     alpr.start_alpr_stream() # Start the ALPR stream.
 

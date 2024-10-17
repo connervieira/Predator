@@ -236,6 +236,8 @@ def load_alert_database_remote(source, cache_directory):
     else: # Predator is in offline mode, but a remote alert database source was specified.
         alert_database = {} # Set the alert database to an empty dictionary.
         display_message("A remote alert database source " + source + " was specified, but Predator is in offline mode. This source has not been loaded.", 2)
+
+    save_to_file(config["general"]["interface_directory"] + "/hotlist.json", json.dumps(alert_database, indent=4)) # Save the active alert database to the interface directory.
     return alert_database
 
 def load_alert_database_local(source):

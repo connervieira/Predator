@@ -25,7 +25,7 @@ if (os.path.exists(config_active_filepath) == False):
         config_default_filepath = predator_root_directory + "/../assets/support/configdefault.json"
         config_outline_filepath = predator_root_directory + "/../assets/support/configoutline.json"
 
-if (os.path.exists(config_active_filepath) == False): # Check to see if the active config filed doesn't exit.
+if (os.path.exists(config_active_filepath) == False): # Check to see if the active config file doesn't exit.
     # Copy the default config file as the active config file.
     with open(config_default_filepath) as configuration_file: config_default= configuration_file.read()
 

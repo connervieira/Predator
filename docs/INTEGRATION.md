@@ -112,9 +112,53 @@ Example file contents:
 ```
 
 
+### Hotlist
+
+After loading all alert sources (as configured in `general>alerts>databases`), Predator will save the combined hot-list to the `hotlist.json` file. This allows external programs to easily access the complete list of alert rules loaded by Predator. The contents of this file take the form of a JSON dictionary, where each top-level key is an alert rule. Note that the sub-contents of each rule are not guaranteed to be present.
+
+Example file contents:
+```JSON
+{
+    "ABC1234": {
+        "name": "",
+        "description": "Testing alert",
+        "author": "V0LT",
+        "source": "",
+        "vehicle": {
+            "make": "Toyota",
+            "model": "Corolla",
+            "year": 2021
+        }
+    },
+    "XYZ1234": {
+        "name": "",
+        "description": "Testing alert",
+        "author": "V0LT",
+        "source": "",
+        "vehicle": {
+            "make": "Subaru",
+            "model": "Impreza",
+            "year": 2016
+        }
+    },
+    "GGG4321": {
+        "name": "",
+        "description": "Testing alert",
+        "author": "V0LT",
+        "source": "",
+        "vehicle": {
+            "make": "Honda",
+            "model": "Accord",
+            "year": 2011
+        }
+    }
+}
+```
+
+
 ## Triggers
 
-In addition to the files for sharing information from Predator to external programs, external programs can use create specific files to trigger certain events in Predator.
+In addition to the files for sharing information from Predator to external programs, external programs can create specific files to trigger certain events in Predator.
 
 ### Dashcam Saving
 
