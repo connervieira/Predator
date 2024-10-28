@@ -48,7 +48,6 @@ if (os.path.exists(config["dashcam"]["notifications"]["reticulum"]["identity_fil
     new_identity.to_file(config["dashcam"]["notifications"]["reticulum"]["identity_file"])
 
 debug_message("Loading Reticulum identity file")
-config["dashcam"]["notifications"]["reticulum"]["identity_file"] = "/home/cvieira/.reticulum/storage/identities/predator"
 identity = RNS.Identity().from_file(config["dashcam"]["notifications"]["reticulum"]["identity_file"])
 
 debug_message("Announcing Reticulum source")
