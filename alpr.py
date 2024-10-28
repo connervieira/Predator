@@ -169,14 +169,14 @@ def load_alpr_log():
 def run_alpr(image_filepath):
     global config
     if (config["general"]["alpr"]["engine"] == "phantom"): # Check to see if the configuration indicates that the Phantom ALPR engine should be used.
-        analysis_command = "alpr -n " + str(config["general"]["alpr"]["validation"]["guesses"]) + " '" + image_filepath + "'"
+        analysis_command = "alpr -n " + str(config["general"]["alpr"]["validation"]["guesses"]) + " \"" + image_filepath + "\""
         reading_output = str(os.popen(analysis_command).read()) # Run the command, and record the raw output string.
         reading_output = json.loads(reading_output) # Convert the JSON string from the command output to actual JSON data that Python can manipulate.
         if ("error" in reading_output): # Check to see if there were errors.
             print("Phantom ALPR encountered an error: " + reading_output["error"]) # Display the ALPR error.
             reading_output["results"] = [] # Set the results of the reading output to a blank placeholder list.
     elif (config["general"]["alpr"]["engine"] == "openalpr"): # Check to see if the configuration indicates that the OpenALPR engine should be used.
-        analysis_command = "alpr -j -n " + str(config["general"]["alpr"]["validation"]["guesses"]) + " " + config["general"]["working_directory"] + "/frames/" + frame # Set up the OpenALPR command.
+        analysis_command = "alpr -j -n " + str(config["general"]["alpr"]["validation"]["guesses"]) + " \"" + image_filepath + "\"" # Set up the OpenALPR command.
         reading_output = str(os.popen(analysis_command).read()) # Run the command, and record the raw output string.
         reading_output = json.loads(reading_output) # Convert the JSON string from the command output to actual JSON data that Python can manipulate.
     else: # If the configured ALPR engine is unknown, then return an error.
