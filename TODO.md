@@ -51,6 +51,7 @@ These are the features actively planned for Predator and are likely to be added 
     - [X] Convert plate corners to bounding box.
     - [X] Create file viewer.
 - [X] Implement revised process exiting for real-time mode.
+- [ ] Finish alert documentation (ALERTS.md)
 
 ## Hypothetical
 

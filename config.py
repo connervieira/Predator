@@ -13,18 +13,19 @@ import os # Required to interact with certain operating system functions
 import json # Required to process JSON data
 import time
 
+predator_root_directory = str(os.path.dirname(os.path.realpath(__file__))) # This variable determines the folder path of the root Predator directory. This should usually automatically recognize itself, but it if it doesn't, you can change it manually.
 
-config_default_filepath = "./assets/support/configdefault.json"
-config_outline_filepath = "./assets/support/configoutline.json"
-config_active_filepath = "./config.json"
+config_default_filepath = predator_root_directory + "/./assets/support/configdefault.json"
+config_outline_filepath = predator_root_directory + "/./assets/support/configoutline.json"
+config_active_filepath = predator_root_directory + "/./config.json"
 
-if (os.path.exists("./config.json") == False):
-    if (os.path.exists("../config.json") == True):
-        config_active_filepath = "../config.json"
-        config_default_filepath = "../assets/support/configdefault.json"
-        config_outline_filepath = "../assets/support/configoutline.json"
+if (os.path.exists(config_active_filepath) == False):
+    if (os.path.exists(predator_root_directory + "/../config.json") == True):
+        config_active_filepath = predator_root_directory + "/../config.json"
+        config_default_filepath = predator_root_directory + "/../assets/support/configdefault.json"
+        config_outline_filepath = predator_root_directory + "/../assets/support/configoutline.json"
 
-if (os.path.exists(config_active_filepath) == False): # Check to see if the active config filed doesn't exit.
+if (os.path.exists(config_active_filepath) == False): # Check to see if the active config file doesn't exit.
     # Copy the default config file as the active config file.
     with open(config_default_filepath) as configuration_file: config_default= configuration_file.read()
 

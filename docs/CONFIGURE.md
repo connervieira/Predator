@@ -42,6 +42,7 @@ This document describes the configuration values found `config.json`.
                 - For example, if your alert database is in `/home/pi/Data/alerts.json`, and your working directory is `/home/pi/Data/`, then then the alert database value should simply be set to `"alerts.json"`, not the the full file path.
             - If a particular entry in this list is a remote source, the remote source should be a complete URL.
                 - For example, an entry might be set to `"https://example.com/alerts.json"`.
+            - To learn more about the alert database format, see the [docs/ALERTS.md](docs/ALERTS.md) document.
     - `display` contains settings related to what is displayed in the command line interface.
         - `ascii_art_header` is a boolean that determines whether or not Predator will display a large ASCII art banner on start up.
             - When set to `false`, the ASCII art banner will be replaced with a small, normal text title.

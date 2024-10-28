@@ -2,6 +2,8 @@
 
 This document explains how external local programs can interface with Predator.
 
+If you're interested in developing your own application to integrate with Predator, or you just want to understand how things work behind the scenes, then you're in the right place!
+
 
 ## Collection
 
@@ -9,7 +11,9 @@ Predator uses various files to share information with external programs. Externa
 
 ### Heartbeat
 
-Basic status information is shared with external programs in the form of 'heartbeats'. Each time a processing cycle is completed, a timestamp is added to the `heartbeat.json` file, located in the interface directory. Old entries in this file are trimmed after a certain threshold, as defined in the configuration. These timestamps are analogous to a real heartbeat, in that they signal to external services that Predator is alive and actively running. The frequency of heartbeats is dependent on the processing speed of the device Predator is running on, but the interval is usually less than 5 to 10 seconds, even on low-power devices.
+Basic status information is shared with external programs in the form of 'heartbeats'. Each time a processing cycle is completed, a timestamp is added to the `heartbeat.json` file, located in the interface directory. Old entries in this file are trimmed after a certain threshold, as defined in the Predator configuration. These timestamps are analogous to a real heartbeat, in that they signal to external services that Predator is alive and actively running. The frequency of heartbeats is dependent on the processing speed of the device Predator is running on, but the interval is usually less than 5 to 10 seconds, even on low-power devices.
+
+In short, if it has been more than a few seconds since the last heart-beat, it is likely that Predator is not actively running.
 
 Example file contents:
 
@@ -26,7 +30,7 @@ Example file contents:
 
 ### State
 
-The `state.json` file contains a basic JSON dictionary that indicates the current state of Predator's operation. This file is updated about as regularly as the heartbeat file. These two files can be used in tandem to establish if Predator is running, and what mode it is running in. The state.json file contains the following keys, which can be set to one of several values.
+The `state.json` file contains a basic JSON dictionary that indicates the current state of Predator's operation. This file is updated about as regularly as the heartbeat file. These two files can be used in tandem to establish if Predator is running, and what mode it is running in. The `state.json` file contains the following keys, which can be set to one of several values.
 - `state` indicates the mode that Predator was running in the last time the state file was updated.
     - `"realtime"` indicates real-time mode.
     - `"dashcam/normal"` indicates normal dash-cam recording.
@@ -108,9 +112,53 @@ Example file contents:
 ```
 
 
+### Hotlist
+
+After loading all alert sources (as configured in `general>alerts>databases`), Predator will save the combined hot-list to the `hotlist.json` file. This allows external programs to easily access the complete list of alert rules loaded by Predator. The contents of this file take the form of a JSON dictionary, where each top-level key is an alert rule. Note that the sub-contents of each rule are not guaranteed to be present.
+
+Example file contents:
+```JSON
+{
+    "ABC1234": {
+        "name": "",
+        "description": "Testing alert",
+        "author": "V0LT",
+        "source": "",
+        "vehicle": {
+            "make": "Toyota",
+            "model": "Corolla",
+            "year": 2021
+        }
+    },
+    "XYZ1234": {
+        "name": "",
+        "description": "Testing alert",
+        "author": "V0LT",
+        "source": "",
+        "vehicle": {
+            "make": "Subaru",
+            "model": "Impreza",
+            "year": 2016
+        }
+    },
+    "GGG4321": {
+        "name": "",
+        "description": "Testing alert",
+        "author": "V0LT",
+        "source": "",
+        "vehicle": {
+            "make": "Honda",
+            "model": "Accord",
+            "year": 2011
+        }
+    }
+}
+```
+
+
 ## Triggers
 
-In addition to the files for sharing information from Predator to external programs, external programs can use create specific files to trigger certain events in Predator.
+In addition to the files for sharing information from Predator to external programs, external programs can create specific files to trigger certain events in Predator.
 
 ### Dashcam Saving
 

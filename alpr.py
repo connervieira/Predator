@@ -236,6 +236,8 @@ def load_alert_database_remote(source, cache_directory):
     else: # Predator is in offline mode, but a remote alert database source was specified.
         alert_database = {} # Set the alert database to an empty dictionary.
         display_message("A remote alert database source " + source + " was specified, but Predator is in offline mode. This source has not been loaded.", 2)
+
+    save_to_file(config["general"]["interface_directory"] + "/hotlist.json", json.dumps(alert_database, indent=4)) # Save the active alert database to the interface directory.
     return alert_database
 
 def load_alert_database_local(source):
@@ -311,7 +313,7 @@ def generate_dashcam_sidecar_files(working_directory, dashcam_files):
                                 top_guess = result["candidates"][0]["plate"] # Use the most likely plate as the top guess.
                         if (top_guess != ""): # Check to see if the top guess is set for this plate.
                             frame_results[top_guess] = {} # Initialize this plate in the dictionary of plates for this frame.
-                            frame_results[top_guess]["coordinates"] = utils.convert_corners_to_bounding_box(result["coordinates"]) # Add the position of this plate in the image. TODO: Convert to bounding box.
+                            frame_results[top_guess]["coordinates"] = utils.convert_corners_to_bounding_box(result["coordinates"]) # Add the position of this plate in the image.
                     if (len(frame_results) > 0): # Check to see if there is at least one result for this frame.
                         analysis_results[frame_number] = frame_results # Add this frame's data to the full analysis results.
                 save_to_file(sidecar_filepath, json.dumps(analysis_results, indent=4)) # Save the analysis results for this file to the side-car file.
