@@ -223,6 +223,9 @@
                 "identity_file": "/home/pi/.reticulum/storage/identities/predator",
                 "instance_name": "My Car",
                 "events": {
+                    "start_up": {
+                        "enabled": true
+                    },
                     "motion_detected": {
                         "enabled": true
                     },

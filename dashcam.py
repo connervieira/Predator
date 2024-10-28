@@ -1012,6 +1012,10 @@ def start_dashcam_recording(dashcam_devices, directory): # This function starts 
             iteration_counter += 1 # Iterate the counter. This value will be used to create unique file names for each recorded video.
             print("Started dashcam recording on " + str(dashcam_devices[device]["index"])) # Inform the user that recording was initiation for this camera device.
 
+    if (config["dashcam"]["notifications"]["reticulum"]["enabled"] == True and config["dashcam"]["notifications"]["reticulum"]["events"]["start_up"]["enabled"] == True): # Check to see if Predator is configured to send start-up notifications over Reticulum.
+        for destination in config["dashcam"]["notifications"]["reticulum"]["destinations"]: # Iterate over each configured destination.
+            reticulum.lxmf_send_message(str(config["dashcam"]["notifications"]["reticulum"]["instance_name"]) + " has been started", destination) # Send a Reticulum LXMF message to this destination.
+
     try:
         if (config["dashcam"]["parked"]["enabled"] == True): # Check to see if parked mode functionality is enabled.
             last_moved_time = utils.get_time() # This value holds the Unix timestamp of the last time the vehicle exceeded the parking speed threshold.

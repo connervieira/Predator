@@ -47,18 +47,22 @@ if (os.path.exists(config["dashcam"]["notifications"]["reticulum"]["identity_fil
     new_identity = RNS.Identity()
     new_identity.to_file(config["dashcam"]["notifications"]["reticulum"]["identity_file"])
 
+debug_message("Loading Reticulum identity file")
+config["dashcam"]["notifications"]["reticulum"]["identity_file"] = "/home/cvieira/.reticulum/storage/identities/predator"
+identity = RNS.Identity().from_file(config["dashcam"]["notifications"]["reticulum"]["identity_file"])
+
+debug_message("Announcing Reticulum source")
+source = lxmf_router.register_delivery_identity(identity, display_name="Predator")
+lxmf_router.announce(source.hash) # Announce this instance.
+last_announce = time.time()
 
 def lxmf_send_message(message, destination):
     global lxmf_router
     global config
 
-    debug_message("Loading Reticulum identity file")
-    config["dashcam"]["notifications"]["reticulum"]["identity_file"] = "/home/cvieira/.reticulum/storage/identities/predator"
-    identity = RNS.Identity().from_file(config["dashcam"]["notifications"]["reticulum"]["identity_file"])
-
-    debug_message("Announcing Reticulum source")
-    source = lxmf_router.register_delivery_identity(identity, display_name="Predator")
-    lxmf_router.announce(source.hash) # Announce this instance.
+    if (time.time() - last_announce > 30*60):
+        debug_message("Announcing Reticulum source")
+        lxmf_router.announce(source.hash) # Announce this instance.
 
     debug_message("Identifying Reticulum destination")
     recipient_hash = bytes.fromhex(destination)

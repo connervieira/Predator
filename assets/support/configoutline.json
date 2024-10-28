@@ -195,6 +195,9 @@
                 "identity_file": "str",
                 "instance_name": "str",
                 "events": {
+                    "start_up": {
+                        "enabled": "bool"
+                    },
                     "motion_detected": {
                         "enabled": "bool"
                     },
