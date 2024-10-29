@@ -18,8 +18,11 @@ If you're already familiar with Predator, and you just want a quick set-up guide
             - Next, install all required Python packages.
             - Finally, run Predator. In the future, you'll need to re-activate the virtual environment every time you run Predator.
         - The most time consuming solution is to install the required packages through your default package manager. Most packages will just be named after the original Python package, with "python3-" appended to the beginning. For example, the `gpiozero` package can be installed with the `sudo apt install python3-gpiozero` command. However, some packages may not follow this naming scheme, and you might need to manually search for them.
-3. Install an ALPR engine, like [Phantom](https://v0lttech.com/phantom.php).
-4. Configure Predator, as described in the [CONFIGURE.md](CONFIGURE.md) file.
+3. If you intended to use Predator's ALPR features, install an ALPR engine, like [Phantom](https://v0lttech.com/phantom.php).
+4. Download and uncompress Predator.
+    - Download stable version from V0LT (recommended): https://v0lttech.com/predator.php
+    - Download the latest (potentially unstable) development version: `git clone https://github.com/connervieira/Predator`
+5. Configure Predator, as described in the [CONFIGURE.md](CONFIGURE.md) file.
 
 
 ## Full Install Guide
