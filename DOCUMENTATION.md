@@ -25,6 +25,11 @@ To learn more about how to start and use Predator's various modes, see the [docs
 Once you have the Predator software up and running, you may want to focus more on the hardware you plan to run it on. You can learn more about hardware requirements in the [docs/HARDWARE.md](docs/HARDWARE.md) file.
 
 
+## Troubleshooting
+
+To learn about common problems, and suggested solutions, see the [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) document.
+
+
 ## Debugging
 
 To learn how to use Predator's debug message feature to troubleshoot problems and improve processing speed, see the [docs/DEBUGGING.md](docs/DEBUGGING.md) file.
