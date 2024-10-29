@@ -473,9 +473,13 @@ This update emphasizes improving the reliability of Predator, especially when op
         - Improved the GPS overlay stamp.
             - The GPS query now uses a "lazy" method, which trades data recency for response time.
                 - This significantly improves frame-rate by reducing the time Predator spends waiting for a GPS response.
-    - Added configuration option to use a different audio recording device.
+    - Updated audio recording.
+        - Improved the reliability of audio recording.
+        - Fixed unexpected behavior when the working directory path contained spaces.
+        - Added configuration option to use a different audio recording device.
+        - Added configuration option to determine which user will be used to run the audio recording process.
     - Added per-device resolution configuration.
-    - Added the ability to disable capture devices without removing them from the configuration entirely.
+    - Added the ability to disable capture devices in the configuration without removing them from the configuration entirely.
     - Predator now changes the status light color when a video is being locked.
     - Dashcam video save events can now be triggered using buttons via GPIO pins.
     - Improved looped recording.
