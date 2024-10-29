@@ -169,7 +169,8 @@
                 "enabled": "bool",
                 "extension": "str",
                 "device": "str",
-                "merge": "bool"
+                "merge": "bool",
+                "record_as_user": "str"
             }
         },
         "parked": {

@@ -191,7 +191,8 @@
                 "enabled": false,
                 "extension": "wav",
                 "device": "",
-                "merge": true
+                "merge": true,
+                "record_as_user": "pi"
             }
         },
         "parked": {

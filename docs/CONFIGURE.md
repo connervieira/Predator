@@ -246,7 +246,9 @@ This document describes the configuration values found `config.json`.
         - `audio` contains settings for configuring Predator's audio recording behavior.
             - `enabled` is a boolean that determines whether or not audio will be recorded at all.
             - `extension` sets the file extension that audio will be saved with.
+            - `device` specifies the device ID (as determined by `arecord --list-pcms`) that will be used to capture audio.
             - `merge` is a boolean that determines whether or not Predator will merge the separate audio and video files when each segment is done recording.
+            - `record_as_user` specifies the user on the system that the audio recording process will be run as. This is useful if the user you normally run Predator with does not have permission to access audio devices.
     - `parked` contains settings to configure the dashcam's parking behavior. Parking mode is experimental, and not recommended for daily use.
         - `enabled` is a boolean that determines whether Predator will ever go into a parked state.
             - When this value is set to `false` Predator will never enable parked mode, even if the conditions defined in this configuration section are met.
@@ -274,6 +276,7 @@ This document describes the configuration values found `config.json`.
             - `instance_name` is a string that determines a friendly name that will be used to identify this instance of Predator in the content of notifications.
                 - This will be appended to the beginning of notifications. For example, when motion is detected, the following format might be used: "[instance_name] has detected motion while parked."
             - `events` contains individual controls to enable and disable notifications for certain events.
+                - `start_up` is triggered when Predator starts dash-cam recording.
                 - `motion_detect` is triggered when Predator detects motion while parked.
                 - `parking_mode_enabled` is triggered when Predator enters parking mode.
                 - `parking_mode_disabled` is triggered when Predator exits parking mode.
