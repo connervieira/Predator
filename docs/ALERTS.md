@@ -28,8 +28,8 @@ This is an example of an alert database with the bare minimum information. This 
 
 ```JSON
 {
-    "AAA1111": {}
-    "BBB2222": {}
+    "AAA1111": {},
+    "BBB2222": {},
     "CCC3333": {}
 }
 ```
