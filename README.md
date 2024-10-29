@@ -12,6 +12,16 @@ The ultimate customizable dashcam/license plate recognition platform.
 While Predator is designed to be stable and reliable, you should not depend on it for safety or security critical tasks. See the [SECURITY.md](SECURITY.md) document for more information.
 
 
+## Clarification
+
+This is the repository for the original version of Predator (often referred to as "vanilla Predator" or "main-line Predator" for clarity). Predator is intended to be a self-contained dash-cam platform with ALPR capabilities. It operates primarily offline, and is not intended for CCTV analysis. To learn more about alternative Predator editions (i.e. versions more suited for stationary home/property security) and the rest of the Predator ecosystem, see <https://v0lttech.com/predator/ecosystem.php>.
+
+
+## Support
+
+If you're interested in commissioning a custom ALPR product using technology from Predator, or need assistant with the installation process, don't hesitate to [contact V0LT](https://v0lttech.com/contact.php)
+
+
 ## Download
 
 Downloads for stable releases of Predator can be found [here](https://v0lttech.com/predator.php).
@@ -19,12 +29,12 @@ Downloads for stable releases of Predator can be found [here](https://v0lttech.c
 
 ## Documentation
 
-Installation, set-up, and usage documentation can be found in the [DOCUMENTATION.md](DOCUMENTATION.md) file.
+Installation, set-up, and usage documentation can be found in the [DOCUMENTATION.md](DOCUMENTATION.md) file, which is included in the downloads linked above.
 
 
 ## Description
 
-Predator is a customizable camera platform focused primarily on license plate recognition in an automotive context. Predator is similar to a traditional dash-cam, but adds license plate recognition, object identification, motion detection, and many more features. It can detect license plates and recognize objects in both pre-recorded video and real-time video streams, or simply capture video like a typical dash-cam. Predator strives to be the ultimate dash-cam platform for both technical hobbyists and customers with unique needs.
+Predator is a customizable camera platform focused primarily on license plate recognition in an automotive context. Predator is similar to a traditional dash-cam, but adds license plate recognition, object identification, motion detection, and many additional features. It can detect license plates and recognize objects in both pre-recorded video and real-time video streams, or simply capture video like a typical dash-cam. Predator strives to be the ultimate dash-cam platform for both technical hobbyists and customers with unique needs.
 
 
 ## Modes
