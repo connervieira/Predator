@@ -244,11 +244,16 @@ This document describes the configuration values found `config.json`.
                     - `width` sets the width of the video, measured in pixels.
                     - `height` sets the height of the video, measured in pixels.
         - `audio` contains settings for configuring Predator's audio recording behavior.
-            - `enabled` is a boolean that determines whether or not audio will be recorded at all.
+            - `enabled` is a boolean that determines whether or not audio will be recorded during dash-cam operation.
             - `extension` sets the file extension that audio will be saved with.
             - `device` specifies the device ID (as determined by `arecord --list-pcms`) that will be used to capture audio.
+            - `format` specifies the format that will be used by the `arecord` process.
             - `merge` is a boolean that determines whether or not Predator will merge the separate audio and video files when each segment is done recording.
-            - `record_as_user` specifies the user on the system that the audio recording process will be run as. This is useful if the user you normally run Predator with does not have permission to access audio devices.
+            - `record_as_user` specifies the user on the system that the audio recording process will be run as.
+                - This is useful if the user you normally run Predator with does not have permission to access audio devices.
+            - `start_delay` determines a length of time (in seconds) that Predator will wait before starting audio recording for each segment.
+                - This delay allows the audio capture device to be release by the previous segment before it is re-opened for the current segment.
+                - This value should be as short as possible to reduce the period of silence at the start of each video, but not so short that the audio capture device fails to open due to being already claimed by the previous segment.
     - `parked` contains settings to configure the dashcam's parking behavior. Parking mode is experimental, and not recommended for daily use.
         - `enabled` is a boolean that determines whether Predator will ever go into a parked state.
             - When this value is set to `false` Predator will never enable parked mode, even if the conditions defined in this configuration section are met.

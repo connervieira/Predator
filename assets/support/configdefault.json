@@ -191,8 +191,10 @@
                 "enabled": false,
                 "extension": "wav",
                 "device": "",
+                "format": "S16_LE",
                 "merge": true,
-                "record_as_user": "pi"
+                "record_as_user": "pi",
+                "start_delay": 0.2
             }
         },
         "parked": {

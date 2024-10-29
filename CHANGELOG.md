@@ -476,8 +476,11 @@ This update emphasizes improving the reliability of Predator, especially when op
     - Updated audio recording.
         - Improved the reliability of audio recording.
         - Fixed unexpected behavior when the working directory path contained spaces.
-        - Added configuration option to use a different audio recording device.
-        - Added configuration option to determine which user will be used to run the audio recording process.
+        - Added configuration options for audio recording.
+            - Added configuration option to use a different audio recording device.
+            - Added configuration option to determine which user on the system will be used to run the audio recording process.
+            - Added configuration option to set the format used by the recording device.
+            - Added configuration option to slightly delay the start of audio recording to prevent the capture device from being opened by two threads at once.
     - Added per-device resolution configuration.
     - Added the ability to disable capture devices in the configuration without removing them from the configuration entirely.
     - Predator now changes the status light color when a video is being locked.

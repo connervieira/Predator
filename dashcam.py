@@ -150,8 +150,7 @@ for device in config["dashcam"]["capture"]["video"]["devices"]: # Iterate throug
 audio_recorders = {} # This will hold each audio recorder process.
 first_segment_started_time = 0
 
-audio_record_delay = 0.2 # This is the length of time (in seconds) that Predator will wait before starting the next audio recorder. This prevents the capture device from being opened by two threads at once.
-audio_record_command = "sudo -u " + str(config["dashcam"]["capture"]["audio"]["record_as_user"]) + " arecord --format=S16_LE"
+audio_record_command = "sudo -u " + str(config["dashcam"]["capture"]["audio"]["record_as_user"]) + " arecord --format=" + str(config["dashcam"]["capture"]["audio"]["format"])
 if (config["dashcam"]["capture"]["audio"]["device"] != ""): # Check to see if a custom device has been set.
     audio_record_command += " --device=" + str(config["dashcam"]["capture"]["audio"]["device"]) + ""
 
@@ -683,7 +682,7 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
         audio_base_name = "_".join(os.path.basename(current_segment_name[device]).split("_")[0:3])
         audio_filepath = directory + "/" + audio_base_name + "." + str(config["dashcam"]["capture"]["audio"]["extension"])
         if (audio_base_name not in audio_recorders or audio_recorders[audio_base_name].poll() is not None): # Check to see if the audio recorder hasn't yet been started by another thread.
-            command = "sleep " + str(audio_record_delay) + "; " + audio_record_command + " \"" + str(audio_filepath) + "\""
+            command = "sleep " + str(float(config["dashcam"]["capture"]["audio"]["start_delay"])) + "; " + audio_record_command + " \"" + str(audio_filepath) + "\""
             audio_recorders[audio_base_name] = subprocess.Popen(command, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Start the next segment's audio recorder.
             del command
     process_timing("end", "Dashcam/Audio Processing")
@@ -717,7 +716,7 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
                     audio_filepath = directory + "/" + audio_base_name + "." + str(config["dashcam"]["capture"]["audio"]["extension"])
                     if (audio_base_name not in audio_recorders or audio_recorders[audio_base_name].poll() is not None): # Check to see if the audio recorder hasn't yet been started by another thread.
                         subprocess.Popen(("sudo -u " + str(config["dashcam"]["capture"]["audio"]["record_as_user"]) + " killall arecord").split(" "), stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Kill the previous arecord instance (if one exists)
-                        command = "sleep " + str(audio_record_delay) + "; " + audio_record_command + " \"" + str(audio_filepath) + "\""
+                        command = "sleep " + str(float(config["dashcam"]["capture"]["audio"]["start_delay"])) + "; " + audio_record_command + " \"" + str(audio_filepath) + "\""
                         audio_recorders[audio_base_name] = subprocess.Popen(command, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Start the next segment's audio recorder.
                         del command
                 process_timing("end", "Dashcam/Audio Processing")
@@ -1178,7 +1177,7 @@ def dashcam_output_handler(directory, device, width, height, framerate):
                             audio_offset = -(config["dashcam"]["parked"]["recording"]["buffer"] / calculated_framerate[device]) # Calculate the audio offset based on the size of the frame-buffer
                             print("Applying offset of " + str(audio_offset))
                         else: # Otherwise, the video was recorded during normal operating.
-                            audio_offset = audio_record_delay # Don't apply an offset, because the audio and video file should start at the same time.
+                            audio_offset = float(config["dashcam"]["capture"]["audio"]["start_delay"]) # Apply the normal configured offset.
                         merge_audio_video(last_video_path, last_audio_path, last_filename_merged, audio_offset) # Run the audio/video merge.
                 process_timing("end", "Dashcam/File Merging")
                 
