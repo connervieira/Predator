@@ -109,7 +109,7 @@
         },
         "sounds": {
             "startup_sound": {
-                "path": "./assets/sounds/testnoise.mp3",
+                "path": "./assets/sounds/startup.mp3",
                 "repeat": 0,
                 "delay": 0.3
             },

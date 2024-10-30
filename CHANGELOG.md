@@ -527,3 +527,6 @@ This update emphasizes improving the reliability of Predator, especially when op
         - Previously, the time offset manager thread would keep Predator alive after using the "Quit" option.
     - All threads now watch a global variable, and will exit when it is changed.
         - This means the user can simply press Ctrl+C once, and all threads will clean up and exit.
+- Updated sound effects.
+    - Removed unused sound files.
+    - Replaced the default start-up sound.
