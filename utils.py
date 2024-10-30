@@ -154,6 +154,12 @@ if (config["general"]["gps"]["enabled"] == True): # Only import the GPS librarie
     from gps import * # Required to access GPS information.
     import gpsd
 import signal # Required to time out functions.
+if (config["developer"]["frame_count_method"] in ["manual" or "opencv"]):
+    try:
+        import cv2
+    except Exception as e:
+        print(e)
+        print("cv2 is required because the `developer>frame_count_method` value is set to 'manual' or 'opencv'")
 
 
 
@@ -794,3 +800,27 @@ def convert_corners_to_bounding_box(corners):
         return bounding_box
     else: # The number of corners is not the expected length.
         return False
+
+
+# This function counts the number of frames in a given video file.
+def count_frames(video, method="manual"):
+    debug_message("Counting frames")
+    cap = cv2.VideoCapture(video)
+    if (method == "opencv"):
+        video_frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT)) # Count the number of frames in the video.
+    elif (method == "ffprobe"):
+        video_frame_count_command = "ffprobe -select_streams v -show_streams \"" + video + "\" 2>/dev/null | grep nb_frames | sed -e 's/nb_frames=//'" # Define the commmand to count the frames in the video.
+        video_frame_count_process = subprocess.Popen(video_frame_count_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True) # Execute the command to count the frames in the video.
+        video_frame_count, command_error = video_frame_count_process.communicate() # Fetch the results of the frame count command.
+        video_frame_count = int(video_frame_count) # Convert the frame count to an integer.
+    elif (method == "manual"):
+        video_frame_count = 0
+        while (cap.isOpened()):
+            ret, frame = cap.read() # Get the next frame.
+            if (ret == False):
+                break
+            video_frame_count += 1
+    else:
+        display_message("Invalid frame count method.", 3)
+        video_frame_count = 0
+    return video_frame_count

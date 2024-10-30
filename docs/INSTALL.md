@@ -36,11 +36,12 @@ This is the installation process for Predator and all of its dependencies. This 
         - `pytz`: Required to manage timezones.
     - Highly recommended:
         - `validators` and `requests`: Required for network functionality, like push notifications, status light interfacing, remote alert lists, and more.
+        - `opencv-python`, `cvlib`: Required for dash-cam recording.
+            - These packages are also required for object recognition and pre-recorded side-car file generation (but not basic license plate recognition).
+            - Unless you have a good reason not to (and you know exactly what you're doing) you should install these packages.
     - Recommended:
         - `gps`, `geopy`, and `gpsd-py3`: Required to enable GPS features.
             - These packages are not required for reading GPX files, and are only necessary for interacting with live GPS devices.
-        - `opencv-python`, `cvlib`: Required for dash-cam recording.
-            - These packages are also required for object recognition (but not license plate recognition).
     - Optional:
         - `psutil`: Required to process disk usage information in management mode and dash-cam mode.
         - `lxmf`, `rns`: Required to send offline parking notifications over the Reticulum stack.

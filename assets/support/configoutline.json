@@ -280,6 +280,7 @@
         "dashcam_saving_queue_overflow": "+int",
         "dashcam_shortterm_framerate_interval": "+float",
         "hard_crash_on_error": "bool",
-        "identify_to_remote_sources": "bool"
+        "identify_to_remote_sources": "bool",
+        "frame_count_method": ["opencv", "ffprobe", "manual"]
     }
 }

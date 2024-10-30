@@ -367,3 +367,8 @@ This document describes the configuration values found `config.json`.
         - Keep in mind that enabling this configuration option will cause Predator to boot-loop if the problem that caused the error isn't resolved between start-ups.
     - `identify_to_remote_sources` determines whether Predator will attach its randomly generated identifier when fetching hot-lists from remote sources. This is helpful to allow administrators of remote hot-list sources to see how many clients are using their server.
         - If you don't control the servers in your remote hot-list sources, you may consider disabling this feature to make it more difficult to identify you.
+    - `frame_count_method` determines the method by which Predator will count frames in video files during side-car file generation in pre-recorded mode.
+        - This value can only be set to one of the following strings:
+            - "opencv" uses the built in OpenCV method to count frames. This method is very efficient, but may produce unexpected results on certain systems.
+            - "ffprobe" uses the FFProbe command. This method is very efficient, but may not support all video formats, and may produce unexpected results on certain systems.
+            - "manual" will load the video with OpenCV, and manually count each valid frame. This method is extremely accurate, but takes significantly longer than the alternative methods.

@@ -16,6 +16,7 @@ import csv
 import os
 import time
 import json # Required to process JSON data
+import cv2
 
 
 
@@ -288,15 +289,14 @@ def generate_dashcam_sidecar_files(working_directory, dashcam_files):
             if (config["general"]["alpr"]["engine"] == "openalpr"): # Check to see if the configure ALPR engine is OpenALPR.
                 alpr_command = ["alpr", "-j", "-n", str(config["general"]["alpr"]["validation"]["guesses"]),  working_directory + "/" + file] # Set up the OpenALPR command.
 
-            video_frame_count_command = "ffprobe -select_streams v -show_streams " + working_directory + "/" + file + " 2>/dev/null | grep nb_frames | sed -e 's/nb_frames=//'" # Define the commmand to count the frames in the video.
-            video_frame_count_process = subprocess.Popen(video_frame_count_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True) # Execute the command to count the frames in the video.
-            video_frame_count, command_error = video_frame_count_process.communicate() # Fetch the results of the frame count command.
-            video_frame_count = int(video_frame_count) # Convert the frame count to an integer.
+            video_frame_count = utils.count_frames(os.path.join(working_directory, file), method="manual")
 
+            utils.debug_message("Running ALPR")
             alpr_process = subprocess.Popen(alpr_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True) # Execute the ALPR command.
             command_output, command_error = alpr_process.communicate()
             command_output = command_output.splitlines()
-            if (len(command_output) == video_frame_count): # Check to make sure the number of frames analyzed is the same as the frame count.
+            utils.debug_message("Processing results")
+            if (abs(len(command_output) - video_frame_count) < 10): # Check to make sure the number of frames analyzed is the same as the frame count.
                 analysis_results = {} # This will hold the analysis results for this video file.
                 for frame_number, frame_data in enumerate(command_output): # Iterate through each frame's analysis results from the commmand output.
                     frame_data = json.loads(frame_data)
@@ -319,5 +319,5 @@ def generate_dashcam_sidecar_files(working_directory, dashcam_files):
                 save_to_file(sidecar_filepath, json.dumps(analysis_results, indent=4)) # Save the analysis results for this file to the side-car file.
                 print("    Analysis complete")
             else:
-                print("    The number of frames in the video does not match the number of frames analyzed.")
+                print("    The number of frames in the video (" + str(len(command_output)) + ") does not match the number of frames analyzed (" + str(video_frame_count) + ").")
                 print("    Skipping analysis")
