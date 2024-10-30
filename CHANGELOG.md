@@ -446,20 +446,24 @@ This update emphasizes improving the reliability of Predator, especially when op
 - Added performance monitoring to state interface file to allow external programs to see basic performance diagnostics.
 - Updated the way automatic GPS time correction is handled.
     - Predator will no longer try to apply a time offset when the system time is in the future relative to the GPS time.
-    - Predator no longer displays warning about the time being desynced when GPS time correction is disabled.
-    - Predator will now reset the time offset if the system time changes.
+    - Predator no longer displays warnings about the time being desynced when GPS time correction is disabled.
+    - Predator will now reset the time offset if the system time changes (i.e. the system connects to the internet and refreshes the time).
 - Updated dash-cam mode.
     - Added customizable frame-rate restrictions.
         - Added a per-device configuration value to set a maximum allowed frame-rate. When this frame-rate is exceeded, Predator will throttle dash-cam recording to stay below the limit.
             - A threshold can be set to allow Predator to round up to the maximum framerate if it is within a small difference.
+                - This means that minor fluctations in frame-rate will not cause the frame-rate to change from file to file.
+                - For example, a frame-rate of 29.85 FPS can be configured to round up to 30 FPS because it is within 0.15 FPS
         - Added a per-device configuration to set a minimum expected frame-rate, below which a warning is displayed. This value does not have any impact on the actual recording frame-rate.
     - Overhauled dash-cam saving.
         - Frames captured during dash-cam recording are now saved in a separate thread.
         - The video file extension and codec are now both configurable.
+        - Predator now gracefully closes the file writing process when terminated.
     - Improved the reliability of dash-cam operation.
         - The file saving back-end now handles sudden time jumps into the future much more reliably.
-            - Instead of creating each segment between the original time and new time, Predator skips to the next segment.
+            - Instead of creating each segment between the original time and new time, Predator skips directly to the next segment.
         - Predator will now attempt to resume recording if the video capture drops on a particular device.
+            - The delay between attempts will increase progressively with each try.
         - A failure on a single capture device will no longer kill recording on other capture devices.
         - Predator now shows a warning instead of an error when the merged audio/video file is missing at the end of a saved segment.
             - This occurs when the audio recording process fails, and doesn't necessarily mean that the video capture has encountered a fatal problem.
@@ -490,9 +494,6 @@ This update emphasizes improving the reliability of Predator, especially when op
     - Added optional background ALPR to dash-cam mode.
         - The user can now configure Predator to conduct ALPR in the background while simultaneously capturing video.
         - Removed the old "background recording" functionality in real-time mode, and it's corresponding configuration value.
-    - Added video playback frame-rate "snapping", such that the video frame-rate round up to the max if it is within a certain distance of the max.
-        - For example, a video recorded at 29.85fps with a maximum configured limit of 30fps can be rounded up to 30fps for sake of consistency.
-        - This means that minor fluctations in frame-rate will not cause the frame-rate to change from file to file.
     - Improved the dashcam output handler.
         - Fixed a bug where Predator would initialize new video segments twice.
         - The output handler will now finish writing the list of frames to write before exiting when Predator is closed, then release the output gracefully.
@@ -502,25 +503,27 @@ This update emphasizes improving the reliability of Predator, especially when op
         - This means that the status lighting can be turned off, and it will only turn back on when an update is made.
     - Changed the default `dashcam_save` status light color to blue, to avoid confusion with `alpr_alert`.
 - Updated configuration back-end.
-    - Increased the max-depth of the configuration validation process.
+    - Increased the maximum depth of the configuration validation process.
     - Predator can now automatically update the configuration file between versions when configuration values are added or removed.
-    - Improve the reliability of the configuration file location when starting Predator from an external tool, like Assassin.
+    - Improved the consistency of the configuration file location when starting Predator from an external source, like Assassin.
 - Added an initial start-up sequence, where Predator shows some basic information before the normal start-up.
     - Predator now creates a file named `install.json` containing some basic install information on the first start-up.
 - Updated the ALPR handler.
-    - Remote alert database sources can now be cached.
-        - This allows Predator to continue using entries from a remote alert database even when the source goes offline.
-    - Migrated most of the ALPR processing to a dedicated file for sake of organization.
+    - Updated how license plate hot-lists are loaded.
+        - Predator now saves the complete loaded alert database (all loaded databases combined) to the `hotlist.json` file in the interface directory.
+        - Remote alert database sources can now be cached.
+            - This allows Predator to continue using entries from a remote alert database even when the source goes offline.
+    - Migrated most of the ALPR processing logic to a dedicated file for sake of organization.
 - Updated real-time mode.
     - The "detected plate" notification sound now plays regardless of the console output level.
-    - Alerts in real-time mode are now played at the end of the processing cycle.
+    - Audio alerts in real-time mode are now played at the end of the processing cycle.
         - Previously, interface updates would have to wait for the audio alerts to finish playing.
 - Updated pre-recorded mode.
     - Improved how Predator handles comma-separated video file names.
         - Video file names now have any trailing or leading whitespace removed after separation.
+    - Added support for "side-car" mode, where Predator will generate files containing ALPR information for videos that were captured previously using dash-cam mode.
 - Improved how Predator exits.
     - Fixed the "Quit" options in pre-recorded and management mode.
         - Previously, the time offset manager thread would keep Predator alive after using the "Quit" option.
     - All threads now watch a global variable, and will exit when it is changed.
         - This means the user can simply press Ctrl+C once, and all threads will clean up and exit.
-- Predator now saves the complete loaded alert database to the `hotlist.json` file in the interface directory.
