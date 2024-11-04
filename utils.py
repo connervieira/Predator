@@ -803,17 +803,17 @@ def convert_corners_to_bounding_box(corners):
 
 
 # This function counts the number of frames in a given video file.
-def count_frames(video, method="manual"):
+def count_frames(video):
     debug_message("Counting frames")
     cap = cv2.VideoCapture(video)
-    if (method == "opencv"):
+    if (config["developer"]["frame_count_method"] == "opencv"):
         video_frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT)) # Count the number of frames in the video.
-    elif (method == "ffprobe"):
+    elif (config["developer"]["frame_count_method"] == "ffprobe"):
         video_frame_count_command = "ffprobe -select_streams v -show_streams \"" + video + "\" 2>/dev/null | grep nb_frames | sed -e 's/nb_frames=//'" # Define the commmand to count the frames in the video.
         video_frame_count_process = subprocess.Popen(video_frame_count_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True) # Execute the command to count the frames in the video.
         video_frame_count, command_error = video_frame_count_process.communicate() # Fetch the results of the frame count command.
         video_frame_count = int(video_frame_count) # Convert the frame count to an integer.
-    elif (method == "manual"):
+    elif (config["developer"]["frame_count_method"] == "manual"):
         video_frame_count = 0
         while (cap.isOpened()):
             ret, frame = cap.read() # Get the next frame.
