@@ -395,6 +395,7 @@ def display_message(message, level=1):
             save_to_file(error_file_location, json.dumps(error_log)) # Save the modified error log to the disk as JSON data.
         print(style.red + "Error: " + message + style.end)
         if (config["developer"]["hard_crash_on_error"] == True):
+            global_variables.predator_running = False
             os._exit(1)
         prompt(style.faint + "Press enter to continue..." + style.end)
 
