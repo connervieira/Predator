@@ -289,7 +289,7 @@ def generate_dashcam_sidecar_files(working_directory, dashcam_files):
             if (config["general"]["alpr"]["engine"] == "openalpr"): # Check to see if the configure ALPR engine is OpenALPR.
                 alpr_command = ["alpr", "-j", "-n", str(config["general"]["alpr"]["validation"]["guesses"]),  working_directory + "/" + file] # Set up the OpenALPR command.
 
-            video_frame_count = utils.count_frames(os.path.join(working_directory, file), method="manual")
+            video_frame_count = utils.count_frames(os.path.join(working_directory, file))
 
             utils.debug_message("Running ALPR")
             alpr_process = subprocess.Popen(alpr_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True) # Execute the ALPR command.

@@ -9,7 +9,7 @@
                 "confidence": 80,
                 "best_effort": true,
                 "license_plate_format": [
-                    "AAA0000"
+                    "AAA0000", "AAA000"
                 ]
             }
         },
@@ -26,7 +26,7 @@
             "debugging_output": false
         },
         "gps": {
-            "enabled": true,
+            "enabled": false,
             "demo_file": "",
             "time_correction": {
                 "enabled": true,
@@ -166,7 +166,7 @@
                     "max_deletions_per_round": 10
                 }
             },
-            "framerate_snap": 0.1
+            "framerate_snap": 0.15
         },
         "capture": {
             "video": {
@@ -221,7 +221,6 @@
             "reticulum": {
                 "enabled": false,
                 "destinations": [
-                    "7d72f75f4aebdb94f977b71d394dd12f"
                 ],
                 "identity_file": "/home/pi/.reticulum/storage/identities/predator",
                 "instance_name": "My Car",

@@ -281,7 +281,7 @@ This update refines Predator's functionality, and focuses its purpose back on li
         - The `alerts_ignore_validation` configuration value has been moved to the 'general' section.
 - Dramatically improved alert handling.
     - Alerts detected in real-time mode are now recorded to a dictionary every round, which makes processing and handling alerts more efficient and organized.
-    - Alerts are now handled on a plate by plate basis, instead of by frame.
+    - Alerts are now handled on a plate-by-plate basis, instead of frame-by-frame.
         - This means only the plates that match alert rules will be marked as alerts in web-hook submissions, logs, and similar context.
         - When the `alerts_ignore_validation` configuration value is enabled, a single rule matching multiple guesses for a particular plate will only be considered one alert.
             - This prevents an alert with wildcards from repeatedly triggering for every similar guess.
@@ -437,12 +437,9 @@ March 6th, 2024
 
 This update emphasizes improving the reliability of Predator, especially when operating in dash-cam mode. This update also expands the functionality of dash-cam mode to allow simultaneous dash-cam recording and ALPR analysis.
 
-*Release date to be determined*
+November 4th, 2024
 
 - Added more descriptive error messages when the interface directory fails to be created.
-- Added comprehensive configuration validation.
-    - Predator now checks to see if each value in the configuration matches the expected data type.
-    - Configuration values that exist in the configuration template file but not in the actual configuration file will show errors.
 - Added performance monitoring to state interface file to allow external programs to see basic performance diagnostics.
 - Updated the way automatic GPS time correction is handled.
     - Predator will no longer try to apply a time offset when the system time is in the future relative to the GPS time.
@@ -503,8 +500,9 @@ This update emphasizes improving the reliability of Predator, especially when op
         - This means that the status lighting can be turned off, and it will only turn back on when an update is made.
     - Changed the default `dashcam_save` status light color to blue, to avoid confusion with `alpr_alert`.
 - Updated configuration back-end.
-    - Increased the maximum depth of the configuration validation process.
     - Predator can now automatically update the configuration file between versions when configuration values are added or removed.
+    - Added comprehensive configuration validation.
+        - Predator now checks to see if each value in the configuration matches the expected data type.
     - Improved the consistency of the configuration file location when starting Predator from an external source, like Assassin.
 - Added an initial start-up sequence, where Predator shows some basic information before the normal start-up.
     - Predator now creates a file named `install.json` containing some basic install information on the first start-up.
