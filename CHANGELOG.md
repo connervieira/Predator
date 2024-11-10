@@ -530,3 +530,8 @@ This update emphasizes improving the reliability of Predator, especially when op
 - Updated sound effects.
     - Removed unused sound files.
     - Replaced the default start-up sound.
+
+
+## Version 11.1
+
+- Predator now issues a warning if a GPIO button appears to be stuck.

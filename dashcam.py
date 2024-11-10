@@ -176,19 +176,22 @@ def watch_button(pin, hold_time=0.2, event=create_trigger_file):
     debug_message("Watching pin " + str(pin))
     button = Button(pin)
     time_pressed = 0
-    last_triggered = 0
+    last_stuck_warning = 0
     while global_variables.predator_running:
         if (button.is_pressed and time_pressed == 0): # Check to see if the button was just pressed.
             debug_message("Pressed" + str(pin))
             time_pressed = time.time()
+        elif (button.is_pressed and time.time() - time_pressed >= 10): # Check to see if the button has been held for an excessively long time (it may be stuck).
+            if (time.time() - last_stuck_warning < 30): # Check to see if it has been at least 30 seconds since the last time a stuck warning was displayed.
+                display_message("The button on pin " + str(pin) + " appears to be stuck.", 3)
+            last_stuck_warning = time.time()
         elif (button.is_pressed and time.time() - time_pressed >= hold_time): # Check to see if the button is being held, and the time threshold has been reached.
             debug_message("Triggered " + str(pin))
-            last_triggered = 0
             event()
         elif (button.is_pressed == False): # If the button is not pressed, reset the timer.
             time_pressed = 0
 
-        time.sleep(hold_time/10)
+        time.sleep(hold_time/10) # Wait briefly before checking the pin again.
 
 
 def run_command_delayed(command, delay=5):
@@ -206,8 +209,7 @@ def merge_audio_video(video_file, audio_file, output_file, audio_offset=0):
     merge_process = subprocess.run(merge_command, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     first_attempt = utils.get_time()
     while (merge_process.returncode != 0): # If the merge process exited with an error, keep trying until it is successful. This might happen if one of the files hasn't fully saved to disk.
-        #merge_process = subprocess.run(merge_command, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-        merge_process = subprocess.run(merge_command, stdout=subprocess.DEVNULL) # TODO
+        merge_process = subprocess.run(merge_command, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
         if (utils.get_time() - first_attempt > 5): # Check to see if FFMPEG has been trying for at least 5 seconds.
             display_message("The audio and video segments could not be merged. It is possible one or both of the files is damaged.", 2)
             process_timing("end", "Dashcam/File Merging")
