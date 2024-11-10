@@ -1387,7 +1387,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
 
                     # Run validation according to the configuration on the plate(s) detected.
                     if (len(config["general"]["alpr"]["validation"]["license_plate_format"]) == 0): # If the user didn't supply a license plate format, then skip license plate validation.
-                        detected_plate = str(list(all_current_plate_guesses[individual_detected_plate].keys())[1]) # Grab the most likely detected plate as the 'detected plate'. TODO: Determine why this is a 1 and not a 0.
+                        detected_plate = str(list(all_current_plate_guesses[individual_detected_plate].keys())[0]) # Grab the most likely detected plate as the 'detected plate'.
                         successfully_found_plate = True # Plate validation wasn't needed, so the fact that a plate existed at all means a valid plate was detected. Indicate that a plate was successfully found this round.
 
                     else: # If the user did supply a license plate format, then check all of the results against the formatting example.

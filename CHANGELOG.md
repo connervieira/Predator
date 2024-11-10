@@ -532,5 +532,9 @@ November 4th, 2024
 
 ## Version 11.1
 
-- Predator now issues a warning if a GPIO button appears to be stuck.
-- Fixed an issue where Predator would fail to start if the `developer>frame_count_method` configuration value was not present.
+- Updated dash-cam mode.
+    - Predator now issues a warning if a GPIO button appears to be stuck.
+    - Fixed an issue where Predator would fail to start if the `developer>frame_count_method` configuration value was not present.
+- Updated real-time mode.
+    - Fixed an issue in real-time mode when no license plate validation templates were set.
+    - Previously, the second most likely plate guess would be accepted, rather than the top guess.
