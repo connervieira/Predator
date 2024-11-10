@@ -154,6 +154,8 @@ if (config["general"]["gps"]["enabled"] == True): # Only import the GPS librarie
     from gps import * # Required to access GPS information.
     import gpsd
 import signal # Required to time out functions.
+if ("developer" not in config or "frame_count_method" not in config["developer"]):
+    config["developer"]["frame_count_method"] = "manual"
 if (config["developer"]["frame_count_method"] in ["manual" or "opencv"]):
     try:
         import cv2
