@@ -532,6 +532,8 @@ November 4th, 2024
 
 ## Version 11.1
 
+November 10th, 2024
+
 - Updated dash-cam mode.
     - Predator now issues a warning if a GPIO button appears to be stuck.
     - Fixed an issue where Predator would fail to start if the `developer>frame_count_method` configuration value was not present.
