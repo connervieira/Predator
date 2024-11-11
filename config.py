@@ -318,7 +318,7 @@ def highest_different_index(config_active, config_default, index): # This functi
 
 
 ignore_indexes = [["realtime", "image", "camera", "devices"], ["dashcam", "saving", "trigger_gpio"], ["dashcam", "stamps", "relay", "triggers"], ["dashcam", "capture", "video", "devices"]] # Configure values specified here will not be checked by the check_defaults_missing() and check_defaults_extra() functions.
-force_indexes = [["dashcam", "physical_controls"]] # This indexes will be checked even though they are dictionaries.
+force_indexes = [["dashcam", "physical_controls"]] # These indexes will be checked even though they are dictionaries.
 
 # This function checks for values that exist in the default config that aren't present in the active config.
 def check_defaults_missing(config_defaults, config_active, index=[], missing_values=[]):
@@ -340,7 +340,7 @@ def check_defaults_missing(config_defaults, config_active, index=[], missing_val
 # This function checks for values that exist on the active config that aren't present in the default config.
 def check_defaults_extra(config_defaults, config_active, index=[], extra_values=[]):
     if (index not in ignore_indexes): # Only continue if the specified index is not ignored.
-        if (type(config_active) == dict):
+        if (type(config_active) == dict and index not in force_indexes):
             for key, section in config_active.items():
                 new_index = index.copy()
                 new_index.append(key)
