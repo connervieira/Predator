@@ -61,7 +61,7 @@ import lighting # Import the lighting.py script.
 update_status_lighting = lighting.update_status_lighting # Load the status lighting update function from the lighting script.
 
 must_import_gpiozero = False
-if (len(config["dashcam"]["physical_controls"]["dashcam_saving"]) > 0):
+if ("physical_controls" in config["dashcam"] and len(config["dashcam"]["physical_controls"]["dashcam_saving"]) > 0):
     must_import_gpiozero = True
 for stamp in config["dashcam"]["stamps"]["relay"]["triggers"]: # Check to see if there are any GPIO relay stamps active.
     if (must_import_gpiozero == True):

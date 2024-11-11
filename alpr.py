@@ -212,6 +212,14 @@ def display_alerts(active_alerts):
 # The following functions are responsible for loading alert database.
 def load_alert_database_remote(source, cache_directory):
     debug_message("Loading remote database source.")
+    if (config["developer"]["identify_to_remote_sources"] == True):
+        with open(predator_root_directory + "/install.json", 'r') as file:
+            install_data = json.load(file)
+            client_id = install_data["id"]
+        if ("?" in source): # Check to see if this source already has associated parameters.
+            source += "&client=" + client_id # Add the client ID to the source parameters.
+        else: # This source does not already have associated parameters.
+            source += "?client="  + client_id # Add the client ID to the source parameters.
     if (config["realtime"]["saving"]["remote_alert_sources"] == True):
         source_hash = hashlib.md5(source.encode()).hexdigest()
     if (config["developer"]["offline"] == False): # Check to see if offline mode is disabled.

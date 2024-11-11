@@ -542,6 +542,17 @@ November 10th, 2024
     - Previously, the second most likely plate guess would be accepted, rather than the top guess.
 
 
+## Version 11.0.2
+
+November 11th, 2024
+
+- Implemented `identify_to_remote_sources` configuration value.
+- Fixed some typos in `README.md` and `CHANGELOG.md`.
+
+
 ## Version 11.1
+
+*Release date to be determined*
+
 - Updated dash-cam mode.
     - Added more options for physical controls via GPIO buttons.
