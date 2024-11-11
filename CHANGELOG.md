@@ -530,7 +530,7 @@ November 4th, 2024
     - Replaced the default start-up sound.
 
 
-## Version 11.1
+## Version 11.0.1
 
 November 10th, 2024
 
@@ -540,3 +540,8 @@ November 10th, 2024
 - Updated real-time mode.
     - Fixed an issue in real-time mode when no license plate validation templates were set.
     - Previously, the second most likely plate guess would be accepted, rather than the top guess.
+
+
+## Version 11.1
+- Updated dash-cam mode.
+    - Added more options for physical controls via GPIO buttons.
