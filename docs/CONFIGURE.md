@@ -209,10 +209,6 @@ This document describes the configuration values found `config.json`.
             - To trigger a save, create this file in the interface directory. Predator will save the video then automatically remove the trigger file.
             - When this file is created, Predator will immediately save the previous and current dashcam video segments. Once the current segment is done recording, Predator will re-save it, such that the saved video doesn't cut off at the moment the saved was triggered.
                 - If Predator is terminated between the initial save and the second save, only video captured after the save trigger won't be saved.
-        - `trigger_gpio` contains GPIO pins that will be monitored for button presses to create the dashcam save trigger file.
-            - This allows hardwired buttons to trigger dashcam video saves.
-            - Each entry in this configuration section uses the GPIO pin number as a key, and contains the following values:
-                - `name` is a human friendly name for the pin, and can be set to any plain text string.
         - `segment_length` is a number that sets how many seconds long each video segment will be before another segment is created.
         - `looped_recording` contains settings that control how and when Predator will erase old dashcam segments to make space for new ones.
             - `mode` determines the method by which Predator determines how to erase old files. This can only be set to one of 3 strings:
@@ -352,6 +348,15 @@ This document describes the configuration values found `config.json`.
             - `devices` is a list that contains device IDs from the `dashcam>capture>video>devices` section of the configuration that will be used in ALPR.
                 - Only devices specified in this list will run ALPR.
                 - If you have a capture device that will never realistically see a license plate (for example, an interior facing camera), you should omit it from this value to reduce unnecssary processing load.
+        - `physical_controls` contains settings for configure physical controls via GPIO pins.
+            - `dashcam_saving` contains settings to trigger dash-cam saving using a GPIO button.
+                - Each entry in this configuration section uses the GPIO pin number as a key, and contains the following values:
+                    - `name` is a human friendly name for the pin, and can be set to any plain text string.
+                    - `hold_time` is a floating point number that determines the number of seconds the button needs to be held to trigger the event.
+            - `stop_predator` contains settings to terminate Predator via GPIO pins.
+                - Each entry in this configuration section uses the GPIO pin number as a key, and contains the following values:
+                    - `name` is a human friendly name for the pin, and can be set to any plain text string.
+                    - `hold_time` is a floating point number that determines the number of seconds the button needs to be held to trigger the event.
 - `developer` contains technical configuration values that developers and experienced users might be interested in.
     - `ignore_list` contains settings for configuring a list of license plates that Predator will ignore.
         - `enabled` is a boolean that determines whether custom ignore lists are enabled or disabled.

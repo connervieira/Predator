@@ -72,11 +72,11 @@ This update contains enhancements that make it much easier to install Predator i
 
 December 8th, 2021
 
-- Added support for 'auto start'.
+- Added support for auto-start.
     - In the script configuration, the user can configure Predator to automatically start into either pre-recorded mode or real-time mode without asking for confirmation.
     - Added optional default preferences for real-time mode.
         - Each preference can be individually pre-set in the configuration. Any values pre-set will have their prompts skipped when starting real-time mode.
-        - Preferences like 'alert database' and 'license plate format' can be skipped without providing a value by setting their default value to a single space.
+        - Preferences like alert database and license plate format can be skipped without providing a value by setting their default value to a single space.
     - Predator can now be configured to automatically load into real-time mode after starting without any user intervention.
     - For sake of debugging, messages will appear each time a prompt is skipped to inform the user why Predator is auto-starting.
 - Yes/no preferences are no longer case-sensitive
@@ -96,7 +96,7 @@ December 8th, 2021
 
 ### Dashcam Update
 
-This update adds 'dash-cam mode' to Predator, which allows it to record video without processing license plates in real-time. This allows you to use your Predator system as a dash-cam while driving, then analyze the video later using 'pre-recorded mode'.
+This update adds dash-cam mode to Predator, which allows it to record video without processing license plates in real-time. This allows you to use your Predator system as a dash-cam while driving, then analyze the video later using pre-recorded mode.
 
 December 29th, 2021
 
@@ -106,8 +106,8 @@ December 29th, 2021
 - Added the ability to correlate pre-recorded video analysis with a GPX file.
 - Added native support for push notifications via Gotify.
 - Changed the audio back-end from Python playsound to mpg321 in order to fix audio on Raspberry Pi.
-- Fixed an issue where the 'separate line' wouldn't appear under detected plates in real-time mode.
-- Added a hyphen to 'real-time' in the mode selection menu.
+- Fixed an issue where the separate line wouldn't appear under detected plates in real-time mode.
+- Added a hyphen to "real-time" in the mode selection menu.
 
 
 
@@ -141,7 +141,7 @@ March 26th, 2022
 - Changed the import process for Tensorflow and OpenCV to allow for failure without terminating Predator.
 - Adjusted the status messages in real-time mode to more accurate represent the current processing step.
 - Added the ability to export license plate GPX location data collected in pre-recorded mode.
-- Added a new 'management mode', which allows the user to run basic system management tasks from inside the Predator interface.
+- Added a new "management mode", which allows the user to run basic system management tasks from inside the Predator interface.
     - Users can now view files in a given Predator project folder.
     - Users can copy any combination of Predator project files to any directory on the system, including an external drive.
     - Users can delete any combination of Predator project files from any project directory.
@@ -178,7 +178,7 @@ March 26th, 2022
 - Fixed an issue where various tasks, like push notifications, audio alerts, shape alerts, and web-hooks wouldn't be completed if license plate validation was turned off.
 - Changed the order in which object recognition and ALPR processing take place.
 - Removed Predator's dependence on GNU AWK in order to improve stability, efficiency, and to make it easier to add features in the future.
-    - Predator now uses OpenALPR's JSON option for it's back-end.
+    - Predator now uses OpenALPR's JSON option for its back-end.
 - Added the ability to detect and process multiple license per frame in real-time mode.
     - Added the `print_detected_plate_count` configuration value to allow the user to change whether or not Predator will display the count of how many license plates it detects each round.
     - This makes Predator significantly more efficient by increasing the amount of plates that can be detected per processing cycle, without significantly increasing the time required to process each cycle.
@@ -238,8 +238,8 @@ February 15th, 2023
 
 This update refines Predator's functionality, and focuses its purpose back on license plate and object recognition. Irrelevant features are moved to external programs that retain compatibility with Predator, but are entirely independent platforms. This update also emphasizes stability, reliability, and consistency.
 
-- Removed 'information mode'
-    - All of the functionality of information mode has been moved to a new platform, called 'Assassin' in an effort to keep Predator focused and effective.
+- Removed information mode
+    - All of the functionality of information mode has been moved to a new platform called [Assassin](https://v0lttech.com/assassin.php) in an effort to keep Predator focused and effective.
 - Added `manual_trigger` configuration value.
     - This configuration value allows for Predator to be manually trigger in real-time mode, where images are only captured when a button is pressed by the user.
 - Simplified library importing process.
@@ -276,9 +276,9 @@ This update refines Predator's functionality, and focuses its purpose back on li
         - This change indirectly fixed an issue where fractional frame intervals could cause crashes.
     - The license plate validation process is now exponentially more efficient.
     - Pre-recorded mode now respects the `default_license_plate_format` configuration value.
-        - Moved the `default_license_plate_format` configuration value to the 'general' section.
+        - Moved the `default_license_plate_format` configuration value to the `general` section.
     - Pre-recorded mode now supports alerts.
-        - The `alerts_ignore_validation` configuration value has been moved to the 'general' section.
+        - The `alerts_ignore_validation` configuration value has been moved to the `general` section.
 - Dramatically improved alert handling.
     - Alerts detected in real-time mode are now recorded to a dictionary every round, which makes processing and handling alerts more efficient and organized.
     - Alerts are now handled on a plate-by-plate basis, instead of frame-by-frame.
@@ -296,7 +296,7 @@ This update refines Predator's functionality, and focuses its purpose back on li
     - Lists can now be edited.
     - The back-end structure is more organized and simplified.
     - The configuration interface can now detect when an unrecognized configuration value is entered.
-- Added a check during loading to verify that the configuration file exists, and is valid.
+- Added a check during loading to verify that the configuration file exists and is valid.
 
 
 
@@ -314,7 +314,7 @@ This update makes several changes to Predator that dramatically improve its proc
     - Configuration values are now referenced directly through-out the program, rather than all being assigned to variables at start-up.
     - Removed the `detected_plate_count` configuration value from the real-time display section.
         - The number of plates detected is now always displayed in the console output.
-    - Dramatically changed 'preferences' system.
+    - Dramatically changed preferences system.
         - Real-time mode and dash-cam mode no longer have run-time preferences, and only consider configuration values.
         - Management mode and pre-recorded mode have modified run-time preferences, and place more emphasis on configuration values.
     - Added several configuration values.
@@ -413,7 +413,7 @@ This update overhauls Predator's dashcam functionality and adds various features
     - Thread names are now automatically determined and assignment when debug messages are displayed.
 - Fixed speed display in real-time mode.
 - Improved GPS integration.
-    - 2D position information can now be displayed even when a 3D fix has not been aquired yet.
+    - 2D position information can now be displayed even when a 3D fix has not been acquired yet.
     - Predator now only opens a single GPS connection, instead of repeatedly opening and closing a connection every time the GPS is queried.
     - Predator can now be configured to replay a GPX file to simulate GPS data for sake of demonstration and testing.
     - Updated the time handling back-end to allow for custom time offsets.
@@ -448,8 +448,8 @@ November 4th, 2024
 - Updated dash-cam mode.
     - Added customizable frame-rate restrictions.
         - Added a per-device configuration value to set a maximum allowed frame-rate. When this frame-rate is exceeded, Predator will throttle dash-cam recording to stay below the limit.
-            - A threshold can be set to allow Predator to round up to the maximum framerate if it is within a small difference.
-                - This means that minor fluctations in frame-rate will not cause the frame-rate to change from file to file.
+            - A threshold can be set to allow Predator to round up to the maximum frame-rate if it is within a small difference.
+                - This means that minor fluctuations in frame-rate will not cause the frame-rate to change from file to file.
                 - For example, a frame-rate of 29.85 FPS can be configured to round up to 30 FPS because it is within 0.15 FPS
         - Added a per-device configuration to set a minimum expected frame-rate, below which a warning is displayed. This value does not have any impact on the actual recording frame-rate.
     - Overhauled dash-cam saving.
@@ -490,7 +490,7 @@ November 4th, 2024
         - Each thread now checks to see if old segments have already been deleted before deleting them themselves.
     - Added optional background ALPR to dash-cam mode.
         - The user can now configure Predator to conduct ALPR in the background while simultaneously capturing video.
-        - Removed the old "background recording" functionality in real-time mode, and it's corresponding configuration value.
+        - Removed the old "background recording" functionality in real-time mode, and its corresponding configuration value.
     - Improved the dashcam output handler.
         - Fixed a bug where Predator would initialize new video segments twice.
         - The output handler will now finish writing the list of frames to write before exiting when Predator is closed, then release the output gracefully.
@@ -530,7 +530,9 @@ November 4th, 2024
     - Replaced the default start-up sound.
 
 
-## Version 11.1
+## Version 11.0.1
+
+November 10th, 2024
 
 - Updated dash-cam mode.
     - Predator now issues a warning if a GPIO button appears to be stuck.
@@ -538,6 +540,22 @@ November 4th, 2024
 - Updated real-time mode.
     - Fixed an issue in real-time mode when no license plate validation templates were set.
     - Previously, the second most likely plate guess would be accepted, rather than the top guess.
+
+
+## Version 11.0.2
+
+November 11th, 2024
+
+- Implemented `identify_to_remote_sources` configuration value.
+- Fixed some typos in `README.md` and `CHANGELOG.md`.
+
+
+## Version 11.1
+
+*Release date to be determined*
+
+- Updated dash-cam mode.
+    - Added more options for physical controls via GPIO buttons.
 - Updated audio output.
     - Added support for multiple audio player back-ends.
         - In addition to supporting the original `mpg321` back-end, Predator now also supports `mplayer`.

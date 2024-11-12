@@ -19,7 +19,7 @@ This is the repository for the original version of Predator (often referred to a
 
 ## Support
 
-If you're interested in commissioning a custom ALPR product using technology from Predator, or need assistant with the installation process, don't hesitate to [contact V0LT](https://v0lttech.com/contact.php)
+If you're interested in commissioning a custom ALPR product using technology from Predator, or need assistance with the installation process, don't hesitate to [contact V0LT](https://v0lttech.com/contact.php).
 
 
 ## Download

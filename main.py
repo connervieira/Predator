@@ -122,7 +122,7 @@ if (os.path.exists(predator_root_directory + "/install.json") == False): # Check
 
     with open(predator_root_directory + "/install.json", 'w') as file:
         json.dump(install_data, file)
-    del install_data
+
 
     print("")
     clear()

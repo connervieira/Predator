@@ -61,7 +61,7 @@ import lighting # Import the lighting.py script.
 update_status_lighting = lighting.update_status_lighting # Load the status lighting update function from the lighting script.
 
 must_import_gpiozero = False
-if (len(config["dashcam"]["saving"]["trigger_gpio"]) > 0):
+if ("physical_controls" in config["dashcam"] and len(config["dashcam"]["physical_controls"]["dashcam_saving"]) > 0):
     must_import_gpiozero = True
 for stamp in config["dashcam"]["stamps"]["relay"]["triggers"]: # Check to see if there are any GPIO relay stamps active.
     if (must_import_gpiozero == True):
@@ -172,7 +172,8 @@ def create_trigger_file():
         os.system("touch '" + trigger_file_location + "'")
         last_trigger_file_created = time.time()
 
-def watch_button(pin, hold_time=0.2, event=create_trigger_file):
+# This function calls the function "event" when the button on "pin" is held for "hold_time" seconds.
+def watch_button(pin, hold_time, event):
     debug_message("Watching pin " + str(pin))
     button = Button(pin)
     time_pressed = 0
@@ -1009,8 +1010,17 @@ def start_dashcam_recording(dashcam_devices, directory): # This function starts 
     update_status_lighting("normal") # Initialize the status lighting to normal.
 
     button_watch_threads = {} # This will hold the processes watching each GPIO that will trigger a dashcam save.
-    for pin in config["dashcam"]["saving"]["trigger_gpio"]: # Iterate through each dashcam save GPIO trigger.
-        button_watch_threads[int(pin)] = threading.Thread(target=watch_button, args=[int(pin)], name="ButtonWatch" + str(pin)) # Create a thread to monitor this pin.
+    for pin in config["dashcam"]["physical_controls"]["dashcam_saving"]: # Iterate through each dashcam save GPIO trigger.
+        hold_time = float(config["dashcam"]["physical_controls"]["dashcam_saving"][pin]["hold_time"])
+        if (hold_time < 0):
+            utils.display_message("The 'hold time' for pin '" + str(pin) + "' is negative. This will likely cause unexpected behavior.", 2)
+        button_watch_threads[int(pin)] = threading.Thread(target=watch_button, args=[int(pin), hold_time, create_trigger_file], name="ButtonWatch" + str(pin)) # Create a thread to monitor this pin.
+        button_watch_threads[int(pin)].start() # Start the thread to monitor the pin.
+    for pin in config["dashcam"]["physical_controls"]["stop_predator"]: # Iterate through each Predator termination GPIO trigger.
+        hold_time = float(config["dashcam"]["physical_controls"]["stop_predator"][pin]["hold_time"])
+        if (hold_time < 0):
+            utils.display_message("The 'hold time' for pin '" + str(pin) + "' is negative. This will likely cause unexpected behavior.", 2)
+        button_watch_threads[int(pin)] = threading.Thread(target=watch_button, args=[int(pin), hold_time, utils.stop_predator], name="ButtonWatch" + str(pin)) # Create a thread to monitor this pin.
         button_watch_threads[int(pin)].start() # Start the thread to monitor the pin.
 
     dashcam_capture_process = [] # Create a placeholder to store the dashcam recording processes.

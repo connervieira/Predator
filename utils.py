@@ -861,3 +861,9 @@ def count_frames(video):
         display_message("Invalid frame count method.", 3)
         video_frame_count = 0
     return video_frame_count
+
+
+# Calling this function will gracefully stop Predator.
+def stop_predator():
+    global_variables.predator_running = False
+    os._exit(1)

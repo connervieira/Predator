@@ -193,7 +193,6 @@
                 "extension": "str"
             },
             "trigger": "str",
-            "trigger_gpio": "dict",
             "segment_length": "+float",
             "looped_recording": {
                 "mode": ["automatic", "manual"],
@@ -312,6 +311,10 @@
             "enabled": "bool",
             "interval": "+float",
             "devices": "list"
+        },
+        "physical_controls": {
+            "dashcam_saving": "dict",
+            "stop_predator": "dict"
         }
     },
     "developer": {
