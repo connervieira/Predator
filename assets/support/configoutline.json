@@ -51,6 +51,69 @@
                 "alpr_detection": "str",
                 "dashcam_save": "str"
             }
+        },
+        "audio": {
+            "enabled": "bool",
+            "player": {
+                "backend": ["mpg321", "mplayer"],
+                "mpg321": {
+                },
+                "mplayer": {
+                    "device": "str"
+                }
+            },
+            "sounds": {
+                "startup": {
+                    "path": "file",
+                    "repeat": "+int",
+                    "delay": "+float"
+                },
+                "alpr_notification": {
+                    "path": "file",
+                    "repeat": "+int",
+                    "delay": "+float"
+                },
+                "alpr_alert": {
+                    "path": "file",
+                    "repeat": "+int",
+                    "delay": "+float"
+                },
+                "gps_connected": {
+                    "path": "file",
+                    "repeat": "+int",
+                    "delay": "+float"
+                },
+                "gps_disconnected": {
+                    "path": "file",
+                    "repeat": "+int",
+                    "delay": "+float"
+                },
+                "gps_fault": {
+                    "path": "file",
+                    "repeat": "+int",
+                    "delay": "+float"
+                },
+                "dashcam_saved": {
+                    "path": "file",
+                    "repeat": "+int",
+                    "delay": "+float"
+                },
+                "message_notice": {
+                    "path": "file",
+                    "repeat": "+int",
+                    "delay": "+float"
+                },
+                "message_warning": {
+                    "path": "file",
+                    "repeat": "+int",
+                    "delay": "+float"
+                },
+                "message_error": {
+                    "path": "file",
+                    "repeat": "+int",
+                    "delay": "+float"
+                }
+            }
         }
     },
     "management": {
@@ -99,23 +162,6 @@
         "image": {
             "camera": {
                 "devices": "dict"
-            }
-        },
-        "sounds": {
-            "startup_sound": {
-                "path": "file",
-                "repeat": "+int",
-                "delay": "+float"
-            },
-            "notification_sound": {
-                "path": "file",
-                "repeat": "+int",
-                "delay": "+float"
-            },
-            "alert_sound": {
-                "path": "file",
-                "repeat": "+int",
-                "delay": "+float"
             }
         },
         "saving": {

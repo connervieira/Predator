@@ -39,7 +39,6 @@ debug_message  = utils.debug_message # Load the debug message function from the 
 clear = utils.clear # Load the screen clearing function from the utils script.
 prompt = utils.prompt # Load the user input prompt function from the utils script.
 is_json = utils.is_json # Load the function used to determine if a given string is valid JSON.
-play_sound = utils.play_sound # Load the function used to play sounds from the utils script.
 display_message = utils.display_message # Load the message display function from the utils script.
 process_gpx = utils.process_gpx # Load the GPX processing function from the utils script.
 save_to_file = utils.save_to_file # Load the file saving function from the utils script.
@@ -204,7 +203,7 @@ else: # If the user his disabled the large ASCII art header, then show a simple 
     if (config["general"]["display"]["startup_message"]!= ""): # Only display the line for the custom message if the user has defined one.
         print(config["general"]["display"]["startup_message"]) # Show the user's custom defined start-up message.
 
-play_sound("startup")
+utils.play_sound("startup")
 
 if (config["realtime"]["push_notifications"]["enabled"] == True): # Check to see if the user has push notifications enabled.
     debug_message("Issuing start-up push notification")
@@ -239,9 +238,6 @@ if (config["prerecorded"]["image"]["processing"]["cropping"]["left_margin"] < 0 
     config["prerecorded"]["image"]["processing"]["cropping"]["bottom_margin"] = 0
     config["prerecorded"]["image"]["processing"]["cropping"]["top_margin"] = 0
 
-for device in config["realtime"]["image"]["camera"]["devices"]: # Iterate through each video device specified in the configuration.
-    if (os.path.exists(config["realtime"]["image"]["camera"]["devices"][device]) == False): # Check to make sure that a camera device points to a valid file.
-        display_message("The 'realtime>image>camera>devices>" + device + "' configuration value does not point to a valid file.", 3)
 
 
 
@@ -1281,6 +1277,9 @@ elif (mode_selection == "1" and config["general"]["modes"]["enabled"]["prerecord
 
 elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"] == True): # The user has set Predator to boot into real-time mode.
     debug_message("Started real-time mode")
+    for device in config["realtime"]["image"]["camera"]["devices"]: # Iterate through each video device specified in the configuration.
+        if (os.path.exists(config["realtime"]["image"]["camera"]["devices"][device]) == False): # Check to make sure that a camera device points to a valid file.
+            display_message("The 'realtime>image>camera>devices>" + device + "' configuration value does not point to a valid file.", 3)
 
 
     # Load the license plate history file.
@@ -1450,7 +1449,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
                 print("Displaying detected license plates...")
 
             for plate in new_plates_detected:
-                play_sound("notification")
+                utils.play_sound("alpr_notification")
             if (config["realtime"]["interface"]["display"]["output_level"] >= 2): # Only display this status message if the output level indicates to do so.
                 print("Plates detected: " + str(len(new_plates_detected))) # Display the number of license plates detected this round.
                 for plate in new_plates_detected:
@@ -1553,7 +1552,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
                     if (config["realtime"]["interface"]["display"]["shape_alerts"] == True): # Check to see if the user has enabled shape notifications.
                         display_shape("triangle") # Display an ASCII triangle in the output.
 
-                    play_sound("alert") # Play the alert sound, if configured to do so.
+                    utils.play_sound("alpr_alert") # Play the alert sound, if configured to do so.
 
             if (config["realtime"]["interface"]["display"]["output_level"] >= 3): # Only display this status message if the output level indicates to do so.
                 print("Done.\n----------")

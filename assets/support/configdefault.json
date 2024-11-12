@@ -55,6 +55,69 @@
                 "alpr_detection": "[U]&R=255&G=128&B=0",
                 "dashcam_save": "[U]&R=0&G=0&B=255"
             }
+        },
+        "audio": {
+            "enabled": false,
+            "player": {
+                "backend": "mplayer",
+                "mpg321": {
+                },
+                "mplayer": {
+                    "device": "alsa:device=hw=0.0"
+                }
+            },
+            "sounds": {
+                "startup": {
+                    "path": "./assets/sounds/startup.mp3",
+                    "repeat": 0,
+                    "delay": 0.3
+                },
+                "alpr_notification": {
+                    "path": "./assets/sounds/platedetected.mp3",
+                    "repeat": 1,
+                    "delay": 0.3
+                },
+                "alpr_alert": {
+                    "path": "./assets/sounds/alerthit.mp3",
+                    "repeat": 1,
+                    "delay": 2.5
+                },
+                "gps_connected": {
+                    "path": "./assets/sounds/voice/gps_connected.mp3",
+                    "repeat": 1,
+                    "delay": 1
+                },
+                "gps_disconnected": {
+                    "path": "./assets/sounds/voice/gps_disconnected.mp3",
+                    "repeat": 1,
+                    "delay": 1
+                },
+                "gps_fault": {
+                    "path": "./assets/sounds/voice/gps_fault.mp3",
+                    "repeat": 1,
+                    "delay": 1
+                },
+                "dashcam_saved": {
+                    "path": "./assets/sounds/voice/video_saved.mp3",
+                    "repeat": 1,
+                    "delay": 1
+                },
+                "message_notice": {
+                    "path": "./assets/sounds/voice/notice.mp3",
+                    "repeat": 1,
+                    "delay": 1
+                },
+                "message_warning": {
+                    "path": "./assets/sounds/voice/warning.mp3",
+                    "repeat": 1,
+                    "delay": 1
+                },
+                "message_error": {
+                    "path": "./assets/sounds/voice/error.mp3",
+                    "repeat": 1,
+                    "delay": 1
+                }
+            }
         }
     },
     "management": {
@@ -105,23 +168,6 @@
                 "devices": {
                     "primary": "/dev/video0"
                 }
-            }
-        },
-        "sounds": {
-            "startup_sound": {
-                "path": "./assets/sounds/startup.mp3",
-                "repeat": 0,
-                "delay": 0.3
-            },
-            "notification_sound": {
-                "path": "./assets/sounds/platedetected.mp3",
-                "repeat": 1,
-                "delay": 0.3
-            },
-            "alert_sound": {
-                "path": "./assets/sounds/alerthit.mp3",
-                "repeat": 1,
-                "delay": 2.5
             }
         },
         "saving": {
