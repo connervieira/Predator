@@ -379,22 +379,32 @@ if (config["general"]["interface_directory"] != ""): # Check to see if the inter
     else: # If the error file doesn't contain valid JSON data, then load a blank placeholder in it's place.
         error_log = json.loads("{}") # Load a blank placeholder dictionary.
 
+last_message = {"notice": 0, "warning": 0, "error": 0}
 def display_message(message, level=1):
     if (level == 1): # Display the message as a notice.
         if (config["general"]["interface_directory"] != ""): # Check to see if the interface directory is enabled.
             error_log[time.time()] = {"msg": message, "type": "notice"} # Add this message to the log file, using the current time as the key.
             save_to_file(error_file_location, json.dumps(error_log)) # Save the modified error log to the disk as JSON data.
+        if (time.time() - last_message["notice"] > 10):
+            play_sound("message_notice")
+        last_message["notice"] = time.time()
         print("Notice: " + message)
     elif (level == 2): # Display the message as a warning.
         if (config["general"]["interface_directory"] != ""): # Check to see if the interface directory is enabled.
             error_log[time.time()] = {"msg": message, "type": "warn"} # Add this message to the log file, using the current time as the key.
             save_to_file(error_file_location, json.dumps(error_log)) # Save the modified error log to the disk as JSON data.
+        if (time.time() - last_message["warning"] > 10):
+            play_sound("message_warning")
+        last_message["warning"] = time.time()
         print(style.yellow + "Warning: " + message + style.end)
         prompt(style.faint + "Press enter to continue..." + style.end)
     elif (level == 3): # Display the message as an error.
         if (config["general"]["interface_directory"] != ""): # Check to see if the interface directory is enabled.
             error_log[time.time()] = {"msg": message, "type": "error"} # Add this message to the log file, using the current time as the key.
             save_to_file(error_file_location, json.dumps(error_log)) # Save the modified error log to the disk as JSON data.
+        if (time.time() - last_message["error"] > 10):
+            play_sound("message_error")
+        last_message["error"] = time.time()
         print(style.red + "Error: " + message + style.end)
         if (config["developer"]["hard_crash_on_error"] == True):
             global_variables.predator_running = False
@@ -477,13 +487,21 @@ def prompt(message, optional=True, input_type=str, default=""):
 
 
 def play_sound(sound_id):
-    sound_key = sound_id + "_sound"
-    if (sound_key in config["realtime"]["sounds"]): # Check to make sure this sound ID actually exists in the configuration
+    if (sound_id in config["general"]["audio"]["sounds"]): # Check to make sure this sound ID actually exists in the configuration.
         debug_message("Playing '" + sound_id + "' sound")
-        if (int(config["realtime"]["sounds"][sound_key]["repeat"]) > 0): # Check to see if the user has audio alerts enabled.
-            for i in range(0, int(config["realtime"]["sounds"][sound_key]["repeat"])): # Repeat the sound several times, if the configuration says to.
-                os.system("mpg321 " + config["realtime"]["sounds"][sound_key]["path"] + " > /dev/null 2>&1 &") # Play the sound specified for this alert type in the configuration.
-                time.sleep(float(config["realtime"]["sounds"][sound_key]["delay"])) # Wait before playing the sound again.
+        if (config["general"]["audio"]["enabled"] == True): # Check if audio playback is enabled.
+            if (int(config["general"]["audio"]["sounds"][sound_id]["repeat"]) > 0): # Check to see if the user has audio alerts enabled.
+                for i in range(0, int(config["general"]["audio"]["sounds"][sound_id]["repeat"])): # Repeat the sound several times, if the configuration says to.
+                    if (config["general"]["audio"]["player"]["backend"] == "mpg321"):
+                        os.system("mpg321 \"" + config["general"]["audio"]["sounds"][sound_id]["path"] + "\" > /dev/null 2>&1 &") # Play the sound specified for this alert type in the configuration.
+                    elif (config["general"]["audio"]["player"]["backend"] == "mplayer"):
+                        if (len(config["general"]["audio"]["player"]["mplayer"]["device"]) == 0):
+                            os.system("mplayer \"" + config["general"]["audio"]["sounds"][sound_id]["path"] + "\" -noconsolecontrols 2>&- 1>/dev/null &") # Play the sound specified for this alert type in the configuration.
+                        else:
+                            os.system("mplayer -ao " + config["general"]["audio"]["player"]["mplayer"]["device"] + " \"" + config["general"]["audio"]["sounds"][sound_id]["path"] + "\" -noconsolecontrols 2>&- 1>/dev/null &") # Play the sound specified for this alert type in the configuration.
+                    else:
+                        display_message("The configured audio player back-end is invalid.", 3)
+                    time.sleep(float(config["general"]["audio"]["sounds"][sound_id]["delay"])) # Wait before playing the sound again.
     else: # No sound with this ID exists in the configuration database, and therefore the sound can't be played.
         display_message("No sound with the ID (" + str(sound_id) + ") exists in the configuration.", 3)
 
@@ -634,6 +652,8 @@ if (len(config["general"]["gps"]["demo_file"]) > 0): # Check to see if there is 
     del demo_file_path
 elif (config["general"]["gps"]["enabled"] == True): # Check to see if GPS is enabled.
     gpsd.connect() # Connect to the GPS daemon.
+last_gps_status = False # This will hold the state of the GPS during the previous location check.
+last_gps_fault = 0 # This will hold a timestamp of the last time the GPS encountered a fault.
 def get_gps_location():
     global gps_demo_gpx_data
     global current_state
@@ -677,12 +697,26 @@ def get_gps_location():
                             global_time_offset = gps_time - time.time()
                             display_message("The local system time differs significantly from the GPS time. Applied time offset of " + str(round(global_time_offset*10**3)/10**3) + " seconds.", 2)
 
+                if (position == [0,0]):
+                    if (last_gps_status != False):
+                        play_sound("gps_disconnected")
+                    last_gps_status = False
+                else:
+                    if (last_gps_status != True):
+                        play_sound("gps_connected")
+                    last_gps_status = True
                 return position[0], position[1], speed, altitude, heading, satellites, gps_time
             except Exception as exception:
                 display_message("A GPS error occurred: " + str(exception), 2)
+                if (time.time() - last_gps_fault > 60):
+                    play_sound("gps_fault")
+                last_gps_fault = time.time()
                 return 0.0000, 0.0000, 0.0, 0.0, 0.0, 0, 0 # Return a default placeholder location.
     else: # If GPS is disabled, then this function should never be called, but return a placeholder position regardless.
-        display_message("The `get_gps_location` function was called, even though GPS is disabled. This is a bug, and should never occur.", 2)
+        display_message("The `get_gps_location` function was called, even though GPS is disabled. This is a bug, and should never occur.", 3)
+        if (time.time() - last_gps_fault > 60):
+            play_sound("gps_fault")
+        last_gps_fault = time.time()
         return 0.0000, 0.0000, 0.0, 0.0, 0.0, 0, 0 # Return a default placeholder location.
 
 most_recent_gps_location = [0.0, 0.0, 0.0, 0.0, 0.0, 0, 0]

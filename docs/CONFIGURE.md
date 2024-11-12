@@ -96,6 +96,35 @@ This document describes the configuration values found `config.json`.
                 - The `alpr_detection` status is relevant in real-time mode, and used when Predator detects any valid license plate.
                 - The `dashcam_save` status is relevant to dash-cam mode, and is triggered when a dashcam video file is saved using the dashcam lock trigger file.
                     - The lighting will remain in the "dashcam_save" status until the segment has ended, and Predator returns to normal, unlocked recording.
+    - `audio` contains settings that control audio play-back.
+        - `enabled` is a boolean value that determines whether audio playback is enabled.
+        - `player` contains settings for controlling how sounds are played.
+            - `backend` sets the audio player back-end Predator will use.
+                - This value can only be set to one of these values: "mpg321", "mplayer"
+            - `mpg321` contains settings for the MPG321 player back-end (if it is selected).
+            - `mplayer` contains settings for the MPlayer player back-end (if it is selected).
+                - `device` is a string that specifies the audio device that will be used for audio playback.
+                    - Leaving this value blank will use the default audio playback device.
+        - `sounds` contains the sound effects that Predator can play when certain events occur.
+            - Each entry in this section has 3 attributes.
+                - The `path` value should be set to the file path of the audio file you want to play.
+                - The `repeat` value should be set to how many times you want the sound effect to be repeated.
+                    - To disable a sound from playing, set this to 0.
+                    - Under normal circumstances, this value should just be "1", but there might be some cases in which you want to play a particular sound repeatedly.
+                - The `delay` value determines how long Predator will wait, in seconds, between repetitions, if `reptition` is set to more than 1.
+                    - Note that this delay includes the time it takes for the previous instances of the sound effect to play.
+                    - For example, if the audio clip you're repeating takes 2 seconds to play, and you want a 1 second delay between audio clips, this setting should be 3 seconds.
+                    - If the delay is set to zero, then all of the repetitions will play over top of each-other.
+            - Each entry in this section corresponds to a sound effect.
+                - `startup` is the sound played just after Predator finishes loading.
+                - `alpr_notification` is the sound played when a valid plate is detected in real-time mode, and the plate is not in an alert database.
+                - `alpr_alert` is the sound played when a valid plate is detected, and the plate is in an alert database.
+                - `gps_connected` is played when the GPS finds a 2D or 3D location fix.
+                - `gps_disconnected` is played when the GPS loses the fix.
+                - `gps_fault` is played when the GPS encounters an error.
+                - `message_notice` is played when a "notice" level message is displayed.
+                - `message_warning` is played when a "warning" level message is displayed.
+                - `message_error` is played when a "error" level message is displayed.
 - `management` contains configuration values related to management mode.
     - `disk_statistics` is a boolean that enables and disables the disk statistics feature of management mode.
         - Setting this to `false` disables disk statistics, and eliminates the need for the 'psutil' Python package to be installed.
@@ -146,23 +175,6 @@ This document describes the configuration values found `config.json`.
         - `camera` contains settings related to image capture.
             - `device` specifies the camera device that will be used to capture images.
                 - Example: `"/dev/video0"`
-    - `sounds` contains the sound effects that Predator can play when certain events occur.
-        - Each entry in this section has 3 attributes.
-            - The `path` value should be set to the file path of the audio file you want to play.
-            - The `repeat` value should be set to how many times you want the sound effect to be repeated.
-                - To disable a sound from playing, set this to 0.
-                - Under normal circumstances, this value should just be "1", but there might be some cases in which you want to play a particular sound repeatedly.
-            - The `device` determines the name of the device that Predator will use to record audio.
-                - You can get a list of the names of the available sound inputs by running the `arecord -L` command.
-                - Leaving this value as a blank string will cause Predator to use the default audio input determined by `arecord`.
-            - The `delay` value determines how long Predator will wait, in seconds, between repetitions, if `reptition` is set to more than 1.
-                - Note that this delay includes the time it takes for the previous instances of the sound effect to play.
-                - For example, if the audio clip you're repeating takes 2 seconds to play, and you want a 1 second delay between audio clips, this setting should be 3 seconds.
-                - If the delay is set to zero, then all of the repetitions will play over top of each-other.
-        - Each entry in this section corresponds to a sound effect.
-            - `startup_sound` is the sound played just after Predator finishes loading.
-            - `notification_sound` is the sound played when a valid plate is detected in real-time mode, and the plate is not in an alert database.
-            - `alert_sound` is the sound played when a valid plate is detected, and the plate is in an alert database.
     - `saving` contains settings related to information logging while operating in real-time mode.
         - `license_plates` contains settings related to saving detected license plates.
             - `enabled` is a boolean value that determines whether license plate saving is enabled.
@@ -242,7 +254,9 @@ This document describes the configuration values found `config.json`.
         - `audio` contains settings for configuring Predator's audio recording behavior.
             - `enabled` is a boolean that determines whether or not audio will be recorded during dash-cam operation.
             - `extension` sets the file extension that audio will be saved with.
-            - `device` specifies the device ID (as determined by `arecord --list-pcms`) that will be used to capture audio.
+            - `device` determines the name of the device that Predator will use to record audio.
+                - You can get a list of the names of the available sound inputs by running the `arecord -L` command.
+                - Leaving this value as a blank string will cause Predator to use the default audio input determined by `arecord`.
             - `format` specifies the format that will be used by the `arecord` process.
             - `merge` is a boolean that determines whether or not Predator will merge the separate audio and video files when each segment is done recording.
             - `record_as_user` specifies the user on the system that the audio recording process will be run as.

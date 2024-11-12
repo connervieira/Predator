@@ -556,3 +556,13 @@ November 11th, 2024
 
 - Updated dash-cam mode.
     - Added more options for physical controls via GPIO buttons.
+- Updated audio output.
+    - Added support for multiple audio player back-ends.
+        - In addition to supporting the original `mpg321` back-end, Predator now also supports `mplayer`.
+    - Moved configuration values.
+        - The `sounds` configuration section has been renamed, moved, and re-organized.
+    - Added more sounds.
+        - `gps_connected` is played when the GPS gains a location fix.
+        - `gps_disconnected` is played when the GPS loses the location fix.
+        - `gps_fault` is played when the GPS encounters a problem.
+        - `dashcam_saved` is played when a dash-cam video segment is saved.
