@@ -5,9 +5,11 @@ Here you can learn about the auto-install script for the Predator ecosystem, and
 
 ## Disclaimer
 
-**This script should only be run on sustems dedicated to the usage of Predator.** This script erases and overwrites files without prompting the user. Do not use this script on a system with files you don't want to lose. Ideally, this script should only be used on a clean OS install.
+**This script should only be run on systems dedicated to the usage of Predator.** This script erases and overwrites files without prompting the user. Do not use this script on a system with files you don't want to lose. Ideally, this script should only be used on a clean OS install.
 
 This script **is not** designed to be run on your normal, every-day computer. Rather, it is designed to quickly deploy Predator on a dedicated system. In other words, if you want to install Predator on your main computer for sake of testing, experimentation, or development, you should not use this script. If you instead want to install the Predator ecosystem on a computer dedicated to ALPR, dash-cam recording, or other Predator functionality, this script can be an extremely conveinent way to do so.
+
+Predator, Cortex, and Optic assume that your username is "pi" by default. If the primary user on your system has a different username, you'll have to manually reconfigure each component after the installation script finishes.
 
 
 ## Support

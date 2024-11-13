@@ -658,6 +658,7 @@ def get_gps_location():
     global gps_demo_gpx_data
     global current_state
     global global_time_offset
+    global last_gps_status
     if (config["general"]["gps"]["enabled"] == True): # Check to see if GPS is enabled.
         if (len(config["general"]["gps"]["demo_file"]) > 0): # Check to see if there is a demo file set.
             current_gpx_key = closest_key(gps_demo_gpx_data, get_time()) # Get the closest entry to the current time in the GPX file.
