@@ -53,9 +53,9 @@ This section describes the initial start-up process of Predator.
         - Next, if your working directory contains Predator dash-cam video, you'll be prompted to enter side-car mode. If not, this dialog will be skipped.
             - Side-car mode will analyze each frame of all dash-cam videos, and generate a side-car file containing ALPR data. Side-car data can be played back using the `tools/video_sidecar_player.py` script.
             - If you select "Y" to enable side-car mode, Predator will immediately begin analyzing all dash-cam videos that don't already have side-car files.
-                - This process make take a very long time, since every frame of every video is analyzed.
+                - This process may take a very long time, since every frame of every video is analyzed.
             - If you select "N" to skip side-car mode, then set-up process will continue with the next dialog.
-        - Provided you haven't selected side-car mode, you'll next be asked to enter the file name(s) of the video(s) you want to analyze. Video(s) should be placed in the working directory you just specified. If you have multiple video files, you can enter them as a comma-separated list. If you want to scan an entire directory, Use a `*` wildcard as the first character.
+        - Provided you haven't selected side-car mode, you'll next be asked to enter the file name(s) of the video(s) you want to analyze. Videos should be placed in the working directory you just specified. If you have multiple video files, you can enter them as a comma-separated list. If you want to scan an entire directory, Use a `*` wildcard as the first character.
             - Example 1: `MyVideo.mp4`
             - Example 2: `MyFirstVideo.mp4, MySecondVideo.mp4`
             - Example 3: `*.mp4`
@@ -71,10 +71,11 @@ This section describes the initial start-up process of Predator.
             - Example: `AAA0000`
         - Next, you'll be asked for the time and date that the specified video recording started.
             - This preference takes the following format: YYYY-mm-dd HH:MM:SS
-            - This preference is optional but will enabled the GPX file setting, which grants the ability to correlate license plates to physical GPS locations.
-                - If you wish to correlate license plates to location data from a GPX file, simply place the GPX file in the working directory, then enter its file name at the prompt. Otherwise, leave it blank.
+            - This preference is optional but will enable the GPX file setting, which has the ability to correlate license plates to physical GPS locations.
         - Finally, you'll be asked for the file name of a GPX file containing location information relevant to the video file you've specified.
             - This setting is optional, but supplying a GPX file with location data allows Predator to pin-point physical locations for each license plate it detects.
+            - If you wish to correlate license plates to location data from a GPX file, simply place the GPX file in the working directory, then enter its file name at the prompt. Otherwise, leave it blank.
+            - This feature only works reliably when analyzing a single video file at a time.
             - If you don't see this setting prompt when running Predator in pre-recorded mode, it is likely that you didn't supply a time and date in the previous prompt. This is required to enable GPX location correlation.
             - Example: `DashcamVideoLocation.gpx`
     - Real-time mode:
@@ -88,7 +89,7 @@ This section describes how each Predator mode works after the initial start-up.
 
 ### Management Mode
 - Unlike the other modes, the management mode revolves entirely around user menus.
-- To navigate through each menu, simply enter the characters associated with the menu selection you'd like to make.
+- To navigate through each menu, simply enter the characters associated with the menu selection you'd like to make, then press enter.
     - Typically, menu items will be identified simply with numbers, but there may also be an additional letter, like in the case of the 'Copy' and 'Delete' menus.
 
 ### Pre-recorded Mode
@@ -101,8 +102,7 @@ This section describes how each Predator mode works after the initial start-up.
     - To navigate this menu, simply enter the ID number of the menu item you want to select, then press enter.
 
 ### Real-time Mode
-- While in real-time mode, Predator will run in an endless loop until quit by holding `Ctrl + C` for a few seconds.
-    - Since Predator launches some of its processes in different threads, pressing `Ctrl + C` a single time might not kill the entire Predator system.
+- While in real-time mode, Predator will run in an endless loop until quit by holding `Ctrl + C`.
 - When one or more license plates are detected, Predator will display it on screen, provided that it is configured to do so.
     - Depending on the configuration, Predator might also display a large text shape to make it easier to see important information at a glance.
     - Depending on the configuration, Predator might play an audio sound indicating the type of plate detected.
