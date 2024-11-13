@@ -263,11 +263,17 @@ def benchmark_camera_framerate(device, frames=5): # This function benchmarks a g
 
 
 # This function is called when the lock trigger file is created, usually to save the current and last segments.
+last_played_dashcam_saved_sound = 0 # This holds the timestamp of the last time the dashcam video was saved so we don't play the saved sound repeatedly in short succession.
 def save_dashcam_segments(file1, file2=""):
     global config
     global segments_saved_time
+    global last_played_dashcam_saved_sound
     process_timing("start", "Dashcam/File Maintenance")
     cooldown = 0.5 # This is how long Predator will wait to allow other threads to detect the lock trigger file. This also determines how long the user has to wait before saving the same file again.
+
+    if (time.time()-last_played_dashcam_saved_sound > 5):
+        utils.play_sound("dashcam_saved")
+    last_played_dashcam_saved_sound = time.time()
 
     anything_saved = False # This will be changed to 'True' is one or more files is saved.
     if (os.path.isdir(config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"]) == False): # Check to see if the saved dashcam video folder needs to be created.
@@ -980,7 +986,7 @@ def background_alpr(device):
                     else:
                         update_status_lighting("normal")
             for plate in detected_plates_valid: # Run once for each detected plate.
-                utils.play_sound("notification") # Play the "new plate detected" sound.
+                utils.play_sound("alpr_notification") # Play the "new plate detected" sound.
             for alert in active_alerts: # Run once for each active alert.
                 if (config["realtime"]["push_notifications"]["enabled"] == True): # Check to see if the user has Gotify notifications enabled.
                     debug_message("Issuing alert push notification")
@@ -989,7 +995,7 @@ def background_alpr(device):
                 if (config["realtime"]["interface"]["display"]["shape_alerts"] == True): # Check to see if the user has enabled shape notifications.
                     utils.display_shape("triangle") # Display an ASCII triangle in the output.
 
-                utils.play_sound("alert") # Play the alert sound, if configured to do so.
+                utils.play_sound("alpr_alert") # Play the alert sound, if configured to do so.
             process_timing("end", "Dashcam/ALPR Display")
 
 

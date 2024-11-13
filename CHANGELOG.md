@@ -566,3 +566,6 @@ November 11th, 2024
         - `gps_disconnected` is played when the GPS loses the location fix.
         - `gps_fault` is played when the GPS encounters a problem.
         - `dashcam_saved` is played when a dash-cam video segment is saved.
+        - `message_notice` is played when notice level message is displayed.
+        - `message_warning` is played when warning level message is displayed.
+        - `message_error` is played when error level message is displayed.
