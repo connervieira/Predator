@@ -571,3 +571,4 @@ November 11th, 2024
         - `message_error` is played when error level message is displayed.
         - `recording_started` is played when dash-cam recording is initiated.
         - `recording_stopped` is played when dash-cam recording is halted.
+- Added `delay_after_boot` configuration option to status lighting to resolve issues with connectivity.
