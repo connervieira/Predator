@@ -379,33 +379,29 @@ if (config["general"]["interface_directory"] != ""): # Check to see if the inter
     else: # If the error file doesn't contain valid JSON data, then load a blank placeholder in it's place.
         error_log = json.loads("{}") # Load a blank placeholder dictionary.
 
-last_message = {"notice": 0, "warning": 0, "error": 0}
-def display_message(message, level=1):
+def display_message(message, level=1, suppress_sound=False):
     if (level == 1): # Display the message as a notice.
         if (config["general"]["interface_directory"] != ""): # Check to see if the interface directory is enabled.
             error_log[time.time()] = {"msg": message, "type": "notice"} # Add this message to the log file, using the current time as the key.
             save_to_file(error_file_location, json.dumps(error_log)) # Save the modified error log to the disk as JSON data.
-        if (time.time() - last_message["notice"] > 10):
-            play_sound("message_notice")
-        last_message["notice"] = time.time()
         print("Notice: " + message)
+        if (suppress_sound == False):
+            play_sound("message_notice")
     elif (level == 2): # Display the message as a warning.
         if (config["general"]["interface_directory"] != ""): # Check to see if the interface directory is enabled.
             error_log[time.time()] = {"msg": message, "type": "warn"} # Add this message to the log file, using the current time as the key.
             save_to_file(error_file_location, json.dumps(error_log)) # Save the modified error log to the disk as JSON data.
-        if (time.time() - last_message["warning"] > 10):
-            play_sound("message_warning")
-        last_message["warning"] = time.time()
         print(style.yellow + "Warning: " + message + style.end)
+        if (suppress_sound == False):
+            play_sound("message_warning")
         prompt(style.faint + "Press enter to continue..." + style.end)
     elif (level == 3): # Display the message as an error.
         if (config["general"]["interface_directory"] != ""): # Check to see if the interface directory is enabled.
             error_log[time.time()] = {"msg": message, "type": "error"} # Add this message to the log file, using the current time as the key.
             save_to_file(error_file_location, json.dumps(error_log)) # Save the modified error log to the disk as JSON data.
-        if (time.time() - last_message["error"] > 10):
-            play_sound("message_error")
-        last_message["error"] = time.time()
         print(style.red + "Error: " + message + style.end)
+        if (suppress_sound == False):
+            play_sound("message_error")
         if (config["developer"]["hard_crash_on_error"] == True):
             global_variables.predator_running = False
             os._exit(1)
@@ -485,23 +481,29 @@ def prompt(message, optional=True, input_type=str, default=""):
 
 
 
+sounds_last_played = {} # This will keep track of the last time each sound effect was played.
+def play_sound(sound_id, override_cooldown=False):
+    global sounds_last_played
 
-def play_sound(sound_id):
     if (sound_id in config["general"]["audio"]["sounds"]): # Check to make sure this sound ID actually exists in the configuration.
-        debug_message("Playing '" + sound_id + "' sound")
-        if (config["general"]["audio"]["enabled"] == True): # Check if audio playback is enabled.
-            if (int(config["general"]["audio"]["sounds"][sound_id]["repeat"]) > 0): # Check to see if the user has audio alerts enabled.
-                for i in range(0, int(config["general"]["audio"]["sounds"][sound_id]["repeat"])): # Repeat the sound several times, if the configuration says to.
-                    if (config["general"]["audio"]["player"]["backend"] == "mpg321"):
-                        os.system("mpg321 \"" + config["general"]["audio"]["sounds"][sound_id]["path"] + "\" > /dev/null 2>&1 &") # Play the sound specified for this alert type in the configuration.
-                    elif (config["general"]["audio"]["player"]["backend"] == "mplayer"):
-                        if (len(config["general"]["audio"]["player"]["mplayer"]["device"]) == 0):
-                            os.system("mplayer \"" + config["general"]["audio"]["sounds"][sound_id]["path"] + "\" -noconsolecontrols 2>&- 1>/dev/null &") # Play the sound specified for this alert type in the configuration.
+        if (sound_id not in sounds_last_played):
+            sounds_last_played[sound_id] = 0
+
+        if (time.time() - sounds_last_played[sound_id] > 10 or override_cooldown == True):
+            debug_message("Playing '" + sound_id + "' sound")
+            if (config["general"]["audio"]["enabled"] == True): # Check if audio playback is enabled.
+                if (int(config["general"]["audio"]["sounds"][sound_id]["repeat"]) > 0): # Check to see if the user has audio alerts enabled.
+                    for i in range(0, int(config["general"]["audio"]["sounds"][sound_id]["repeat"])): # Repeat the sound several times, if the configuration says to.
+                        if (config["general"]["audio"]["player"]["backend"] == "mpg321"):
+                            os.system("mpg321 \"" + config["general"]["audio"]["sounds"][sound_id]["path"] + "\" > /dev/null 2>&1 &") # Play the sound specified for this alert type in the configuration.
+                        elif (config["general"]["audio"]["player"]["backend"] == "mplayer"):
+                            if (len(config["general"]["audio"]["player"]["mplayer"]["device"]) == 0):
+                                os.system("mplayer \"" + config["general"]["audio"]["sounds"][sound_id]["path"] + "\" -noconsolecontrols 2>&- 1>/dev/null &") # Play the sound specified for this alert type in the configuration.
+                            else:
+                                os.system("mplayer -ao " + config["general"]["audio"]["player"]["mplayer"]["device"] + " \"" + config["general"]["audio"]["sounds"][sound_id]["path"] + "\" -noconsolecontrols 2>&- 1>/dev/null &") # Play the sound specified for this alert type in the configuration.
                         else:
-                            os.system("mplayer -ao " + config["general"]["audio"]["player"]["mplayer"]["device"] + " \"" + config["general"]["audio"]["sounds"][sound_id]["path"] + "\" -noconsolecontrols 2>&- 1>/dev/null &") # Play the sound specified for this alert type in the configuration.
-                    else:
-                        display_message("The configured audio player back-end is invalid.", 3)
-                    time.sleep(float(config["general"]["audio"]["sounds"][sound_id]["delay"])) # Wait before playing the sound again.
+                            display_message("The configured audio player back-end is invalid.", 3)
+                        time.sleep(float(config["general"]["audio"]["sounds"][sound_id]["delay"])) # Wait before playing the sound again.
     else: # No sound with this ID exists in the configuration database, and therefore the sound can't be played.
         display_message("No sound with the ID (" + str(sound_id) + ") exists in the configuration.", 3)
 
