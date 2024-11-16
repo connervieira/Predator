@@ -112,6 +112,16 @@
                     "path": "file",
                     "repeat": "+int",
                     "delay": "+float"
+                },
+                "recording_started": {
+                    "path": "file",
+                    "repeat": "+int",
+                    "delay": "+float"
+                },
+                "recording_stopped": {
+                    "path": "file",
+                    "repeat": "+int",
+                    "delay": "+float"
                 }
             }
         }

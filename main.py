@@ -1585,6 +1585,7 @@ elif (mode_selection == "3" and config["general"]["modes"]["enabled"]["dashcam"]
     except:
         global_variables.predator_running = False
         display_message("Dashcam recording halted.", 1)
+        utils.play_sound("recording_stopped")
 
 
 

@@ -569,3 +569,5 @@ November 11th, 2024
         - `message_notice` is played when notice level message is displayed.
         - `message_warning` is played when warning level message is displayed.
         - `message_error` is played when error level message is displayed.
+        - `recording_started` is played when dash-cam recording is initiated.
+        - `recording_stopped` is played when dash-cam recording is halted.

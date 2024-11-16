@@ -104,7 +104,7 @@
                 },
                 "message_notice": {
                     "path": "./assets/sounds/voice/notice.mp3",
-                    "repeat": 1,
+                    "repeat": 0,
                     "delay": 1
                 },
                 "message_warning": {
@@ -114,6 +114,16 @@
                 },
                 "message_error": {
                     "path": "./assets/sounds/voice/error.mp3",
+                    "repeat": 1,
+                    "delay": 1
+                },
+                "recording_started": {
+                    "path": "./assets/sounds/voice/recording_started.mp3",
+                    "repeat": 1,
+                    "delay": 1
+                },
+                "recording_stopped": {
+                    "path": "./assets/sounds/voice/recording_stopped.mp3",
                     "repeat": 1,
                     "delay": 1
                 }
