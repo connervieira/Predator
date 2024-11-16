@@ -88,6 +88,9 @@ This document describes the configuration values found `config.json`.
             - This is the base part of the URL that Predator will send requests to in order to update the status lighting.
             - By default, this setting is set to the default router IP address of the "WLED" lighting controller software. However, you should be able to modify it to fit any lighting controller software that supports GET network requests.
             - This is that value that precedes the `status_lighting_values` entries explained below.
+        - `delay_after_boot` specifies a number of seconds to ignore all status lighting requests after boot.
+            - If your lighting system starts up along-side Predator, you may need to wait for the controller to connect to the network before status light requests can be made. Otherwise, the first few requests will time-out.
+            - Any status lighting request made within the delay will be ignored.
         - `status_lighting_values`
             - These are individual values that will be appended to the `status_lighting_base_url` setting described above in order to form the URL that Predator will send a request to.
             - This is where you specify what RGB colors Predator will use for each status indication.

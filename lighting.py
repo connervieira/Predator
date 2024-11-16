@@ -15,6 +15,7 @@ import validators # Required to validating URLs.
 import requests # Required to send network requests.
 import json # Required to process JSON data.
 import os # Required to interact with certain operating system functions.
+import time
 
 import utils # Import the utils.py script.
 style = utils.style # Load the style from the utils script.
