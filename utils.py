@@ -75,6 +75,7 @@ def get_time():
     return adjusted_time
 
 
+
 # Define the function to print debugging information when the configuration specifies to do so.
 debugging_time_record = {}
 def debug_message(message, thread="MainThread"):
@@ -482,17 +483,27 @@ def prompt(message, optional=True, input_type=str, default=""):
 
 
 sounds_last_played = {} # This will keep track of the last time each sound effect was played.
+audio_playing = False
 def play_sound(sound_id, override_cooldown=False):
     global sounds_last_played
+    global audio_playing
 
     if (sound_id in config["general"]["audio"]["sounds"]): # Check to make sure this sound ID actually exists in the configuration.
         if (sound_id not in sounds_last_played):
             sounds_last_played[sound_id] = 0
 
         if (time.time() - sounds_last_played[sound_id] > 10 or override_cooldown == True):
+            sounds_last_played[sound_id] = time.time()
             debug_message("Playing '" + sound_id + "' sound")
             if (config["general"]["audio"]["enabled"] == True): # Check if audio playback is enabled.
                 if (int(config["general"]["audio"]["sounds"][sound_id]["repeat"]) > 0): # Check to see if the user has audio alerts enabled.
+                    x = 0
+                    while (audio_playing == True):
+                        x += 1
+                        time.sleep(0.1)
+                        if (x > 100):
+                            display_message("The audio process timed out", 2, True)
+                    audio_playing = True
                     for i in range(0, int(config["general"]["audio"]["sounds"][sound_id]["repeat"])): # Repeat the sound several times, if the configuration says to.
                         if (config["general"]["audio"]["player"]["backend"] == "mpg321"):
                             os.system("mpg321 \"" + config["general"]["audio"]["sounds"][sound_id]["path"] + "\" > /dev/null 2>&1 &") # Play the sound specified for this alert type in the configuration.
@@ -504,6 +515,7 @@ def play_sound(sound_id, override_cooldown=False):
                         else:
                             display_message("The configured audio player back-end is invalid.", 3)
                         time.sleep(float(config["general"]["audio"]["sounds"][sound_id]["delay"])) # Wait before playing the sound again.
+                    audio_playing = False
     else: # No sound with this ID exists in the configuration database, and therefore the sound can't be played.
         display_message("No sound with the ID (" + str(sound_id) + ") exists in the configuration.", 3)
 

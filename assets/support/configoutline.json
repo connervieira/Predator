@@ -45,6 +45,7 @@
         "status_lighting": {
             "enabled": "bool",
             "base_url": "str",
+            "delay_after_boot": "+float",
             "values": {
                 "normal": "str",
                 "alpr_alert": "str",

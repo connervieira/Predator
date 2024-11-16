@@ -37,18 +37,22 @@ except:
 
 
 current_status_light_id = ""
+start_time = time.time() # This stores the time that the status lighting engine was first loaded (when Predator started).
 def update_status_lighting(url_id):
     global current_status_light_id
+    global start_time
     debug_message("Updating status lighting")
-    if (url_id != current_status_light_id): # Check to see if the status light URL ID is different from the current state of the lights.
-        current_status_light_id = url_id
-        if (config["general"]["status_lighting"]["enabled"] == True): # Only update the status lighting if it is enabled in the configuration.
-            status_lighting_update_url = str(config["general"]["status_lighting"]["values"][url_id]).replace("[U]", str(config["general"]["status_lighting"]["base_url"])) # Prepare the URL where a request will be sent in order to update the status lighting.
-            if (config["developer"]["offline"] == False): # Check to make sure offline mode is disabled before sending the network request to update the status lighting.
-                if (validators.url(status_lighting_update_url)): # Check to make sure the URL ID supplied actually resolves to a valid URL in the configuration database.
-                    try:
-                        response = requests.get(status_lighting_update_url, timeout=0.5)
-                    except:
-                        display_message("Failed to update status lighting. The request timed out.", 3) # Display a warning indicating that the status lighting request timed out.
-                else:
-                    display_message("Unable to update status lighting. Invalid URL configured for " + url_id, 3) # Display a warning indicating that the URL was invalid, and no network request was sent.
+    if (time.time() - start_time >= config["general"]["status_lighting"]["delay_after_boot"]):
+        if (url_id != current_status_light_id): # Check to see if the status light URL ID is different from the current state of the lights.
+            current_status_light_id = url_id
+            if (config["general"]["status_lighting"]["enabled"] == True): # Only update the status lighting if it is enabled in the configuration.
+                status_lighting_update_url = str(config["general"]["status_lighting"]["values"][url_id]).replace("[U]", str(config["general"]["status_lighting"]["base_url"])) # Prepare the URL where a request will be sent in order to update the status lighting.
+                if (config["developer"]["offline"] == False): # Check to make sure offline mode is disabled before sending the network request to update the status lighting.
+                    if (validators.url(status_lighting_update_url)): # Check to make sure the URL ID supplied actually resolves to a valid URL in the configuration database.
+                        try:
+                            response = requests.get(status_lighting_update_url, timeout=0.5)
+                        except:
+                            display_message("Failed to update status lighting. The request timed out.", 3) # Display a warning indicating that the status lighting request timed out.
+                    else:
+                        display_message("Unable to update status lighting. Invalid URL configured for " + url_id, 3) # Display a warning indicating that the URL was invalid, and no network request was sent.
+    debug_message("Status light update complete")

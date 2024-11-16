@@ -170,7 +170,7 @@ def create_trigger_file():
             os.system("mkdir -p '" + str(config["general"]["interface_directory"]) + "'")
             os.system("chmod -R 777 '" + str(config["general"]["interface_directory"]) + "'")
         os.system("touch '" + trigger_file_location + "'")
-        last_trigger_file_created = time.time()
+    last_trigger_file_created = time.time()
 
 # This function calls the function "event" when the button on "pin" is held for "hold_time" seconds.
 def watch_button(pin, hold_time, event):
@@ -183,7 +183,7 @@ def watch_button(pin, hold_time, event):
             debug_message("Pressed" + str(pin))
             time_pressed = time.time()
         elif (button.is_pressed and time.time() - time_pressed >= 10): # Check to see if the button has been held for an excessively long time (it may be stuck).
-            if (time.time() - last_stuck_warning < 30): # Check to see if it has been at least 30 seconds since the last time a stuck warning was displayed.
+            if (time.time() - last_stuck_warning > 10): # Check to see if it has been at least 30 seconds since the last time a stuck warning was displayed.
                 display_message("The button on pin " + str(pin) + " appears to be stuck.", 3)
             last_stuck_warning = time.time()
         elif (button.is_pressed and time.time() - time_pressed >= hold_time): # Check to see if the button is being held, and the time threshold has been reached.
