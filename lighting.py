@@ -25,7 +25,6 @@ display_message = utils.display_message # Load the error message display functio
 
 
 predator_root_directory = str(os.path.dirname(os.path.realpath(__file__))) # This variable determines the folder path of the root Predator directory. This should usually automatically recognize itself, but it if it doesn't, you can change it manually.
-
 try:
     if (os.path.exists(predator_root_directory + "/config.json")):
         config = json.load(open(predator_root_directory + "/config.json")) # Load the configuration database from config.json

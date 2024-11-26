@@ -34,9 +34,6 @@
             },
             "lazy_polling_interval": 1.0
         },
-        "object_recognition": {
-            "enabled": false
-        },
         "modes": {
             "auto_start": "",
             "enabled": {
@@ -167,10 +164,6 @@
                 "clearing": true
             }
         },
-        "object_recognition": {
-            "enabled": false,
-            "video_still_path": "/dev/shm/phantom-webcam.jpg"
-        },
         "gps": {
             "alpr_location_tagging": true
         },
@@ -190,10 +183,6 @@
                 "enabled": true,
                 "file": "plate_history.json",
                 "save_guesses": false
-            },
-            "object_recognition": {
-                "enabled": true,
-                "file": "object_recognition_log.csv"
             }
         },
         "push_notifications": {
@@ -258,8 +247,11 @@
                 "speed": 1,
                 "time": 10
             },
-            "recording": {
-                "highlight_motion": {
+            "event": {
+                "trigger": "motion",
+                "timeout": 15,
+                "buffer": 30,
+                "label": {
                     "enabled": false,
                     "color": [
                         0,
@@ -267,9 +259,14 @@
                         0
                     ]
                 },
-                "sensitivity": 0.2,
-                "timeout": 5,
-                "buffer": 30
+                "trigger_motion": {
+                    "sensitivity": 0.2
+                },
+                "trigger_object_recognition": {
+                    "model_weights": "./assets/models/dashcam_model.pt",
+                    "objects": ["PERSON_PEDESTRIAN"],
+                    "minimum_confidence": 0.6
+                }
             }
         },
         "notifications": {
@@ -283,7 +280,7 @@
                     "start_up": {
                         "enabled": true
                     },
-                    "motion_detected": {
+                    "parked_event": {
                         "enabled": true
                     },
                     "parking_mode_enabled": {

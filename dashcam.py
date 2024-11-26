@@ -39,6 +39,9 @@ update_state = utils.update_state
 convert_speed = utils.convert_speed
 save_to_file = utils.save_to_file
 
+if (config["dashcam"]["parked"]["event"]["trigger"] == "object_recognition"):
+    import object_recognition # object_recognition.py
+
 import threading
 import time
 import cv2
@@ -110,11 +113,11 @@ if (config["dashcam"]["parked"]["enabled"] == True): # Only validate the parking
     if (config["dashcam"]["parked"]["conditions"]["speed"] < 0):
         display_message("The 'dashcam>parked>conditions>speed' setting is a negative number. This will prevent Predator from ever entering parked mode. To prevent unexpected behavior, you should set 'dashcam>parked>enabled' to 'false'.", 2)
 
-    if (config["dashcam"]["parked"]["recording"]["sensitivity"] < 0):
+    if (config["dashcam"]["parked"]["event"]["trigger_motion"]["sensitivity"] < 0):
         display_message("The 'dashcam>parked>recording>sensitivity' setting is a negative number. This will cause unexpected behavior.", 3)
-    elif (config["dashcam"]["parked"]["recording"]["sensitivity"] > 0.9):
+    elif (config["dashcam"]["parked"]["event"]["trigger_motion"]["sensitivity"] > 0.9):
         display_message("The 'dashcam>parked>recording>sensitivity' setting is an exceedingly high value (above 90%). This will likely cause unexpected behavior.", 2)
-    elif (config["dashcam"]["parked"]["recording"]["sensitivity"] > 1):
+    elif (config["dashcam"]["parked"]["event"]["trigger_motion"]["sensitivity"] > 1):
         display_message("The 'dashcam>parked>recording>sensitivity' setting is above 100%. This will effectively prevent Predator from ever detecting motion.", 2)
 
 
@@ -159,9 +162,7 @@ if (config["dashcam"]["capture"]["audio"]["device"] != ""): # Check to see if a 
 
 
 
-trigger_file_location = config["general"]["interface_directory"] + "/" + config["dashcam"]["saving"]["trigger"] # Define the path of the dashcam lock trigger file.
-trigger_file_location = trigger_file_location.replace("//", "/") # Remove any duplicate slashes in the file path.
-
+trigger_file_location = os.path.join(config["general"]["interface_directory"], config["dashcam"]["saving"]["trigger"]) # Define the path of the dashcam lock trigger file.
 last_trigger_file_created = 0
 def create_trigger_file():
     global last_trigger_file_created
@@ -448,21 +449,24 @@ def detect_motion(frame, background_subtractor):
 
 
 # This function is called as a subprocess of the parked dashcam recording, and is triggered when motion is detected. This function exits when motion is no longer detected (after the motion detection timeout), and returns to dormant parked mode.
-def record_parked_motion(capture, framerate, width, height, device, directory, frame_history):
+def record_parked(capture, framerate, width, height, device, directory, frame_history):
     global instant_framerate
     global calculated_framerate
     global parked
     global recording_active
     global config
     global audio_recorders
+    global audio_record_command
+    global current_segment_name
 
     recording_active = True # Indicate the Predator is not actively capturing frames.
 
-    last_motion_detected = utils.get_time() # Initialize the last time that motion was detected to now. We can assume motion was just detected because this function is only called after motion is detected.
+    last_event_detected = utils.get_time() # Initialize the last time that an event was detected to now. We can assume an event was just detected because this function is only called after an event is triggered.
 
-    process_timing("start", "Dashcam/Detection Motion")
-    background_subtractor = cv2.createBackgroundSubtractorMOG2() # Initialize the background subtractor for motion detection.
-    process_timing("end", "Dashcam/Detection Motion")
+    if (config["dashcam"]["parked"]["event"]["trigger"] == "motion"):
+        process_timing("start", "Dashcam/Detection Motion")
+        background_subtractor = cv2.createBackgroundSubtractorMOG2() # Initialize the background subtractor for motion detection.
+        process_timing("end", "Dashcam/Detection Motion")
 
 
     current_segment_name[device] = directory + "/predator_dashcam_" + str(round(utils.get_time())) + "_" + str(device) + "_0_P"
@@ -472,7 +476,6 @@ def record_parked_motion(capture, framerate, width, height, device, directory, f
         audio_base_name = "_".join(os.path.basename(current_segment_name[device]).split("_")[0:3])
         audio_filepath = directory + "/" + audio_base_name + "." + str(config["dashcam"]["capture"]["audio"]["extension"])
         if (audio_base_name not in audio_recorders or audio_recorders[audio_base_name].poll() is not None): # Check to see if the audio recorder hasn't yet been started by another thread.
-            subprocess.Popen(("sudo -u " + str(config["dashcam"]["capture"]["audio"]["record_as_user"]) + " killall arecord").split(" "), stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Kill the previous arecord instance (if one exists)
             command = audio_record_command + " \"" + str(audio_filepath) + "\""
             audio_recorders[audio_base_name] = subprocess.Popen(command, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Start the next segment's audio recorder.
             del command
@@ -482,6 +485,7 @@ def record_parked_motion(capture, framerate, width, height, device, directory, f
     process_timing("start", "Dashcam/Writing")
     for frame in frame_history: # Iterate through each frame in the frame history.
         write_frame(frame, device)
+    frame_history = [] # Clear the frame buffer.
     process_timing("end", "Dashcam/Writing")
 
     frames_captured = 0 # This is a placeholder that will keep track of how many frames are captured in this parked recording.
@@ -498,19 +502,25 @@ def record_parked_motion(capture, framerate, width, height, device, directory, f
     expected_time_since_last_frame_fastest = 1/float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"]) # Calculate the shortest expected time between two frames.
     process_timing("end", "Dashcam/Calculations")
 
-    while (utils.get_time() - last_motion_detected < config["dashcam"]["parked"]["recording"]["timeout"] and parked == True): # Run until motion is not detected for a certain period of time.
+
+    while (global_variables.predator_running): # Run until the criteria for event recording are no longer met.
+        if (parked == False): # Check to see if parked mode has been exited.
+            break # Exit event recording.
+        if (utils.get_time() - last_event_detected > config["dashcam"]["parked"]["event"]["timeout"]): # Check to see if no motion has been detected in a while.
+            break # Exit event recording.
+            
         heartbeat() # Issue a status heartbeat.
         update_state("dashcam/parked_active", instant_framerate)
 
         if (capture is None or capture.isOpened() == False): # Check to see if the capture failed to open.
             display_message("The video capture on device '" + str(device) + "' was dropped during parked recording", 3)
 
+        process_timing("start", "Dashcam/Calculations")
         if (time.time() - shortterm_framerate[device]["start"] > float(config["developer"]["dashcam_shortterm_framerate_interval"])): # Check to see if enough time has passed since the last short-term framerate update was made.
             shortterm_framerate[device]["framerate"] = shortterm_framerate[device]["frames"] / (time.time() - shortterm_framerate[device]["start"]) # Calculate the short-term frame-rate.
             shortterm_framerate[device]["start"] = time.time() # Reset the timer.
             shortterm_framerate[device]["frames"] = 0 # Reset the number of frames.
         shortterm_framerate[device]["frames"] += 1 # Increment the number of frames since the last reading.
-
         time_since_last_frame = time.time()-last_frame_captured # Calculate the time (in seconds) since the last frame was captured.
         instant_framerate[device] = 1/time_since_last_frame
         if (time_since_last_frame > expected_time_since_last_frame_slowest): # Check see if the current frame-rate is below the minimum expected frame-rate.
@@ -524,28 +534,42 @@ def record_parked_motion(capture, framerate, width, height, device, directory, f
         ret, frame = capture.read() # Capture a frame.
         last_frame_captured = time.time() # Update the time that the last frame was captured.
         frames_captured+=1 # Increment the frame counter.
+        process_timing("end", "Dashcam/Calculations")
 
         process_timing("start", "Dashcam/Image Manipulation")
         if (config["dashcam"]["capture"]["video"]["devices"][device]["flip"]): # Check to see if Predator is convered to flip this capture device's output.
             frame = cv2.rotate(frame, cv2.ROTATE_180) # Flip the frame by 180 degrees.
         process_timing("end", "Dashcam/Image Manipulation")
 
-        process_timing("start", "Dashcam/Motion Detection")
-        contours, moving_percentage = detect_motion(frame, background_subtractor) # Run motion analysis on this frame.
+        if (config["dashcam"]["parked"]["event"]["trigger"] == "motion"):
+            process_timing("start", "Dashcam/Motion Detection")
+            contours, moving_percentage = detect_motion(frame, background_subtractor) # Run motion analysis on this frame.
 
-        if (moving_percentage > float(config["dashcam"]["parked"]["recording"]["sensitivity"]) * 0.8): # Check to see if there is movement that exceeds 80% of the sensitivity threshold. This ensures that motion that is just barely over the threshold doesn't cause Predator to repeatedly start and stop recording.
-            last_motion_detected = utils.get_time()
-            if (utils.get_time() - last_motion_detected > 2): # Check to see if it has been more than 2 seconds since motion was last detected so that the message is only displayed after there hasn't been motion for some time.
-                display_message("Detected motion.", 1)
+            if (moving_percentage > float(config["dashcam"]["parked"]["event"]["trigger_motion"]["sensitivity"]) * 0.8): # Check to see if there is movement that exceeds 80% of the sensitivity threshold. This ensures that motion that is just barely over the threshold doesn't cause Predator to repeatedly start and stop recording.
+                if (utils.get_time() - last_event_detected > 2): # Check to see if it has been more than 2 seconds since motion was last detected so that the message is only displayed after there hasn't been motion for some time.
+                    display_message("Detected event.", 1)
+                last_event_detected = utils.get_time()
 
-        if (config["dashcam"]["parked"]["recording"]["highlight_motion"]["enabled"] == True):
-            for contour in contours: # Iterate through each contour.
-                if cv2.contourArea(contour) > 1: # Check to see if this contour is big enough to be worth highlighting.
-                    color = config["dashcam"]["parked"]["recording"]["highlight_motion"]["color"]
-                    x, y, w, h = cv2.boundingRect(contour) # Define the edges of the contour.
-                    cv2.rectangle(frame, (x, y), (x+w, y+h), (color[2], color[1], color[0]), 2) # Draw a box around the contour in the frame.
+            if (config["dashcam"]["parked"]["event"]["label"]["enabled"] == True):
+                for contour in contours: # Iterate through each contour.
+                    if cv2.contourArea(contour) > 1: # Check to see if this contour is big enough to be worth highlighting.
+                        color = config["dashcam"]["parked"]["event"]["label"]["color"]
+                        x, y, w, h = cv2.boundingRect(contour) # Define the edges of the contour.
+                        cv2.rectangle(frame, (x, y), (x+w, y+h), (color[2], color[1], color[0]), 2) # Draw a box around the contour in the frame.
+            process_timing("end", "Dashcam/Motion Detection")
+        elif (config["dashcam"]["parked"]["event"]["trigger"] == "object_recognition"):
+            process_timing("start", "Dashcam/Object Recognition")
+            detected_objects = object_recognition.predict(frame, "dashcam")
+            for element in detected_objects:
+                if (element["conf"] >= config["dashcam"]["parked"]["event"]["trigger_object_recognition"]["minimum_confidence"] and element["name"] in config["dashcam"]["parked"]["event"]["trigger_object_recognition"]["objects"]): # Check to see if this object is in the list of target objects.
+                    if (utils.get_time() - last_event_detected > 2): # Check to see if it has been more than 2 seconds since motion was last detected so that the message is only displayed after there hasn't been motion for some time.
+                        display_message("Detected event.", 1)
+                    last_event_detected = utils.get_time()
+                    if (config["dashcam"]["parked"]["event"]["label"]["enabled"] == True):
+                        color = config["dashcam"]["parked"]["event"]["label"]["color"]
+                        cv2.rectangle(frame, (element["bbox"]["x1"], element["bbox"]["y1"]), (element["bbox"]["x2"], element["bbox"]["y2"]), (color[2], color[1], color[0]), 2) # Draw a box around the contour in the frame.
+            process_timing("end", "Dashcam/Object Recognition")
 
-        process_timing("end", "Dashcam/Motion Detection")
 
         frame = apply_dashcam_stamps(frame, device) # Apply dashcam overlay stamps to the frame.
 
@@ -555,7 +579,16 @@ def record_parked_motion(capture, framerate, width, height, device, directory, f
 
     recording_active = False
 
-    display_message("Stopped motion recording.", 1)
+    display_message("Stopped parked event recording.", 1)
+
+    process_timing("start", "Dashcam/File Merging")
+    if (config["dashcam"]["capture"]["audio"]["merge"] == True and config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if Predator is configured to merge audio and video files.
+        if (os.path.exists(audio_filepath) == False):
+            display_message("The audio file was missing during audio/video merging. It is possible something has gone wrong with recording.", 2)
+        else:
+            audio_offset = (config["dashcam"]["parked"]["event"]["buffer"] / calculated_framerate[device]) # Calculate the audio offset based on the size of the frame-buffer.
+            merge_audio_video(current_segment_name[device] + "." + config["dashcam"]["saving"]["file"]["extension"], audio_filepath, current_segment_name[device] + ".mkv", audio_offset) # Run the audio/video merge.
+    process_timing("end", "Dashcam/File Merging")
 
 
     return frames_captured / (utils.get_time() - capture_start_time)
@@ -650,9 +683,10 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
     capture.set(cv2.CAP_PROP_FRAME_HEIGHT,height) # Set the video stream height.
     process_timing("end", "Dashcam/Capture Management")
 
-    process_timing("start", "Dashcam/Motion Detection")
-    background_subtractor = cv2.createBackgroundSubtractorMOG2() # Initialize the background subtractor for motion detection.
-    process_timing("end", "Dashcam/Motion Detection")
+    if (config["dashcam"]["parked"]["event"]["trigger"] == "motion"):
+        process_timing("start", "Dashcam/Motion Detection")
+        background_subtractor = cv2.createBackgroundSubtractorMOG2() # Initialize the background subtractor for motion detection.
+        process_timing("end", "Dashcam/Motion Detection")
 
 
     frame_history = [] # This will hold the last several frames in a buffer.
@@ -691,6 +725,7 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
         audio_base_name = "_".join(os.path.basename(current_segment_name[device]).split("_")[0:3])
         audio_filepath = directory + "/" + audio_base_name + "." + str(config["dashcam"]["capture"]["audio"]["extension"])
         if (audio_base_name not in audio_recorders or audio_recorders[audio_base_name].poll() is not None): # Check to see if the audio recorder hasn't yet been started by another thread.
+            subprocess.Popen(("sudo -u " + str(config["dashcam"]["capture"]["audio"]["record_as_user"]) + " killall arecord").split(" "), stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Kill the previous arecord instance (if one exists)
             command = "sleep " + str(float(config["dashcam"]["capture"]["audio"]["start_delay"])) + "; " + audio_record_command + " \"" + str(audio_filepath) + "\""
             audio_recorders[audio_base_name] = subprocess.Popen(command, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Start the next segment's audio recorder.
             del command
@@ -788,10 +823,10 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
         process_timing("end", "Dashcam/Capture Management")
 
         process_timing("start", "Dashcam/Frame Buffer")
-        if (config["dashcam"]["parked"]["recording"]["buffer"] > 0): # Check to see if the frame buffer is greater than 0 before adding frames to the buffer.
+        if (config["dashcam"]["parked"]["event"]["buffer"] > 0): # Check to see if the frame buffer is greater than 0 before adding frames to the buffer.
             frame_history.append(apply_dashcam_stamps(frame, device)) # Add the frame that was just captured to the frame buffer.
-            if (len(frame_history) > config["dashcam"]["parked"]["recording"]["buffer"]): # Check to see if the frame buffer has exceeded the maximum length.
-                frame_history = frame_history[-config["dashcam"]["parked"]["recording"]["buffer"]:] # Trim the frame buffer to the appropriate length.
+            if (len(frame_history) > config["dashcam"]["parked"]["event"]["buffer"]): # Check to see if the frame buffer has exceeded the maximum length.
+                frame_history = frame_history[-config["dashcam"]["parked"]["event"]["buffer"]:] # Trim the frame buffer to the appropriate length.
         process_timing("end", "Dashcam/Frame Buffer")
 
 
@@ -808,25 +843,48 @@ def capture_dashcam_video(directory, device="main", width=1280, height=720):
 
             process_timing("start", "Dashcam/Audio Processing")
             if (config["dashcam"]["capture"]["audio"]["enabled"] == True):
+                audio_base_name = "_".join(os.path.basename(current_segment_name[device]).split("_")[0:3])
+                audio_filepath = directory + "/" + audio_base_name + "." + str(config["dashcam"]["capture"]["audio"]["extension"])
                 if (audio_base_name in audio_recorders and audio_recorders[audio_base_name].poll() is None): # Check to see if there is an active audio recorder.
                     audio_recorders[audio_base_name].terminate() # Kill the active audio recorder.
+                subprocess.Popen(("sudo -u " + str(config["dashcam"]["capture"]["audio"]["record_as_user"]) + " killall arecord").split(" "), stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Kill the trailing arecord process.
             process_timing("end", "Dashcam/Audio Processing")
-            process_timing("start", "Dashcam/Motion Detection")
-            contours, moving_percentage = detect_motion(frame, background_subtractor) # Run motion analysis on this frame.
-            process_timing("end", "Dashcam/Motion Detection")
 
 
-            if (moving_percentage > float(config["dashcam"]["parked"]["recording"]["sensitivity"])): # Check to see if there is movement that exceeds the sensitivity threshold.
-                display_message("Detected motion.", 1)
-                if (config["dashcam"]["notifications"]["reticulum"]["enabled"] == True and config["dashcam"]["notifications"]["reticulum"]["events"]["motion_detected"]["enabled"] == True): # Check to see if Predator is configured to send motion detection notifications over Reticulum.
-                    for destination in config["dashcam"]["notifications"]["reticulum"]["destinations"]: # Iterate over each configured destination.
-                        reticulum.lxmf_send_message(str(config["dashcam"]["notifications"]["reticulum"]["instance_name"]) + " has detected motion while parked", destination) # Send a Reticulum LXMF message to this destination.
-                calculated_framerate[device] = record_parked_motion(capture, calculated_framerate[device], width, height, device, directory, frame_history) # Run parked motion recording, and update the framerate to the newly calculated framerate.
-                if (calculated_framerate[device] > float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"])): # Check to see if the calculated frame-rate exceeds the maximum allowed frame-rate.
-                    calculated_framerate[device] = float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"]) # Set the frame-rate to the maximum allowed frame-rate.
+            # Next we run check to see if something triggers dash-cam recording.
+            if (config["dashcam"]["parked"]["event"]["trigger"] == "motion"):
                 process_timing("start", "Dashcam/Motion Detection")
-                background_subtractor = cv2.createBackgroundSubtractorMOG2() # Reset the background subtractor after motion is detected.
+                contours, moving_percentage = detect_motion(frame, background_subtractor) # Run motion analysis on this frame.
                 process_timing("end", "Dashcam/Motion Detection")
+
+
+                if (moving_percentage > float(config["dashcam"]["parked"]["event"]["trigger_motion"]["sensitivity"])): # Check to see if there is movement that exceeds the sensitivity threshold.
+                    display_message("Detected event.", 1)
+                    if (config["dashcam"]["notifications"]["reticulum"]["enabled"] == True and config["dashcam"]["notifications"]["reticulum"]["events"]["parked_event"]["enabled"] == True): # Check to see if Predator is configured to send motion detection notifications over Reticulum.
+                        for destination in config["dashcam"]["notifications"]["reticulum"]["destinations"]: # Iterate over each configured destination.
+                            reticulum.lxmf_send_message(str(config["dashcam"]["notifications"]["reticulum"]["instance_name"]) + " has detected motion while parked", destination) # Send a Reticulum LXMF message to this destination.
+                    calculated_framerate[device] = record_parked(capture, calculated_framerate[device], width, height, device, directory, frame_history) # Run parked recording, and update the framerate to the newly calculated framerate.
+                    frame_history = [] # Clear the frame buffer.
+                    if (calculated_framerate[device] > float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"])): # Check to see if the calculated frame-rate exceeds the maximum allowed frame-rate.
+                        calculated_framerate[device] = float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"]) # Set the frame-rate to the maximum allowed frame-rate.
+                    process_timing("start", "Dashcam/Motion Detection")
+                    background_subtractor = cv2.createBackgroundSubtractorMOG2() # Reset the background subtractor after motion is detected.
+                    process_timing("end", "Dashcam/Motion Detection")
+            elif (config["dashcam"]["parked"]["event"]["trigger"] == "object_recognition"):
+                detected_objects = object_recognition.predict(frame, "dashcam")
+                object_recognition_triggered = False # This will be switched to `True` if one or more relevant objects are identified.
+                for element in detected_objects:
+                    if (element["conf"] >= config["dashcam"]["parked"]["event"]["trigger_object_recognition"]["minimum_confidence"] and element["name"] in config["dashcam"]["parked"]["event"]["trigger_object_recognition"]["objects"]): # Check to see if this object is in the list of target objects.
+                        object_recognition_triggered = True
+                if (object_recognition_triggered == True):
+                    display_message("Detected event.", 1)
+                    if (config["dashcam"]["notifications"]["reticulum"]["enabled"] == True and config["dashcam"]["notifications"]["reticulum"]["events"]["parked_event"]["enabled"] == True): # Check to see if Predator is configured to send motion detection notifications over Reticulum.
+                        for destination in config["dashcam"]["notifications"]["reticulum"]["destinations"]: # Iterate over each configured destination.
+                            reticulum.lxmf_send_message(str(config["dashcam"]["notifications"]["reticulum"]["instance_name"]) + " has detected motion while parked", destination) # Send a Reticulum LXMF message to this destination.
+                    calculated_framerate[device] = record_parked(capture, calculated_framerate[device], width, height, device, directory, frame_history) # Run parked recording, and update the framerate to the newly calculated framerate.
+                    frame_history = [] # Clear the frame buffer.
+                    if (calculated_framerate[device] > float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"])): # Check to see if the calculated frame-rate exceeds the maximum allowed frame-rate.
+                        calculated_framerate[device] = float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"]) # Set the frame-rate to the maximum allowed frame-rate.
 
 
         else: # If the vehicle is not parked, then run normal video processing.
@@ -1081,7 +1139,6 @@ def start_dashcam_recording(dashcam_devices, directory): # This function starts 
                                 reticulum.lxmf_send_message(str(config["dashcam"]["notifications"]["reticulum"]["instance_name"]) + " has exited parked mode.", destination) # Send a Reticulum LXMF message to this destination.
                     parked = False # Exit parked mode.
                     recording_active = True # Indicate the Predator is actively capturing frames.
-                
                 time.sleep(1)
 
     except Exception as exception:
@@ -1192,12 +1249,9 @@ def dashcam_output_handler(directory, device, width, height, framerate):
                     if (os.path.exists(last_audio_path) == False):
                         display_message("The audio file was missing during audio/video merging. It is possible something has gone wrong with recording.", 2)
                     else:
-                        if (last_segment_name[-1].upper() == "P"): # Check to see if the previous file was recorded while parked.
-                            audio_offset = -(config["dashcam"]["parked"]["recording"]["buffer"] / calculated_framerate[device]) # Calculate the audio offset based on the size of the frame-buffer
-                            print("Applying offset of " + str(audio_offset))
-                        else: # Otherwise, the video was recorded during normal operating.
+                        if (last_segment_name[-1].upper() != "P"): # Check to make sure the previous segment was not a parked segment.
                             audio_offset = float(config["dashcam"]["capture"]["audio"]["start_delay"]) # Apply the normal configured offset.
-                        merge_audio_video(last_video_path, last_audio_path, last_filename_merged, audio_offset) # Run the audio/video merge.
+                            merge_audio_video(last_video_path, last_audio_path, last_filename_merged, audio_offset) # Run the audio/video merge.
                 process_timing("end", "Dashcam/File Merging")
                 
 

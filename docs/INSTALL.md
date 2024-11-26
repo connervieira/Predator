@@ -8,7 +8,7 @@ This document contains detailed instructions on how to install Predator.
 If you're already familiar with Predator, and you just want a quick set-up guide, you can use the following steps to set everything up. For more detailed instructions, skip to the 'Full Install Guide' later in the document.
 
 1. Install Linux packages: `sudo apt-get install ffmpeg mpg321 gpsd gpsd-clients imagemagick fswebcam libhdf5-dev build-essential`
-2. Install Python packages: `pip3 install pytz validators requests gps gpsd-py3 opencv-python cvlib tensorflow keras silence-tensorflow psutil rns lxmf gpiozero`
+2. Install Python packages: `pip3 install pytz validators requests gps gpsd-py3 opencv-python psutil rns lxmf gpiozero`
     - If you see an "externally managed environment" error while installing Python packages, consider one of the following solutions:
         - If you're installing Predator on a system dedicated to its use (such as a computer installed in a vehicle), you can override this warning and force install the packages (at the risk of breaking your install) using by adding the `--break-system-packages` flag to the installation command.
             - It's worth mentioning that during testing, using the `--break-system-packages` flag while installing Predator has never caused any noticable system issues on any common Debian-based Linux distribution (Ubuntu, Mint, Raspberry Pi OS, etc.). However, you should still exercise caution when using it, especially if you aren't using a fresh Python installation.
@@ -31,13 +31,12 @@ This is the installation process for Predator and all of its dependencies. This 
 
 ### Dependencies
 
-- Python packages: `pip3 install pytz validators requests gps geopy gpsd-py3 opencv-python cvlib tensorflow keras silence-tensorflow psutil`
+- Python packages: `pip3 install pytz validators requests gps geopy gpsd-py3 opencv-python psutil`
     - Required:
         - `pytz`: Required to manage timezones.
     - Highly recommended:
         - `validators` and `requests`: Required for network functionality, like push notifications, status light interfacing, remote alert lists, and more.
-        - `opencv-python`, `cvlib`: Required for dash-cam recording.
-            - These packages are also required for object recognition and pre-recorded side-car file generation (but not basic license plate recognition).
+        - `opencv-python`: Required for dash-cam recording.
             - Unless you have a good reason not to (and you know exactly what you're doing) you should install these packages.
     - Recommended:
         - `gps`, `geopy`, and `gpsd-py3`: Required to enable GPS features.
@@ -46,7 +45,6 @@ This is the installation process for Predator and all of its dependencies. This 
         - `psutil`: Required to process disk usage information in management mode and dash-cam mode.
         - `lxmf`, `rns`: Required to send offline parking notifications over the Reticulum stack.
         - `gpiozero`: Required to trigger events using GPIO inputs.
-        - `tensorflow`, `keras`, `silence-tensorflow`: Required for object recognition features.
 - System packages: `sudo apt-get install ffmpeg mpg321 gpsd gpsd-clients imagemagick fswebcam`
     - Highly recommended:
         - `ffmpeg`: Required for audio/video merging in dash-cam mode, and video processing in pre-recorded mode.

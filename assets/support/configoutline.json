@@ -30,9 +30,6 @@
             },
             "lazy_polling_interval": "+float"
         },
-        "object_recognition": {
-            "enabled": "bool"
-        },
         "modes": {
             "auto_start": "str",
             "enabled": {
@@ -163,10 +160,6 @@
                 "clearing": "bool"
             }
         },
-        "object_recognition": {
-            "enabled": "bool",
-            "video_still_path": "str"
-        },
         "gps": {
             "alpr_location_tagging": "bool"
         },
@@ -184,10 +177,6 @@
                 "enabled": "bool",
                 "file": "str",
                 "save_guesses": "bool"
-            },
-            "object_recognition": {
-                "enabled": "bool",
-                "file": "str"
             }
         },
         "push_notifications": {
@@ -237,14 +226,22 @@
                 "speed": "+float",
                 "time": "+float"
             },
-            "recording": {
-                "highlight_motion": {
+            "event": {
+                "trigger": ["motion", "object_recognition"],
+                "timeout": "+float",
+                "buffer": "+int",
+                "label": {
                     "enabled": "bool",
                     "color": "list"
                 },
-                "sensitivity": "+float",
-                "timeout": "+float",
-                "buffer": "+int"
+                "trigger_motion": {
+                    "sensitivity": "+float"
+                },
+                "trigger_object_recognition": {
+                    "model_weights": "file",
+                    "objects": "list",
+                    "minimum_confidence": "+float"
+                }
             }
         },
         "notifications": {
@@ -257,7 +254,7 @@
                     "start_up": {
                         "enabled": "bool"
                     },
-                    "motion_detected": {
+                    "parked_event": {
                         "enabled": "bool"
                     },
                     "parking_mode_enabled": {

@@ -552,10 +552,12 @@ November 11th, 2024
 
 ## Version 11.1
 
-*Release date to be determined*
+November 20th, 2024
 
 - Updated dash-cam mode.
-    - Added more options for physical controls via GPIO buttons.
+    - Updated physical control options.
+        - Organized the physical control section of the configuration.
+        - Predator can now be stopped using physical controls.
 - Updated audio output.
     - Added support for multiple audio player back-ends.
         - In addition to supporting the original `mpg321` back-end, Predator now also supports `mplayer`.
@@ -572,3 +574,13 @@ November 11th, 2024
         - `recording_started` is played when dash-cam recording is initiated.
         - `recording_stopped` is played when dash-cam recording is halted.
 - Added `delay_after_boot` configuration option to status lighting to resolve issues with connectivity.
+
+
+## Version 12.0
+
+*Release date to be determined*
+
+- Updated object recognition behavior.
+    - Removed the existing object recognition implementation from real-time and pre-recorded mode.
+    - Implemented object recognition support for dash-cam mode's parking functionality.
+- Updated dash-cam mode parking functionality.

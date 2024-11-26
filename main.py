@@ -156,17 +156,6 @@ if (config["developer"]["offline"] == True): # If offline mode is enabled, then 
 heartbeat() # Issue an initial heartbeat at start-up.
 
 
-if (config["general"]["object_recognition"]["enabled"] == True): # Check to see whether object recognition (Tensorflow/OpenCV) is enabled.
-    debug_message("Loading object recognition")
-    try: # "Try" to import Tensorflow and OpenCV; Don't quit the entire program if an error is encountered.
-        import silence_tensorflow.auto # Silences tensorflow warnings
-        import cv2 # Required for object recognition (not license plate recognition)
-        import cvlib as cv # Required for object recognition (not license plate recognition)
-        from cvlib.object_detection import draw_bbox # Required for object recognition (not license plate recognition)
-    except Exception:
-        display_message("The object recognition libraries could not be imported.", 3)
-
-
 import lighting # Import the lighting.py script.
 update_status_lighting = lighting.update_status_lighting # Load the status lighting update function from the lighting script.
 
@@ -355,10 +344,8 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                 copy_prerecorded_processed_frames = False
                 copy_prerecorded_gpx_files = False
                 copy_prerecorded_license_plate_analysis_data = False
-                copy_prerecorded_object_recognition_data = False
                 copy_prerecorded_license_plate_location_data = False
                 copy_realtime_license_plate_recognition_data = False
-                copy_realtime_object_recognition_data = False
                 copy_dashcam_video = False
 
                 while True: # Run the "copy files" selection menu on a loop forever until the user is finished selecting files.
@@ -385,10 +372,6 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                         print("P3. [X] License plate analysis data files")
                     else:
                         print("P3. [ ] License plate analysis data files")
-                    if (copy_prerecorded_object_recognition_data == True):
-                        print("P4. [X] Object recognition data files")
-                    else:
-                        print("P4. [ ] Object recognition data files")
                     if (copy_prerecorded_license_plate_location_data == True):
                         print("P5. [X] License plate location data files")
                     else:
@@ -399,10 +382,6 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                         print("R1. [X] License plate recognition data files")
                     else:
                         print("R1. [ ] License plate recognition data files")
-                    if (copy_realtime_object_recognition_data == True):
-                        print("R2. [X] Object recognition data files")
-                    else:
-                        print("R2. [ ] Object recognition data files")
                     print("")
                     print("===== Dash-cam Mode =====")
                     if (copy_dashcam_video == True):
@@ -427,13 +406,9 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                     elif (selection.lower() == "p3"):
                         copy_prerecorded_license_plate_analysis_data = not copy_prerecorded_license_plate_analysis_data
                     elif (selection.lower() == "p4"):
-                        copy_prerecorded_object_recognition_data = not copy_prerecorded_object_recognition_data
-                    elif (selection.lower() == "p5"):
                         copy_prerecorded_license_plate_location_data = not copy_prerecorded_license_plate_location_data
                     elif (selection.lower() == "r1"):
                         copy_realtime_license_plate_recognition_data = not copy_realtime_license_plate_recognition_data
-                    elif (selection.lower() == "r2"):
-                        copy_realtime_object_recognition_data = not copy_realtime_object_recognition_data
                     elif (selection.lower() == "d1"):
                         copy_dashcam_video = not copy_dashcam_video
                 
@@ -454,14 +429,10 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                     os.system("cp " + config["general"]["working_directory"] + "/*.gpx " + copy_destination)
                 if (copy_prerecorded_license_plate_analysis_data):
                     os.system("cp " + config["general"]["working_directory"] + "/pre_recorded_license_plate_export.* " + copy_destination)
-                if (copy_prerecorded_object_recognition_data):
-                    os.system("cp " + config["general"]["working_directory"] + "/pre_recorded_object_detection_export.* " + copy_destination)
                 if (copy_prerecorded_license_plate_location_data):
                     os.system("cp " + config["general"]["working_directory"] + "/pre_recorded_location_data_export.* " + copy_destination)
                 if (copy_realtime_license_plate_recognition_data):
                     os.system("cp " + config["general"]["working_directory"] + "/real_time_plates* " + copy_destination)
-                if (copy_realtime_object_recognition_data):
-                    os.system("cp '" + config["general"]["working_directory"] + "/" + config["realtime"]["saving"]["object_recognition"]["file"] + "' " + copy_destination)
                 if (copy_dashcam_video):
                     os.system("cp " + config["general"]["working_directory"] + "/predator_dashcam* " + copy_destination)
 
@@ -475,10 +446,8 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                 delete_prerecorded_processed_frames = False
                 delete_prerecorded_gpx_files = False
                 delete_prerecorded_license_plate_analysis_data = False
-                delete_prerecorded_object_recognition_data = False
                 delete_prerecorded_license_plate_location_data = False
                 delete_realtime_license_plate_recognition_data = False
-                delete_realtime_object_recognition_data = False
                 delete_dashcam_video = False
 
                 while True: # Run the "delete files" selection menu on a loop forever until the user is finished selecting files.
@@ -505,24 +474,16 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                         print("P3. [X] License plate analysis data files")
                     else:
                         print("P3. [ ] License plate analysis data files")
-                    if (delete_prerecorded_object_recognition_data == True):
-                        print("P4. [X] Object recognition data files")
-                    else:
-                        print("P4. [ ] Object recognition data files")
                     if (delete_prerecorded_license_plate_location_data == True):
-                        print("P5. [X] License plate location data files")
+                        print("P4. [X] License plate location data files")
                     else:
-                        print("P5. [ ] License plate location data files")
+                        print("P4. [ ] License plate location data files")
                     print("")
                     print("===== Real-time Mode =====")
                     if (delete_realtime_license_plate_recognition_data == True):
                         print("R1. [X] License plate recognition data files")
                     else:
                         print("R1. [ ] License plate recognition data files")
-                    if (delete_realtime_object_recognition_data == True):
-                        print("R2. [X] Object recognition data files")
-                    else:
-                        print("R2. [ ] Object recognition data files")
                     print("")
                     print("===== Dash-cam Mode =====")
                     if (delete_dashcam_video == True):
@@ -546,13 +507,9 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                     elif (selection.lower() == "p3"):
                         delete_prerecorded_license_plate_analysis_data = not delete_prerecorded_license_plate_analysis_data
                     elif (selection.lower() == "p4"):
-                        delete_prerecorded_object_recognition_data = not delete_prerecorded_object_recognition_data
-                    elif (selection.lower() == "p5"):
                         delete_prerecorded_license_plate_location_data = not delete_prerecorded_license_plate_location_data
                     elif (selection.lower() == "r1"):
                         delete_realtime_license_plate_recognition_data = not delete_realtime_license_plate_recognition_data
-                    elif (selection.lower() == "r2"):
-                        delete_realtime_object_recognition_data = not delete_realtime_object_recognition_data
                     elif (selection.lower() == "d1"):
                         delete_dashcam_video = not delete_dashcam_video
 
@@ -570,14 +527,10 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                         os.system("rm " + config["general"]["working_directory"] + "/*.gpx")
                     if (delete_prerecorded_license_plate_analysis_data):
                         os.system("rm " + config["general"]["working_directory"] + "/pre_recorded_license_plate_export.*")
-                    if (delete_prerecorded_object_recognition_data):
-                        os.system("rm " + config["general"]["working_directory"] + "/pre_recorded_object_detection_export.*")
                     if (delete_prerecorded_license_plate_location_data):
                         os.system("rm " + config["general"]["working_directory"] + "/pre_recorded_location_data_export.*")
                     if (delete_realtime_license_plate_recognition_data):
                         os.system("rm " + config["general"]["working_directory"] + "/real_time_plates*")
-                    if (delete_realtime_object_recognition_data):
-                        os.system("rm " + config["general"]["working_directory"] + "/" + config["realtime"]["saving"]["object_recognition"]["file"])
                     if (delete_dashcam_video):
                         os.system("rm " + config["general"]["working_directory"] + "/predator_dashcam*")
                     clear()
@@ -866,27 +819,6 @@ elif (mode_selection == "1" and config["general"]["modes"]["enabled"]["prerecord
 
 
 
-        # If enabled, count how many objects are in each frame.
-        if (config["general"]["object_recognition"]["enabled"] == True):
-            debug_message("Running object recognition")
-            print("Running object recognition...")
-            time.sleep(1) # Wait for a short period of time to allow the images to finish saving.
-            object_count = {} # Create an empty dictionary that will hold each frame and the object recognition counts.
-            for frame in frames: # Iterate through each frame.
-                object_count[frame] = {} # Initial the dictionary for this frame.
-                frame_path = config["general"]["working_directory"] + "/frames/" + frame # Set the file path of the current frame.
-                image = cv2.imread(frame_path) # Load the frame.
-                object_recognition_bounding_box, object_recognition_labels, object_recognition_confidence = cv.detect_common_objects(image) # Analyze the image.
-                for object_recognized in object_recognition_labels: # Iterate through each object recognized.
-                    if (object_recognized in object_count[frame]):
-                        object_count[frame][object_recognized]+=1
-                    else:
-                        object_count[frame][object_recognized] = 1
-
-            print("Done.\n")
-
-
-
         # Analyze each individual frame, and collect possible plate IDs.
         debug_message("Running ALPR")
         print("Scanning for license plates...")
@@ -1042,15 +974,11 @@ elif (mode_selection == "1" and config["general"]["modes"]["enabled"]["prerecord
             print("Please select an option")
             print("0. Quit")
             print("1. Manage license plate data")
-            if (config["general"]["object_recognition"]["enabled"] == True): # Check to see if object recognition is enabled before displaying the object recognition option.
-                print("2. Manage object recognition data")
-            else:
-                print(style.faint + "2. Manage object recognition data" + style.end)
             if (gpx_file != ""): # Check to see if a GPX correlation is enabled before displaying the position data option.
-                print("3. Manage position data")
+                print("2. Manage position data")
             else:
-                print(style.faint + "3. Manage position data" + style.end)
-            print("4. View session statistics")
+                print(style.faint + "2. Manage position data" + style.end)
+            print("3. View session statistics")
             selection = prompt("Selection: ", optional=False, input_type=str)
 
 
@@ -1156,56 +1084,7 @@ elif (mode_selection == "1" and config["general"]["modes"]["enabled"]["prerecord
                 utils.wait_for_input()
 
 
-            elif (selection == "2"): # The user has selected to manage object recognition data.
-                if (config["general"]["object_recognition"]["enabled"] == True):
-                    print("    Please select an option")
-                    print("    0. Back")
-                    print("    1. View data")
-                    print("    2. Export data")
-                    selection = prompt("    Selection: ", optional=False, input_type=str)
-
-                    if (selection == "1"): # The user has selected to view object recognition data.
-                        print("        Please select an option")
-                        print("        0. Back")
-                        print("        1. View as Python data")
-                        print("        2. View as JSON data")
-                        selection = prompt("        Selection: ", optional=False, input_type=str)
-
-                        if (selection == "0"):
-                            print("Returning to main menu.")
-                        elif (selection == "1"):
-                            print(object_count)
-                        elif (selection == "2"):
-                            print(json.dumps(object_count, indent=4))
-                        else:
-                            display_message("Invalid selection.", 2)
-
-                    elif (selection == "2"): # The user has selected to export object recognition data.
-                        print("        Please select an option")
-                        print("        0. Back")
-                        print("        1. Export as Python data")
-                        print("        2. Export as JSON data")
-                        selection = prompt("Selection: ", optional=False, input_type=str)
-
-                        if (selection == "0"):
-                            print("Returning to main menu.")
-                        elif (selection == "1"):
-                            save_to_file(config["general"]["working_directory"] + "/pre_recorded_object_detection_export.txt", str(object_count)) # Save to disk.
-                        elif (selection == "2"):
-                            save_to_file(config["general"]["working_directory"] + "/pre_recorded_object_detection_export.json", json.dumps(object_count, indent=4)) # Save to disk.
-                        else:
-                            display_message("Invalid selection.", 2)
-
-                    else: # The user has selected an invalid option in the object recognition data management menu.
-                        display_message("Invalid selection.", 2)
-
-                else: # The user has selected the object recognition data management menu, but object recognition has been disabled.
-                    display_message("Object recognition has been disabled. There is no object recognition data to manage.", 2)
-
-                utils.wait_for_input()
-
-
-            elif (selection == "3"): # The user has selected to manage GPX location information.
+            elif (selection == "2"): # The user has selected to manage GPX location information.
                 if (gpx_file != ""): # Check to see if a GPX file was provided for analysis.
                     print("    Please select an option")
                     print("    0. Back")
@@ -1256,7 +1135,7 @@ elif (mode_selection == "1" and config["general"]["modes"]["enabled"]["prerecord
                 utils.wait_for_input()
 
 
-            elif (selection == "4"): # If the user selects option 4 on the main menu, then show the statistics for this session.
+            elif (selection == "3"): # If the user selects option 4 on the main menu, then show the statistics for this session.
                 print("    Frames analyzed: " + str(len(alpr_frames))) # Show how many frames of video were analyzed.
                 print("    Plates found: " + str(len(plates_detected))) # Show how many unique plates were detected.
                 print("    Videos analyzed: " + str(len(videos))) # Show how many videos were analyzed.
@@ -1345,31 +1224,6 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
 
             if (config["realtime"]["interface"]["display"]["output_level"] >= 3): # Only display this status message if the output level indicates to do so.
                 print("Done\n----------")
-
-
-
-
-            # If enabled, run object recognition on the captured frame.
-            if (config["general"]["object_recognition"]["enabled"] == True and config["realtime"]["object_recognition"]["enabled"] == True): # Check to make sure real-time object recognition is enabled.
-                debug_message("Running object recognition")
-                if (config["realtime"]["interface"]["display"]["output_level"] >= 3): # Only display this status message if the output level indicates to do so.
-                    print("Running object recognition...")
-
-                if (os.path.exists(config["realtime"]["object_recognition"]["video_still_path"]) == True): # Check to see if the video still image file exists.
-                    image = cv2.imread(config["realtime"]["object_recognition"]["video_still_path"]) # Load the frame.
-                    object_recognition_bounding_box, object_recognition_labels, object_recognition_confidence = cv.detect_common_objects(image) # Analyze the image.
-                    objects_identified = str(object_recognition_labels) # Convert the list of objects identified into a plain string.
-                    if (objects_identified != "[]"): # Check to see that there were actually identified objects.
-                        if (config["realtime"]["interface"]["display"]["output_level"] >= 2): # Only display this status message if the output level indicates to do so.
-                            print("Objects identified: " + objects_identified)
-                        export_data = str(round(time.time()*10)/10) + "," + objects_identified + "\n" # Add the timestamp to the export data, followed by the object's detected, followed by a line break to prepare for the next entry to be added later.
-                        if (config["realtime"]["saving"]["object_recognition"]["enabled"] == True): # Check to see if the user has configured Predator to save recognized objects to disk.
-                            add_to_file(config["general"]["working_directory"] + "/" + str(config["realtime"]["saving"]["object_recognition"]["file"]), export_data) # Add the export data to the end of the file and write it to disk.
-                else:
-                    display_message("Object recognition could not be completed since the video still image file does not exist.",2)
-                        
-                    if (config["realtime"]["interface"]["display"]["output_level"] >= 3): # Only display this status message if the output level indicates to do so.
-                        print("Done\n----------")
 
 
 
@@ -1590,8 +1444,5 @@ elif (mode_selection == "3" and config["general"]["modes"]["enabled"]["dashcam"]
 
 
 
-
 else: # The user has selected an unrecognized mode.
     display_message("The selected mode is invalid.", 3) # Display an error message indicating that the selected mode isn't recognized.
-
-
