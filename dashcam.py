@@ -130,11 +130,6 @@ if (config["dashcam"]["parked"]["enabled"] == True): # Only validate the parking
 parked = False # Start with parked mode disabled.
 first_segment_start_time = 0 # This keeps track of the timestamp of when the first dash-cam segment started.
 
-frames_to_write = {}
-for device in config["dashcam"]["capture"]["video"]["devices"]: # Iterate through each device in the configuration.
-    if (config["dashcam"]["capture"]["video"]["devices"][device]["enabled"] == True):
-        frames_to_write[device] = [] # Add this device to the frame buffer.
-
 instant_framerate = {} # This will hold the instantaneous frame-rate of each device, which is calculated based on the time between the two most recent frames. This value is expected to flucuate significantly.
 calculated_framerate = {} # This will hold the calculated frame-rate of each device, which is calculated based on the number of frames captured in the previous segment.
 shortterm_framerate = {} # This will hold the short-term frame-rate of each device, which is calculated based on number of frames captured over the previous few seconds.
@@ -168,7 +163,7 @@ def create_trigger_file():
             os.system("mkdir -p '" + str(config["general"]["interface_directory"]) + "'")
             os.system("chmod -R 777 '" + str(config["general"]["interface_directory"]) + "'")
         if (os.path.exists(os.path.join(config["general"]["interface_directory"], config["dashcam"]["saving"]["trigger"])) == False): # Check to see if the trigger file hasn't already been created.
-            os.system("echo " + str(time.time()) + " \"" + os.path.join(config["general"]["interface_directory"], config["dashcam"]["saving"]["trigger"]) + "\"") # Save the trigger file with the current time as the timestamp.
+            os.system("echo " + str(time.time()) + " > \"" + os.path.join(config["general"]["interface_directory"], config["dashcam"]["saving"]["trigger"]) + "\"") # Save the trigger file with the current time as the timestamp.
     last_trigger_file_created = time.time()
 
 # This function calls the function "event" when the button on "pin" is held for "hold_time" seconds.
@@ -491,7 +486,7 @@ def apply_dashcam_stamps(frame, device=""):
     if (config["dashcam"]["stamps"]["diagnostic"]["state"]["enabled"] == True): # Check to see if the state overlay stamp is enabled.
         current_state = utils.get_current_state()
         if (parked == False):
-            if (os.path.exists(os.path.join(config["general"]["interface_directory"], config["dashcam"]["saving"]["trigger"])) == False): # Check to see if the trigger file exists.
+            if (os.path.exists(os.path.join(config["general"]["interface_directory"], config["dashcam"]["saving"]["trigger"])) == True): # Check to see if the trigger file exists.
                 diagnostic_stamp = diagnostic_stamp + "NS"
             else:
                 diagnostic_stamp = diagnostic_stamp + "NN"
@@ -993,6 +988,7 @@ def dashcam_normal(device):
 
 
             delete_old_segments() # Handle the erasing of any old dash-cam segments that need to be deleted.
+            update_status_lighting("normal") # Return the status lighting to normal.
 
 
             # Initialize the next segment name:
