@@ -882,3 +882,12 @@ def count_frames(video):
 def stop_predator():
     global_variables.predator_running = False
     os._exit(1)
+
+
+# This function converts a value to an integer, and returns 0 if the provided value is not a number.
+def to_int(value):
+    try:
+        value = int(value)
+    except:
+        value = 0
+    return value

@@ -1430,7 +1430,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
 # Dash-cam mode
 elif (mode_selection == "3" and config["general"]["modes"]["enabled"]["dashcam"] == True): # The user has set Predator to boot into dash-cam mode.
     print("\nStarting dashcam recording")
-    dashcam.start_dashcam_recording(config["dashcam"]["capture"]["video"]["devices"], config["general"]["working_directory"]) # Start the dashcam recording process.
+    dashcam.dashcam()
     debug_message("Started dash-cam mode")
     try:
         print("Press Ctrl+C to exit")
@@ -1438,8 +1438,8 @@ elif (mode_selection == "3" and config["general"]["modes"]["enabled"]["dashcam"]
             time.sleep(1)
     except:
         global_variables.predator_running = False
-        display_message("Dashcam recording halted.", 1)
-        utils.play_sound("recording_stopped")
+    display_message("Dashcam recording halted.", 1)
+    utils.play_sound("recording_stopped")
 
 
 
