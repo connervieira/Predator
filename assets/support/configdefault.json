@@ -236,9 +236,11 @@
                 "extension": "wav",
                 "device": "",
                 "format": "S16_LE",
+                "rate": 44100,
                 "merge": true,
                 "record_as_user": "pi",
-                "start_delay": 0.2
+                "start_delay": 0.2,
+                "display_output": false
             }
         },
         "parked": {

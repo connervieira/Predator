@@ -207,11 +207,11 @@ This document describes the configuration values found `config.json`.
                 - "XVID" is used for'.avi' files, and is the default option.
                 - "MP4V" is used for '.mp4' files, and is great for video player compatability.
                     - Note that this codec will often result in the current vidoe segment being lost in the event of a sudden power loss.
-            - `extension` is the video file extension.
+            - `extension` is the video file extension (not including the dot).
+                - When audio/video merging is enabled, the resulting file will always have the "mkv" extension, irrespective of this setting.
         - `trigger` is the name of a file inside the interface directory that will trigger Predator to save the current and previous dashcam segments.
             - To trigger a save, create this file in the interface directory. Predator will save the video then automatically remove the trigger file.
-            - When this file is created, Predator will immediately save the previous and current dashcam video segments. Once the current segment is done recording, Predator will re-save it, such that the saved video doesn't cut off at the moment the saved was triggered.
-                - If Predator is terminated between the initial save and the second save, only video captured after the save trigger won't be saved.
+            - Predator will check for the presence of this file at the end of each segment, and copy the relevant files to the saving directory.
         - `segment_length` is a number that sets how many seconds long each video segment will be before another segment is created.
         - `looped_recording` contains settings that control how and when Predator will erase old dashcam segments to make space for new ones.
             - `mode` determines the method by which Predator determines how to erase old files. This can only be set to one of 3 strings:
@@ -261,12 +261,16 @@ This document describes the configuration values found `config.json`.
                 - You can get a list of the names of the available sound inputs by running the `arecord -L` command.
                 - Leaving this value as a blank string will cause Predator to use the default audio input determined by `arecord`.
             - `format` specifies the format that will be used by the `arecord` process.
+            - `rate` is an integer that specifies the audio sample rate in Hz (16000, 44100, 48000, etc.)
             - `merge` is a boolean that determines whether or not Predator will merge the separate audio and video files when each segment is done recording.
+                - This setting is ignored during parked event recording, and audio/video is always saved separately.
             - `record_as_user` specifies the user on the system that the audio recording process will be run as.
                 - This is useful if the user you normally run Predator with does not have permission to access audio devices.
             - `start_delay` determines a length of time (in seconds) that Predator will wait before starting audio recording for each segment.
                 - This delay allows the audio capture device to be release by the previous segment before it is re-opened for the current segment.
                 - This value should be as short as possible to reduce the period of silence at the start of each video, but not so short that the audio capture device fails to open due to being already claimed by the previous segment.
+            - `display_output` is a boolean that determines whether Predator will display the console output of the audio recording command for sake of debugging.
+                - Under normal circumstances, this should be set to `false` to avoid unexpected behavior.
     - `parked` contains settings to configure the dashcam's parking behavior. Parking mode is experimental, and not recommended for daily use.
         - `enabled` is a boolean that determines whether Predator will ever go into a parked state.
             - When this value is set to `false` Predator will never enable parked mode, even if the conditions defined in this configuration section are met.

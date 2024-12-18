@@ -578,9 +578,22 @@ November 20th, 2024
 
 ## Version 12.0
 
+### Dashcam Update 3
+
 *Release date to be determined*
 
 - Updated object recognition behavior.
     - Removed the existing object recognition implementation from real-time and pre-recorded mode.
     - Implemented object recognition support for dash-cam mode's parking functionality.
-- Updated dash-cam mode parking functionality.
+- Overhauled dash-cam recording back-end.
+    - Combined the separated dash-cam recording and writing threads into a single process.
+    - Restructed underlying function calls.
+        - Predator now has organized functions for each recording state (normal, parked-dormant, parked-event)
+        - Sub-functions are called as separate threads by a supervisor process.
+    - Changed the dash-cam video file name template.
+        - Saved dash-cam videos now follow this structure: "YYYY-MM-DD HHMMSS Predator X.ext"
+            - `YYYY-MM-DD HHMMSS` is replaced by the current date and time in 24 hour format.
+            - `X` is replaced by the recording mode.
+                - "N" indicates normal recording.
+                - "P" indicates parked recording.
+            - `ext` is replaced by the file extension.

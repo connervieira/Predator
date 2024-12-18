@@ -128,10 +128,7 @@ if (config["dashcam"]["parked"]["enabled"] == True): # Only validate the parking
 
 # Define global variables
 parked = False # Start with parked mode disabled.
-current_segment_name = {} # This stores the name of each capture device thread's segment.
-for device in config["dashcam"]["capture"]["video"]["devices"]: # Iterate through each device in the configuration.
-    if (config["dashcam"]["capture"]["video"]["devices"][device]["enabled"] == True):
-        current_segment_name[device] = ""
+first_segment_start_time = 0 # This keeps track of the timestamp of when the first dash-cam segment started.
 
 frames_to_write = {}
 for device in config["dashcam"]["capture"]["video"]["devices"]: # Iterate through each device in the configuration.
@@ -149,11 +146,12 @@ for device in config["dashcam"]["capture"]["video"]["devices"]: # Iterate throug
         shortterm_framerate[device]["framerate"] = 0
 
 audio_recorders = {} # This will hold each audio recorder process.
-first_segment_started_time = 0
 
-audio_record_command = "sudo -u " + str(config["dashcam"]["capture"]["audio"]["record_as_user"]) + " arecord --format=" + str(config["dashcam"]["capture"]["audio"]["format"])
+audio_record_command = "sudo -u " + str(config["dashcam"]["capture"]["audio"]["record_as_user"]) + " arecord --quiet --format=" + str(config["dashcam"]["capture"]["audio"]["format"])
 if (config["dashcam"]["capture"]["audio"]["device"] != ""): # Check to see if a custom device has been set.
     audio_record_command += " --device=" + str(config["dashcam"]["capture"]["audio"]["device"]) + ""
+if (str(config["dashcam"]["capture"]["audio"]["rate"]) != ""): # Check to see if a custom rate has been set.
+    audio_record_command += " --rate=" + str(config["dashcam"]["capture"]["audio"]["rate"]) + ""
 
 
 
@@ -230,7 +228,6 @@ if (config["dashcam"]["alpr"]["enabled"] == True): # Check to see if background 
         plate_log = alpr.load_alpr_log()
 def background_alpr(device):
     global current_frame_data
-    global saving_active # This variable is used to determine which value the status lighting should be returned to after a plate detection.
     if (config["realtime"]["saving"]["license_plates"]["enabled"] == True): # Check to see if the license plate logging file name is not empty. If the file name is empty, then license plate logging will be disabled.
         global plate_log
 
@@ -462,7 +459,6 @@ def apply_dashcam_stamps(frame, device=""):
     global instant_framerate
     global calculated_framerate
     global shortterm_framerate
-    global saving_active
     global parked
 
     process_timing("start", "Dashcam/Apply Stamps")
@@ -495,10 +491,10 @@ def apply_dashcam_stamps(frame, device=""):
     if (config["dashcam"]["stamps"]["diagnostic"]["state"]["enabled"] == True): # Check to see if the state overlay stamp is enabled.
         current_state = utils.get_current_state()
         if (parked == False):
-            if (saving_active == False):
-                diagnostic_stamp = diagnostic_stamp + "NN"
-            elif (saving_active == True):
+            if (os.path.exists(os.path.join(config["general"]["interface_directory"], config["dashcam"]["saving"]["trigger"])) == False): # Check to see if the trigger file exists.
                 diagnostic_stamp = diagnostic_stamp + "NS"
+            else:
+                diagnostic_stamp = diagnostic_stamp + "NN"
         elif (parked == True):
             if (current_state["mode"] == "dashcam/parked_dormant"):
                 diagnostic_stamp = diagnostic_stamp + "PD"
@@ -592,6 +588,12 @@ def dashcam_parked_dormant(device):
 
     device_index = config["dashcam"]["capture"]["video"]["devices"][device]["index"]
 
+    # Initialize motion detection:
+    if (config["dashcam"]["parked"]["event"]["trigger"] == "motion"):
+        process_timing("start", "Dashcam/Detection Motion")
+        background_subtractor = cv2.createBackgroundSubtractorMOG2() # Initialize the background subtractor for motion detection.
+        process_timing("end", "Dashcam/Detection Motion")
+
     capture = cv2.VideoCapture(device_index) # Open the video stream.
     codec = list(config["dashcam"]["capture"]["video"]["devices"][device]["codec"])
     capture.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(codec[0], codec[1], codec[2], codec[3])) # Set the video codec.
@@ -607,8 +609,7 @@ def dashcam_parked_dormant(device):
 
     frame_buffer = [] # This is a buffer that will hold the last N frames.
     while global_variables.predator_running and parked == True:
-
-        frame = ret, frame = capture.read() # Capture a frame.
+        ret, frame = capture.read() # Capture a frame.
 
         if (config["dashcam"]["capture"]["video"]["devices"][device]["flip"]): # Check to see if Predator is configured to flip this capture device's output.
             process_timing("start", "Dashcam/Image Manipulation")
@@ -619,9 +620,9 @@ def dashcam_parked_dormant(device):
         current_frame_data[device] = frame # Set the current frame for this device as the frame after rotation has been applied, but before overlay stamps.
         process_timing("end", "Dashcam/Capture Management")
 
-        frame_buffer.append(frame)
-        if (len(frame_history) > config["dashcam"]["parked"]["event"]["buffer"]): # Check to see if the frame buffer has exceeded the maximum length.
-            frame_history = frame_history[-config["dashcam"]["parked"]["event"]["buffer"]:] # Trim the frame buffer to the appropriate length.
+        frame_buffer.append(apply_dashcam_stamps(frame, device))
+        if (len(frame_buffer) > config["dashcam"]["parked"]["event"]["buffer"]): # Check to see if the frame buffer has exceeded the maximum length.
+            frame_buffer = frame_buffer[-config["dashcam"]["parked"]["event"]["buffer"]:] # Trim the frame buffer to the appropriate length.
 
 
         # ==========================================
@@ -631,28 +632,34 @@ def dashcam_parked_dormant(device):
             contours, moving_percentage = detect_motion(frame, background_subtractor) # Run motion analysis on this frame.
             if (moving_percentage > float(config["dashcam"]["parked"]["event"]["trigger_motion"]["sensitivity"])): # Check to see if there is movement that exceeds the sensitivity threshold.
                 display_message("Detected event.", 1)
-                dashcam_parked_event(device, frame_buffer)
+                dashcam_parked_event(capture, device, frame_buffer)
+                delete_old_segments()
             process_timing("end", "Dashcam/Motion Detection")
         elif (config["dashcam"]["parked"]["event"]["trigger"] == "object_recognition"):
             process_timing("start", "Dashcam/Object Recognition")
             detected_objects = object_recognition.predict(frame, "dashcam")
             for element in detected_objects:
+                print(element["name"])
                 if (element["conf"] >= config["dashcam"]["parked"]["event"]["trigger_object_recognition"]["minimum_confidence"] and element["name"] in config["dashcam"]["parked"]["event"]["trigger_object_recognition"]["objects"]): # Check to see if this object is in the list of target objects.
                     display_message("Detected event.", 1)
-                    dashcam_parked_event(device, frame_buffer)
+                    dashcam_parked_event(capture, frame_buffer)
+                    delete_old_segments()
             process_timing("end", "Dashcam/Object Recognition")
+        else:
+            utils.display_message("Unknown event detection method", 3)
         # ==========================================
 
 
 
 
 # This function is called as a subprocess of the parked dashcam recording, and is triggered when motion is detected. This function exits when motion is no longer detected (after the motion detection timeout), and returns to dormant parked mode.
-def dashcam_parked_event(device, frame_buffer):
+def dashcam_parked_event(capture, device, frame_buffer):
     global parked
     global instant_framerate
     global calculated_framerate
     global audio_recorders
     global audio_record_command
+
 
 
     directory = config["general"]["working_directory"]
@@ -669,9 +676,9 @@ def dashcam_parked_event(device, frame_buffer):
 
 
     # Initialize the output for this segment:
-    segment_name = datetime.datetime.fromtimestamp(utils.get_time()).strftime('%Y-%m-%d %H%i%S') + " Predator " + str(device) + " P"
+    segment_name = datetime.datetime.fromtimestamp(utils.get_time()).strftime('%Y-%m-%d %H%M%S') + " Predator " + str(device) + " P"
     output_codec = list(config["dashcam"]["saving"]["file"]["codec"])
-    output = cv2.VideoWriter(os.path.join(directory, segment_name + "." + config["dashcam"]["saving"]["file"]["extension"]), cv2.VideoWriter_fourcc(output_codec[0], output_codec[1], output_codec[2], output_codec[3]), float(framerate), (config["dashcam"]["capture"]["video"]["devices"][device]["resolution"]["width"], config["dashcam"]["capture"]["video"]["devices"][device]["resolution"]["width"])) # Initialize the first video output.
+    output = cv2.VideoWriter(os.path.join(directory, segment_name + "." + config["dashcam"]["saving"]["file"]["extension"]), cv2.VideoWriter_fourcc(output_codec[0], output_codec[1], output_codec[2], output_codec[3]), calculated_framerate[device], (config["dashcam"]["capture"]["video"]["devices"][device]["resolution"]["width"], config["dashcam"]["capture"]["video"]["devices"][device]["resolution"]["height"])) # Initialize the first video output.
 
     # Handle audio recording for this segment:
     if (config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if audio recording is enabled in the configuration.
@@ -680,7 +687,11 @@ def dashcam_parked_event(device, frame_buffer):
         if (segment_name not in audio_recorders or audio_recorders[segment_name].poll() is not None): # Check to see if the audio recorder hasn't yet been started by another thread.
             subprocess.Popen(("sudo -u " + str(config["dashcam"]["capture"]["audio"]["record_as_user"]) + " killall arecord").split(" "), stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Kill the previous arecord instance (if one exists)
             command = "sleep " + str(float(config["dashcam"]["capture"]["audio"]["start_delay"])) + "; " + audio_record_command + " \"" + str(audio_filepath) + "\""
-            audio_recorders[segment_name] = subprocess.Popen(command, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Start the next segment's audio recorder.
+            if (config["dashcam"]["capture"]["audio"]["display_output"] == True):
+                print("Executing:", audio_record_command)
+                audio_recorders[segment_name] = subprocess.Popen(command, shell=True) # Start the next segment's audio recorder.
+            else:
+                audio_recorders[segment_name] = subprocess.Popen(command, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Start the next segment's audio recorder.
             del command
         process_timing("end", "Dashcam/Audio Processing")
 
@@ -706,17 +717,6 @@ def dashcam_parked_event(device, frame_buffer):
         expected_time_since_last_frame_slowest = 1/float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["min"]) # Calculate the longest expected time between two frames.
     expected_time_since_last_frame_fastest = 1/float(config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"]) # Calculate the shortest expected time between two frames.
     process_timing("end", "Dashcam/Calculations")
-
-
-    process_timing("start", "Dashcam/Capture Management")
-    capture = cv2.VideoCapture(device_index) # Open the video stream.
-    codec = list(config["dashcam"]["capture"]["video"]["devices"][device]["codec"])
-    capture.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(codec[0], codec[1], codec[2], codec[3])) # Set the video codec.
-    capture.set(cv2.CAP_PROP_FPS, config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"]) # Set the frame-rate to a high value so OpenCV will use the highest frame-rate the capture supports.
-
-    capture.set(cv2.CAP_PROP_FRAME_WIDTH, config["dashcam"]["capture"]["video"]["devices"][device]["resolution"]["width"]) # Set the video stream width.
-    capture.set(cv2.CAP_PROP_FRAME_HEIGHT, config["dashcam"]["capture"]["video"]["devices"][device]["resolution"]["height"]) # Set the video stream height.
-    process_timing("end", "Dashcam/Capture Management")
 
 
     while global_variables.predator_running and parked == True and utils.get_time() - last_event_detected < config["dashcam"]["parked"]["event"]["timeout"]: # Run until the criteria for event recording are no longer met.
@@ -759,7 +759,7 @@ def dashcam_parked_event(device, frame_buffer):
             process_timing("start", "Dashcam/Motion Detection")
             contours, moving_percentage = detect_motion(frame, background_subtractor) # Run motion analysis on this frame.
 
-            if (moving_percentage > float(config["dashcam"]["parked"]["event"]["trigger_motion"]["sensitivity"]) * 0.8): # Check to see if there is movement that exceeds 80% of the sensitivity threshold. This ensures that motion that is just barely over the threshold doesn't cause Predator to repeatedly start and stop recording.
+            if (moving_percentage > float(config["dashcam"]["parked"]["event"]["trigger_motion"]["sensitivity"])): # Check to see if there is movement that exceeds the sensitivity threshold. This ensures that motion that is just barely over the threshold doesn't cause Predator to repeatedly start and stop recording.
                 if (utils.get_time() - last_event_detected > 2): # Check to see if it has been more than 2 seconds since motion was last detected so that the message is only displayed after there hasn't been motion for some time.
                     display_message("Detected event.", 1)
                 last_event_detected = utils.get_time()
@@ -794,14 +794,15 @@ def dashcam_parked_event(device, frame_buffer):
 
     display_message("Stopped parked event recording.", 1)
 
-    process_timing("start", "Dashcam/File Merging")
-    merge_audio_video(
-        os.path.join(directory, segment_name + "." + config["dashcam"]["saving"]["file"]["extension"]), # video file path
-        os.path.join(directory, segment_name + "." + str(config["dashcam"]["capture"]["audio"]["extension"])), # audio file path
-        os.path.join(directory, segment_name + ".mkv"), # output file path
-        float(original_buffer_size/calculated_framerate[device]) # audio offset
-    )
-    process_timing("end", "Dashcam/File Merging")
+    # Stop audio/video recording:
+    if (config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if audio recording is enabled in the configuration.
+        process_timing("start", "Dashcam/Audio Processing")
+        if (segment_names[-1] in audio_recorders and audio_recorders[segment_names[-1]].poll() is None): # Check to see if there is an active audio recorder.
+            audio_recorders[segment_names[-1]].terminate() # Kill the previous segment's audio recorder.
+        time.sleep(config["dashcam"]["capture"]["audio"]["start_delay"]) # Wait briefly for the audio recorder to terminate.
+        subprocess.Popen(("sudo -u " + str(config["dashcam"]["capture"]["audio"]["record_as_user"]) + " killall arecord").split(" "), stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Force kill all audio recording processes.
+        process_timing("end", "Dashcam/Audio Processing")
+    output = None # Release the output.
 
     process_timing("start", "Dashcam/Calculations")
     calculated_framerate[device] = frames_captured / (time.time() - capture_start_time)
@@ -816,7 +817,7 @@ def delete_old_segments():
 
     process_timing("start", "Dashcam/File Maintenance")
 
-    dashcam_files_list_command = "ls " + config["general"]["working_directory"] + " | grep predator_dashcam" # Set up the command to get a list of all unsaved dashcam videos in the working directory.
+    dashcam_files_list_command = "ls " + config["general"]["working_directory"] + " | grep \" Predator \"" # Set up the command to get a list of all unsaved dashcam videos in the working directory.
     dashcam_files = str(os.popen(dashcam_files_list_command).read())[:-1].splitlines() # Run the command, and record the raw output string.
     dashcam_files = sorted(dashcam_files) # Sort the dashcam files alphabetically to get them in chronological order (oldest first).
 
@@ -907,20 +908,21 @@ def dashcam_normal(device):
     process_timing("end", "Dashcam/Calculations")
 
 
-    if (first_segment_started_time == 0): # Check to see if the first segment start time hasn't yet been updated. Since this is a global variable, another dashcam thread may have already set it.
-        first_segment_started_time = utils.get_time() # This variable keeps track of when the first segment was started. It is shared between threads.
+    if (first_segment_start_time == 0): # Check to see if the first segment start time hasn't yet been updated. Since this is a global variable, another dashcam thread may have already set it.
+        first_segment_start_time = utils.get_time() # This variable keeps track of when the first segment was started. It is shared between threads.
     last_frame_captured = time.time() # This will hold the exact time that the last frame was captured. Here, the value is initialized to the current time before any frames have been captured.
 
-    # Initialize the first segment.
+    # Initialize the first segment:
+    segment_number = 0
     segment_started_time = time.time() # This value holds the exact time the segment started for sake of frame-rate calculations.
     shortterm_framerate[device]["start"] = time.time()
     shortterm_framerate[device]["frames"] = 0
     frames_since_last_segment = 0
 
-    segment_names = [datetime.datetime.fromtimestamp(first_segment_started_time).strftime('%Y-%m-%d %H%i%S') + " Predator " + str(device) + " N"] # Initialize the first segment name for this device.
+    segment_names = [datetime.datetime.fromtimestamp(first_segment_start_time).strftime('%Y-%m-%d %H%M%S') + " Predator " + str(device) + " N"] # Initialize the first segment name for this device.
 
     output_codec = list(config["dashcam"]["saving"]["file"]["codec"])
-    output = cv2.VideoWriter(os.path.join(directory, segment_names[-1] + "." + config["dashcam"]["saving"]["file"]["extension"]), cv2.VideoWriter_fourcc(output_codec[0], output_codec[1], output_codec[2], output_codec[3]), float(framerate), (config["dashcam"]["capture"]["video"]["devices"][device]["resolution"]["width"], config["dashcam"]["capture"]["video"]["devices"][device]["resolution"]["height"])) # Initialize the first video output.
+    output = cv2.VideoWriter(os.path.join(directory, segment_names[-1] + "." + config["dashcam"]["saving"]["file"]["extension"]), cv2.VideoWriter_fourcc(output_codec[0], output_codec[1], output_codec[2], output_codec[3]), calculated_framerate[device], (config["dashcam"]["capture"]["video"]["devices"][device]["resolution"]["width"], config["dashcam"]["capture"]["video"]["devices"][device]["resolution"]["height"])) # Initialize the first video output.
 
 
     if (config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if audio recording is enabled in the configuration.
@@ -929,7 +931,11 @@ def dashcam_normal(device):
         if (segment_names[-1] not in audio_recorders or audio_recorders[segment_names[-1]].poll() is not None): # Check to see if the audio recorder hasn't yet been started by another thread.
             subprocess.Popen(("sudo -u " + str(config["dashcam"]["capture"]["audio"]["record_as_user"]) + " killall arecord").split(" "), stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Kill the previous arecord instance (if one exists)
             command = "sleep " + str(float(config["dashcam"]["capture"]["audio"]["start_delay"])) + "; " + audio_record_command + " \"" + str(audio_filepath) + "\""
-            audio_recorders[segment_names[-1]] = subprocess.Popen(command, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Start the next segment's audio recorder.
+            if (config["dashcam"]["capture"]["audio"]["display_output"] == True):
+                print("Executing:", audio_record_command)
+                audio_recorders[segment_names[-1]] = subprocess.Popen(command, shell=True) # Start the next segment's audio recorder.
+            else:
+                audio_recorders[segment_names[-1]] = subprocess.Popen(command, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Start the next segment's audio recorder.
             del command
         process_timing("end", "Dashcam/Audio Processing")
 
@@ -943,7 +949,7 @@ def dashcam_normal(device):
         # =======================================
         # ===== Start of segment management =====
         # =======================================
-        if (utils.get_time() > first_segment_started_time + (segment_number+1)*config["dashcam"]["saving"]["segment_length"]): # Check to see if a new segment needs to be created.
+        if (utils.get_time() > first_segment_start_time + (segment_number+1)*config["dashcam"]["saving"]["segment_length"]): # Check to see if a new segment needs to be created.
             # End the current segment:
             output = None # Release the output writer.
             if (config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if audio recording is enabled in the configuration.
@@ -967,13 +973,13 @@ def dashcam_normal(device):
             process_timing("end", "Dashcam/File Merging")
 
             # Handle segment locking:
-            if (os.path.exists(os.path.join(config["general"]["interface_directory"], config["dashcam"]["saving"]["trigger"])) == False): # Check to see if the trigger file exists.
+            if (os.path.exists(os.path.join(config["general"]["interface_directory"], config["dashcam"]["saving"]["trigger"])) == True): # Check to see if the trigger file exists.
                 if (config["dashcam"]["capture"]["audio"]["merge"] == True and config["dashcam"]["capture"]["audio"]["enabled"] == True):
                     threading.Thread(target=lock_dashcam_segment, args=[segment_names[-1]], name="DashcamSegmentSave") # Create the thread to save this dash-cam segment.
                     if (len(segment_names) >= 2): # Check to see if there is a segment before the current.
                         with open(os.path.join(config["general"]["interface_directory"], config["dashcam"]["saving"]["trigger"])) as file:
                             last_trigger_timestamp = utils.to_int(file.read())
-                        if (last_trigger_timestamp - (first_segment_started_time + (segment_number * config["dashcam"]["saving"]["segment_length"])) <= 15): # Check to see if the save was initiated within the first 15 seconds of the segment.
+                        if (last_trigger_timestamp - (first_segment_start_time + (segment_number * config["dashcam"]["saving"]["segment_length"])) <= 15): # Check to see if the save was initiated within the first 15 seconds of the segment.
                             threading.Thread(target=lock_dashcam_segment, args=[segment_names[-1]], name="DashcamSegmentSave") # Create the thread to save the previous segment.
 
             # Calculate the frame-rate of the last segment:
@@ -986,15 +992,15 @@ def dashcam_normal(device):
 
 
             # Initialize the next segment name:
-            while (utils.get_time() > first_segment_started_time + (segment_number+1)*config["dashcam"]["saving"]["segment_length"]): # Run until the segment number is correct. This prevents a bunch of empty video files from being created when the system time suddenly jumps into the future.
+            while (utils.get_time() > first_segment_start_time + (segment_number+1)*config["dashcam"]["saving"]["segment_length"]): # Run until the segment number is correct. This prevents a bunch of empty video files from being created when the system time suddenly jumps into the future.
                 frames_since_last_segment = 0 # Reset the global "frames_since_last_segment" variable for this device.
                 segment_started_time = time.time() # This value holds the exact time the segment started for sake of frame-rate calculations.
                 segment_number += 1
-            segment_names.append(datetime.datetime.fromtimestamp(first_segment_started_time + (segment_number+1)*config["dashcam"]["saving"]["segment_length"]).strftime('%Y-%m-%d %H%i%S') + " Predator " + str(device) + " N")
+            segment_names.append(datetime.datetime.fromtimestamp(first_segment_start_time + (segment_number*config["dashcam"]["saving"]["segment_length"])).strftime('%Y-%m-%d %H%M%S') + " Predator " + str(device) + " N")
 
             # Initialize the output for the next segment:
             output_codec = list(config["dashcam"]["saving"]["file"]["codec"])
-            output = cv2.VideoWriter(os.path.join(directory, segment_names[-1] + "." + config["dashcam"]["saving"]["file"]["extension"]), cv2.VideoWriter_fourcc(output_codec[0], output_codec[1], output_codec[2], output_codec[3]), float(framerate), (config["dashcam"]["capture"]["video"]["devices"][device]["resolution"]["width"], config["dashcam"]["capture"]["video"]["devices"][device]["resolution"]["height"])) # Initialize the first video output.
+            output = cv2.VideoWriter(os.path.join(directory, segment_names[-1] + "." + config["dashcam"]["saving"]["file"]["extension"]), cv2.VideoWriter_fourcc(output_codec[0], output_codec[1], output_codec[2], output_codec[3]), calculated_framerate[device], (config["dashcam"]["capture"]["video"]["devices"][device]["resolution"]["width"], config["dashcam"]["capture"]["video"]["devices"][device]["resolution"]["height"])) # Initialize the first video output.
 
             # Handle audio recording for the next segment:
             if (config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if audio recording is enabled in the configuration.
@@ -1003,7 +1009,11 @@ def dashcam_normal(device):
                 if (segment_names[-1] not in audio_recorders or audio_recorders[segment_names[-1]].poll() is not None): # Check to see if the audio recorder hasn't yet been started by another thread.
                     subprocess.Popen(("sudo -u " + str(config["dashcam"]["capture"]["audio"]["record_as_user"]) + " killall arecord").split(" "), stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Kill the previous arecord instance (if one exists)
                     command = "sleep " + str(float(config["dashcam"]["capture"]["audio"]["start_delay"])) + "; " + audio_record_command + " \"" + str(audio_filepath) + "\""
-                    audio_recorders[segment_names[-1]] = subprocess.Popen(command, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Start the next segment's audio recorder.
+                    if (config["dashcam"]["capture"]["audio"]["display_output"] == True):
+                        print("Executing:", audio_record_command)
+                        audio_recorders[segment_names[-1]] = subprocess.Popen(command, shell=True) # Start the next segment's audio recorder.
+                    else:
+                        audio_recorders[segment_names[-1]] = subprocess.Popen(command, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Start the next segment's audio recorder.
                     del command
                 process_timing("end", "Dashcam/Audio Processing")
         # =====================================
@@ -1092,13 +1102,33 @@ def dashcam_normal(device):
             print(json.dumps(process_timing("dump", ""), indent=4))
 
 
+
+    # ===============================================
+    # The main recording loop has exited, so wrap up:
     if (config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if audio recording is enabled in the configuration.
         process_timing("start", "Dashcam/Audio Processing")
         if (segment_names[-1] in audio_recorders and audio_recorders[segment_names[-1]].poll() is None): # Check to see if there is an active audio recorder.
             audio_recorders[segment_names[-1]].terminate() # Kill the previous segment's audio recorder.
+        time.sleep(config["dashcam"]["capture"]["audio"]["start_delay"]) # Wait briefly for the audio recorder to terminate.
+        subprocess.Popen(("sudo -u " + str(config["dashcam"]["capture"]["audio"]["record_as_user"]) + " killall arecord").split(" "), stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Force kill all audio recording processes.
         process_timing("end", "Dashcam/Audio Processing")
     output = None # Release the output file.
     capture.release() # Release the capture device.
+    first_segment_start_time = 0 # Reset the segment start time.
+
+    process_timing("start", "Dashcam/File Merging")
+    if (config["dashcam"]["capture"]["audio"]["merge"] == True and config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if Predator is configured to merge audio and video files.
+        if (os.path.exists(os.path.join(directory, segment_names[-1] + "." + str(config["dashcam"]["capture"]["audio"]["extension"]))) == True): # Check to make sure the audio file exists before attemping to merge.
+            merge_audio_video(
+                os.path.join(directory, segment_names[-1] + "." + config["dashcam"]["saving"]["file"]["extension"]), # video file path
+                os.path.join(directory, segment_names[-1] + "." + str(config["dashcam"]["capture"]["audio"]["extension"])), # audio file path
+                os.path.join(directory, segment_names[-1] + ".mkv"), # output file path
+                float(config["dashcam"]["capture"]["audio"]["start_delay"]) # audio offset
+            )
+        else: # The audio file does not exist.
+            display_message("The audio file was missing during audio/video merging.", 2)
+    process_timing("end", "Dashcam/File Merging")
+    # ===============================================
 
 
 
@@ -1157,7 +1187,6 @@ def dashcam():
     
     iteration_counter = 0 # Set the iteration counter to 0 so that we can increment it for each recording device specified.
     for device in config["dashcam"]["capture"]["video"]["devices"]: # Iterate through each device in the configuration.
-        print(device, "HERE")
         if (config["dashcam"]["capture"]["video"]["devices"][device]["enabled"] == True):
             dashcam_normal_processes.append(threading.Thread(target=dashcam_normal, args=[device], name="DashcamCapture" + str(config["dashcam"]["capture"]["video"]["devices"][device]["index"])))
             dashcam_normal_processes[iteration_counter].start()
@@ -1171,51 +1200,46 @@ def dashcam():
 
 
 
-    while global_variables.predator_running:
-        if (config["dashcam"]["parked"]["enabled"] == True): # Check to see if parked mode functionality is enabled.
-            last_moved_time = utils.get_time() # This value holds the Unix timestamp of the last time the vehicle exceeded the parking speed threshold.
-            while global_variables.predator_running: # Run until Predator is terminated.
-                if (config["general"]["gps"]["enabled"] == True): # Check to see if GPS is enabled.
-                    current_location = get_gps_location() # Get the current GPS location.
-                else:
-                    current_location = [0, 0, 0, 0, 0, 0]
-                if (current_location[2] > config["dashcam"]["parked"]["conditions"]["speed"]): # Check to see if the current speed exceeds the parked speed threshold.
-                    last_moved_time = utils.get_time()
+    last_moved_time = utils.get_time() # This value holds the Unix timestamp of the last time the vehicle exceeded the parking speed threshold. Here it is initialized to the current time.
+    while global_variables.predator_running: # Run until Predator is terminated.
+        if (config["dashcam"]["parked"]["enabled"] == True): # Check to see if parking mode is enabled before checking for movement.
+            if (config["general"]["gps"]["enabled"] == True): # Check to see if GPS is enabled.
+                current_location = get_gps_location() # Get the current GPS location.
+            else:
+                current_location = [0, 0, 0, 0, 0, 0]
+            if (current_location[2] > config["dashcam"]["parked"]["conditions"]["speed"]): # Check to see if the current speed exceeds the parked speed threshold.
+                last_moved_time = utils.get_time()
 
-                if (utils.get_time() - last_moved_time > config["dashcam"]["parked"]["conditions"]["time"]): # Check to see if the amount of time the vehicle has been stopped exceeds the time threshold to enable parked mode.
-                    if (parked == False): # Check to see if Predator wasn't already in parked mode.
-                        parked = True # Enter parked mode.
-                        display_message("Entered parked mode.", 1)
-                        if (config["dashcam"]["notifications"]["reticulum"]["enabled"] == True and config["dashcam"]["notifications"]["reticulum"]["events"]["parking_mode_enabled"]["enabled"] == True): # Check to see if Predator is configured to parking mode activation notifications over Reticulum.
-                            for destination in config["dashcam"]["notifications"]["reticulum"]["destinations"]: # Iterate over each configured destination.
-                                reticulum.lxmf_send_message(str(config["dashcam"]["notifications"]["reticulum"]["instance_name"]) + " has entered parked mode.", destination) # Send a Reticulum LXMF message to this destination.
-                        time.sleep(2) # Wait briefly to allow the other threads to finish.
-                        # Start parked dormant dash-cam monitoring:
-                        iteration_counter = 0 # Set the iteration counter to 0 so that we can increment it for each recording device specified.
-                        for device in config["dashcam"]["capture"]["video"]["devices"]: # Run through each camera device specified in the configuration, and launch an OpenCV recording instance for it.
-                            if (config["dashcam"]["capture"]["video"]["devices"][device]["enabled"] == True):
-                                dashcam_parked_processes.append(threading.Thread(target=dashcam_parked_dormant, args=[device], name="ParkedDormant" + str(config["dashcam"]["capture"]["video"]["devices"][device]["index"])))
-                                dashcam_parked_processes[iteration_counter].start()
-                                iteration_counter += 1 # Iterate the counter. This value will be used to create unique file names for each recorded video.
+            if (utils.get_time() - last_moved_time > config["dashcam"]["parked"]["conditions"]["time"]): # Check to see if the amount of time the vehicle has been stopped exceeds the time threshold to enable parked mode.
+                if (parked == False): # Check to see if Predator wasn't already in parked mode.
+                    parked = True # Enter parked mode.
+                    display_message("Entered parked mode.", 1)
+                    if (config["dashcam"]["notifications"]["reticulum"]["enabled"] == True and config["dashcam"]["notifications"]["reticulum"]["events"]["parking_mode_enabled"]["enabled"] == True): # Check to see if Predator is configured to parking mode activation notifications over Reticulum.
+                        for destination in config["dashcam"]["notifications"]["reticulum"]["destinations"]: # Iterate over each configured destination.
+                            reticulum.lxmf_send_message(str(config["dashcam"]["notifications"]["reticulum"]["instance_name"]) + " has entered parked mode.", destination) # Send a Reticulum LXMF message to this destination.
+                    time.sleep(2) # Wait briefly to allow the other threads to finish.
+                    # Start parked dormant dash-cam monitoring:
+                    iteration_counter = 0 # Set the iteration counter to 0 so that we can increment it for each recording device specified.
+                    for device in config["dashcam"]["capture"]["video"]["devices"]: # Run through each camera device specified in the configuration, and launch an OpenCV recording instance for it.
+                        if (config["dashcam"]["capture"]["video"]["devices"][device]["enabled"] == True):
+                            dashcam_parked_processes.append(threading.Thread(target=dashcam_parked_dormant, args=[device], name="ParkedDormant" + str(config["dashcam"]["capture"]["video"]["devices"][device]["index"])))
+                            dashcam_parked_processes[iteration_counter].start()
+                            iteration_counter += 1 # Iterate the counter. This value will be used to create unique file names for each recorded video.
 
-                else: # The vehicle has not been stopped for the minimum time to activate parking mode.
-                    if (parked == True): # Check to see if Predator wasn't already out of parked mode.
-                        parked = False # Exit parked mode.
-                        display_message("Exited parked mode.", 1)
-                        if (config["dashcam"]["notifications"]["reticulum"]["enabled"] == True and config["dashcam"]["notifications"]["reticulum"]["events"]["parking_mode_disabled"]["enabled"] == True): # Check to see if Predator is configured to parking mode deactivation notifications over Reticulum.
-                            for destination in config["dashcam"]["notifications"]["reticulum"]["destinations"]: # Iterate over each configured destination.
-                                reticulum.lxmf_send_message(str(config["dashcam"]["notifications"]["reticulum"]["instance_name"]) + " has exited parked mode.", destination) # Send a Reticulum LXMF message to this destination.
-                        time.sleep(2) # Wait briefly to allow the other threads to finish.
-                        # Restart normal dash-cam recording:
-                        iteration_counter = 0 # Set the iteration counter to 0 so that we can increment it for each recording device specified.
-                        for device in config["dashcam"]["capture"]["video"]["devices"]: # Run through each camera device specified in the configuration, and launch an OpenCV recording instance for it.
-                            if (config["dashcam"]["capture"]["video"]["devices"][device]["enabled"] == True):
-                                dashcam_normal_processes.append(threading.Thread(target=dashcam_normal, args=[device], name="DashcamCapture" + str(config["dashcam"]["capture"]["video"]["devices"][device]["index"])))
-                                dashcam_normal_processes[iteration_counter].start()
-                                iteration_counter += 1 # Iterate the counter. This value will be used to create unique file names for each recorded video.
-        try:
-            time.sleep(1)
-        except Exception as exception:
-            global_variables.predator_running = False
-            print(exception)
+            else: # The vehicle has not been stopped for the minimum time to activate parking mode.
+                if (parked == True): # Check to see if Predator wasn't already out of parked mode.
+                    parked = False # Exit parked mode.
+                    display_message("Exited parked mode.", 1)
+                    if (config["dashcam"]["notifications"]["reticulum"]["enabled"] == True and config["dashcam"]["notifications"]["reticulum"]["events"]["parking_mode_disabled"]["enabled"] == True): # Check to see if Predator is configured to parking mode deactivation notifications over Reticulum.
+                        for destination in config["dashcam"]["notifications"]["reticulum"]["destinations"]: # Iterate over each configured destination.
+                            reticulum.lxmf_send_message(str(config["dashcam"]["notifications"]["reticulum"]["instance_name"]) + " has exited parked mode.", destination) # Send a Reticulum LXMF message to this destination.
+                    time.sleep(2) # Wait briefly to allow the other threads to finish.
+                    # Restart normal dash-cam recording:
+                    iteration_counter = 0 # Set the iteration counter to 0 so that we can increment it for each recording device specified.
+                    for device in config["dashcam"]["capture"]["video"]["devices"]: # Run through each camera device specified in the configuration, and launch an OpenCV recording instance for it.
+                        if (config["dashcam"]["capture"]["video"]["devices"][device]["enabled"] == True):
+                            dashcam_normal_processes.append(threading.Thread(target=dashcam_normal, args=[device], name="DashcamCapture" + str(config["dashcam"]["capture"]["video"]["devices"][device]["index"])))
+                            dashcam_normal_processes[iteration_counter].start()
+                            iteration_counter += 1 # Iterate the counter. This value will be used to create unique file names for each recorded video.
+        time.sleep(1)
     display_message("Dashcam recording exited.", 1)
