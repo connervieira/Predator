@@ -932,7 +932,7 @@ def dashcam_normal(device):
     if (config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if audio recording is enabled in the configuration.
         process_timing("start", "Dashcam/Audio Processing")
         audio_filepath = os.path.join(directory, segment_base_names[-1] + "." + str(config["dashcam"]["capture"]["audio"]["extension"]))
-        if (segment_base_names[-1] not in audio_recorders or audio_base_recorders[segment_base_names[-1]].poll() is not None): # Check to see if the audio recorder hasn't yet been started by another thread.
+        if (segment_base_names[-1] not in audio_recorders or audio_recorders[segment_base_names[-1]].poll() is not None): # Check to see if the audio recorder hasn't yet been started by another thread.
             subprocess.Popen(("sudo -u " + str(config["dashcam"]["capture"]["audio"]["record_as_user"]) + " killall arecord").split(" "), stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Kill the previous arecord instance (if one exists)
             command = "sleep " + str(float(config["dashcam"]["capture"]["audio"]["start_delay"])) + "; " + audio_record_command + " \"" + str(audio_filepath) + "\""
             if (config["dashcam"]["capture"]["audio"]["display_output"] == True):
