@@ -54,8 +54,8 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Finish alert documentation (ALERTS.md)
 - [X] Fix frame counting for side-car mode.
 - [X] Document `developer>frame_count_method` configuration value in `docs/CONFIGURE.md.
+- [X] Validate multi-channel recording.
 - [ ] Add sound effect for parking mode.
-- [ ] Validate multi-channel recording.
 
 
 ## Hypothetical
