@@ -676,22 +676,25 @@ def dashcam_parked_event(capture, device, frame_buffer):
 
 
     # Initialize the output for this segment:
-    segment_name = datetime.datetime.fromtimestamp(utils.get_time()).strftime('%Y-%m-%d %H%M%S') + " Predator " + str(device) + " P"
+    start_time = utils.get_time()
+    segment_base_name = datetime.datetime.fromtimestamp(start_time).strftime('%Y-%m-%d %H%M%S') + " Predator"
+    segment_name = datetime.datetime.fromtimestamp(start_time).strftime('%Y-%m-%d %H%M%S') + " Predator " + str(device) + " P"
+    del start_time
     output_codec = list(config["dashcam"]["saving"]["file"]["codec"])
     output = cv2.VideoWriter(os.path.join(directory, segment_name + "." + config["dashcam"]["saving"]["file"]["extension"]), cv2.VideoWriter_fourcc(output_codec[0], output_codec[1], output_codec[2], output_codec[3]), calculated_framerate[device], (config["dashcam"]["capture"]["video"]["devices"][device]["resolution"]["width"], config["dashcam"]["capture"]["video"]["devices"][device]["resolution"]["height"])) # Initialize the first video output.
 
     # Handle audio recording for this segment:
     if (config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if audio recording is enabled in the configuration.
         process_timing("start", "Dashcam/Audio Processing")
-        audio_filepath = os.path.join(directory, segment_name + "." + str(config["dashcam"]["capture"]["audio"]["extension"]))
-        if (segment_name not in audio_recorders or audio_recorders[segment_name].poll() is not None): # Check to see if the audio recorder hasn't yet been started by another thread.
+        audio_filepath = os.path.join(directory, segment_base_name + "." + str(config["dashcam"]["capture"]["audio"]["extension"]))
+        if (segment_base_name not in audio_recorders or audio_recorders[segment_base_name].poll() is not None): # Check to see if the audio recorder hasn't yet been started by another thread.
             subprocess.Popen(("sudo -u " + str(config["dashcam"]["capture"]["audio"]["record_as_user"]) + " killall arecord").split(" "), stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Kill the previous arecord instance (if one exists)
             command = "sleep " + str(float(config["dashcam"]["capture"]["audio"]["start_delay"])) + "; " + audio_record_command + " \"" + str(audio_filepath) + "\""
             if (config["dashcam"]["capture"]["audio"]["display_output"] == True):
                 print("Executing:", audio_record_command)
-                audio_recorders[segment_name] = subprocess.Popen(command, shell=True) # Start the next segment's audio recorder.
+                audio_recorders[segment_base_name] = subprocess.Popen(command, shell=True) # Start the next segment's audio recorder.
             else:
-                audio_recorders[segment_name] = subprocess.Popen(command, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Start the next segment's audio recorder.
+                audio_recorders[segment_base_name] = subprocess.Popen(command, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Start the next segment's audio recorder.
             del command
         process_timing("end", "Dashcam/Audio Processing")
 
@@ -797,8 +800,8 @@ def dashcam_parked_event(capture, device, frame_buffer):
     # Stop audio/video recording:
     if (config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if audio recording is enabled in the configuration.
         process_timing("start", "Dashcam/Audio Processing")
-        if (segment_names[-1] in audio_recorders and audio_recorders[segment_names[-1]].poll() is None): # Check to see if there is an active audio recorder.
-            audio_recorders[segment_names[-1]].terminate() # Kill the previous segment's audio recorder.
+        if (segment_base_names[-1] in audio_recorders and audio_recorders[segment_base_names[-1]].poll() is None): # Check to see if there is an active audio recorder.
+            audio_recorders[segment_base_names[-1]].terminate() # Kill the previous segment's audio recorder.
         time.sleep(config["dashcam"]["capture"]["audio"]["start_delay"]) # Wait briefly for the audio recorder to terminate.
         subprocess.Popen(("sudo -u " + str(config["dashcam"]["capture"]["audio"]["record_as_user"]) + " killall arecord").split(" "), stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Force kill all audio recording processes.
         process_timing("end", "Dashcam/Audio Processing")
@@ -919,6 +922,7 @@ def dashcam_normal(device):
     shortterm_framerate[device]["frames"] = 0
     frames_since_last_segment = 0
 
+    segment_base_names = [datetime.datetime.fromtimestamp(first_segment_start_time).strftime('%Y-%m-%d %H%M%S') + " Predator"] # Initialize the first segment name for this device.
     segment_names = [datetime.datetime.fromtimestamp(first_segment_start_time).strftime('%Y-%m-%d %H%M%S') + " Predator " + str(device) + " N"] # Initialize the first segment name for this device.
 
     output_codec = list(config["dashcam"]["saving"]["file"]["codec"])
@@ -927,15 +931,15 @@ def dashcam_normal(device):
 
     if (config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if audio recording is enabled in the configuration.
         process_timing("start", "Dashcam/Audio Processing")
-        audio_filepath = os.path.join(directory, segment_names[-1] + "." + str(config["dashcam"]["capture"]["audio"]["extension"]))
-        if (segment_names[-1] not in audio_recorders or audio_recorders[segment_names[-1]].poll() is not None): # Check to see if the audio recorder hasn't yet been started by another thread.
+        audio_filepath = os.path.join(directory, segment_base_names[-1] + "." + str(config["dashcam"]["capture"]["audio"]["extension"]))
+        if (segment_base_names[-1] not in audio_recorders or audio_base_recorders[segment_base_names[-1]].poll() is not None): # Check to see if the audio recorder hasn't yet been started by another thread.
             subprocess.Popen(("sudo -u " + str(config["dashcam"]["capture"]["audio"]["record_as_user"]) + " killall arecord").split(" "), stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Kill the previous arecord instance (if one exists)
             command = "sleep " + str(float(config["dashcam"]["capture"]["audio"]["start_delay"])) + "; " + audio_record_command + " \"" + str(audio_filepath) + "\""
             if (config["dashcam"]["capture"]["audio"]["display_output"] == True):
                 print("Executing:", audio_record_command)
-                audio_recorders[segment_names[-1]] = subprocess.Popen(command, shell=True) # Start the next segment's audio recorder.
+                audio_recorders[segment_base_names[-1]] = subprocess.Popen(command, shell=True) # Start the next segment's audio recorder.
             else:
-                audio_recorders[segment_names[-1]] = subprocess.Popen(command, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Start the next segment's audio recorder.
+                audio_recorders[segment_base_names[-1]] = subprocess.Popen(command, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Start the next segment's audio recorder.
             del command
         process_timing("end", "Dashcam/Audio Processing")
 
@@ -954,17 +958,17 @@ def dashcam_normal(device):
             output = None # Release the output writer.
             if (config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if audio recording is enabled in the configuration.
                 process_timing("start", "Dashcam/Audio Processing")
-                if (segment_names[-1] in audio_recorders and audio_recorders[segment_names[-1]].poll() is None): # Check to see if there is an active audio recorder.
-                    audio_recorders[segment_names[-1]].terminate() # Kill the previous segment's audio recorder.
+                if (segment_base_names[-1] in audio_recorders and audio_recorders[segment_base_names[-1]].poll() is None): # Check to see if there is an active audio recorder.
+                    audio_recorders[segment_base_names[-1]].terminate() # Kill the previous segment's audio recorder.
                 process_timing("end", "Dashcam/Audio Processing")
 
             # Merge the video/audio segment that was just completed:
             process_timing("start", "Dashcam/File Merging")
             if (config["dashcam"]["capture"]["audio"]["merge"] == True and config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if Predator is configured to merge audio and video files.
-                if (os.path.exists(os.path.join(directory, segment_names[-1] + "." + str(config["dashcam"]["capture"]["audio"]["extension"]))) == True): # Check to make sure the audio file exists before attemping to merge.
+                if (os.path.exists(os.path.join(directory, segment_base_names[-1] + "." + str(config["dashcam"]["capture"]["audio"]["extension"]))) == True): # Check to make sure the audio file exists before attemping to merge.
                     merge_audio_video(
                         os.path.join(directory, segment_names[-1] + "." + config["dashcam"]["saving"]["file"]["extension"]), # video file path
-                        os.path.join(directory, segment_names[-1] + "." + str(config["dashcam"]["capture"]["audio"]["extension"])), # audio file path
+                        os.path.join(directory, segment_base_names[-1] + "." + str(config["dashcam"]["capture"]["audio"]["extension"])), # audio file path
                         os.path.join(directory, segment_names[-1] + ".mkv"), # output file path
                         float(config["dashcam"]["capture"]["audio"]["start_delay"]) # audio offset
                     )
@@ -996,6 +1000,7 @@ def dashcam_normal(device):
                 frames_since_last_segment = 0 # Reset the global "frames_since_last_segment" variable for this device.
                 segment_started_time = time.time() # This value holds the exact time the segment started for sake of frame-rate calculations.
                 segment_number += 1
+            segment_base_names.append(datetime.datetime.fromtimestamp(first_segment_start_time + (segment_number*config["dashcam"]["saving"]["segment_length"])).strftime('%Y-%m-%d %H%M%S') + " Predator")
             segment_names.append(datetime.datetime.fromtimestamp(first_segment_start_time + (segment_number*config["dashcam"]["saving"]["segment_length"])).strftime('%Y-%m-%d %H%M%S') + " Predator " + str(device) + " N")
 
             # Initialize the output for the next segment:
@@ -1005,15 +1010,15 @@ def dashcam_normal(device):
             # Handle audio recording for the next segment:
             if (config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if audio recording is enabled in the configuration.
                 process_timing("start", "Dashcam/Audio Processing")
-                audio_filepath = os.path.join(directory, segment_names[-1] + "." + str(config["dashcam"]["capture"]["audio"]["extension"]))
-                if (segment_names[-1] not in audio_recorders or audio_recorders[segment_names[-1]].poll() is not None): # Check to see if the audio recorder hasn't yet been started by another thread.
+                audio_filepath = os.path.join(directory, segment_base_names[-1] + "." + str(config["dashcam"]["capture"]["audio"]["extension"]))
+                if (segment_base_names[-1] not in audio_recorders or audio_recorders[segment_base_names[-1]].poll() is not None): # Check to see if the audio recorder hasn't yet been started by another thread.
                     subprocess.Popen(("sudo -u " + str(config["dashcam"]["capture"]["audio"]["record_as_user"]) + " killall arecord").split(" "), stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Kill the previous arecord instance (if one exists)
                     command = "sleep " + str(float(config["dashcam"]["capture"]["audio"]["start_delay"])) + "; " + audio_record_command + " \"" + str(audio_filepath) + "\""
                     if (config["dashcam"]["capture"]["audio"]["display_output"] == True):
                         print("Executing:", audio_record_command)
-                        audio_recorders[segment_names[-1]] = subprocess.Popen(command, shell=True) # Start the next segment's audio recorder.
+                        audio_recorders[segment_base_names[-1]] = subprocess.Popen(command, shell=True) # Start the next segment's audio recorder.
                     else:
-                        audio_recorders[segment_names[-1]] = subprocess.Popen(command, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Start the next segment's audio recorder.
+                        audio_recorders[segment_base_names[-1]] = subprocess.Popen(command, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Start the next segment's audio recorder.
                     del command
                 process_timing("end", "Dashcam/Audio Processing")
         # =====================================
@@ -1107,8 +1112,8 @@ def dashcam_normal(device):
     # The main recording loop has exited, so wrap up:
     if (config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if audio recording is enabled in the configuration.
         process_timing("start", "Dashcam/Audio Processing")
-        if (segment_names[-1] in audio_recorders and audio_recorders[segment_names[-1]].poll() is None): # Check to see if there is an active audio recorder.
-            audio_recorders[segment_names[-1]].terminate() # Kill the previous segment's audio recorder.
+        if (segment_base_names[-1] in audio_recorders and audio_recorders[segment_base_names[-1]].poll() is None): # Check to see if there is an active audio recorder.
+            audio_recorders[segment_base_names[-1]].terminate() # Kill the previous segment's audio recorder.
         time.sleep(config["dashcam"]["capture"]["audio"]["start_delay"]) # Wait briefly for the audio recorder to terminate.
         subprocess.Popen(("sudo -u " + str(config["dashcam"]["capture"]["audio"]["record_as_user"]) + " killall arecord").split(" "), stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Force kill all audio recording processes.
         process_timing("end", "Dashcam/Audio Processing")
@@ -1121,7 +1126,7 @@ def dashcam_normal(device):
         if (os.path.exists(os.path.join(directory, segment_names[-1] + "." + str(config["dashcam"]["capture"]["audio"]["extension"]))) == True): # Check to make sure the audio file exists before attemping to merge.
             merge_audio_video(
                 os.path.join(directory, segment_names[-1] + "." + config["dashcam"]["saving"]["file"]["extension"]), # video file path
-                os.path.join(directory, segment_names[-1] + "." + str(config["dashcam"]["capture"]["audio"]["extension"])), # audio file path
+                os.path.join(directory, segment_base_names[-1] + "." + str(config["dashcam"]["capture"]["audio"]["extension"])), # audio file path
                 os.path.join(directory, segment_names[-1] + ".mkv"), # output file path
                 float(config["dashcam"]["capture"]["audio"]["start_delay"]) # audio offset
             )
