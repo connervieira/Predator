@@ -58,7 +58,14 @@ These are the features actively planned for Predator and are likely to be added 
 - [ ] Add sound effect for parking mode.
 
 
+## Issues
+
+This section contains known issues that don't currently have a planned fix.
+
+- [ ] Videos and audio are often de-synced by a brief amount of time.
+- [ ] Predator can only record audio for a single camera in parked mode.
+
+
 ## Hypothetical
 
 Features in this section may be added in the future, but are not actively planned.
-
