@@ -426,19 +426,20 @@ def lock_dashcam_segment(file):
     if (time.time()-last_played_dashcam_saved_sound > 5):
         utils.play_sound("dashcam_saved")
     last_played_dashcam_saved_sound = time.time()
+    utils.display_message("Locked dash-cam segment file")
 
     if (os.path.isdir(os.path.join(config["general"]["working_directory"], config["dashcam"]["saving"]["directory"])) == False): # Check to see if the saved dashcam video folder needs to be created.
         os.system("mkdir -p '" + os.path.join(config["general"]["working_directory"], config["dashcam"]["saving"]["directory"] + "'")) # Create the saved dashcam video directory.
 
     if (os.path.isdir(os.path.join(config["general"]["working_directory"], config["dashcam"]["saving"]["directory"]))): # Check to see if the dashcam saving directory exists.
-        os.system("cp '" + file1 + "' '" + config["general"]["working_directory"] + "/" + config["dashcam"]["saving"]["directory"] + "'") # Copy the current dashcam video segment to the saved folder.
+        os.system("cp \"" + file + "\" \"" + os.path.join(config["general"]["working_directory"], config["dashcam"]["saving"]["directory"]) + "\"") # Copy the current dashcam video segment to the saved folder.
         anything_saved = True # Indicate that at least one file was saved.
     else:
         display_message("The dashcam saving directory does not exist, and could not be created. The dashcam video could not be locked.", 3)
 
     time.sleep(0.5) # Wait for a short period of time so that other dashcam recording threads have time to detect the trigger file.
-    os.system("rm -rf '" + os.path.join(config["general"]["interface_directory"], config["dashcam"]["saving"]["trigger"]) + "'") # Remove the dashcam lock trigger file.
-    if (os.path.exists(config["general"]["interface_directory"] + "/" + config["dashcam"]["saving"]["trigger"])): # Check to see if the trigger file exists even after it should have been removed.
+    os.system("rm -f '" + os.path.join(config["general"]["interface_directory"], config["dashcam"]["saving"]["trigger"]) + "'") # Remove the dashcam lock trigger file.
+    if (os.path.exists(os.path.join(config["general"]["interface_directory"], config["dashcam"]["saving"]["trigger"]))): # Check to see if the trigger file exists even after it should have been removed.
         display_message("Unable to remove dashcam lock trigger file.", 3)
 
     process_timing("end", "Dashcam/File Maintenance")
@@ -973,13 +974,20 @@ def dashcam_normal(device):
 
             # Handle segment locking:
             if (os.path.exists(os.path.join(config["general"]["interface_directory"], config["dashcam"]["saving"]["trigger"])) == True): # Check to see if the trigger file exists.
+                # == Save the most recent segment: ==
                 if (config["dashcam"]["capture"]["audio"]["merge"] == True and config["dashcam"]["capture"]["audio"]["enabled"] == True):
-                    threading.Thread(target=lock_dashcam_segment, args=[segment_names[-1]], name="DashcamSegmentSave") # Create the thread to save this dash-cam segment.
-                    if (len(segment_names) >= 2): # Check to see if there is a segment before the current.
-                        with open(os.path.join(config["general"]["interface_directory"], config["dashcam"]["saving"]["trigger"])) as file:
-                            last_trigger_timestamp = utils.to_int(file.read())
-                        if (last_trigger_timestamp - (first_segment_start_time + (segment_number * config["dashcam"]["saving"]["segment_length"])) <= 15): # Check to see if the save was initiated within the first 15 seconds of the segment.
-                            threading.Thread(target=lock_dashcam_segment, args=[segment_names[-1]], name="DashcamSegmentSave") # Create the thread to save the previous segment.
+                    threading.Thread(target=lock_dashcam_segment, args=[os.path.join(directory, segment_names[-1] + ".mkv")], name="DashcamSegmentSave").start() # Create the thread to save this dash-cam segment.
+                else:
+                    threading.Thread(target=lock_dashcam_segment, args=[os.path.join(directory, segment_names[-1] + ".*")], name="DashcamSegmentSave").start() # Create the thread to save this dash-cam segment.
+                # == Save the segment before the most recent (if applicable): ==
+                if (len(segment_names) >= 2): # Check to see if there is a segment before the current.
+                    with open(os.path.join(config["general"]["interface_directory"], config["dashcam"]["saving"]["trigger"])) as file:
+                        last_trigger_timestamp = utils.to_int(file.read())
+                    if (last_trigger_timestamp - (first_segment_start_time + (segment_number * config["dashcam"]["saving"]["segment_length"])) <= 15): # Check to see if the save was initiated within the first 15 seconds of the segment.
+                        if (config["dashcam"]["capture"]["audio"]["merge"] == True and config["dashcam"]["capture"]["audio"]["enabled"] == True):
+                            threading.Thread(target=lock_dashcam_segment, args=[os.path.join(directory, segment_names[-2] + ".mkv")], name="DashcamSegmentSave").start() # Create the thread to save this dash-cam segment.
+                        else:
+                            threading.Thread(target=lock_dashcam_segment, args=[os.path.join(directory, segment_names[-2] + ".*")], name="DashcamSegmentSave").start() # Create the thread to save this dash-cam segment.
 
             # Calculate the frame-rate of the last segment:
             calculated_framerate[device] = frames_since_last_segment/(time.time()-segment_started_time) # Calculate the frame-rate of the previous segment.
@@ -1154,7 +1162,7 @@ def dashcam():
 
 
     update_status_lighting("normal") # Initialize the status lighting to normal.
-
+    os.system("rm -f '" + os.path.join(config["general"]["interface_directory"], config["dashcam"]["saving"]["trigger"]) + "'") # Remove the dashcam lock trigger file, in case it exists at start-up.
 
     # =================================
     # Initialize the physical controls:

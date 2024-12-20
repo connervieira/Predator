@@ -33,6 +33,21 @@ predator_root_directory = str(os.path.dirname(os.path.realpath(__file__))) # Thi
 import time # Required to add delays and handle dates/times.
 import sys # Required to read command line arguments.
 
+if ("--help" in sys.argv):
+    print("\npython3 main.py [MODE] [DIRECTORY] [OPTIONS]")
+    print("    MODE is the number representing operating mode Predator will use.")
+    print("        0\t\tManagement Mode")
+    print("        1\t\tPre-recorded Mode")
+    print("        2\t\tReal-time Mode")
+    print("        3\t\tDash-cam Mode")
+    print("    DIRECTORY specifies the working directory Predator will use.")
+    print("    OPTIONS is any number of command-line options from the list below.")
+    print("        --headless\tenables headless mode, where all user prompts are skipped")
+    print("        --help\t\tdisplays this help message, then exits")
+
+    global_variables.predator_running = False
+    exit()
+
 import utils # Import the utils.py scripts.
 style = utils.style # Load the style from the utils script.
 debug_message  = utils.debug_message # Load the debug message function from the utils script.
@@ -261,7 +276,7 @@ if (len(sys.argv) > 1): # Check to see if there is at least 1 command line argum
         config["general"]["modes"]["auto_start"] = sys.argv[1] # Set the automatic start mode to the mode specified by the command line argument.
 
 if (len(sys.argv) > 2): # Check to see if there are at least 2 command line arguments.
-    if (sys.argv[2] != "--headless"):
+    if (sys.argv[2] not in ["--headless", "--help"]):
         config["general"]["working_directory"] = str(sys.argv[2]) # Set the working directory to the path specified by the command line argument.
 
 

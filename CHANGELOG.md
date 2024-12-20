@@ -597,3 +597,4 @@ November 20th, 2024
                 - "N" indicates normal recording.
                 - "P" indicates parked recording.
             - `ext` is replaced by the file extension.
+- Added `--help` commmand line option.
