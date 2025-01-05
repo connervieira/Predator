@@ -164,6 +164,9 @@ if (config["developer"]["frame_count_method"] in ["manual" or "opencv"]):
         print(e)
         print("cv2 is required because the `developer>frame_count_method` value is set to 'manual' or 'opencv'")
 
+# TODO: Check if Base64 is needed (remote telemetry is enabled).
+import base64
+
 
 
 if (config["general"]["interface_directory"] != ""): # Check to see if the interface directory is enabled.
@@ -878,8 +881,9 @@ def count_frames(video):
     return video_frame_count
 
 # This function is called for every frame, and uploads dash-cam telemetry information at regular intervals.
-last_telementry_sent = 0 # This holds the timestamp of the last time telemetry was sent.
+last_telemetry_sent = 0 # This holds the timestamp of the last time telemetry was sent.
 def send_telemetry(data):
+    global last_telemetry_sent
     # data = {
     #     "image": {
     #         "main": [OpenCV image],
@@ -896,7 +900,7 @@ def send_telemetry(data):
     #     }
     # }
     if (time.time() - last_telemetry_sent >= 10): # Check to see if it has been at least 10 seconds since the last telemetry update.
-        for (device in data["image"]):
+        for device in data["image"]:
             original_height, original_width = data["image"][device].shape[:2]
             target_height = 720
             scale_factor = target_height / original_height
@@ -904,11 +908,11 @@ def send_telemetry(data):
 
             data["image"][device] = cv2.resize(data["image"][device], (new_width, target_height)) # Resize the frame to the target size.
             retval, buffer = cv2.imencode('.jpg', data["image"][device])
-            data["image"][device] = base64.b64encode(buffer)
+            data["image"][device] = base64.b64encode(buffer).decode("utf-8")
         last_telemetry_sent = time.time()
 
         submission = json.dumps(data) # Convert the image information into a string.
-        request = requests.post("http://localhost/portal/ingest.php", data={"identifier": "ebdbaf0781f03d54422b1321", "data": submission}, timeout=8) # TODO: Add configuration options.
+        request = requests.post("http://192.168.0.137/portal/ingest.php", data={"identifier": "ebdbaf0781f03d54422b1321", "data": submission}, timeout=8) # TODO: Add configuration options.
 
 
 

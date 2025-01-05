@@ -1115,7 +1115,7 @@ def dashcam_normal(device):
             "spd": current_location[2],
             "head": current_location[4]
         }
-        send_telemetry(data)
+        utils.send_telemetry(telemetry_data)
 
 
         # ===================
