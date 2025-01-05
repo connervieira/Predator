@@ -33,7 +33,6 @@ display_message = utils.display_message
 debug_message = utils.debug_message
 process_timing = utils.process_timing
 get_gps_location = utils.get_gps_location
-get_gps_location_lazy = utils.get_gps_location_lazy
 heartbeat = utils.heartbeat
 update_state = utils.update_state
 convert_speed = utils.convert_speed
@@ -517,7 +516,7 @@ def apply_dashcam_stamps(frame, device=""):
     gps_stamp = "" # Set the GPS to a blank placeholder. Elements will be added to this in the next steps.
     if (config["general"]["gps"]["enabled"] == True): # Check to see if GPS features are enabled before processing the GPS stamp.
         if (config["dashcam"]["stamps"]["gps"]["location"]["enabled"] == True or config["dashcam"]["stamps"]["gps"]["altitude"]["enabled"] == True or config["dashcam"]["stamps"]["gps"]["speed"]["enabled"] == True): # Check to see if at least one of the GPS stamps is enabled.
-            current_location = get_gps_location_lazy() # Get the most recent location.
+            current_location = utils.get_gps_location_lazy() # Get the most recent location.
             
             if (config["dashcam"]["stamps"]["gps"]["location"]["enabled"] == True): # Check to see if the GPS location stamp is enabled.
                 gps_stamp = gps_stamp + "(" + str(f'{current_location[0]:.5f}') + ", " + str(f'{current_location[1]:.5f}') + ")  " # Add the current coordinates to the GPS stamp.
@@ -1101,6 +1100,22 @@ def dashcam_normal(device):
         # ===================================
         # Write the frame to the output file:
         output.write(frame)
+
+
+        # ===============
+        # Send telemetry:
+        telemetry_data = {}
+        telemetry_data["image"] = current_frame_data
+        current_location = utils.get_gps_location_lazy() # Get the most recent location.
+        telemetry_data["location"] = {
+            "time": utils.get_time(),
+            "lat": current_location[0],
+            "lon": current_location[1],
+            "alt": current_location[3],
+            "spd": current_location[2],
+            "head": current_location[4]
+        }
+        send_telemetry(data)
 
 
         # ===================

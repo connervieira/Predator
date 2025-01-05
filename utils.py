@@ -877,6 +877,40 @@ def count_frames(video):
         video_frame_count = 0
     return video_frame_count
 
+# This function is called for every frame, and uploads dash-cam telemetry information at regular intervals.
+last_telementry_sent = 0 # This holds the timestamp of the last time telemetry was sent.
+def send_telemetry(data):
+    # data = {
+    #     "image": {
+    #         "main": [OpenCV image],
+    #         "rear": "[OpenCV image]",
+    #         ...
+    #     },
+    #     "location": {
+    #         "time": 0.0,
+    #         "lat": 0.0,
+    #         "lon": 0.0,
+    #         "alt": 0.0,
+    #         "spd": 0.0,
+    #         "head": 0.0
+    #     }
+    # }
+    if (time.time() - last_telemetry_sent >= 10): # Check to see if it has been at least 10 seconds since the last telemetry update.
+        for (device in data["image"]):
+            original_height, original_width = data["image"][device].shape[:2]
+            target_height = 720
+            scale_factor = target_height / original_height
+            new_width = int(original_width * scale_factor)
+
+            data["image"][device] = cv2.resize(data["image"][device], (new_width, target_height)) # Resize the frame to the target size.
+            retval, buffer = cv2.imencode('.jpg', data["image"][device])
+            data["image"][device] = base64.b64encode(buffer)
+        last_telemetry_sent = time.time()
+
+        submission = json.dumps(data) # Convert the image information into a string.
+        request = requests.post("http://localhost/portal/ingest.php", data={"identifier": "ebdbaf0781f03d54422b1321", "data": submission}, timeout=8) # TODO: Add configuration options.
+
+
 
 # Calling this function will gracefully stop Predator.
 def stop_predator():
@@ -891,3 +925,5 @@ def to_int(value):
     except:
         value = 0
     return value
+
+
