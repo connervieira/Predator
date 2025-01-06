@@ -66,7 +66,21 @@ if (time.daylight and time.localtime().tm_isdst >= 1):
     daylight_savings = True
 else:
     daylight_savings = False
-timezone_offset = -(time.altzone if daylight_savings else time.timezone) # This is the local timezone's offset from UTC in seconds.
+if daylight_savings:
+    timezone_offset = time.altzone
+else:
+    timezone_offset = time.timezone
+
+# Get the timezone offset as a text stamp.
+hours = offset // 3600
+minutes = (offset // 60) % 60
+if hours < 0: # Check to see if the hours offset is negative.
+    sign = "-"
+else:
+    sign = "+"
+hours = abs(hours) # Make the hours field positive, now that we've specified the sign.
+timezone_offset_stamp = "UTC" + sign + "{:02d}:{:02d}".format(hours, minutes)
+
 
 global_time_offset = 0 
 def get_time():
@@ -688,7 +702,7 @@ def get_gps_location():
                 current_state["gps"] = gps_data_packet.mode 
                 if (gps_data_packet.mode >= 2): # Check to see if the GPS has a 2D fix yet.
                     try:
-                        gps_time = datetime.datetime.strptime(str(gps_data_packet.time)[:-1]+"000" , '%Y-%m-%dT%H:%M:%S.%f').astimezone().timestamp() + timezone_offset # Determine the local Unix timestamp from the GPS timestamp.
+                        gps_time = datetime.datetime.strptime(str(gps_data_packet.time)[:-1]+"000" , '%Y-%m-%dT%H:%M:%S.%f').astimezone().timestamp() - timezone_offset # Determine the local Unix timestamp from the GPS timestamp.
                     except:
                         gps_time = 0
                     position = gps_data_packet.position()
@@ -884,7 +898,11 @@ def count_frames(video):
 last_telemetry_sent = 0 # This holds the timestamp of the last time telemetry was sent.
 def send_telemetry(data):
     global last_telemetry_sent
+    data["system"]["timezone"] = timezone_offset_stamp # Add the system timezone to the data.
     # data = {
+    #    "system": {
+    #         "timezone": "UTC+00:00"
+    #     },
     #     "image": {
     #         "main": [OpenCV image],
     #         "rear": "[OpenCV image]",
@@ -900,6 +918,7 @@ def send_telemetry(data):
     #     }
     # }
     if (time.time() - last_telemetry_sent >= 10): # Check to see if it has been at least 10 seconds since the last telemetry update.
+
         for device in data["image"]:
             original_height, original_width = data["image"][device].shape[:2]
             target_height = 720
