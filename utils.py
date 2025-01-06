@@ -932,6 +932,7 @@ def send_telemetry(data):
 
         submission = json.dumps(data) # Convert the image information into a string.
         request = requests.post("http://192.168.0.137/portal/ingest.php", data={"identifier": "ebdbaf0781f03d54422b1321", "data": submission}, timeout=8) # TODO: Add configuration options.
+        # TODO: Check to see if the request was successful.
 
 
 
