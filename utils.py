@@ -72,8 +72,8 @@ else:
     timezone_offset = time.timezone
 
 # Get the timezone offset as a text stamp.
-hours = offset // 3600
-minutes = (offset // 60) % 60
+hours = timezone_offset // 3600
+minutes = (timezone_offset // 60) % 60
 if hours < 0: # Check to see if the hours offset is negative.
     sign = "-"
 else:
@@ -898,6 +898,7 @@ def count_frames(video):
 last_telemetry_sent = 0 # This holds the timestamp of the last time telemetry was sent.
 def send_telemetry(data):
     global last_telemetry_sent
+    data["system"] = {}
     data["system"]["timezone"] = timezone_offset_stamp # Add the system timezone to the data.
     # data = {
     #    "system": {
