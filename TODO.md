@@ -56,6 +56,7 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Document `developer>frame_count_method` configuration value in `docs/CONFIGURE.md.
 - [X] Validate multi-channel recording.
 - [ ] Add sound effect for parking mode.
+- [ ] Add management mode option to manually upload telemetry back-log.
 
 
 ## Issues
