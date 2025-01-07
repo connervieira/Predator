@@ -178,8 +178,8 @@ if (config["developer"]["frame_count_method"] in ["manual" or "opencv"]):
         print(e)
         print("cv2 is required because the `developer>frame_count_method` value is set to 'manual' or 'opencv'")
 
-# TODO: Check if Base64 is needed (remote telemetry is enabled).
-import base64
+if ("telemetry" in config["dashcam"] and config["dashcam"]["telemetry"]["enabled"] == True): # Check to see if base64 is needed (for encoding images).
+    import base64
 
 
 
@@ -894,22 +894,42 @@ def count_frames(video):
         video_frame_count = 0
     return video_frame_count
 
+
+
+
+
+if ("telemetry" in config["dashcam"] and config["dashcam"]["telemetry"]["saved_failed_updates"]):
+    telemetry_backlog_file_location = config["general"]["interface_directory"] + "/telemetry_backlog.json"
+    if (os.path.exists(telemetry_backlog_file_location) == False): # If the backlog file doesn't exist, create it.
+        save_to_file(telemetry_backlog_file_location, "{}") # Save a blank placeholder dictionary to the backlog file.
+
+    telemetry_backlog_file = open(telemetry_backlog_file_location, "r") # Open the backlog log file for reading.
+    telemetry_backlog_contents = telemetry_backlog_file.read() # Read the raw contents of the backlog file as a string.
+    telemetry_backlog_file.close() # Close the backlog log file.
+
+    if (is_json(telemetry_backlog_contents) == True): # If the backlog file contains valid JSON data, then load it.
+        telemetry_backlog = json.loads(telemetry_backlog_contents) # Read and load the backlog log from the file.
+    else: # If the backlog file doesn't contain valid JSON data, then load a blank placeholder in it's place.
+        telemetry_backlog = json.loads("{}") # Load a blank placeholder dictionary.
 # This function is called for every frame, and uploads dash-cam telemetry information at regular intervals.
 last_telemetry_sent = 0 # This holds the timestamp of the last time telemetry was sent.
 def send_telemetry(data):
     global last_telemetry_sent
+    global telemetry_backlog
     data["system"] = {}
     data["system"]["timezone"] = timezone_offset_stamp # Add the system timezone to the data.
+
+    # Format:
     # data = {
-    #    "system": {
-    #         "timezone": "UTC+00:00"
+    #    "system": { # Must be present
+    #         "timezone": "UTC+00:00" # Must be present and valid.
     #     },
-    #     "image": {
+    #     "image": { # Can be omitted if no image data is present.
     #         "main": [OpenCV image],
     #         "rear": "[OpenCV image]",
     #         ...
     #     },
-    #     "location": {
+    #     "location": { # Must be present, but can be set to all zeros.
     #         "time": 0.0,
     #         "lat": 0.0,
     #         "lon": 0.0,
@@ -918,22 +938,62 @@ def send_telemetry(data):
     #         "head": 0.0
     #     }
     # }
-    if (time.time() - last_telemetry_sent >= 10): # Check to see if it has been at least 10 seconds since the last telemetry update.
-
+    if (time.time() - last_telemetry_sent >= 10): # Check to see if it has been at least 10 seconds since the last telemetry update. Note: most external receivers (such as V0LT Portal) will reject any data within 10 seconds of a previous datapoint.
+        print("Sending telemetry") # TODO: REMOVE
         for device in data["image"]:
+            # Rescale the image to 720p:
             original_height, original_width = data["image"][device].shape[:2]
             target_height = 720
             scale_factor = target_height / original_height
-            new_width = int(original_width * scale_factor)
+            if (scale_factor < 1): # Check to make sure we're shrinking the image, not upscaling it.
+                new_width = int(original_width * scale_factor)
+                data["image"][device] = cv2.resize(data["image"][device], (new_width, target_height)) # Resize the frame to the target size.
 
-            data["image"][device] = cv2.resize(data["image"][device], (new_width, target_height)) # Resize the frame to the target size.
+            # Encode the image to base64 for transmission:
             retval, buffer = cv2.imencode('.jpg', data["image"][device])
             data["image"][device] = base64.b64encode(buffer).decode("utf-8")
+
         last_telemetry_sent = time.time()
 
         submission = json.dumps(data) # Convert the image information into a string.
-        request = requests.post("http://192.168.0.137/portal/ingest.php", data={"identifier": "ebdbaf0781f03d54422b1321", "data": submission}, timeout=8) # TODO: Add configuration options.
-        # TODO: Check to see if the request was successful.
+        try:
+            request = requests.post(config["dashcam"]["telemetry"]["target"], data={"identifier": config["dashcam"]["telemetry"]["identifier"], "data": submission}, timeout=8) # Submit the data.
+            response = request.content
+            if (is_json(response)):
+                response = json.loads(response)
+                if ("success" in response and response["success"] == True):
+                    success = True
+                else:
+                    success = False
+                    if ("reason" in response):
+                        display_message("The remote telemetry provider responded with an error: " + str(response["reason"]), 2)
+                    else:
+                        display_message("The remote telemetry provider responded with an unknown error.", 2)
+            else:
+                display_message("The response from the remote telemetry provider was not valid JSON.", 2)
+                success = False
+        except:
+            display_message("The telemetry", 2)
+            success = False
+
+        if (success == True):
+            if (len(telemetry_backlog) > 0): # Check to see if there is at least one request in the back-log.
+                for timestamp in telemetry_backlog: # Iterate over each entry in the telemetry back-log.
+                    try:
+                        request = requests.post(config["dashcam"]["telemetry"]["target"], data={"identifier": config["dashcam"]["telemetry"]["identifier"], "data": json.dumps(telemetry_backlog[timestamp])}, timeout=8) # Submit the data.
+                        response = request.content
+                        if ("success" in response and response["success"] == True):
+                            success = True
+                        else:
+                            success = False
+                    except:
+                        success = False
+                    if (success == True): # Check to see if the data submission was successful.
+                        del telemetry_backlog[timestamp] # Delete this point from the back-log.
+                save_to_file(telemetry_backlog_file_location, json.dumps(telemetry_backlog)) # Save the updated back-log file.
+        else:
+            telemetry_backlog[data["location"]["time"]] = data # Add this datapoint to the back-log.
+            save_to_file(telemetry_backlog_file_location, json.dumps(telemetry_backlog)) # Save the updated back-log file.
 
 
 

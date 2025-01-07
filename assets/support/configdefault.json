@@ -380,6 +380,12 @@
             },
             "stop_predator": {
             }
+        },
+        "telemetry": {
+            "enabled": false,
+            "target": "https://v0lttech.com/portal/ingest.php",
+            "vehicle_identifier": "",
+            "saved_failed_updates": true
         }
     },
     "developer": {
