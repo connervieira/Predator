@@ -364,6 +364,12 @@ This document describes the configuration values found `config.json`.
                 - Each entry in this configuration section uses the GPIO pin number as a key, and contains the following values:
                     - `name` is a human friendly name for the pin, and can be set to any plain text string.
                     - `hold_time` is a floating point number that determines the number of seconds the button needs to be held to trigger the event.
+        - `telemetry` contains settings for configuring Predator to send telemetry data like dash-cam previous and GPS data to an external service (see [docs/INTEGRATION.md](docs/INTEGRATION.md) for more information).
+            - `enabled` is a boolean that determined whether telemetry sending is enabled.
+            - `target` is the network target that telemetry data will be submitted to.
+            - `vehicle_identifier` is the identifier used to authenticate with the external service.
+            - saved_failed_updates` is a boolean that determines whether Predator will store failed telemetry submissions, and attempt to automatically re-upload them later.
+                - When enabled, a file named `telemetry_backlog.json` will be created in the working directory.
 - `developer` contains technical configuration values that developers and experienced users might be interested in.
     - `ignore_list` contains settings for configuring a list of license plates that Predator will ignore.
         - `enabled` is a boolean that determines whether custom ignore lists are enabled or disabled.

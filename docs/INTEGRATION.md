@@ -1,13 +1,13 @@
 # Integration
 
-This document explains how external local programs can interface with Predator.
+This document explains how external programs can interface with Predator.
 
 If you're interested in developing your own application to integrate with Predator, or you just want to understand how things work behind the scenes, then you're in the right place!
 
 
-## Collection
+## Collection - Local
 
-Predator uses various files to share information with external programs. External programs can read these files to collect information from Predator.
+Predator uses various files to share information with external programs. Programs running on the same system can read these files from the working directory to collect information from Predator in real-time.
 
 ### Heartbeat
 
@@ -49,8 +49,8 @@ Example file contents:
     "mode": "dashcam/parked_dormant",
     "gps": 3,
     "performance": {
-        "front": 49.571633251
-        "rear": 46.661928151
+        "front": 49.571633251,
+        "rear": 46.661928151,
         "cabin": 21.128199629
     }
 }
@@ -156,9 +156,9 @@ Example file contents:
 ```
 
 
-## Triggers
+## Triggers - Local
 
-In addition to the files for sharing information from Predator to external programs, external programs can create specific files to trigger certain events in Predator.
+In addition to the files for sharing information, programs running on the same system can create specific files to trigger certain events in Predator.
 
 ### Dashcam Saving
 
@@ -166,3 +166,45 @@ When an important event happens while driving, a user may want to save a specifi
 
 Dashcam saving can be triggered by create the file specified by the `dashcam>saving>trigger` configuration value inside the interface directory. When this file is created, Predator will save the current dashcam video to the configured directory, then delete the trigger file. The trigger file does not need to contain any information. Only its existence is required to trigger Predator.
 
+
+## Telemetry - Remote
+
+Predator allows users to share telemetry with remote network targets.
+
+Predator sends telemetry as a POST request with two fields:
+- `"identifier"` is a unique identifier used to authenticate with the remote service.
+    - This value is defined in the configuration as `dashcam>telemetry>vehicle_identifier`
+- `"data"` contains the telemetry data as a JSON string with the following structure:
+    - `system` contains information about the Predator system. This field must be present.
+        - `timezone` is the timezone relative to UTC, which follows the format "UTC+00:00". This field must be present.
+    - `image` contains image information captured by each of the devices defined in the Predator configuration as `dashcam>capture>video>devices`.
+        - Each capture device has a field in this section, with the capture device as the key, and the image as the value (encoded in base64).
+        - This section can be omitted, and may not always be present in data submissions.
+    - `location` contains GPS location information. This section must be included, but can be set to all zeros if no GPS data is available.
+        - `time` is the Unix timestamp when this point was captured.
+        - `lat` is the latitude of this point.
+        - `lon` is the longitude of this point.
+        - `alt` is the altitude (in meters) of this point.
+        - `spd` is the speed (in meters per second) of this point.
+        - `head` is the heading of travel of this point.
+
+Below is an example of the "data" field, formatted for readability:
+```json
+{
+   "system": {
+        "timezone": "UTC-04:00"
+    },
+    "image": {
+        "front": "QECAgICAgQDAgICAgUEBAME...",
+        "rear": "SNVs45WGRagZLerHJ6nA4x2N..."
+    },
+    "location": {
+        "time": 1451606400,
+        "lat": 41.688906,
+        "lon": -81.208030,
+        "alt": 241.4,
+        "spd": 31.9,
+        "head": 40.0
+    }
+}
+```

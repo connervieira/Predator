@@ -325,6 +325,12 @@
         "physical_controls": {
             "dashcam_saving": "dict",
             "stop_predator": "dict"
+        },
+        "telemetry": {
+            "enabled": "bool",
+            "target": "str",
+            "vehicle_identifier": "str",
+            "saved_failed_updates": "bool"
         }
     },
     "developer": {
