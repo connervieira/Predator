@@ -669,6 +669,16 @@ def display_shape(shape):
 
 
 
+# This function returns the nearest timestamp key in dictionary to a given timestamp.
+def closest_key(array, search_key):
+    current_best = [0, get_time()]
+    for key in array: # Iterate through each timestamp in the given dictionary.
+        difference = abs(float(search_key) - float(key)) # Calculate the difference in time between the given timestamp, and this timestamp.
+        if (difference < current_best[1]): # Check to see if this entry is closer than the current best.
+            current_best = [key, difference] # Make this entry the current best.
+
+    return current_best # Return the closest found entry.
+
 
 
 # Define the function that will be used to get the current GPS coordinates.
@@ -823,18 +833,6 @@ def display_number(display_number="0"):
     for line_index in display_lines: # Iterate through each line that needs to displayed.
         print(display_lines[line_index]) # Print each individual line.
 
-
-
-
-# This function returns the nearest timestamp key in dictionary to a given timestamp.
-def closest_key(array, search_key):
-    current_best = [0, get_time()]
-    for key in array: # Iterate through each timestamp in the given dictionary.
-        difference = abs(float(search_key) - float(key)) # Calculate the difference in time between the given timestamp, and this timestamp.
-        if (difference < current_best[1]): # Check to see if this entry is closer than the current best.
-            current_best = [key, difference] # Make this entry the current best.
-
-    return current_best # Return the closest found entry.
 
 
 

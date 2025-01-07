@@ -598,3 +598,4 @@ November 20th, 2024
                 - "P" indicates parked recording.
             - `ext` is replaced by the file extension.
 - Added `--help` commmand line option.
+- Fixed GPS demo mode.
