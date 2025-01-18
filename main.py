@@ -124,7 +124,7 @@ if (os.path.exists(predator_root_directory + "/install.json") == False): # Check
     clear()
     print(style.bold + style.red + "Privacy" + style.end)
     print("Predator does not share telemetry or usage data with V0LT, or any other entity. However, by default, Predator will attach a random identifier to requests made to remote license plate list sources (as configured under `general>alerts>databases`). This identifier allows administrators of servers hosting license plate lists to roughly count how many clients are using their lists. If you're concerned about the administrator of one of your remote license plate lists using this unique identifier to derive information about how often you use Predator (based on when you fetch their lists), you can disable this functionality using the `developer>identify_to_remote_sources` configuration value.")
-    print("Additionally, by default, Predator will fetch a hardcoded ignore list from the V0LT website. Once again, this functionality does not send any identifiable information or telemetry data. To disable this functionality, either enable the `developer>offline` configuration value to disable all network requests, or remove the hardcoded ignore list from `ignore.py`.")
+    print("Additionally, by default, Predator will fetch a hardcoded ignore list from the V0LT website. This functionality does not send any identifiable information or telemetry data (even when identify_to_remote_sources is enabled). To disable this functionality, either enable the `developer>offline` configuration value to disable all network requests, or remove the hardcoded ignore list from `ignore.py`.")
     print("For more information, see the `docs/CONFIGURE.md` document.")
     input(style.faint + "Press enter to continue..." + style.end)
 
@@ -430,26 +430,28 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
 
                 # Prompt the user for the copying destination.
                 copy_destination = "" # Set the copy_destination as a blank placeholder.
-                while os.path.exists(copy_destination) == False: # Repeatedly ask the user for a valid copy destination until they enter one that is valid.
-                    copy_destination = prompt("Destination path: ", optional=False, input_type=str) # Prompt the user for a destination path.
+                while os.path.isdir(copy_destination) == False: # Repeatedly ask the user for a valid copy destination until they enter one that is valid.
+                    copy_destination = prompt("Destination directory: ", optional=False, input_type=str) # Prompt the user for a destination path.
+                    if (os.path.isdir(copy_destination) == False):
+                        display_message("The specified destination is not a valid directory.", 2)
 
 
                 # Copy the files as per the user's inputs.
                 print("Copying files...")
                 if (copy_management_configuration):
-                    os.system("cp " + predator_root_directory + "/config.json " + copy_destination)
+                    os.system("cp \"" + predator_root_directory + "/config.json\" \"" + copy_destination + "\"")
                 if (copy_prerecorded_processed_frames):
-                    os.system("cp -r " + config["general"]["working_directory"] + "/frames " + copy_destination)
+                    os.system("cp -r \"" + config["general"]["working_directory"] + "/frames\" \"" + copy_destination + "\"")
                 if (copy_prerecorded_gpx_files):
-                    os.system("cp " + config["general"]["working_directory"] + "/*.gpx " + copy_destination)
+                    os.system("cp \"" + config["general"]["working_directory"] + "/*.gpx\" \"" + copy_destination + "\"")
                 if (copy_prerecorded_license_plate_analysis_data):
-                    os.system("cp " + config["general"]["working_directory"] + "/pre_recorded_license_plate_export.* " + copy_destination)
+                    os.system("cp \"" + config["general"]["working_directory"] + "/pre_recorded_license_plate_export.*\" \"" + copy_destination + "\"")
                 if (copy_prerecorded_license_plate_location_data):
-                    os.system("cp " + config["general"]["working_directory"] + "/pre_recorded_location_data_export.* " + copy_destination)
+                    os.system("cp \"" + config["general"]["working_directory"] + "/pre_recorded_location_data_export.*\" \"" + copy_destination + "\"")
                 if (copy_realtime_license_plate_recognition_data):
-                    os.system("cp " + config["general"]["working_directory"] + "/real_time_plates* " + copy_destination)
+                    os.system("cp \"" + config["general"]["working_directory"] + "/real_time_plates*\" \"" + copy_destination + "\"")
                 if (copy_dashcam_video):
-                    os.system("cp " + config["general"]["working_directory"] + "/predator_dashcam* " + copy_destination)
+                    os.system("cp \"" + os.path.join(config["general"]["working_directory"], "*Predator*." + config["dashcam"]["saving"]["file"]["extension"]) + "\" \"" + copy_destination + "\"")
 
                 clear()
                 print("Files have finished copying.")
@@ -535,19 +537,19 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                 if (prompt("Are you sure you want to delete the selected files permanently? (y/n): ").lower() == "y"):
                     print("Deleting files...")
                     if (delete_management_custom):
-                        os.system("rm -r " + config["general"]["working_directory"] + "/" + delete_custom_file_name)
+                        os.system("rm -r \"" + config["general"]["working_directory"] + "/" + delete_custom_file_name + "\"")
                     if (delete_prerecorded_processed_frames):
-                        os.system("rm -r " + config["general"]["working_directory"] + "/frames")
+                        os.system("rm -r \"" + config["general"]["working_directory"] + "/frames\"")
                     if (delete_prerecorded_gpx_files):
-                        os.system("rm " + config["general"]["working_directory"] + "/*.gpx")
+                        os.system("rm \"" + config["general"]["working_directory"] + "/*.gpx\"")
                     if (delete_prerecorded_license_plate_analysis_data):
-                        os.system("rm " + config["general"]["working_directory"] + "/pre_recorded_license_plate_export.*")
+                        os.system("rm \"" + config["general"]["working_directory"] + "/pre_recorded_license_plate_export.*\"")
                     if (delete_prerecorded_license_plate_location_data):
-                        os.system("rm " + config["general"]["working_directory"] + "/pre_recorded_location_data_export.*")
+                        os.system("rm \"" + config["general"]["working_directory"] + "/pre_recorded_location_data_export.*\"")
                     if (delete_realtime_license_plate_recognition_data):
-                        os.system("rm " + config["general"]["working_directory"] + "/real_time_plates*")
+                        os.system("rm \"" + config["general"]["working_directory"] + "/real_time_plates*\"")
                     if (delete_dashcam_video):
-                        os.system("rm " + config["general"]["working_directory"] + "/predator_dashcam*")
+                        os.system("rm \"" + os.path.join(config["general"]["working_directory"], "*Predator*." + config["dashcam"]["saving"]["file"]["extension"]) + "\"")
                     clear()
                     print("Files have finished deleting.")
                 else:

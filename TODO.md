@@ -57,6 +57,7 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Validate multi-channel recording.
 - [ ] Add sound effect for parking mode.
 - [ ] Add management mode option to manually upload telemetry back-log.
+- [ ] Fix management mode for dashcam video (main.py:452 and 550)
 
 
 ## Issues

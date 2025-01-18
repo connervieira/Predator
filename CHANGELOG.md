@@ -599,3 +599,5 @@ November 20th, 2024
             - `ext` is replaced by the file extension.
 - Added `--help` commmand line option.
 - Fixed GPS demo mode.
+- Improved the reliability of file copying and erasing via management.
+    - Previously, this functionality might have behaved unexpected when the file path involved spaces.
