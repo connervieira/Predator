@@ -1281,7 +1281,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
                     # Run the appropriate tasks, based on whether or not a valid license plate was detected.
                     if (successfully_found_plate == True): # Check to see if a valid plate was detected this round after the validation process ran.
                         detected_license_plates.append(detected_plate) # Save the most likely license plate ID to the detected_license_plates complete list.
-                        new_plates_detected.append(detected_plate) # Save the most likely license plate ID to this round's new_plates_detected list.
+                        new_plates_detected.append([detected_plate, individual_detected_plate]) # Save the most likely license plate to this round's new_plates_detected list, as well as the plate from "all_current_plate_guesses" that it comes from.
 
 
                         if (config["realtime"]["push_notifications"]["enabled"] == True): # Check to see if the user has Gotify notifications enabled.
@@ -1298,7 +1298,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
 
                     elif (successfully_found_plate == False): # A plate was found, but none of the guesses matched the formatting guidelines provided by the user.
                         if (config["general"]["alpr"]["validation"]["best_effort"] == True): # Check to see if 'best effort' validation is enabled.
-                            new_plates_detected.append(next(iter(all_current_plate_guesses[individual_detected_plate]))) # Add the most likely guess for this plate to the list of detected license plates.
+                            new_plates_detected.append([next(iter(all_current_plate_guesses[individual_detected_plate])), individual_detected_plate]) # Add the most likely guess for this plate to the list of detected license plates.
 
                         if (config["realtime"]["interface"]["display"]["shape_alerts"] == True): # Check to see if the user has enabled shape notifications.
                             display_shape("circle") # Display an ASCII circle in the output.
@@ -1324,7 +1324,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
             if (config["realtime"]["interface"]["display"]["output_level"] >= 2): # Only display this status message if the output level indicates to do so.
                 print("Plates detected: " + str(len(new_plates_detected))) # Display the number of license plates detected this round.
                 for plate in new_plates_detected:
-                    print("    Detected plate: " + plate) # Print the detected plate.
+                    print("    Detected plate: " + plate[0]) # Print the detected plate.
 
 
 
@@ -1349,9 +1349,9 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
             else: #  If the user has disabled alerts that ignore license plate validation, then only check the validated plate array against the alert database.
                 for rule in alert_database: # Run through every plate in the alert plate database supplied by the user. If no database was supplied, this list will be empty, and will not run.
                     for plate in new_plates_detected: # Iterate through each plate that was detected and validated this round.
-                        if (fnmatch.fnmatch(plate, rule)): # Check to see the validated detected plate matches this particular plate in the alert database, taking wildcards into account.
-                            active_alerts[plate] = alert_database[rule] # Add this plate to the active alerts dictionary.
-                            active_alerts[plate]["rule"] = rule # Add the rule that triggered this alert to the alert information.
+                        if (fnmatch.fnmatch(plate[0], rule)): # Check to see the validated detected plate matches this particular plate in the alert database, taking wildcards into account.
+                            active_alerts[plate[0]] = alert_database[rule] # Add this plate to the active alerts dictionary.
+                            active_alerts[plate[0]]["rule"] = rule # Add the rule that triggered this alert to the alert information.
 
 
 
@@ -1376,19 +1376,23 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
                     plate_log[current_time]["plates"] = {}
 
 
-                    for plate in all_current_plate_guesses: # Iterate though each plate detected this round.
-                        if (config["realtime"]["saving"]["license_plates"]["save_guesses"] == True): # Only initialize the plate's guesses to the log if Predator is configured to do so.
-                            plate_log[current_time]["plates"][plate] = {"alerts": [], "guesses": {}} # Initialize this plate in the plate log.
-                        else:
-                            plate_log[current_time]["plates"][plate] = {"alerts": []} # Initialize this plate in the plate log.
-                        for guess in all_current_plate_guesses[plate]: # Iterate through each guess in this plate.
-                            if (guess in active_alerts): # Check to see if this guess matches one of the active alerts.
-                                plate_log[current_time]["plates"][plate]["alerts"].append(active_alerts[guess]["rule"]) # Add the rule that triggered the alert to a separate list.
-                            if (config["realtime"]["saving"]["license_plates"]["save_guesses"] == True): # Only add this guess to the log if Predator is configured to do so.
-                                plate_log[current_time]["plates"][plate]["guesses"][guess] = all_current_plate_guesses[plate][guess] # Add this guess to the log, with its confidence level.
+                    if (config["realtime"]["saving"]["license_plates"]["save_guesses"] == True): # Check if Predator is configured to save all plate guesses.
+                        plate_log[current_time]["plates"][plate] = {"alerts": [], "guesses": {}} # Initialize this plate in the plate log.
+                        for plate in all_current_plate_guesses: # Iterate though each plate detected this round.
+                            for guess in all_current_plate_guesses[plate]: # Iterate through each guess in this plate.
+                                if (guess in active_alerts): # Check to see if this guess matches one of the active alerts.
+                                    plate_log[current_time]["plates"][plate]["alerts"].append(active_alerts[guess]["rule"]) # Add the rule that triggered the alert to a separate list.
+                                if (config["realtime"]["saving"]["license_plates"]["save_guesses"] == True): # Only add this guess to the log if Predator is configured to do so.
+                                    plate_log[current_time]["plates"][plate]["guesses"][guess] = all_current_plate_guesses[plate][guess] # Add this guess to the log, with its confidence level.
+                    else: # Predator is configured only to save the most likely plate guess to the plate log file.
+                        for plate in new_plates_detected: # Iterate over each individual plate detected.
+                            plate_log[current_time]["plates"][plate[0]] = {"alerts": []} # Initialize this plate in the plate log.
+                            for guess in all_current_plate_guesses[plate[1]]: # Iterate through each guess associated with this plate.
+                                if (guess in active_alerts): # Check to see if this guess matches one of the active alerts.
+                                    plate_log[current_time]["plates"][plate[0]]["alerts"].append(active_alerts[guess]["rule"]) # Add the rule that triggered the alert to a separate list.
 
 
-                        plate_log[current_time]["plates"][plate]["alerts"] = list(dict.fromkeys(plate_log[current_time]["plates"][plate]["alerts"])) # De-duplicate the 'alerts' list for this plate.
+                        plate_log[current_time]["plates"][plate[0]]["alerts"] = list(dict.fromkeys(plate_log[current_time]["plates"][plate[0]]["alerts"])) # De-duplicate the 'alerts' list for this plate.
 
                     save_to_file(config["general"]["working_directory"] + "/" + config["realtime"]["saving"]["license_plates"]["file"], json.dumps(plate_log)) # Save the modified plate log to the disk as JSON data.
 
@@ -1435,7 +1439,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
                 time.sleep(float(config["realtime"]["interface"]["behavior"]["delays"]["alert"])) # Trigger a delay based on the fact that there is at least one active alert.
             else:
                 time.sleep(float(config["realtime"]["interface"]["behavior"]["delays"]["normal"])) # Trigger a normal delay.
-    except:
+    except Exception as e:
         print("Exiting Predator...")
         global_variables.predator_running = False
         os.popen("killall alpr") # Kill the background ALPR process.

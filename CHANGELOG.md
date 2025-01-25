@@ -597,6 +597,7 @@ November 20th, 2024
                 - "N" indicates normal recording.
                 - "P" indicates parked recording.
             - `ext` is replaced by the file extension.
+- Improved license plate logging in real-time mode.
 - Added `--help` commmand line option.
 - Fixed GPS demo mode.
 - Improved the reliability of file copying and erasing via management.
