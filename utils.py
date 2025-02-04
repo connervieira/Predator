@@ -918,25 +918,6 @@ def send_telemetry(data):
         data["system"] = {}
         data["system"]["timezone"] = timezone_offset_stamp # Add the system timezone to the data.
 
-        # Format:
-        # data = {
-        #    "system": { # Must be present
-        #         "timezone": "UTC+00:00" # Must be present and valid.
-        #     },
-        #     "image": { # Can be omitted if no image data is present.
-        #         "main": [OpenCV image],
-        #         "rear": "[OpenCV image]",
-        #         ...
-        #     },
-        #     "location": { # Must be present, but can be set to all zeros.
-        #         "time": 0.0,
-        #         "lat": 0.0,
-        #         "lon": 0.0,
-        #         "alt": 0.0,
-        #         "spd": 0.0,
-        #         "head": 0.0
-        #     }
-        # }
         if (time.time() - last_telemetry_sent >= 10): # Check to see if it has been at least 10 seconds since the last telemetry update. Note: most external receivers (such as V0LT Portal) will reject any data within 10 seconds of a previous datapoint.
             for device in data["image"]:
                 # Rescale the image to 720p:
@@ -968,15 +949,16 @@ def send_telemetry(data):
                         else:
                             display_message("The remote telemetry provider responded with an unknown error.", 2)
                 else:
-                    display_message("The response from the remote telemetry provider was not valid JSON.", 2)
+                    display_message("The response from the remote telemetry provider was not valid JSON. (" + str(response) + ")", 2)
                     success = False
             except Exception as exception:
                 display_message("The telemetry upload process failed with the following exception:", 2)
                 print(exception)
                 success = False
 
-            if (success == True):
+            if (success == True): # Check to see if the current submission was successful.
                 if (len(telemetry_backlog) > 0): # Check to see if there is at least one request in the back-log.
+                    consecutive_failures = 0 # This will count consecutive failures to we can tell if we should abort.
                     for timestamp in list(telemetry_backlog.keys()): # Iterate over each entry in the telemetry back-log.
                         try:
                             request = requests.post(config["dashcam"]["telemetry"]["target"], data={"identifier": config["dashcam"]["telemetry"]["vehicle_identifier"], "data": json.dumps(telemetry_backlog[timestamp])}, timeout=8) # Submit the data.
@@ -984,13 +966,23 @@ def send_telemetry(data):
                             if ("success" in response and response["success"] == True):
                                 success = True
                             else:
+                                if ("code" in response): # Check to see if an error code was returned.
+                                    if (response["code"] in ["timezone_offset_invalid"]): # Check to see if the error code matches a type that would cause all of the other points to fail as well.
+                                        break
+                                    elif (response["code"] in ["timestamp_invalid"]): # Check to see if the error code matches a type that would cause this entry to fail forever.
+                                        del telemetry_backlog[timestamp] # Delete this point from the back-log.
                                 success = False
                         except Exception as e:
                             success = False
                         if (success == True): # Check to see if the data submission was successful.
+                            consecutive_failures = 0 # Reset the consecutive failure counter.
                             del telemetry_backlog[timestamp] # Delete this point from the back-log.
+                        else:
+                            consecutive_failures += 1
+                        if (consecutive_failures >= 10): # Check to see if we have had several consecutive failures.
+                            break # Exit the loop (give up on the remaining 
                     save_to_file(telemetry_backlog_file_location, json.dumps(telemetry_backlog)) # Save the updated back-log file.
-            else:
+            else: # Otherwise, the current submission failed.
                 del data["image"] # Delete the image data before adding it to the backlog.
                 telemetry_backlog[data["location"]["time"]] = data # Add this datapoint to the back-log.
                 save_to_file(telemetry_backlog_file_location, json.dumps(telemetry_backlog)) # Save the updated back-log file.
