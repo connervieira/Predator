@@ -57,6 +57,7 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Validate multi-channel recording.
 - [ ] Add sound effect for parking mode.
 - [ ] Add management mode option to manually upload telemetry back-log.
+- [ ] Allow Predator to lock dashcam videos even after audio merging fails.
 
 
 ## Issues
