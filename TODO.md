@@ -72,3 +72,5 @@ This section contains known issues that don't currently have a planned fix.
 ## Hypothetical
 
 Features in this section may be added in the future, but are not actively planned.
+
+- [ ] Add "pursuit" mode that automatically starts tracking telemetry when a specific relay is triggered.
