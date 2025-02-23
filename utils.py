@@ -918,19 +918,27 @@ def send_telemetry(data):
         data["system"] = {}
         data["system"]["timezone"] = timezone_offset_stamp # Add the system timezone to the data.
 
-        if (time.time() - last_telemetry_sent >= 10): # Check to see if it has been at least 10 seconds since the last telemetry update. Note: most external receivers (such as V0LT Portal) will reject any data within 10 seconds of a previous datapoint.
-            for device in data["image"]:
-                # Rescale the image to 720p:
-                original_height, original_width = data["image"][device].shape[:2]
-                target_height = 720
-                scale_factor = target_height / original_height
-                if (scale_factor < 1): # Check to make sure we're shrinking the image, not upscaling it.
-                    new_width = int(original_width * scale_factor)
-                    data["image"][device] = cv2.resize(data["image"][device], (new_width, target_height)) # Resize the frame to the target size.
 
-                # Encode the image to base64 for transmission:
-                retval, buffer = cv2.imencode('.jpg', data["image"][device])
-                data["image"][device] = base64.b64encode(buffer).decode("utf-8")
+        if (time.time() - last_telemetry_sent >= 10): # Check to see if it has been at least 10 seconds since the last telemetry update. Note: most external receivers (such as V0LT Portal) will reject any data within 10 seconds of a previous datapoint.
+            if (config["dashcam"]["telemetry"]["send_images"] == True):
+                for device in list(data["image"]):
+                    try:
+                        # Rescale the image to 720p:
+                        original_height, original_width = data["image"][device].shape[:2]
+                        target_height = 720
+                        scale_factor = target_height / original_height
+                        if (scale_factor < 1): # Check to make sure we're shrinking the image, not upscaling it.
+                            new_width = int(original_width * scale_factor)
+                            data["image"][device] = cv2.resize(data["image"][device], (new_width, target_height)) # Resize the frame to the target size.
+
+                        # Encode the image to base64 for transmission:
+                        retval, buffer = cv2.imencode('.jpg', data["image"][device])
+                        data["image"][device] = base64.b64encode(buffer).decode("utf-8")
+                    except:
+                        del data["image"][device]
+                        print("FAILED") # TODO: Replace with a proper error message.
+            else:
+                del data["image"]
 
             last_telemetry_sent = time.time()
 

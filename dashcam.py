@@ -1105,7 +1105,7 @@ def dashcam_normal(device):
         # ===============
         # Send telemetry:
         telemetry_data = {}
-        telemetry_data["image"] = current_frame_data
+        telemetry_data["image"] = dict(current_frame_data)
         current_location = utils.get_gps_location_lazy() # Get the most recent location.
         telemetry_data["location"] = {
             "time": utils.get_time(),
@@ -1115,7 +1115,9 @@ def dashcam_normal(device):
             "spd": current_location[2],
             "head": current_location[4]
         }
-        utils.send_telemetry(telemetry_data)
+        #utils.send_telemetry(telemetry_data)
+        telemetry_thread = threading.Thread(target=utils.send_telemetry, args=[dict(telemetry_data)]) # Create a separate thread to process and upload telemetry.
+        telemetry_thread.start()
 
 
         # ===================

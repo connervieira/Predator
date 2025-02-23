@@ -368,8 +368,10 @@ This document describes the configuration values found `config.json`.
             - `enabled` is a boolean that determined whether telemetry sending is enabled.
             - `target` is the network target that telemetry data will be submitted to.
             - `vehicle_identifier` is the identifier used to authenticate with the external service.
-            - saved_failed_updates` is a boolean that determines whether Predator will store failed telemetry submissions, and attempt to automatically re-upload them later.
+            - `save_failed_updates` is a boolean that determines whether Predator will store failed telemetry submissions, and attempt to automatically re-upload them later.
                 - When enabled, a file named `telemetry_backlog.json` will be created in the working directory.
+            - `send_images` is a boolean that determines whether Predator will upload the current frame of each capture device every time telemetry is uploaded.
+                - Setting this to `true` will dramatically increase data usage, and may cause frame rate drops without sufficient processing power.
 - `developer` contains technical configuration values that developers and experienced users might be interested in.
     - `ignore_list` contains settings for configuring a list of license plates that Predator will ignore.
         - `enabled` is a boolean that determines whether custom ignore lists are enabled or disabled.

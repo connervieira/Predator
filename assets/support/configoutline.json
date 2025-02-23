@@ -330,7 +330,8 @@
             "enabled": "bool",
             "target": "str",
             "vehicle_identifier": "str",
-            "saved_failed_updates": "bool"
+            "save_failed_updates": "bool",
+            "send_images": "bool"
         }
     },
     "developer": {

@@ -385,7 +385,8 @@
             "enabled": false,
             "target": "https://v0lttech.com/portal/ingest.php",
             "vehicle_identifier": "",
-            "saved_failed_updates": true
+            "save_failed_updates": true,
+            "send_images": false
         }
     },
     "developer": {
