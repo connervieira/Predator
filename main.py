@@ -1392,7 +1392,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
                                     plate_log[current_time]["plates"][plate[0]]["alerts"].append(active_alerts[guess]["rule"]) # Add the rule that triggered the alert to a separate list.
 
 
-                        plate_log[current_time]["plates"][plate[0]]["alerts"] = list(dict.fromkeys(plate_log[current_time]["plates"][plate[0]]["alerts"])) # De-duplicate the 'alerts' list for this plate.
+                            plate_log[current_time]["plates"][plate[0]]["alerts"] = list(dict.fromkeys(plate_log[current_time]["plates"][plate[0]]["alerts"])) # De-duplicate the 'alerts' list for this plate.
 
                     save_to_file(config["general"]["working_directory"] + "/" + config["realtime"]["saving"]["license_plates"]["file"], json.dumps(plate_log)) # Save the modified plate log to the disk as JSON data.
 
