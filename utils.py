@@ -727,7 +727,7 @@ def get_gps_location():
                     satellites = gps_data_packet.sats
                 else:
                     altitude = 0 # Use a placeholder for altitude.
-                    heading = 0 # Use a placeholder for heading.
+                    heading = -1 # Use a placeholder for heading.
                     satellites = 0 # Use a placeholder for satellites.
 
                 if (config["general"]["gps"]["time_correction"]["enabled"] == True):
