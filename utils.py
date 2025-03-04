@@ -896,7 +896,7 @@ def count_frames(video):
 
 
 
-if ("telemetry" in config["dashcam"] and config["dashcam"]["telemetry"]["saved_failed_updates"]):
+if ("telemetry" in config["dashcam"] and config["dashcam"]["telemetry"]["save_failed_updates"]):
     telemetry_backlog_file_location = config["general"]["working_directory"] + "/telemetry_backlog.json"
     if (os.path.exists(telemetry_backlog_file_location) == False): # If the backlog file doesn't exist, create it.
         save_to_file(telemetry_backlog_file_location, "{}") # Save a blank placeholder dictionary to the backlog file.
@@ -991,7 +991,8 @@ def send_telemetry(data):
                             break # Exit the loop (give up on the remaining 
                     save_to_file(telemetry_backlog_file_location, json.dumps(telemetry_backlog)) # Save the updated back-log file.
             else: # Otherwise, the current submission failed.
-                del data["image"] # Delete the image data before adding it to the backlog.
+                if ("image" in data): # Check to see if there is an image associated with this submission.
+                    del data["image"] # Delete the image data before adding it to the backlog.
                 telemetry_backlog[data["location"]["time"]] = data # Add this datapoint to the back-log.
                 save_to_file(telemetry_backlog_file_location, json.dumps(telemetry_backlog)) # Save the updated back-log file.
 
