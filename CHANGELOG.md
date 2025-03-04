@@ -591,14 +591,18 @@ November 20th, 2024
         - Predator now has organized functions for each recording state (normal, parked-dormant, parked-event)
         - Sub-functions are called as separate threads by a supervisor process.
     - Changed the dash-cam video file name template.
-        - Saved dash-cam videos now follow this structure: "YYYY-MM-DD HHMMSS Predator X.ext"
+        - Saved dash-cam videos now follow this structure: "YYYY-MM-DD HHMMSS Predator device X.ext"
             - `YYYY-MM-DD HHMMSS` is replaced by the current date and time in 24 hour format.
+            - `device` is replaced by the capture device name as defined in the configuration file.
             - `X` is replaced by the recording mode.
                 - "N" indicates normal recording.
                 - "P" indicates parked recording.
             - `ext` is replaced by the file extension.
-- Improved license plate logging in real-time mode.
+- Updated real-time mode.
+    - Improved license plate logging in real-time mode.
 - Added `--help` commmand line option.
-- Fixed GPS demo mode.
+- Made improvements to the GPS back-end.
+    - Fixed GPS demo mode.
+    - When the heading can't be identified, the GPS back-end now returns -1 instead of 0.
 - Improved the reliability of file copying and erasing via management.
     - Previously, this functionality might have behaved unexpected when the file path involved spaces.
