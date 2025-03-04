@@ -977,7 +977,9 @@ def dashcam_normal(device):
                 if (config["dashcam"]["capture"]["audio"]["merge"] == True and config["dashcam"]["capture"]["audio"]["enabled"] == True):
                     threading.Thread(target=lock_dashcam_segment, args=[os.path.join(directory, segment_names[-1] + ".mkv")], name="DashcamSegmentSave").start() # Create the thread to save this dash-cam segment.
                 else:
-                    threading.Thread(target=lock_dashcam_segment, args=[os.path.join(directory, segment_names[-1] + ".*")], name="DashcamSegmentSave").start() # Create the thread to save this dash-cam segment.
+                    threading.Thread(target=lock_dashcam_segment, args=[os.path.join(directory, segment_names[-1] + "." + config["dashcam"]["saving"]["file"]["extension"])], name="DashcamSegmentSave").start() # Create the thread to save this dash-cam segment.
+                    if (config["dashcam"]["capture"]["audio"]["enabled"] == True):
+                        threading.Thread(target=lock_dashcam_segment, args=[os.path.join(directory, segment_names[-1] + "." + config["dashcam"]["capture"]["audio"]["extension"])], name="DashcamSegmentSave").start() # Create the thread to save this dash-cam segment.
                 # == Save the segment before the most recent (if applicable): ==
                 if (len(segment_names) >= 2): # Check to see if there is a segment before the current.
                     with open(os.path.join(config["general"]["interface_directory"], config["dashcam"]["saving"]["trigger"])) as file:
@@ -986,7 +988,10 @@ def dashcam_normal(device):
                         if (config["dashcam"]["capture"]["audio"]["merge"] == True and config["dashcam"]["capture"]["audio"]["enabled"] == True):
                             threading.Thread(target=lock_dashcam_segment, args=[os.path.join(directory, segment_names[-2] + ".mkv")], name="DashcamSegmentSave").start() # Create the thread to save this dash-cam segment.
                         else:
-                            threading.Thread(target=lock_dashcam_segment, args=[os.path.join(directory, segment_names[-2] + ".*")], name="DashcamSegmentSave").start() # Create the thread to save this dash-cam segment.
+                            threading.Thread(target=lock_dashcam_segment, args=[os.path.join(directory, segment_names[-2] + "." + config["dashcam"]["saving"]["file"]["extension"])], name="DashcamSegmentSave").start() # Create the thread to save this dash-cam segment.
+                            if (config["dashcam"]["capture"]["audio"]["enabled"] == True):
+                                threading.Thread(target=lock_dashcam_segment, args=[os.path.join(directory, segment_names[-2] + "." + config["dashcam"]["capture"]["audio"]["extension"])], name="DashcamSegmentSave").start() # Create the thread to save this dash-cam segment.
+
 
             # Calculate the frame-rate of the last segment:
             calculated_framerate[device] = frames_since_last_segment/(time.time()-segment_started_time) # Calculate the frame-rate of the previous segment.
