@@ -1360,7 +1360,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
             if (config["realtime"]["saving"]["license_plates"]["enabled"] == True): # Check to see if license plate history saving is enabled.
                 debug_message("Saving license plate history")
 
-                if (len(all_current_plate_guesses) > 0): # Only save the license plate history for this round if 1 or more plates were detected.
+                if ((len(all_current_plate_guesses) > 0 and config["realtime"]["saving"]["license_plates"]["save_guesses"] == True) or (len(new_plates_detected) > 0 and config["realtime"]["saving"]["license_plates"]["save_guesses"] == False)): # Only save the license plate history for this round if 1 or more plates were detected.
                     current_time = time.time() # Get the current timestamp.
 
                     plate_log[current_time] = {} # Initialize an entry in the plate history log using the current time.
@@ -1369,12 +1369,11 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
                         if (config["general"]["gps"]["enabled"] == True): # Check to see if GPS functionality is enabled.
                             current_location = get_gps_location() # Get the current location.
                         else:
-                            current_location = [0.0, 0.0] # Grab a placeholder for the current location, since GPS functionality is disabled.
+                            current_location = [0.0, 0.0, 0, -1] # Grab a placeholder for the current location, since GPS functionality is disabled.
 
-                        plate_log[current_time]["location"] = {"lat": current_location[0],"lon": current_location[1]} # Add the current location to the plate history log entry.
+                        plate_log[current_time]["location"] = {"lat": current_location[0],"lon": current_location[1], "alt": current_location[3], "head": current_location[4]} # Add the current location to the plate history log entry.
 
                     plate_log[current_time]["plates"] = {}
-
 
                     if (config["realtime"]["saving"]["license_plates"]["save_guesses"] == True): # Check if Predator is configured to save all plate guesses.
                         plate_log[current_time]["plates"][plate] = {"alerts": [], "guesses": {}} # Initialize this plate in the plate log.
