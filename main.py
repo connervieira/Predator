@@ -72,6 +72,7 @@ log_alerts = utils.log_alerts # Load the function to issue active alerts to the 
 import re # Required to use Regex.
 import datetime # Required for converting between timestamps and human readable date/time information.
 import fnmatch # Required to use wildcards to check strings.
+import threading # Required to check which threads are alive when Predator fails to exit in a timely manner.
 
 if (config["general"]["modes"]["enabled"]["realtime"] == True):
     import alpr
@@ -1461,6 +1462,14 @@ elif (mode_selection == "3" and config["general"]["modes"]["enabled"]["dashcam"]
 
 
 
-
 else: # The user has selected an unrecognized mode.
     display_message("The selected mode is invalid.", 3) # Display an error message indicating that the selected mode isn't recognized.
+
+
+
+utils.display_message("Predator is exiting.", 1)
+time.sleep(1.5)
+if (len(threading.enumerate()) > 1):
+    utils.display_message("The following threads have not exited properly. Press Ctrl+C again to force terminate.", 2)
+    for thread in threading.enumerate():
+        print("    " + thread.name)

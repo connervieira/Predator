@@ -765,7 +765,7 @@ most_recent_gps_location = [0.0, 0.0, 0.0, 0.0, 0.0, 0, 0]
 def gps_daemon():
     debug_message("Starting lazy GPS daemon")
     global most_recent_gps_location
-    while True:
+    while global_variables.predator_running:
         debug_message("Fetching lazy GPS location")
         most_recent_gps_location = get_gps_location()
         time.sleep(float(config["general"]["gps"]["lazy_polling_interval"])) # Wait before polling the GPS again.
@@ -911,6 +911,7 @@ if ("telemetry" in config["dashcam"] and config["dashcam"]["telemetry"]["save_fa
         telemetry_backlog = json.loads("{}") # Load a blank placeholder dictionary.
 # This function is called for every frame, and uploads dash-cam telemetry information at regular intervals.
 last_telemetry_sent = 0 # This holds the timestamp of the last time telemetry was sent.
+
 def send_telemetry(data):
     global last_telemetry_sent
     global telemetry_backlog
@@ -920,7 +921,7 @@ def send_telemetry(data):
 
 
         if (time.time() - last_telemetry_sent >= 10): # Check to see if it has been at least 10 seconds since the last telemetry update. Note: most external receivers (such as V0LT Portal) will reject any data within 10 seconds of a previous datapoint.
-            if (config["dashcam"]["telemetry"]["send_images"] == True):
+            if ("send_images" in config["dashcam"]["telemetry"] and config["dashcam"]["telemetry"]["send_images"] == True): # Check to see if image sending is enabled.
                 for device in list(data["image"]):
                     try:
                         # Rescale the image to 720p:
@@ -934,9 +935,9 @@ def send_telemetry(data):
                         # Encode the image to base64 for transmission:
                         retval, buffer = cv2.imencode('.jpg', data["image"][device])
                         data["image"][device] = base64.b64encode(buffer).decode("utf-8")
-                    except:
+                    except Exception as e:
                         del data["image"][device]
-                        print("FAILED") # TODO: Replace with a proper error message.
+                        utils.display_message("The '" + str(device) + "' image could not be processed for remote telemetry (" + str(e) + ")", 2)
             else:
                 del data["image"]
 
@@ -957,7 +958,7 @@ def send_telemetry(data):
                         else:
                             display_message("The remote telemetry provider responded with an unknown error.", 2)
                 else:
-                    display_message("The response from the remote telemetry provider was not valid JSON. (" + str(response) + ")", 2)
+                    display_message("The response from the remote telemetry provider was not valid JSON, which may indicate a server-side error. (" + str(response) + ")", 2)
                     success = False
             except Exception as exception:
                 display_message("The telemetry upload process failed with the following exception:", 2)

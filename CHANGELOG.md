@@ -606,3 +606,5 @@ November 20th, 2024
     - When the heading can't be identified, the GPS back-end now returns -1 instead of 0.
 - Improved the reliability of file copying and erasing via management.
     - Previously, this functionality might have behaved unexpected when the file path involved spaces.
+- Improved the reliablity of graceful exits when pressing `Ctrl+C`.
+    - Predator will detect when a thread is holding the process alive, and will display its name.
