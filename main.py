@@ -1468,7 +1468,10 @@ else: # The user has selected an unrecognized mode.
 
 
 utils.display_message("Predator is exiting.", 1)
-time.sleep(1.5)
+for i in range(0,15):
+    time.sleep(0.1)
+    if (len(threading.enumerate()) <= 1):
+        break
 if (len(threading.enumerate()) > 1):
     utils.display_message("The following threads have not exited properly. Press Ctrl+C again to force terminate.", 2)
     for thread in threading.enumerate():
