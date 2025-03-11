@@ -1,6 +1,6 @@
 # Predator
 
-**Copyright 2024 V0LT - Conner Vieira**
+**Copyright 2025 V0LT - Conner Vieira**
 
 The ultimate customizable dashcam/license plate recognition platform.
 

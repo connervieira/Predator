@@ -31,7 +31,7 @@ This is the installation process for Predator and all of its dependencies. This 
 
 ### Dependencies
 
-- Python packages: `pip3 install pytz validators requests gps geopy gpsd-py3 opencv-python psutil`
+- Python packages: `pip3 install pytz validators requests gps gpsd-py3 opencv-python psutil`
     - Required:
         - `pytz`: Required to manage timezones.
     - Highly recommended:
@@ -39,7 +39,7 @@ This is the installation process for Predator and all of its dependencies. This 
         - `opencv-python`: Required for dash-cam recording.
             - Unless you have a good reason not to (and you know exactly what you're doing) you should install these packages.
     - Recommended:
-        - `gps`, `geopy`, and `gpsd-py3`: Required to enable GPS features.
+        - `gps` and `gpsd-py3`: Required to enable GPS features.
             - These packages are not required for reading GPX files, and are only necessary for interacting with live GPS devices.
     - Optional:
         - `psutil`: Required to process disk usage information in management mode and dash-cam mode.
