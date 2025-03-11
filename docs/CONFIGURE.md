@@ -364,7 +364,7 @@ This document describes the configuration values found `config.json`.
                 - Each entry in this configuration section uses the GPIO pin number as a key, and contains the following values:
                     - `name` is a human friendly name for the pin, and can be set to any plain text string.
                     - `hold_time` is a floating point number that determines the number of seconds the button needs to be held to trigger the event.
-        - `telemetry` contains settings for configuring Predator to send telemetry data like dash-cam previous and GPS data to an external service (see [docs/INTEGRATION.md](docs/INTEGRATION.md) for more information).
+        - `telemetry` contains settings for configuring Predator to send telemetry data like dash-cam images and GPS data to an external service (see [docs/INTEGRATION.md](docs/INTEGRATION.md) for more information).
             - `enabled` is a boolean that determined whether telemetry sending is enabled.
             - `target` is the network target that telemetry data will be submitted to.
             - `vehicle_identifier` is the identifier used to authenticate with the external service.
