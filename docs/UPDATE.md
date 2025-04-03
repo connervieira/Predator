@@ -14,18 +14,11 @@ This is the most technical step in updating Predator. There are a few different 
 
 ### Automatic (Recommended)
 
-Predator versions 12.0 and later can automatically reconcile differences between the existing configuration file and the default configuration from the new version. To use this feature, simply update Predator, leaving your existing `config.json` file in place. On first start-up, Predator will compare the active configuration file with the version's default, and reconcile differences. Values that only exist in the active configuration will be removed. Values that only exist in the default configuration file will be added to the active configuration.
+Predator versions 12.0 and later can automatically reconcile differences between the existing configuration file and the default configuration from the new version. To use this feature, simply update Predator, leaving your existing `config.json` file in place. On first start-up, Predator will compare the active configuration file with the version's default, and reconcile differences. Values that only exist in the active configuration will be removed. Values that only exist in the default configuration file will be added to the active configuration. Modified values will remain unchanged.
 
 ### Refresh
 
-The most reliable way to update your configuration is to simply replace it with the default `assets/support/configdefault.json` file from the new version of Predator, and manually copy over the important values from your old configuration file. This method makes it much less likely that you'll accidentally use an incompatible configuration file.
-
-### Brute Force
-
-If you've made extensive changes to your configuration file, and don't want to manually re-configure the new version, you can try directly copying your current `config.json` file over the one from the new version. Predator's configuration file often changes dramatically from version to version, so this will almost certainly require some adjustments to your configuration file to make to make it compatible.
-
-When you first run Predator using your original configuration file, you will likely see several errors about missing or invalid configuration values. You should take note of the invalid configuration values, and use the information found in the [docs/CONFIGURE.md](docs/CONFIGURE.md) file to modify the `config.json` file to correct the invalid values. It is likely that some values listed as invalid will be completely missing from your original configuration file. In this case, you may want to copy them from the default configuration file that came with the new version of Predator.
-
+The most reliable way to update your configuration is to simply replace it with the default `assets/support/configdefault.json` file from the new version of Predator, and manually copy over the important values from your old configuration file. This method makes it much less likely that you'll accidentally use an incompatible configuration file. However, this will require you to fully re-configure Predator from scratch.
 
 ## Troubleshooting
 

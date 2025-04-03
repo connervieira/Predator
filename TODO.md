@@ -55,10 +55,8 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Fix frame counting for side-car mode.
 - [X] Document `developer>frame_count_method` configuration value in `docs/CONFIGURE.md.
 - [X] Validate multi-channel recording.
-- [ ] Add sound effect for parking mode.
-- [ ] Add management mode option to manually upload telemetry back-log.
-- [ ] Allow Predator to lock dashcam videos even after audio merging fails.
-- [ ] Fix management mode for dashcam video (main.py:452 and 550)
+- [X] Allow Predator to lock dashcam videos even after audio merging fails.
+- [X] Fix management mode for dashcam video (main.py:452 and 550)
 
 
 ## Issues

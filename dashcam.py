@@ -977,14 +977,14 @@ def dashcam_normal(device):
             # Handle segment locking:
             if (os.path.exists(os.path.join(config["general"]["interface_directory"], config["dashcam"]["saving"]["trigger"])) == True): # Check to see if the trigger file exists.
                 # == Save the most recent segment: ==
-                if (config["dashcam"]["capture"]["audio"]["merge"] == True and config["dashcam"]["capture"]["audio"]["enabled"] == True):
+                if (os.path.exists(os.path.join(directory, segment_names[-1] + ".mkv"))): # Check to see if the merge file exists.
                     threading.Thread(target=lock_dashcam_segment, args=[os.path.join(directory, segment_names[-1] + ".mkv")], name="DashcamSegmentSave").start() # Create the thread to save this dash-cam segment.
-                else:
-                    threading.Thread(target=lock_dashcam_segment, args=[os.path.join(directory, segment_names[-1] + "." + config["dashcam"]["saving"]["file"]["extension"])], name="DashcamSegmentSave").start() # Create the thread to save this dash-cam segment.
+                else: # Otherwise, merging is disabled, or the merge process failed.
+                    threading.Thread(target=lock_dashcam_segment, args=[os.path.join(directory, segment_names[-1] + "." + config["dashcam"]["saving"]["file"]["extension"])], name="DashcamSegmentSave").start() # Create the thread to save this dash-cam video segment.
                     if (config["dashcam"]["capture"]["audio"]["enabled"] == True):
-                        threading.Thread(target=lock_dashcam_segment, args=[os.path.join(directory, segment_names[-1] + "." + config["dashcam"]["capture"]["audio"]["extension"])], name="DashcamSegmentSave").start() # Create the thread to save this dash-cam segment.
+                        threading.Thread(target=lock_dashcam_segment, args=[os.path.join(directory, segment_names[-1] + "." + config["dashcam"]["capture"]["audio"]["extension"])], name="DashcamSegmentSave").start() # Create the thread to save this dash-cam audio segment.
                 # == Save the segment before the most recent (if applicable): ==
-                if (len(segment_names) >= 2): # Check to see if there is a segment before the current.
+                if (len(segment_names) > 1): # Check to see if there is a segment before the current.
                     with open(os.path.join(config["general"]["interface_directory"], config["dashcam"]["saving"]["trigger"])) as file:
                         last_trigger_timestamp = utils.to_int(file.read())
                     if (last_trigger_timestamp - (first_segment_start_time + (segment_number * config["dashcam"]["saving"]["segment_length"])) <= 15): # Check to see if the save was initiated within the first 15 seconds of the segment.

@@ -17,7 +17,8 @@ Here is a break-down of each value in an alert database:
         - `color`: This is an optional sub-value for the vehicle color (all lowercase, human-friendly name).
         - `make`: This is an optional sub-value for the vehicle manufacturer.
         - `model`: This is an optional sub-value for the vehicle model.
-        - `year`: This is an optional sub-value for the vehicle year. This value should be an integer.
+        - `year`: This is an optional sub-value for the vehicle year. This value should be an integer (0 for none).
+        - `vin`: This is an optional value to specify the vehicle's identification number (all uppercase).
 
 
 ## Examples
@@ -49,7 +50,8 @@ This is an example of an alert database with all supported information included.
             "color": "red",
             "make": "Toyota",
             "model": "Corolla",
-            "year": 2021
+            "year": 2001,
+            "vin": "1GKEK13T251163542"
         }
     },
     "XYZ1234": {
@@ -60,8 +62,9 @@ This is an example of an alert database with all supported information included.
         "vehicle": {
             "color": "black",
             "make": "Subaru",
-            "model": "Impreza",
-            "year": 2016
+            "model": "Legacy",
+            "year": 2015,
+            "vin": "4S3BNAF64F3014194"
         }
     },
     "ABC1234": {
@@ -72,8 +75,9 @@ This is an example of an alert database with all supported information included.
         "vehicle": {
             "color": "blue",
             "make": "Honda",
-            "model": "Accord",
-            "year": 2011
+            "model": "Civic",
+            "year": 2009,
+            "vin": "19XFA165X9E038243"
         }
     }
 }

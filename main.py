@@ -450,9 +450,9 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                 if (copy_prerecorded_license_plate_location_data):
                     os.system("cp \"" + config["general"]["working_directory"] + "/pre_recorded_location_data_export.*\" \"" + copy_destination + "\"")
                 if (copy_realtime_license_plate_recognition_data):
-                    os.system("cp \"" + config["general"]["working_directory"] + "/real_time_plates*\" \"" + copy_destination + "\"")
+                    os.system("cp \"" + os.path.join(config["general"]["working_directory"], config["realtime"]["saving"]["license_plates"]["file"]) + "/\" \"" + copy_destination + "\"")
                 if (copy_dashcam_video):
-                    os.system("cp \"" + os.path.join(config["general"]["working_directory"], "*Predator*." + config["dashcam"]["saving"]["file"]["extension"]) + "\" \"" + copy_destination + "\"")
+                    os.system("cp \"" + os.path.join(config["general"]["working_directory"], "* Predator *." + config["dashcam"]["saving"]["file"]["extension"]) + "\" \"" + copy_destination + "\"")
 
                 clear()
                 print("Files have finished copying.")
@@ -548,9 +548,9 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                     if (delete_prerecorded_license_plate_location_data):
                         os.system("rm \"" + config["general"]["working_directory"] + "/pre_recorded_location_data_export.*\"")
                     if (delete_realtime_license_plate_recognition_data):
-                        os.system("rm \"" + config["general"]["working_directory"] + "/real_time_plates*\"")
+                        os.system("rm \"" + os.path.join(config["general"]["working_directory"], config["realtime"]["saving"]["license_plates"]["file"]) + "/\"")
                     if (delete_dashcam_video):
-                        os.system("rm \"" + os.path.join(config["general"]["working_directory"], "*Predator*." + config["dashcam"]["saving"]["file"]["extension"]) + "\"")
+                        os.system("rm \"" + os.path.join(config["general"]["working_directory"], "* Predator *." + config["dashcam"]["saving"]["file"]["extension"]) + "\"")
                     clear()
                     print("Files have finished deleting.")
                 else:
