@@ -236,7 +236,6 @@ def load_alert_database_remote(source, cache_directory):
         try:
             alert_database = json.loads(processed_download_data) # Load the alert database as JSON data.
             if (config["realtime"]["saving"]["remote_alert_sources"]["enabled"] == True):
-                print("SAVING")
                 if (os.path.isdir(cache_directory) == False):
                     os.system("mkdir -p '" + str(cache_directory) + "'")
                 save_to_file(cache_directory + "/" + source_hash + ".json", json.dumps(alert_database))
