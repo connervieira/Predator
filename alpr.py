@@ -220,22 +220,23 @@ def load_alert_database_remote(source, cache_directory):
             source += "&client=" + client_id # Add the client ID to the source parameters.
         else: # This source does not already have associated parameters.
             source += "?client="  + client_id # Add the client ID to the source parameters.
-    if (config["realtime"]["saving"]["remote_alert_sources"] == True):
+    if (config["realtime"]["saving"]["remote_alert_sources"]["enabled"] == True):
         source_hash = hashlib.md5(source.encode()).hexdigest()
     if (config["developer"]["offline"] == False): # Check to see if offline mode is disabled.
         try:
             raw_download_data = requests.get(source, timeout=6).text # Save the raw text data from the URL to a variable.
-        except:
+        except: # The network request has failed:
             raw_download_data = "{}"
             display_message("The license plate alert database from " + source + " could not be loaded.", 2)
-            if (config["realtime"]["saving"]["remote_alert_sources"] == True):
+            if (config["realtime"]["saving"]["remote_alert_sources"]["enabled"] == True):
                 if (os.path.exists(cache_directory + "/" + source_hash + ".json")): # Check to see if the cached file exists.
                     debug_message("Attempting to load locally cached data for this remote source.")
                     return load_alert_database_local(cache_directory + "/" + source_hash + ".json") # Load the locally cached file.
         processed_download_data = str(raw_download_data) # Convert the downloaded data to a string.
         try:
             alert_database = json.loads(processed_download_data) # Load the alert database as JSON data.
-            if (config["realtime"]["saving"]["remote_alert_sources"] == True):
+            if (config["realtime"]["saving"]["remote_alert_sources"]["enabled"] == True):
+                print("SAVING")
                 if (os.path.isdir(cache_directory) == False):
                     os.system("mkdir -p '" + str(cache_directory) + "'")
                 save_to_file(cache_directory + "/" + source_hash + ".json", json.dumps(alert_database))
@@ -266,7 +267,7 @@ def load_alert_database_local(source):
     return alert_database
 
 def load_alert_database(sources, project_directory): # This function compiles the provided list of sources into a single complete alert dictionary.
-    cache_directory = project_directory + "/" + config["realtime"]["saving"]["remote_alert_sources"]["directory"]
+    cache_directory = os.path.join(project_directory, config["realtime"]["saving"]["remote_alert_sources"]["directory"])
     debug_message("Loading license plate alert list")
     complete_alert_database = {} # Set the complete alert database to a placeholder dictionary.
     for source in sources: # Iterate through each source in the list of sources.
