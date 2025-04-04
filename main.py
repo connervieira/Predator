@@ -1235,10 +1235,10 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
                         exit() # Terminate the program.
 
                 if (ignore_plate == False): # Only process this plate if it isn't set to be ignored.
-                    all_current_plate_guesses[detected_plate["candidates"][0]["plate"]] = {} # Create an empty dictionary for this plate so we can add all the potential plate guesses to it in the next step.
+                    all_current_plate_guesses[detected_plate["candidates"][0]["plate"]] = {"guesses": {}, "identifier": detected_plate["identifier"]} # Create an empty dictionary for this plate so we can add all the potential plate guesses to it in the next step.
 
                     for plate_guess in detected_plate["candidates"]: # Iterate through each plate guess candidate for each potential plate detected.
-                        all_current_plate_guesses[detected_plate["candidates"][0]["plate"]][plate_guess["plate"]] = plate_guess["confidence"] # Add the current plate guess candidate to the list of plate guesses.
+                        all_current_plate_guesses[detected_plate["candidates"][0]["plate"]]["guesses"][plate_guess["plate"]] = plate_guess["confidence"] # Add the current plate guess candidate to the list of plate guesses.
 
             if (config["realtime"]["interface"]["display"]["output_level"] >= 3): # Only display this status message if the output level indicates to do so.
                 print("Done\n----------")
@@ -1264,8 +1264,8 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
                     else: # If the user did supply a license plate format, then check all of the results against the formatting example.
                         if (config["realtime"]["interface"]["display"]["show_validation"] == True): # Only print the validated plate if the configuration says to do so.
                             print ("    Plate guesses:")
-                        for plate_guess in all_current_plate_guesses[individual_detected_plate]: # Iterate through each plate and grab the first plate that matches the plate formatting guidelines as the 'detected plate'.
-                            if (all_current_plate_guesses[individual_detected_plate][plate_guess] >= float(config["general"]["alpr"]["validation"]["confidence"])): # Check to make sure this plate's confidence is higher than the minimum threshold set in the configuration.
+                        for plate_guess in all_current_plate_guesses[individual_detected_plate]["guesses"]: # Iterate through each plate and grab the first plate that matches the plate formatting guidelines as the 'detected plate'.
+                            if (all_current_plate_guesses[individual_detected_plate]["guesses"][plate_guess] >= float(config["general"]["alpr"]["validation"]["confidence"])): # Check to make sure this plate's confidence is higher than the minimum threshold set in the configuration.
                                 if any(alpr.validate_plate(plate_guess, format_template) for format_template in config["general"]["alpr"]["validation"]["license_plate_format"]): # Check to see whether or not the plate passes the validation based on the format specified by the user.
                                     detected_plate = plate_guess # Grab the validated plate as the 'detected plate'.
                                     successfully_found_plate = True # The plate was successfully validated, so indicate that a plate was successfully found this round.
@@ -1299,7 +1299,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
 
                     elif (successfully_found_plate == False): # A plate was found, but none of the guesses matched the formatting guidelines provided by the user.
                         if (config["general"]["alpr"]["validation"]["best_effort"] == True): # Check to see if 'best effort' validation is enabled.
-                            new_plates_detected.append([next(iter(all_current_plate_guesses[individual_detected_plate])), individual_detected_plate]) # Add the most likely guess for this plate to the list of detected license plates.
+                            new_plates_detected.append([next(iter(all_current_plate_guesses[individual_detected_plate]["guesses"])), individual_detected_plate]) # Add the most likely guess for this plate to the list of detected license plates.
 
                         if (config["realtime"]["interface"]["display"]["shape_alerts"] == True): # Check to see if the user has enabled shape notifications.
                             display_shape("circle") # Display an ASCII circle in the output.
@@ -1340,7 +1340,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
             if (config["general"]["alerts"]["alerts_ignore_validation"] == True): # If the user has enabled alerts that ignore license plate validation, then check each of the ALPR guesses against the license plate alert database.
                 for rule in alert_database: # Run through every plate in the alert plate database supplied by the user. If no database was supplied, this list will be empty, and will not run.
                     for plate in all_current_plate_guesses: # Iterate through each of the plates detected this round, regardless of whether or not they were validated.
-                        for guess in all_current_plate_guesses[plate]: # Run through each of the plate guesses generated by ALPR, regardless of whether or not they are valid according to the plate formatting guideline.
+                        for guess in all_current_plate_guesses[plate]["guesses"]: # Run through each of the plate guesses generated by ALPR, regardless of whether or not they are valid according to the plate formatting guideline.
                             if (fnmatch.fnmatch(guess, rule)): # Check to see this detected plate guess matches this particular plate in the alert database, taking wildcards into account.
                                 active_alerts[guess] = alert_database[rule] # Add this plate to the active alerts dictionary.
                                 active_alerts[guess]["rule"] = rule # Add the rule that triggered this alert to the alert information.
@@ -1379,15 +1379,15 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
                     if (config["realtime"]["saving"]["license_plates"]["save_guesses"] == True): # Check if Predator is configured to save all plate guesses.
                         plate_log[current_time]["plates"][plate] = {"alerts": [], "guesses": {}} # Initialize this plate in the plate log.
                         for plate in all_current_plate_guesses: # Iterate though each plate detected this round.
-                            for guess in all_current_plate_guesses[plate]: # Iterate through each guess in this plate.
+                            for guess in all_current_plate_guesses[plate]["guesses"]: # Iterate through each guess in this plate.
                                 if (guess in active_alerts): # Check to see if this guess matches one of the active alerts.
                                     plate_log[current_time]["plates"][plate]["alerts"].append(active_alerts[guess]["rule"]) # Add the rule that triggered the alert to a separate list.
                                 if (config["realtime"]["saving"]["license_plates"]["save_guesses"] == True): # Only add this guess to the log if Predator is configured to do so.
-                                    plate_log[current_time]["plates"][plate]["guesses"][guess] = all_current_plate_guesses[plate][guess] # Add this guess to the log, with its confidence level.
+                                    plate_log[current_time]["plates"][plate]["guesses"][guess] = all_current_plate_guesses[plate]["guesses"][guess] # Add this guess to the log, with its confidence level.
                     else: # Predator is configured only to save the most likely plate guess to the plate log file.
                         for plate in new_plates_detected: # Iterate over each individual plate detected.
                             plate_log[current_time]["plates"][plate[0]] = {"alerts": []} # Initialize this plate in the plate log.
-                            for guess in all_current_plate_guesses[plate[1]]: # Iterate through each guess associated with this plate.
+                            for guess in all_current_plate_guesses[plate[1]]["guesses"]: # Iterate through each guess associated with this plate.
                                 if (guess in active_alerts): # Check to see if this guess matches one of the active alerts.
                                     plate_log[current_time]["plates"][plate[0]]["alerts"].append(active_alerts[guess]["rule"]) # Add the rule that triggered the alert to a separate list.
 
@@ -1398,7 +1398,10 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
 
             valid_plates_with_guesses = {} # This will hold a dictionary of all valid plates with their guesses as children.
             for plate in new_plates_detected:
-                valid_plates_with_guesses[plate[0]] = all_current_plate_guesses[plate[1]]
+                valid_plates_with_guesses[plate[0]] = {
+                    "guesses": all_current_plate_guesses[plate[1]]["guesses"],
+                    "identifier": all_current_plate_guesses[plate[1]]["identifier"]
+                }
 
 
 
@@ -1444,9 +1447,19 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
             else:
                 time.sleep(float(config["realtime"]["interface"]["behavior"]["delays"]["normal"])) # Trigger a normal delay.
     except Exception as e:
+        print(e)
         print("Exiting Predator...")
         global_variables.predator_running = False
         os.popen("killall alpr") # Kill the background ALPR process.
+
+        e_type, e_object, e_traceback = sys.exc_info()
+        e_filename = os.path.split(e_traceback.tb_frame.f_code.co_filename)[1]
+        e_message = str(e)
+        e_line_number = e_traceback.tb_lineno
+        print(f'exception type: {e_type}')
+        print(f'exception filename: {e_filename}')
+        print(f'exception line number: {e_line_number}')
+        print(f'exception message: {e_message}')
 
 
 

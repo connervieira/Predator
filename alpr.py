@@ -91,6 +91,10 @@ def alpr_stream_maintainer(): # This function runs an endless loop that maintain
                 if ("error" in message): # Check to see if there were errors while executing the ALPR process. This will only work for alerts issued by Phantom, not OpenALPR.
                     display_message("Phantom ALPR encountered an error: " + message["error"], 2) # Display the ALPR error.
                 for plate in message["results"]: # Iterate through each license plate in this line.
+                    if ("identifier" in message): # Check to see if the identifier field is present. This field is supported in Phantom V1.4.0+.
+                        plate["identifier"] = message["identifier"]
+                    else:
+                        plate["identifier"] = None
                     queued_plate_reads.append(plate) # Add each license plate to the license plate queue.
             else:
                 display_message("The information returned by the ALPR engine is not valid JSON. Maybe you've specified the wrong ALPR engine in the configuration?", 2)

@@ -608,3 +608,4 @@ November 20th, 2024
     - Previously, this functionality might have behaved unexpected when the file path involved spaces.
 - Improved the reliablity of graceful exits when pressing `Ctrl+C`.
     - Predator will detect when a thread is holding the process alive, and will display its name.
+- The plates file in the interface directory now contains the image identifiers introduced in Phantom V1.4.0.
