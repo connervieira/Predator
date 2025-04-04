@@ -1396,6 +1396,10 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
 
                     save_to_file(config["general"]["working_directory"] + "/" + config["realtime"]["saving"]["license_plates"]["file"], json.dumps(plate_log)) # Save the modified plate log to the disk as JSON data.
 
+            valid_plates_with_guesses = {} # This will hold a dictionary of all valid plates with their guesses as children.
+            for plate in new_plates_detected:
+                valid_plates_with_guesses[plate[0]] = all_current_plate_guesses[plate[1]]
+
 
 
             # Issue interface file updates.
@@ -1405,7 +1409,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
                     print("Issuing interface updates...")
                 heartbeat() # Issue a status heartbeat.
                 update_state("realtime") # Update the system status.
-                log_plates(all_current_plate_guesses) # Update the list of recently detected license plates.
+                log_plates(valid_plates_with_guesses) # Update the list of recently detected license plates.
                 log_alerts(active_alerts) # Update the list of active alerts.
                 if (config["realtime"]["interface"]["display"]["output_level"] >= 3): # Only display this status message if the output level indicates to do so.
                     print("Done.\n----------")

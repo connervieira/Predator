@@ -978,7 +978,7 @@ def send_telemetry(data):
                                 if ("code" in response): # Check to see if an error code was returned.
                                     if (response["code"] in ["timezone_offset_invalid"]): # Check to see if the error code matches a type that would cause all of the other points to fail as well.
                                         break
-                                    elif (response["code"] in ["timestamp_invalid"]): # Check to see if the error code matches a type that would cause this entry to fail forever.
+                                    elif (response["code"] in ["timestamp_invalid", "premature_submission"]): # Check to see if the error code matches a type that would cause this entry to fail forever.
                                         del telemetry_backlog[timestamp] # Delete this point from the back-log.
                                 success = False
                         except Exception as e:
