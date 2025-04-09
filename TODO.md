@@ -57,6 +57,7 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Validate multi-channel recording.
 - [X] Allow Predator to lock dashcam videos even after audio merging fails.
 - [X] Fix management mode for dashcam video (main.py:452 and 550)
+- [ ] Add a global variable to prevent multiple threads from trying to upload the telemtry back-log at the same time.
 
 
 ## Issues
