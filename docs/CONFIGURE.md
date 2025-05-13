@@ -164,11 +164,6 @@ This document describes the configuration values found `config.json`.
                 - `alert` is a decimal number that determines how long Predator will delay before starting the next round when there is an active alert.
                 - `normal` is a decimal number that determines how long Predator will delay before starting the next round under normal circumstances.
             - `clearing` is a boolean that determines whether or not Predator will clear the output screen between analysis rounds during real-time mode.
-    - `object_recognition` contains settings related to object recognition in real-time mode.
-        - `enabled` is a boolean value that enables and disables object recognition in real-time mode.
-            - This setting does not override the `general>object_recognition>enabled` setting.
-        - `video_still_path` is an absolute file-path to the image Predator should run object recognition on.
-            - By default, Phantom stores video stills from the capture device stream to `/dev/shm/phantom-webcam.jpg`, so that is where this setting should point to in most cases.
     - `gps` contains settings related to GPS-based features in real-time mode.
         - `alpr_location_tagging` is a boolean that determines whether or not the current GPS location will be saved to the log file each time a plate is logged.
     - `image` contains settings related to image handling.
@@ -183,11 +178,10 @@ This document describes the configuration values found `config.json`.
                 - Example: `"plate_history.json"`
             - `save_guesses` determines whether or not Predator will save all guesses for each license plate to the license plate log file.
                 - When set to `false`, only the top guess will be logged. All other guesses will not be saved.
-        - `object_recognition` contains settings related to saving detected objects.
-            - `enabled` is a boolean value that determines whether object recognition saving is enabled.
-            - `file` is a string that determines the CSV file name Predator will use to save the objects it detects in real-time mode.
-                - This file is created in the working directory.
-                - Example: `"object_recognition_log.csv"`
+        - `remote_alert_sources` contains settings related to caching license plate alert lists from remote sources.
+            - `enabled` is a boolean value that determines whether remote alert list caching is enabled.
+            - `directory` is a string that determines the directory within the working directory where Predator will store cached license plate alert lists.
+                - This directory will be created automatically if it does not exist.
     - `push_notifications` contains settings related to Gotify push notifications.
         - `enabled` is a boolean value that determines whether push notifications are enabled.
         - `server` is a string that specifies the Gotify server that Predator will attempt to use. It should include the protocol and port number.
@@ -276,16 +270,25 @@ This document describes the configuration values found `config.json`.
             - `speed` is the speed at which Predator will consider the vehicle to be stopped, measured in meters per second.
             - `time` is the length of time, in seconds, that the vehicle needs to be below the speed threshold for Predator to consider the vehicle to be parked.
                 - This value should be long enough that Predator doesn't consider the vehicle to be parked while at red lights or in traffic, but short enough that parking mode will be activated within a reasonable amount of time of the vehicle being parked.
-        - `recording` contains settings that control how Predator will record video while parked.
-            - `highlight_motion` contains settings that control if/how Predator will highlight motion while running motion detection.
-                - `enabled` is a boolean that determines whether Predator will draw bounding boxes around detected motion while parked.
-                - `color` is a list that determines the color of the bounding boxes, where the first, second, and third values represent the red, green, and blue channels respectively.
-            - `sensitivity` determines the fraction of the screen that motion needs to cover to trigger recording, ranging from 0 to 1.
-                - For example, a value of `0.05` would require that motion cover 5% of the entire field of view of the camera in order to activate recording.
-                - Lower values make Predator more sensitive to motion, since less motion is required to trigger recording.
-                - You can use the `tools/motion_detect_test.py` script to test this setting to find the best value for your use case.
-            - `timeout` determines the length of time, in seconds, after motion is detected, that Predator will record video while parked.
-            - `buffer` determines the number of frames that Predator will keep in a buffer. These frames will be added to the beginning of videos triggered by motion detection.
+        - `event` contains settings that control how Predator determines and records events while parked.
+            - `trigger` determines the method Predator will use to trigger events. This value can be set to either "motion" for motion detection or "object_recognition" for identifying objects using machine learning.
+            - `timeout` is a positive decimal number that determines the number of seconds an event will continue recording after the last trigger was detected.
+                - For example, if the time out is set to 10, and the trigger uses object recognition, then Predator will continue recording for 10 seconds after the object is no longer visible. If the object re-enters the frame, then recording will continue and the timer is reset.
+            - `buffer` is a positive integer number that determines the number of past frames Predator will keep buffered while waiting for an event.
+                - Higher values will allow Predator to save a few moments before an event was detected in the recording.
+                - Lower values will minimize stuttering at the start of event recordings, since the frame buffer does not take as long to write.
+            - `label` contains settings for controlling if/how events are labeled in the video recording.
+                - `enabled` is a boolean that determines if events will be highlighting in the video recording.
+                - `color` is a list of 3 integer values between 0 and 255 that determine the color of the event outline, representing red, green, and blue in order.
+            - `trigger_motion` contains settings that are used when the `dashcam>parked>event>trigger` value is set to "motion".
+                - `sensitivity` is a decimal number between 0 and 1 that determines how much of the frame needs to be in motion before an event is triggered, such that higher values result in less sensitivity.
+                    - A value of 1 indicates that the entire frame must be in motion, which will likely never occur.
+                    - A value of 0 indicates that any motion at all will trigger an event, which will likely result in continuous recording.
+            - `trigger_object_recognition` contains settings that are used when the `dashcam>parked>event>trigger` value is set to "object_recognition".
+                - `model_weights` points to a file relative to the Predator instance directory containing Ultralytics model weights.
+                - `objects` is a list of objects (from the specified model) that should trigger an event if detected while parked.
+                - `minimum_confidence` is a decimal number between 0 and 1 that determines the minimum confidence level for a detected object before it is considered.
+                    - Higher values will filter out false detections, at the risk of missing legitimate detections.
     - `notifications` contains settings to control how Predator issues notifications about dashcam events.
         - `reticulum` controls LXMF notifications over the Reticulum networking protocol.
             - `enabled` is a boolean value that determines whether or not Reticulum LXMF notifications are enabled.
@@ -296,7 +299,7 @@ This document describes the configuration values found `config.json`.
                 - This will be appended to the beginning of notifications. For example, when motion is detected, the following format might be used: "[instance_name] has detected motion while parked."
             - `events` contains individual controls to enable and disable notifications for certain events.
                 - `start_up` is triggered when Predator starts dash-cam recording.
-                - `motion_detect` is triggered when Predator detects motion while parked.
+                - `parked_event` is triggered when Predator detects an event (motion of object recognition) while parked.
                 - `parking_mode_enabled` is triggered when Predator enters parking mode.
                 - `parking_mode_disabled` is triggered when Predator exits parking mode.
     - `stamps` contains several configurable stamps that can be overlaid on the video recording.
@@ -360,7 +363,7 @@ This document describes the configuration values found `config.json`.
             - `stop_predator` contains settings to terminate Predator via GPIO pins.
                 - Each entry in this configuration section uses the GPIO pin number as a key, and contains the following values:
                     - `name` is a human friendly name for the pin, and can be set to any plain text string.
-                    - `hold_time` is a floating point number that determines the number of seconds the button needs to be held to trigger the event.
+                    - `hold_time` is a positive floating point number that determines the number of seconds the button needs to be held to trigger the event.
         - `telemetry` contains settings for configuring Predator to send telemetry data like dash-cam images and GPS data to an external service (see [docs/INTEGRATION.md](docs/INTEGRATION.md) for more information).
             - `enabled` is a boolean that determined whether telemetry sending is enabled.
             - `target` is the network target that telemetry data will be submitted to.
