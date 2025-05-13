@@ -66,9 +66,6 @@ This document describes the configuration values found `config.json`.
             - Lazy mode is used when response time is more important than data recency.
                 - Lazy mode is mainly used for the dash-cam overlay stamp.
             - This interval should generally correspond to the maximum refresh rate of your GPS. For example, if your GPS, can only refresh a 1Hz, you should set this to 1 (for 1 second). A 10 Hz GPS might use 0.1 (0.1 seconds between polls, or 10 polls per second).
-    - `object_recognition` contains settings related to Predator's object recognition capabilities.
-        - `enabled` is a boolean that determines whether or not object recognition is enabled globally.
-            - Setting this to `false` removes Predator's dependency on Tensorflow.
     - `modes` contains settings related to Predator's operating modes.
         - `auto_start` is a string that determines which mode (if any) Predator will automatically load into upon start-up.
             - There are 4 possible values this can be set to, not including being left blank.
