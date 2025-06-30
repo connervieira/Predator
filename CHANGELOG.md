@@ -578,7 +578,7 @@ November 20th, 2024
 
 ## Version 12.0
 
-### Dashcam Update 3
+### Object Recognition Update
 
 *Release date to be determined*
 

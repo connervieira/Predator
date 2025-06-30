@@ -51,7 +51,8 @@
                 "normal": "[U]&R=0&G=255&B=0",
                 "alpr_alert": "[U]&R=255&G=0&B=0",
                 "alpr_detection": "[U]&R=255&G=128&B=0",
-                "dashcam_save": "[U]&R=0&G=0&B=255"
+                "dashcam_save": "[U]&R=0&G=0&B=255",
+                "dashcam_object": "[U]&R=0&G=128&B=255"
             }
         },
         "audio": {
@@ -99,6 +100,11 @@
                     "path": "./assets/sounds/voice/video_saved.mp3",
                     "repeat": 1,
                     "delay": 1
+                },
+                "dashcam_object_alert": {
+                    "path": "./assets/sounds/voice/dashcam_object_alert.mp3",
+                    "repeat": 1,
+                    "delay": 0.5
                 },
                 "message_notice": {
                     "path": "./assets/sounds/voice/notice.mp3",
@@ -183,6 +189,10 @@
                 "enabled": true,
                 "file": "plate_history.json",
                 "save_guesses": false
+            },
+            "object_recognition": {
+                "enabled": true,
+                "file": "object_recognition.json"
             }
         },
         "push_notifications": {
@@ -387,6 +397,8 @@
             "vehicle_identifier": "",
             "save_failed_updates": true,
             "send_images": false
+        },
+        "object_recognition": {
         }
     },
     "developer": {

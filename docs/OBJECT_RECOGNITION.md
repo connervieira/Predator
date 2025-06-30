@@ -1,0 +1,15 @@
+# Object Recognition
+
+Below is a list of all supported object recognition classes:
+- `WILDLIFE_DEER`
+- `WILDLIFE_SQUIRREL`
+- `WILDLIFE_RACCOON`
+- `WILDLIFE_HORSE`
+- `PERSON_PEDESTRIAN`
+- `PERSON_CYCLIST`
+- `VEHICLE_CAR`
+- `VEHICLE_CAR_POLICE`
+- `VEHICLE_TRUCK`
+- `VEHICLE_BUS`
+- `VEHICLE_MOTORBIKE`
+

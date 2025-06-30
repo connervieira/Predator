@@ -320,7 +320,7 @@ def highest_different_index(config_active, config_default, index): # This functi
     return []
 
 
-ignore_indexes = [["realtime", "image", "camera", "devices"], ["dashcam", "saving", "trigger_gpio"], ["dashcam", "stamps", "relay", "triggers"], ["dashcam", "capture", "video", "devices"], ["dashcam", "physical_controls"]] # Configuration values specified here will not be checked by the check_defaults_missing() and check_defaults_extra() functions.
+ignore_indexes = [["realtime", "image", "camera", "devices"], ["dashcam", "saving", "trigger_gpio"], ["dashcam", "stamps", "relay", "triggers"], ["dashcam", "capture", "video", "devices"], ["dashcam", "physical_controls"], ["dashcam", "object_recognition"]] # Configuration values specified here will not be checked by the check_defaults_missing() and check_defaults_extra() functions.
 force_indexes = [["dashcam", "physical_controls"]] # These indexes will be checked even though they are dictionaries.
 
 # This function checks for values that exist in the default config that aren't present in the active config.

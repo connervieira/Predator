@@ -523,12 +523,15 @@ def play_sound(sound_id, override_cooldown=False):
                     audio_playing = True
                     for i in range(0, int(config["general"]["audio"]["sounds"][sound_id]["repeat"])): # Repeat the sound several times, if the configuration says to.
                         if (config["general"]["audio"]["player"]["backend"] == "mpg321"):
-                            os.system("mpg321 \"" + config["general"]["audio"]["sounds"][sound_id]["path"] + "\" > /dev/null 2>&1 &") # Play the sound specified for this alert type in the configuration.
+                            command = "mpg321 \"" + config["general"]["audio"]["sounds"][sound_id]["path"] + "\" > /dev/null 2>&1 &"
+                            os.system(command) # Play the sound specified for this alert type in the configuration.
                         elif (config["general"]["audio"]["player"]["backend"] == "mplayer"):
                             if (len(config["general"]["audio"]["player"]["mplayer"]["device"]) == 0):
-                                os.system("mplayer \"" + config["general"]["audio"]["sounds"][sound_id]["path"] + "\" -noconsolecontrols 2>&- 1>/dev/null &") # Play the sound specified for this alert type in the configuration.
+                                command = "mplayer \"" + config["general"]["audio"]["sounds"][sound_id]["path"] + "\" -noconsolecontrols 2>&- 1>/dev/null &"
+                                os.system(command)
                             else:
-                                os.system("mplayer -ao " + config["general"]["audio"]["player"]["mplayer"]["device"] + " \"" + config["general"]["audio"]["sounds"][sound_id]["path"] + "\" -noconsolecontrols 2>&- 1>/dev/null &") # Play the sound specified for this alert type in the configuration.
+                                command = "mplayer -ao " + config["general"]["audio"]["player"]["mplayer"]["device"] + " \"" + config["general"]["audio"]["sounds"][sound_id]["path"] + "\" -noconsolecontrols 2>&- 1>/dev/null &"
+                                os.system(command)
                         else:
                             display_message("The configured audio player back-end is invalid.", 3)
                         time.sleep(float(config["general"]["audio"]["sounds"][sound_id]["delay"])) # Wait before playing the sound again.

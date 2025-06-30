@@ -47,7 +47,8 @@
                 "normal": "str",
                 "alpr_alert": "str",
                 "alpr_detection": "str",
-                "dashcam_save": "str"
+                "dashcam_save": "str",
+                "dashcam_object": "str"
             }
         },
         "audio": {
@@ -92,6 +93,11 @@
                     "delay": "+float"
                 },
                 "dashcam_saved": {
+                    "path": "file",
+                    "repeat": "+int",
+                    "delay": "+float"
+                },
+                "dashcam_object_alert": {
                     "path": "file",
                     "repeat": "+int",
                     "delay": "+float"
@@ -177,6 +183,10 @@
                 "enabled": "bool",
                 "file": "str",
                 "save_guesses": "bool"
+            },
+            "object_recognition": {
+                "enabled": "bool",
+                "file": "str"
             }
         },
         "push_notifications": {
@@ -332,7 +342,8 @@
             "vehicle_identifier": "str",
             "save_failed_updates": "bool",
             "send_images": "bool"
-        }
+        },
+        "object_recognition": "dict"
     },
     "developer": {
         "ignore_list": {

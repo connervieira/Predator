@@ -38,8 +38,18 @@ update_state = utils.update_state
 convert_speed = utils.convert_speed
 save_to_file = utils.save_to_file
 
+# Determine if the object recognition library needs to be imported.
+if ("object_recognition" not in config["dashcam"]): # Check to see if the object recognition field is missing. This will be the case if this instance of Predator has been updated from a version that previously didn't support this feature.
+    config["dashcam"]["object_recognition"] = {}
+object_recognition_needed = False
 if (config["dashcam"]["parked"]["event"]["trigger"] == "object_recognition"):
+    object_recognition_needed = True
+for device in config["dashcam"]["object_recognition"]:
+    if (config["dashcam"]["object_recognition"][device]["enabled"] == True):
+        object_recognition_needed = True
+if (object_recognition_needed == True):
     import object_recognition # object_recognition.py
+del object_recognition_needed
 
 import threading
 import time
@@ -368,6 +378,64 @@ def background_alpr(device):
             time.sleep(float(config["dashcam"]["alpr"]["interval"])) # Sleep (if configured to do so) before starting the next processing loop.
 
 
+if (config["realtime"]["saving"]["object_recognition"]["enabled"] == True):
+    debug_message("Loading object_recognition history")
+    object_recognition_file_location = config["general"]["working_directory"] + "/" + config["realtime"]["saving"]["object_recognition"]["file"]
+    if (os.path.exists(object_recognition_file_location) == False): # If the log file doesn't exist, create it.
+        save_to_file(object_recognition_file_location, "{}") # Save a blank placeholder dictionary to the log file.
+    object_recognition_file = open(object_recognition_file_location, "r") # Open the log file for reading.
+    object_recognition_file_contents = object_recognition_file.read() # Read the raw contents of the file as a string.
+    object_recognition_file.close() # Close the log file.
+
+    if (utils.is_json(object_recognition_file_contents) == True): # If the file contains valid JSON data, then load it.
+        object_recognition_log = json.loads(object_recognition_file_contents) # Read and load the log from the file contents.
+    else: # If the log file doesn't contain valid JSON data, then load a blank placeholder in it's place.
+        object_recognition_log = json.loads("{}") # Load a blank placeholder dictionary.
+
+def background_object_recognition(device):
+    global object_recognition_file_location
+    global object_recognition_log
+    global current_frame_data
+
+    while device not in current_frame_data: # Wait until the first frame is captured on this device.
+        time.sleep(1)
+
+    last_object_alert = 0 # This is a placeholder that will hold the timestamp of the last object alert.
+    while global_variables.predator_running:
+        # Detect objects:
+        detected_objects = object_recognition.predict(current_frame_data[device], "dashcam")
+        considered_objects = []
+        for detected_object in detected_objects:
+            if (detected_object["name"] in config["dashcam"]["object_recognition"][device]["objects_considered"]):
+                if (detected_object["conf"] >= config["dashcam"]["object_recognition"][device]["minimum_confidence"]):
+                    considered_objects.append(detected_object)
+        del detected_objects
+
+        # Find object alerts:
+        alert_objects = []
+        for detected_object in considered_objects:
+            if (detected_object["name"] in config["dashcam"]["object_recognition"][device]["objects_alert"]):
+                alert_objects.append(detected_object)
+
+        # Handle object logging:
+        if (device not in object_recognition_log):
+            object_recognition_log[device] = {}
+        if (len(considered_objects) > 0):
+            object_recognition_log[device][utils.get_time()] = considered_objects
+            utils.save_to_file(object_recognition_file_location, json.dumps(object_recognition_log, indent=4))
+
+        # Handle alerts:
+        if (len(alert_objects) > 0):
+            if (time.time() - last_object_alert > 3):
+                print(utils.style.red + "Detected alert object" + utils.style.end)
+                utils.play_sound("dashcam_object_alert")
+                update_status_lighting("dashcam_object") # Return the status lighting to normal.
+            last_object_alert = time.time()
+
+
+        time.sleep(float(config["dashcam"]["object_recognition"][device]["delay"]))
+
+
 
 def benchmark_camera_framerate(device, frames=5): # This function benchmarks a given camera to determine its framerate.
     global config
@@ -634,7 +702,6 @@ def dashcam_parked_dormant(device):
             process_timing("start", "Dashcam/Object Recognition")
             detected_objects = object_recognition.predict(frame, "dashcam")
             for element in detected_objects:
-                print(element["name"])
                 if (element["conf"] >= config["dashcam"]["parked"]["event"]["trigger_object_recognition"]["minimum_confidence"] and element["name"] in config["dashcam"]["parked"]["event"]["trigger_object_recognition"]["objects"]): # Check to see if this object is in the list of target objects.
                     display_message("Detected event.", 1)
                     dashcam_parked_event(capture, frame_buffer)
@@ -1213,6 +1280,7 @@ def dashcam():
     dashcam_normal_processes = [] # Create a placeholder to store the normal dashcam recording processes.
     dashcam_parked_processes = [] # Create a placeholder to store the parked dashcam recording processes.
     dashcam_alpr_process = {} # Create a placeholder to store the dashcam ALPR processes.
+    dashcam_objectrecognition_process = {} # Create a placeholder to store the dashcam object recognition processes for standard recording.
 
     utils.play_sound("recording_started")
     if (config["dashcam"]["notifications"]["reticulum"]["enabled"] == True and config["dashcam"]["notifications"]["reticulum"]["events"]["start_up"]["enabled"] == True): # Check to see if Predator is configured to send start-up notifications over Reticulum.
@@ -1231,6 +1299,13 @@ def dashcam():
 
             iteration_counter += 1 # Iterate the counter. This value will be used to create unique file names for each recorded video.
             print("Started dashcam recording on " + str(config["dashcam"]["capture"]["video"]["devices"][device]["index"])) # Inform the user that recording was initiation for this camera device.
+
+    iteration_counter = 0 # Set the iteration counter to 0 so that we can increment it for each recording device specified.
+    for device in config["dashcam"]["object_recognition"]: # Iterate over each device configured to run object recognition during recording.
+        if (config["dashcam"]["object_recognition"][device]["enabled"] == True): # Check to make sure object recognition is enabled for this device.
+            dashcam_objectrecognition_process[iteration_counter] = threading.Thread(target=background_object_recognition, args=[device], name="DashcamObjectRecognition" + str(config["dashcam"]["capture"]["video"]["devices"][device]["index"]))
+            dashcam_objectrecognition_process[iteration_counter].start()
+            iteration_counter += 1 # Iterate the counter. This value will be used to create unique file names for each recorded video.
 
 
 

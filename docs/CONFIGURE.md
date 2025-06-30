@@ -96,6 +96,7 @@ This document describes the configuration values found `config.json`.
                 - The `alpr_detection` status is relevant in real-time mode, and used when Predator detects any valid license plate.
                 - The `dashcam_save` status is relevant to dash-cam mode, and is triggered when a dashcam video file is saved using the dashcam lock trigger file.
                     - The lighting will remain in the "dashcam_save" status until the segment has ended, and Predator returns to normal, unlocked recording.
+                - The `dashcam_object` status is triggered when Predator detects an object as defined under `dashcam>object_recognition>DEVICE>objects_alert`.
     - `audio` contains settings that control audio play-back.
         - `enabled` is a boolean value that determines whether audio playback is enabled.
         - `player` contains settings for controlling how sounds are played.
@@ -122,6 +123,8 @@ This document describes the configuration values found `config.json`.
                 - `gps_connected` is played when the GPS finds a 2D or 3D location fix.
                 - `gps_disconnected` is played when the GPS loses the fix.
                 - `gps_fault` is played when the GPS encounters an error.
+                - `dashcam_saved` is played when the current dash-cam video segment is manually saved by the user.
+                - `dashcam_object_alert` is played when Predator detects an object as defined under `dashcam>object_recognition>DEVICE>objects_alert`.
                 - `message_notice` is played when a "notice" level message is displayed.
                 - `message_warning` is played when a "warning" level message is displayed.
                 - `message_error` is played when a "error" level message is displayed.
@@ -287,6 +290,7 @@ This document describes the configuration values found `config.json`.
             - `trigger_object_recognition` contains settings that are used when the `dashcam>parked>event>trigger` value is set to "object_recognition".
                 - `model_weights` points to a file relative to the Predator instance directory containing Ultralytics model weights.
                 - `objects` is a list of objects (from the specified model) that should trigger an event if detected while parked.
+                    - The objects supported by the first-party V0LT model are listed in the [docs/OBJECT_RECOGNITION.md](docs/OBJECT_RECOGNITION.md) file.
                 - `minimum_confidence` is a decimal number between 0 and 1 that determines the minimum confidence level for a detected object before it is considered.
                     - Higher values will filter out false detections, at the risk of missing legitimate detections.
     - `notifications` contains settings to control how Predator issues notifications about dashcam events.
@@ -372,6 +376,17 @@ This document describes the configuration values found `config.json`.
                 - When enabled, a file named `telemetry_backlog.json` will be created in the working directory.
             - `send_images` is a boolean that determines whether Predator will upload the current frame of each capture device every time telemetry is uploaded.
                 - Setting this to `true` will dramatically increase data usage, and may cause frame rate drops without sufficient processing power.
+        - `object_recognition` contains settings for configuring object recogition during normal dash-cam recording.
+            - Each sub-value of this configuration section corresponds to a single capture device, and is a dictionary where the key is the capture device ID (as defined under dashcam>capture>video>devices). Only devices defined in this section will run object recognition during normal dash-cam recording. This section has no effect object recognition during parked recording.
+            - Each sub-dictionary has the following values:
+                - `enabled` is a boolean that determines whether object recognition will run on this device during normal dashcam recording.
+                - `objects_considered` is a list of object names that should be considered (detected/processed).
+                    - The objects supported by the first-party V0LT model are listed in the [docs/OBJECT_RECOGNITION.md](docs/OBJECT_RECOGNITION.md) file.
+                - `objects_alert` is a list of object names that will trigger real-time alerts.
+                    - Any objects listed in this section must also be listed in `objects_considered` or they will be ignored.
+                - `minimum_confidence` is a floating point number between 0 and 1 that determines the minimum confidence for a detected object to be considered.
+                - `delay` this is a decimal number that specifies the number of seconds to wait between each analysis.
+                    - This can be set to `0` to process frames as fast as possible, but some users might want to specify a delay to reduce processing load.
 - `developer` contains technical configuration values that developers and experienced users might be interested in.
     - `ignore_list` contains settings for configuring a list of license plates that Predator will ignore.
         - `enabled` is a boolean that determines whether custom ignore lists are enabled or disabled.
