@@ -175,6 +175,7 @@ def create_trigger_file():
             os.system("echo " + str(time.time()) + " > \"" + os.path.join(config["general"]["interface_directory"], config["dashcam"]["saving"]["trigger"]) + "\"") # Save the trigger file with the current time as the timestamp.
     last_trigger_file_created = time.time()
 
+
 # This function calls the function "event" when the button on "pin" is held for "hold_time" seconds.
 def watch_button(pin, hold_time, event):
     debug_message("Watching pin " + str(pin))
@@ -440,6 +441,9 @@ def background_object_recognition(device):
 def benchmark_camera_framerate(device, frames=5): # This function benchmarks a given camera to determine its framerate.
     global config
 
+    if (len(config["developer"]["dashcam_demo_video"]) > 0):
+        return 30
+
     resolution = [config["dashcam"]["capture"]["video"]["devices"][device]["resolution"]["width"], config["dashcam"]["capture"]["video"]["devices"][device]["resolution"]["height"]] # This determines the resolution that will be used for the video capture device.
     capture = cv2.VideoCapture(config["dashcam"]["capture"]["video"]["devices"][device]["index"]); # Open the video capture device.
     codec = list(config["dashcam"]["capture"]["video"]["devices"][device]["codec"])
@@ -657,9 +661,12 @@ def dashcam_parked_dormant(device):
         background_subtractor = cv2.createBackgroundSubtractorMOG2() # Initialize the background subtractor for motion detection.
         process_timing("end", "Dashcam/Detection Motion")
 
-    capture = cv2.VideoCapture(device_index) # Open the video stream.
-    codec = list(config["dashcam"]["capture"]["video"]["devices"][device]["codec"])
-    capture.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(codec[0], codec[1], codec[2], codec[3])) # Set the video codec.
+    if (len(config["developer"]["dashcam_demo_video"]) > 0):
+        capture = cv2.VideoCapture(os.path.join(config["general"]["working_directory"], config["developer"]["dashcam_demo_video"]))
+    else:
+        capture = cv2.VideoCapture(device_index) # Open the video stream.
+        codec = list(config["dashcam"]["capture"]["video"]["devices"][device]["codec"])
+        capture.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(codec[0], codec[1], codec[2], codec[3])) # Set the video codec.
     capture.set(cv2.CAP_PROP_FPS, config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"]) # Set the frame-rate to a high value so OpenCV will use the highest frame-rate the capture supports.
 
     capture.set(cv2.CAP_PROP_FRAME_WIDTH, config["dashcam"]["capture"]["video"]["devices"][device]["resolution"]["width"]) # Set the video stream width.
@@ -950,10 +957,13 @@ def dashcam_normal(device):
     process_timing("start", "Dashcam/Capture Management")
     debug_message("Opening video stream on '" + device + "'")
 
-    capture = cv2.VideoCapture(device_index) # Open the video stream.
-    codec = list(config["dashcam"]["capture"]["video"]["devices"][device]["codec"])
-    capture.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(codec[0], codec[1], codec[2], codec[3])) # Set the video codec.
-    capture.set(cv2.CAP_PROP_FPS, config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"]) # Set the frame-rate to a high value so OpenCV will use the highest frame-rate the capture supports.
+    if (len(config["developer"]["dashcam_demo_video"]) > 0):
+        capture = cv2.VideoCapture(os.path.join(config["general"]["working_directory"], config["developer"]["dashcam_demo_video"]))
+    else:
+        capture = cv2.VideoCapture(device_index) # Open the video stream.
+        codec = list(config["dashcam"]["capture"]["video"]["devices"][device]["codec"])
+        capture.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(codec[0], codec[1], codec[2], codec[3])) # Set the video codec.
+        capture.set(cv2.CAP_PROP_FPS, config["dashcam"]["capture"]["video"]["devices"][device]["framerate"]["max"]) # Set the frame-rate to a high value so OpenCV will use the highest frame-rate the capture supports.
 
     capture.set(cv2.CAP_PROP_FRAME_WIDTH, config["dashcam"]["capture"]["video"]["devices"][device]["resolution"]["width"]) # Set the video stream width.
     capture.set(cv2.CAP_PROP_FRAME_HEIGHT, config["dashcam"]["capture"]["video"]["devices"][device]["resolution"]["height"]) # Set the video stream height.
@@ -1138,12 +1148,17 @@ def dashcam_normal(device):
         if not ret: # Check to see if the frame failed to be read.
             display_message("Failed to receive video frame from the '" + device  + "' device. It is possible this device has been disconnected.", 2)
             for i in range(1, 12): # Attempt to re-open the capture device several times.
+                if (global_variables.predator_running == False):
+                    break
                 time.sleep(5*i) # Wait before re-attempting to open the capture device. The length of time between attempts increases with each attempt.
                 display_message("Attempting to re-open capture on '" + device  + "' device.", 1)
                 process_timing("start", "Dashcam/Capture Management")
-                capture = cv2.VideoCapture(device_index) # Open the video stream.
-                codec = list(config["dashcam"]["capture"]["video"]["devices"][device]["codec"])
-                capture.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(codec[0], codec[1], codec[2], codec[3])) # Set the video codec.
+                if (len(config["developer"]["dashcam_demo_video"]) > 0):
+                    capture = cv2.VideoCapture(os.path.join(config["general"]["working_directory"], config["developer"]["dashcam_demo_video"]))
+                else:
+                    capture = cv2.VideoCapture(device_index) # Open the video stream.
+                    codec = list(config["dashcam"]["capture"]["video"]["devices"][device]["codec"])
+                    capture.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(codec[0], codec[1], codec[2], codec[3])) # Set the video codec.
                 capture.set(cv2.CAP_PROP_FRAME_WIDTH, config["dashcam"]["capture"]["video"]["devices"][device]["resolution"]["width"]) # Set the video stream width.
                 capture.set(cv2.CAP_PROP_FRAME_HEIGHT, config["dashcam"]["capture"]["video"]["devices"][device]["resolution"]["height"]) # Set the video stream height.
                 process_timing("end", "Dashcam/Capture Management")
@@ -1174,6 +1189,9 @@ def dashcam_normal(device):
 
         # ===================================
         # Write the frame to the output file:
+        if (config["developer"]["dashcam_show_frame"] == True):
+            cv2.imshow(device, frame)
+            cv2.waitKey(1)
         output.write(frame)
 
 

@@ -421,3 +421,7 @@ This document describes the configuration values found `config.json`.
             - "opencv" uses the built in OpenCV method to count frames. This method is very efficient, but may produce unexpected results on certain systems.
             - "ffprobe" uses the FFProbe command. This method is very efficient, but may not support all video formats, and may produce unexpected results on certain systems.
             - "manual" will load the video with OpenCV, and manually count each valid frame. This method is extremely accurate, but takes significantly longer than the alternative methods.
+    - `dashcam_demo_video` is an optional string that will override video dash-cam recording with a pre-recorded video file-path (working directory relative).
+        - When this value is left blank, Predator will read frames off of the capture device(s) like normal.
+        - When this string is set to a file-path, Predator will instead read frames off of the specified video file.
+    - `dashcam_show_frame` is a boolean that determines whether the current captured video frame will be displayed using OpenCV for each dash-cam capture device.

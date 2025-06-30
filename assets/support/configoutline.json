@@ -358,6 +358,8 @@
         "dashcam_shortterm_framerate_interval": "+float",
         "hard_crash_on_error": "bool",
         "identify_to_remote_sources": "bool",
-        "frame_count_method": ["opencv", "ffprobe", "manual"]
+        "frame_count_method": ["opencv", "ffprobe", "manual"],
+        "dashcam_demo_video": "str",
+        "dashcam_show_frame": "bool"
     }
 }

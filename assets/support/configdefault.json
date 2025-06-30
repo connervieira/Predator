@@ -102,7 +102,7 @@
                     "delay": 1
                 },
                 "dashcam_object_alert": {
-                    "path": "./assets/sounds/voice/dashcam_object_alert.mp3",
+                    "path": "./assets/sounds/dashcam_object_alert.mp3",
                     "repeat": 1,
                     "delay": 0.5
                 },
@@ -414,6 +414,8 @@
         "dashcam_shortterm_framerate_interval": 0.25,
         "hard_crash_on_error": false,
         "identify_to_remote_sources": true,
-        "frame_count_method": "manual"
+        "frame_count_method": "manual",
+        "dashcam_demo_video": "",
+        "dashcam_show_frame": false
     }
 }

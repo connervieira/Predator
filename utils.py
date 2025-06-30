@@ -899,7 +899,7 @@ def count_frames(video):
 
 
 
-if ("telemetry" in config["dashcam"] and config["dashcam"]["telemetry"]["save_failed_updates"]):
+if ("telemetry" in config["dashcam"] and "save_failed_updates" in config["dashcam"]["telemetry"] and config["dashcam"]["telemetry"]["save_failed_updates"]):
     telemetry_backlog_file_location = config["general"]["working_directory"] + "/telemetry_backlog.json"
     if (os.path.exists(telemetry_backlog_file_location) == False): # If the backlog file doesn't exist, create it.
         save_to_file(telemetry_backlog_file_location, "{}") # Save a blank placeholder dictionary to the backlog file.

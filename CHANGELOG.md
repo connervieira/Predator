@@ -605,7 +605,8 @@ November 20th, 2024
     - Fixed GPS demo mode.
     - When the heading can't be identified, the GPS back-end now returns -1 instead of 0.
 - Improved the reliability of file copying and erasing via management.
-    - Previously, this functionality might have behaved unexpected when the file path involved spaces.
+    - Previously, this functionality might have behaved unexpectedly when the file path involved spaces.
 - Improved the reliablity of graceful exits when pressing `Ctrl+C`.
     - Predator will detect when a thread is holding the process alive, and will display its name.
+    - Predator will now abandon trying to re-open a dropped capture device when gracefully exiting.
 - The plates file in the interface directory now contains the image identifiers introduced in Phantom V1.4.0.
