@@ -989,7 +989,8 @@ def send_telemetry(data):
                             success = False
                         if (success == True): # Check to see if the data submission was successful.
                             consecutive_failures = 0 # Reset the consecutive failure counter.
-                            del telemetry_backlog[timestamp] # Delete this point from the back-log.
+                            if (timestamp in telemetry_backlog): # Check to see if this timestamp is still present in the backlog (it may have been removed by another thread).
+                                del telemetry_backlog[timestamp] # Delete this point from the back-log.
                         else:
                             consecutive_failures += 1
                         if (consecutive_failures >= 10): # Check to see if we have had several consecutive failures.

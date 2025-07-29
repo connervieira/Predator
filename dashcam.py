@@ -1208,7 +1208,6 @@ def dashcam_normal(device):
             "spd": current_location[2],
             "head": current_location[4]
         }
-        #utils.send_telemetry(telemetry_data)
         telemetry_thread = threading.Thread(target=utils.send_telemetry, args=[dict(telemetry_data)]) # Create a separate thread to process and upload telemetry.
         telemetry_thread.start()
 
