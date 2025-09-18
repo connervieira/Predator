@@ -916,15 +916,18 @@ if ("telemetry" in config["dashcam"] and "save_failed_updates" in config["dashca
 # This function is called for every frame, and uploads dash-cam telemetry information at regular intervals.
 last_telemetry_sent = 0 # This holds the timestamp of the last time telemetry was sent.
 
+sending_telemetry = False # This is used to indicate whether or not telemetry is being actively sent on a certain thread.
 def send_telemetry(data):
     global last_telemetry_sent
     global telemetry_backlog
+    global sending_telemetry
     if (config["dashcam"]["telemetry"]["enabled"]):
         data["system"] = {}
         data["system"]["timezone"] = timezone_offset_stamp # Add the system timezone to the data.
 
 
-        if (time.time() - last_telemetry_sent >= 10): # Check to see if it has been at least 10 seconds since the last telemetry update. Note: most external receivers (such as V0LT Portal) will reject any data within 10 seconds of a previous datapoint.
+        if (time.time() - last_telemetry_sent >= 10 and sending_telemetry == False): # Check to see if it has been at least 10 seconds since the last telemetry update. Note: most external receivers (such as V0LT Portal) will reject any data within 10 seconds of a previous datapoint.
+            sending_telemetry = True # This will be reset to 'False' when this thread is no longer sending telemetry.
             if ("send_images" in config["dashcam"]["telemetry"] and config["dashcam"]["telemetry"]["send_images"] == True): # Check to see if image sending is enabled.
                 for device in list(data["image"]):
                     try:
@@ -994,13 +997,14 @@ def send_telemetry(data):
                         else:
                             consecutive_failures += 1
                         if (consecutive_failures >= 10): # Check to see if we have had several consecutive failures.
-                            break # Exit the loop (give up on the remaining 
+                            break # Exit the loop (give up on the remaining points)
                     save_to_file(telemetry_backlog_file_location, json.dumps(telemetry_backlog)) # Save the updated back-log file.
             else: # Otherwise, the current submission failed.
                 if ("image" in data): # Check to see if there is an image associated with this submission.
                     del data["image"] # Delete the image data before adding it to the backlog.
                 telemetry_backlog[data["location"]["time"]] = data # Add this datapoint to the back-log.
                 save_to_file(telemetry_backlog_file_location, json.dumps(telemetry_backlog)) # Save the updated back-log file.
+            sending_telemetry = False
 
 
 
