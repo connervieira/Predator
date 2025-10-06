@@ -17,7 +17,7 @@ except:
 
 
 
-def benchmark_camera_framerate(device, frames=5): # This function benchmarks a given camera to determine its framerate.
+def benchmark_camera_framerate(device, frames=1000): # This function benchmarks a given camera to determine its framerate.
     global config
 
     resolution = [config["dashcam"]["capture"]["video"]["devices"][device]["resolution"]["width"], config["dashcam"]["capture"]["video"]["devices"][device]["resolution"]["height"]] # This determines the resolution that will be used for the video capture device.
