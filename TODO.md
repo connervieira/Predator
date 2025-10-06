@@ -58,6 +58,7 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Allow Predator to lock dashcam videos even after audio merging fails.
 - [X] Fix management mode for dashcam video (main.py:452 and 550)
 - [X] Add a global variable to prevent multiple threads from trying to upload the telemtry back-log at the same time.
+- [ ] Detect when a configured dash-cam object recognition or ALPR device does not exist in the dashcam devices.
 
 
 ## Issues
