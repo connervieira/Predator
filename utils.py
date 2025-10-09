@@ -900,7 +900,7 @@ def count_frames(video):
 
 
 
-if ("telemetry" in config["dashcam"] and "save_failed_updates" in config["dashcam"]["telemetry"] and config["dashcam"]["telemetry"]["save_failed_updates"]):
+if ("telemetry" in config["dashcam"] and "save_failed_updates" in config["dashcam"]["telemetry"] and config["dashcam"]["telemetry"]["enabled"] == True and config["dashcam"]["telemetry"]["save_failed_updates"] == True):
     telemetry_backlog_file_location = config["general"]["working_directory"] + "/telemetry_backlog.json"
     if (os.path.exists(telemetry_backlog_file_location) == False): # If the backlog file doesn't exist, create it.
         save_to_file(telemetry_backlog_file_location, "{}") # Save a blank placeholder dictionary to the backlog file.
@@ -913,6 +913,8 @@ if ("telemetry" in config["dashcam"] and "save_failed_updates" in config["dashca
         telemetry_backlog = json.loads(telemetry_backlog_contents) # Read and load the backlog log from the file.
     else: # If the backlog file doesn't contain valid JSON data, then load a blank placeholder in it's place.
         telemetry_backlog = json.loads("{}") # Load a blank placeholder dictionary.
+else:
+    telemetry_backlog = {}
 # This function is called for every frame, and uploads dash-cam telemetry information at regular intervals.
 last_telemetry_sent = 0 # This holds the timestamp of the last time telemetry was sent.
 
@@ -921,7 +923,7 @@ def send_telemetry(data):
     global last_telemetry_sent
     global telemetry_backlog
     global sending_telemetry
-    if (config["dashcam"]["telemetry"]["enabled"]):
+    if (config["dashcam"]["telemetry"]["enabled"] == True):
         data["system"] = {}
         data["system"]["timezone"] = timezone_offset_stamp # Add the system timezone to the data.
 
@@ -1000,10 +1002,11 @@ def send_telemetry(data):
                             break # Exit the loop (give up on the remaining points)
                     save_to_file(telemetry_backlog_file_location, json.dumps(telemetry_backlog)) # Save the updated back-log file.
             else: # Otherwise, the current submission failed.
-                if ("image" in data): # Check to see if there is an image associated with this submission.
-                    del data["image"] # Delete the image data before adding it to the backlog.
-                telemetry_backlog[data["location"]["time"]] = data # Add this datapoint to the back-log.
-                save_to_file(telemetry_backlog_file_location, json.dumps(telemetry_backlog)) # Save the updated back-log file.
+                if (config["dashcam"]["telemetry"]["save_failed_updates"] == True):
+                    if ("image" in data): # Check to see if there is an image associated with this submission.
+                        del data["image"] # Delete the image data before adding it to the backlog.
+                    telemetry_backlog[data["location"]["time"]] = data # Add this datapoint to the back-log.
+                    save_to_file(telemetry_backlog_file_location, json.dumps(telemetry_backlog)) # Save the updated back-log file.
             sending_telemetry = False
 
 

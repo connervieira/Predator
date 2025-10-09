@@ -59,6 +59,7 @@ These are the features actively planned for Predator and are likely to be added 
 - [X] Fix management mode for dashcam video (main.py:452 and 550)
 - [X] Add a global variable to prevent multiple threads from trying to upload the telemtry back-log at the same time.
 - [ ] Detect when a configured dash-cam object recognition or ALPR device does not exist in the dashcam devices.
+- [ ] Implement the ability to stream GPIO data from a remote source using `tools/gpio_relay.py`.
 
 
 ## Issues

@@ -1485,6 +1485,7 @@ else: # The user has selected an unrecognized mode.
 
 
 utils.display_message("Predator is exiting.", 1)
+global_variables.predator_running = False
 for i in range(0,15):
     time.sleep(0.1)
     if (len(threading.enumerate()) <= 1):

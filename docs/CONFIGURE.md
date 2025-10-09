@@ -360,14 +360,21 @@ This document describes the configuration values found `config.json`.
                 - Only devices specified in this list will run ALPR.
                 - If you have a capture device that will never realistically see a license plate (for example, an interior facing camera), you should omit it from this value to reduce unnecssary processing load.
         - `physical_controls` contains settings for configure physical controls via GPIO pins.
-            - `dashcam_saving` contains settings to trigger dash-cam saving using a GPIO button.
-                - Each entry in this configuration section uses the GPIO pin number as a key, and contains the following values:
-                    - `name` is a human friendly name for the pin, and can be set to any plain text string.
-                    - `hold_time` is a floating point number that determines the number of seconds the button needs to be held to trigger the event.
-            - `stop_predator` contains settings to terminate Predator via GPIO pins.
-                - Each entry in this configuration section uses the GPIO pin number as a key, and contains the following values:
-                    - `name` is a human friendly name for the pin, and can be set to any plain text string.
-                    - `hold_time` is a positive floating point number that determines the number of seconds the button needs to be held to trigger the event.
+            - `behavior`
+                - `method` determines the method by which GPIO events will be monitored, and can only be set to the following values:
+                    - `gpio_local` uses the `gpiozero` package to monitor GPIO pins connected to the host device.
+                    - `gpio_remote` uses the `socket` package to receive GPIO events from an external device, running GPIOZero.
+                - `gpio_local` contains options for configuring local GPIO behavior.
+                - `gpio_remote` contains options for configuring remote GPIO behavior.
+            - `actions`
+                - `dashcam_saving` contains settings to trigger dash-cam saving using a GPIO button.
+                    - Each entry in this configuration section uses the GPIO pin number as a key, and contains the following values:
+                        - `name` is a human friendly name for the pin, and can be set to any plain text string.
+                        - `hold_time` is a floating point number that determines the number of seconds the button needs to be held to trigger the event.
+                - `stop_predator` contains settings to terminate Predator via GPIO pins.
+                    - Each entry in this configuration section uses the GPIO pin number as a key, and contains the following values:
+                        - `name` is a human friendly name for the pin, and can be set to any plain text string.
+                        - `hold_time` is a positive floating point number that determines the number of seconds the button needs to be held to trigger the event.
         - `telemetry` contains settings for configuring Predator to send telemetry data like dash-cam images and GPS data to an external service (see [docs/INTEGRATION.md](docs/INTEGRATION.md) for more information).
             - `enabled` is a boolean that determined whether telemetry sending is enabled.
             - `target` is the network target that telemetry data will be submitted to.

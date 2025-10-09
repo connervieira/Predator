@@ -320,8 +320,8 @@ def highest_different_index(config_active, config_default, index): # This functi
     return []
 
 
-ignore_indexes = [["realtime", "image", "camera", "devices"], ["dashcam", "saving", "trigger_gpio"], ["dashcam", "stamps", "relay", "triggers"], ["dashcam", "capture", "video", "devices"], ["dashcam", "physical_controls"], ["dashcam", "object_recognition"]] # Configuration values specified here will not be checked by the check_defaults_missing() and check_defaults_extra() functions.
-force_indexes = [["dashcam", "physical_controls"]] # These indexes will be checked even though they are dictionaries.
+ignore_indexes = [["realtime", "image", "camera", "devices"], ["dashcam", "stamps", "relay", "triggers"], ["dashcam", "capture", "video", "devices"], ["dashcam", "object_recognition"]] # Configuration values specified here will not be checked by the check_defaults_missing() and check_defaults_extra() functions.
+force_indexes = [["dashcam", "physical_controls", "actions"]] # These indexes will be checked even though they are dictionaries.
 
 # This function checks for values that exist in the default config that aren't present in the active config.
 def check_defaults_missing(config_defaults, config_active, index=[], missing_values=[]):
@@ -380,7 +380,6 @@ def update_config():
         time.sleep(5)
     if (config_active != load_config(config_active_filepath)): # Check to see if the configuration has been modified.
         save_to_file(config_active_filepath, json.dumps(config_active, indent=4)) # Save the updated configuration.
-
 
 
 update_config()

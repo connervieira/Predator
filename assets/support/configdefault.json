@@ -386,9 +386,21 @@
             "devices": []
         },
         "physical_controls": {
-            "dashcam_saving": {
+            "behavior": {
+                "method": "gpio_remote",
+                "gpio_local": {},
+                "gpio_remote": {
+                    "host": {
+                        "address": "",
+                        "port": 5000
+                    }
+                }
             },
-            "stop_predator": {
+            "actions": {
+                "dashcam_saving": {
+                },
+                "stop_predator": {
+                }
             }
         },
         "telemetry": {

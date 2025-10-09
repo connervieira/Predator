@@ -333,8 +333,20 @@
             "devices": "list"
         },
         "physical_controls": {
-            "dashcam_saving": "dict",
-            "stop_predator": "dict"
+            "behavior": {
+                "method": ["gpio_local", "gpio_remote"],
+                "gpio_local": "dict",
+                "gpio_remote": {
+                    "host": {
+                        "address": "str",
+                        "port": "+int"
+                    }
+                }
+            },
+            "actions": {
+                "dashcam_saving": "dict",
+                "stop_predator": "dict"
+            }
         },
         "telemetry": {
             "enabled": "bool",
