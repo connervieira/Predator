@@ -600,6 +600,11 @@ November 20th, 2024
             - `ext` is replaced by the file extension.
     - Added support for real-time object recognition capabilities while recording dash-cam video.
         - Predator can now detect, log, and alert to specific objects while recording dash-cam video.
+    - Added new dashcam developer features.
+        - It is now possible to stream frames from a pre-recorded video rather than a real capture device for sake of testing using the `developer>dashcam_demo_video` configuration value.
+        - Added a configuration value to show the current dash-cam frame during recording (`developer>dashcam_show_frame`)
+    - Improved stability
+        - The segment length configuration value is now validated when starting dash-cam recording.
 - Updated real-time mode.
     - Improved license plate logging in real-time mode.
 - Added `--help` commmand line option.
@@ -612,6 +617,3 @@ November 20th, 2024
     - Predator will detect when a thread is holding the process alive, and will display its name.
     - Predator will now abandon trying to re-open a dropped capture device when gracefully exiting.
 - The plates file in the interface directory now contains the image identifiers introduced in Phantom V1.4.0.
-- Added new dashcam developer features.
-    - It is now possible to stream frames from a pre-recorded video rather than a real capture device for sake of testing using the `developer>dashcam_demo_video` configuration value.
-    - Added a configuration value to show the current dash-cam frame during recording (`developer>dashcam_show_frame`)

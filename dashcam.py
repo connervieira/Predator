@@ -1310,7 +1310,11 @@ def dashcam():
     if (at_least_one_enabled_device == False):
         display_message("There are no dashcam capture devices enabled. Dashcam recording will not start.", 3)
     del at_least_one_enabled_device
-    # =================================================================================
+
+    # Ensure the segment length is a positive number to prevent an endless loop of empty segments:
+    if (config["dashcam"]["saving"]["segment_length"] <= 0):
+        display_message("Invalid dashcam segment length '" + str(config["dashcam"]["saving"]["segment_length"]) + "'. Defaulting to 60 seconds.", 2)
+        config["dashcam"]["saving"]["segment_length"] = 60
 
 
 
