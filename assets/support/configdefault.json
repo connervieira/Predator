@@ -390,6 +390,9 @@
                 "method": "gpio_local",
                 "invert": false,
                 "gpio_local": {},
+                "gpio_module": {
+                    "pin_prefix": "C"
+                },
                 "gpio_remote": {
                     "host": {
                         "address": "",

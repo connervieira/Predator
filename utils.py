@@ -520,22 +520,24 @@ def play_sound(sound_id, override_cooldown=False):
                         time.sleep(0.1)
                         if (x > 100):
                             display_message("The audio process timed out", 2, True)
-                    audio_playing = True
-                    for i in range(0, int(config["general"]["audio"]["sounds"][sound_id]["repeat"])): # Repeat the sound several times, if the configuration says to.
-                        if (config["general"]["audio"]["player"]["backend"] == "mpg321"):
-                            command = "mpg321 \"" + config["general"]["audio"]["sounds"][sound_id]["path"] + "\" > /dev/null 2>&1 &"
-                            os.system(command) # Play the sound specified for this alert type in the configuration.
-                        elif (config["general"]["audio"]["player"]["backend"] == "mplayer"):
-                            if (len(config["general"]["audio"]["player"]["mplayer"]["device"]) == 0):
-                                command = "mplayer \"" + config["general"]["audio"]["sounds"][sound_id]["path"] + "\" -noconsolecontrols 2>&- 1>/dev/null &"
-                                os.system(command)
+                            break
+                    if (audio_playing == False): # Check to make sure no other audio is playing. We waited for this to be the case, but a timeout will result in this still being true.
+                        audio_playing = True
+                        for i in range(0, int(config["general"]["audio"]["sounds"][sound_id]["repeat"])): # Repeat the sound several times, if the configuration says to.
+                            if (config["general"]["audio"]["player"]["backend"] == "mpg321"):
+                                command = "mpg321 \"" + config["general"]["audio"]["sounds"][sound_id]["path"] + "\" > /dev/null 2>&1 &"
+                                os.system(command) # Play the sound specified for this alert type in the configuration.
+                            elif (config["general"]["audio"]["player"]["backend"] == "mplayer"):
+                                if (len(config["general"]["audio"]["player"]["mplayer"]["device"]) == 0):
+                                    command = "mplayer \"" + config["general"]["audio"]["sounds"][sound_id]["path"] + "\" -noconsolecontrols 2>&- 1>/dev/null &"
+                                    os.system(command)
+                                else:
+                                    command = "mplayer -ao " + config["general"]["audio"]["player"]["mplayer"]["device"] + " \"" + config["general"]["audio"]["sounds"][sound_id]["path"] + "\" -noconsolecontrols 2>&- 1>/dev/null &"
+                                    os.system(command)
                             else:
-                                command = "mplayer -ao " + config["general"]["audio"]["player"]["mplayer"]["device"] + " \"" + config["general"]["audio"]["sounds"][sound_id]["path"] + "\" -noconsolecontrols 2>&- 1>/dev/null &"
-                                os.system(command)
-                        else:
-                            display_message("The configured audio player back-end is invalid.", 3)
-                        time.sleep(float(config["general"]["audio"]["sounds"][sound_id]["delay"])) # Wait before playing the sound again.
-                    audio_playing = False
+                                display_message("The configured audio player back-end is invalid.", 3)
+                            time.sleep(float(config["general"]["audio"]["sounds"][sound_id]["delay"])) # Wait before playing the sound again.
+                        audio_playing = False
     else: # No sound with this ID exists in the configuration database, and therefore the sound can't be played.
         display_message("No sound with the ID (" + str(sound_id) + ") exists in the configuration.", 3)
 

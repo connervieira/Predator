@@ -381,11 +381,16 @@ This document describes the configuration values found `config.json`.
                 - `method` determines the method by which GPIO events will be monitored, and can only be set to the following values:
                     - `gpio_local` uses the `gpiozero` package to monitor GPIO pins connected to the host device.
                     - `gpio_module` uses an external FT232H via `blinka` to monitor GPIO pins.
-                        - When this method is selected, pin numbers specified in the Predator configuration file refer to the "C" pins on the FT232 board. For example, using pin "3" in the configuration file will use pin "C3" on the board.
                     - `gpio_remote` uses the `socket` package to receive GPIO events from an external device, running GPIOZero.
                 - `invert` determines whether GPIO inputs will be inverted (true becomes false, false becomes true)
                 - `gpio_local` contains options for configuring local GPIO behavior.
+                - `gpio_module` contains options for configuring GPIO behavior when using an external module (FT232H).
+                    - `pin_prefix` is a string (usually a single character) that is prefixed to all pin numbers. This is used to specify the bank of pins on the FT232H module to use.
+                        - For example, if `pin_prefix` is set to "C", then a pin configured as `3` in Predator will refer to pin "C3" on the GPIO module.
                 - `gpio_remote` contains options for configuring remote GPIO behavior.
+                    - `host` contains settings that configure the network target where GPIO states will be fetched from.
+                        - `address` is the IP address/domain of the network target.
+                        - `port` is the port on the network target where a connection will be established.
             - `actions`
                 - `dashcam_saving` contains settings to trigger dash-cam saving using a GPIO button.
                     - Each entry in this configuration section uses the GPIO pin number as a key, and contains the following values:

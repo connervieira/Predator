@@ -196,6 +196,13 @@ def update_gpio_state(pin, state):
     if (config["dashcam"]["physical_controls"]["behavior"]["invert"] == True):
         state = not state
     gpio_state[pin] = state
+def get_gpio_state(pin):
+    global gpio_state
+    pin = int(pin)
+    if (pin in gpio_state):
+        return gpio_state[pin]
+    else:
+        return False
 def monitor_gpio():
     global gpio_state
 
@@ -230,11 +237,26 @@ def monitor_gpio():
                 pins_to_monitor.append(config["dashcam"]["stamps"]["relay"]["triggers"][stamp]["pin"])
 
         for pin in pins_to_monitor:
-            buttons[pin] = digitalio.DigitalInOut(getattr(board, "C" + str(pin)))
+            buttons[pin] = digitalio.DigitalInOut(getattr(board, config["dashcam"]["physical_controls"]["behavior"]["gpio_module"]["pin_prefix"] + str(pin)))
             buttons[pin].direction = digitalio.Direction.INPUT
+        consecutive_gpio_errors = 0 # This is a placeholder that will count up each time the GPIO monitoring process encounters an error, and reset each time a pin is successfully checked.
         while global_variables.predator_running: # Run forever (until terminated).
             for pin in buttons: # Iterate through each button.
-                update_gpio_state(pin, buttons[pin].value) # Update the state of this pin.
+                try:
+                    update_gpio_state(pin, buttons[pin].value) # Update the state of this pin.
+                    consecutive_gpio_errors = 0 # Reset the GPIO error counter.
+                except Exception as e:
+                    utils.display_message("The GPIO monitoring process in pin '" + str(pin) + "' encountered an error: " + str(e), 2)
+                    consecutive_gpio_errors += 1 # Increment the GPIO error counter.
+
+                    time.sleep(5) # Wait an arbitrary amount of time before resuming monitoring the GPIO pin.
+
+                    # Re-open the pins to monitor:
+                    for pin in pins_to_monitor:
+                        buttons[pin] = digitalio.DigitalInOut(getattr(board, config["dashcam"]["physical_controls"]["behavior"]["gpio_module"]["pin_prefix"] + str(pin)))
+                        buttons[pin].direction = digitalio.Direction.INPUT
+
+                    break # Skip checking the other pins, and just restart the cycle.
 
 
     elif (config["dashcam"]["physical_controls"]["behavior"]["method"] == "gpio_remote"): # Remote GPIO from a network target running the `gpio_relay.py` tool.
@@ -259,22 +281,20 @@ gpio_monitor.start()
 
 # This function calls the function `event` when the button on `pin` is held for `hold_time` seconds.
 def watch_button(pin, hold_time, event):
-    global gpio_state
-
     time_pressed = 0
     last_stuck_warning = 0
     while global_variables.predator_running:
-        if (gpio_state[pin] == True and time_pressed == 0): # Check to see if the button was just pressed.
+        if (get_gpio_state(pin) == True and time_pressed == 0): # Check to see if the button was just pressed.
             debug_message("Pressed" + str(pin))
             time_pressed = time.time()
-        elif (gpio_state[pin] == True and time.time() - time_pressed >= 10): # Check to see if the button has been held for an excessively long time (it may be stuck).
+        elif (get_gpio_state(pin) == True and time.time() - time_pressed >= 10): # Check to see if the button has been held for an excessively long time (it may be stuck).
             if (time.time() - last_stuck_warning > 10): # Check to see if it has been at least 30 seconds since the last time a stuck warning was displayed.
                 display_message("The button on pin " + str(pin) + " appears to be stuck.", 3)
             last_stuck_warning = time.time()
-        elif (gpio_state[pin] == True and time.time() - time_pressed >= hold_time): # Check to see if the button is being held, and the time threshold has been reached.
+        elif (get_gpio_state(pin) == True and time.time() - time_pressed >= hold_time): # Check to see if the button is being held, and the time threshold has been reached.
             debug_message("Triggered " + str(pin))
             event()
-        elif (gpio_state[pin] == False): # If the button is not pressed, reset the timer.
+        elif (get_gpio_state(pin) == False): # If the button is not pressed, reset the timer.
             time_pressed = 0
 
         time.sleep(hold_time/10) # Wait briefly before checking the pin again.
@@ -648,7 +668,7 @@ def apply_dashcam_stamps(frame, device=""):
         stamp_number = 0
         for stamp in config["dashcam"]["stamps"]["relay"]["triggers"]:
             if (config["dashcam"]["stamps"]["relay"]["triggers"][stamp]["enabled"] == True): # Check to see if this relay stamp is enabled.
-                if (gpio_state[int(config["dashcam"]["stamps"]["relay"]["triggers"][stamp]["pin"])] == True): # Check to see if the relay is triggered.
+                if (get_gpio_state(config["dashcam"]["stamps"]["relay"]["triggers"][stamp]["pin"]) == True): # Check to see if the relay is triggered.
                     relay_stamp_color = config["dashcam"]["stamps"]["relay"]["colors"]["on"]
                 else:
                     relay_stamp_color = config["dashcam"]["stamps"]["relay"]["colors"]["off"]

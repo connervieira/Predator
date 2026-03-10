@@ -79,7 +79,7 @@ You can learn more about the installation process for each program in their resp
 
 ### External GPIO Module
 
-If you're using an external GPIO module (i.e. a USB FT232H, not Raspberry Pi GPIO), you'll need to create the following udev rules:
+If you're using an external GPIO module (i.e. a USB FT232H, not Raspberry Pi GPIO), you may need to create the following udev rules:
 ```
 # /etc/udev/rules.d/11-ftdi.rules
 SUBSYSTEM=="usb", ATTR{idVendor}=="0403", ATTR{idProduct}=="6001", GROUP="plugdev", MODE="0666"
