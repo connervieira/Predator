@@ -336,6 +336,23 @@ This document describes the configuration values found `config.json`.
                     - "NS" for normal recording when the current segment is being saved to the event folder.
                     - "PD" for parked recording while the system is dormant, and waiting for motion to trigger recording.
                     - "PA" for parked recording while the system is actively recording an event.
+        - `relay` contains configuration values to show the state of physical relays via GPIO as dash-cam overlays to show the state of vehicle components (horn, brakes, siren, etc.).
+            - `enabled` determines of the relay overlay is enabled.
+                - Setting this to `false` will disable all relay overlays, regardless of whether the individual triggers are enabled.
+            
+            - `colors` defines the text color of the relay overlays for both states (on or off).
+                - `on` defines the color when the trigger is active.
+                    - The first value represents red, the second value represents green, and the third value represents blue.
+                - `off` defines the color when the trigger is not active.
+                    - The first value represents red, the second value represents green, and the third value represents blue.
+            - `triggers` is a dictionary of relay-based overlays with corresponding trigger criteria.
+                - Each key in this dictionary is an arbitrary ID for one relay overlay (ex: "horn", "turn_signal_left", etc.)
+                    - Each key holds a sub-dictionary with these sub-values:
+                        - `enabled` is a boolean that allows this relay to be individually disabled (`true`: enabled, `false`: disabled).
+                        - `pin` is an integer that corresponds to a PIN on the associated GPIO controller.
+                        - `invert` is a boolean that inverts the output of the relay (for example, when the relay is active (closed), the trigger is disabled)
+                            - This value stacks with the `invert` value from the `physical_controls`, which can lead to double negatives (ex: `true` inverted twice is still `true`)
+                        - `text` is a string that defines the text that appears in the overlay (ex: "HORN", "SIREN", etc.).
         - `gps` contains configuration values for the stamp shown at the top of the frame, containing location information.
             - `color` is a list of three values between 0 and 255 that determines the font cover of the overlay stamp.
                 - The first value represents red, the second value represents green, and the third value represents blue.
@@ -363,7 +380,10 @@ This document describes the configuration values found `config.json`.
             - `behavior`
                 - `method` determines the method by which GPIO events will be monitored, and can only be set to the following values:
                     - `gpio_local` uses the `gpiozero` package to monitor GPIO pins connected to the host device.
+                    - `gpio_module` uses an external FT232H via `blinka` to monitor GPIO pins.
+                        - When this method is selected, pin numbers specified in the Predator configuration file refer to the "C" pins on the FT232 board. For example, using pin "3" in the configuration file will use pin "C3" on the board.
                     - `gpio_remote` uses the `socket` package to receive GPIO events from an external device, running GPIOZero.
+                - `invert` determines whether GPIO inputs will be inverted (true becomes false, false becomes true)
                 - `gpio_local` contains options for configuring local GPIO behavior.
                 - `gpio_remote` contains options for configuring remote GPIO behavior.
             - `actions`

@@ -387,7 +387,8 @@
         },
         "physical_controls": {
             "behavior": {
-                "method": "gpio_remote",
+                "method": "gpio_local",
+                "invert": false,
                 "gpio_local": {},
                 "gpio_remote": {
                     "host": {

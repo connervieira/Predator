@@ -605,6 +605,11 @@ November 20th, 2024
         - Added a configuration value to show the current dash-cam frame during recording (`developer>dashcam_show_frame`)
     - Improved stability
         - The segment length configuration value is now validated when starting dash-cam recording.
+    - Improved GPIO integration.
+        - Created a unified GPIO system with heavy abstraction to make Predator more GPIO back-end agnostic.
+            - Added support for external GPIO modules (FT232H)
+            - Added the experimental ability to relay GPIO pins from an external device over the network (not recommended)
+        - Added the ability to globally invert GPIO inputs.
 - Updated real-time mode.
     - Improved license plate logging in real-time mode.
 - Added `--help` commmand line option.

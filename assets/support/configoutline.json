@@ -334,7 +334,8 @@
         },
         "physical_controls": {
             "behavior": {
-                "method": ["gpio_local", "gpio_remote"],
+                "method": ["gpio_local", "gpio_module", "gpio_remote"],
+                "invert": "bool",
                 "gpio_local": "dict",
                 "gpio_remote": {
                     "host": {

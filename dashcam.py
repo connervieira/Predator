@@ -72,19 +72,25 @@ if (config["dashcam"]["alpr"]["enabled"] == True): # Check to see if background 
 import lighting # Import the lighting.py script.
 update_status_lighting = lighting.update_status_lighting # Load the status lighting update function from the lighting script.
 
-must_import_gpiozero = False
+must_import_gpio = False
 if ("physical_controls" in config["dashcam"]):
     if ("behavior" in config["dashcam"]["physical_controls"]): # Check to see if the `behavior` field is present (this will not be the case for versions before V12).
-        if (config["dashcam"]["physical_controls"]["behavior"]["method"] == "gpio_local"): # First, see if we need GPIOZero for local GPIO monitoring.
-            if (len(config["dashcam"]["physical_controls"]["dashcam_saving"]) > 0):
-                must_import_gpiozero = True
+        if (config["dashcam"]["physical_controls"]["behavior"]["method"] in ["gpio_local", "gpio_module"]): # First, see if we need local GPIO monitoring.
+            if (len(config["dashcam"]["physical_controls"]["actions"]["dashcam_saving"]) > 0):
+                must_import_gpio = True
             for stamp in config["dashcam"]["stamps"]["relay"]["triggers"]: # Check to see if there are any GPIO relay stamps active.
-                if (must_import_gpiozero == True):
+                if (must_import_gpio == True):
                     break # Exit the loop, since GPIOZero has already been imported.
                 if (config["dashcam"]["stamps"]["relay"]["triggers"][stamp]["enabled"] == True): # Check to see if at least one relay stamp is enabled.
-                    must_import_gpiozero = True
-            if (must_import_gpiozero == True):
-                from gpiozero import Button # Import GPIOZero
+                    must_import_gpio = True
+            if (must_import_gpio == True):
+                if (config["dashcam"]["physical_controls"]["behavior"]["method"] == "gpio_local"):
+                    from gpiozero import Button # Import GPIOZero
+                elif (config["dashcam"]["physical_controls"]["behavior"]["method"] == "gpio_module"):
+                    # Import adafruit-blinka:
+                    os.environ.setdefault('BLINKA_FT232H', '1')
+                    import board
+                    import digitalio
         elif (config["dashcam"]["physical_controls"]["behavior"]["method"] == "gpio_remote"): # Alternatively, see if we need `socket` to monitor GPIO from a remote source.
             import socket
     else: # If the relevant configuration section is not yet initialized, then only import socket (the default).
@@ -187,26 +193,51 @@ def create_trigger_file():
 gpio_state = {}
 def update_gpio_state(pin, state):
     global gpio_state
+    if (config["dashcam"]["physical_controls"]["behavior"]["invert"] == True):
+        state = not state
     gpio_state[pin] = state
 def monitor_gpio():
     global gpio_state
-    if (config["dashcam"]["physical_controls"]["behavior"]["method"] == "gpio_local"):
+
+    if (config["dashcam"]["physical_controls"]["behavior"]["method"] == "gpio_local"): # Local GPIO via `gpiozero` (Raspberry Pi).
         buttons = {}
         pins_to_monitor = []
-        for pin in config["dashcam"]["physical_controls"]["dashcam_saving"]: # Iterate through each dashcam save GPIO trigger.
+        for pin in config["dashcam"]["physical_controls"]["actions"]["dashcam_saving"]: # Iterate through each dashcam save GPIO trigger.
             pins_to_monitor.append(pin)
-        for pin in config["dashcam"]["physical_controls"]["stop_predator"]: # Iterate through each dashcam save GPIO trigger.
+        for pin in config["dashcam"]["physical_controls"]["actions"]["stop_predator"]: # Iterate through each dashcam save GPIO trigger.
             pins_to_monitor.append(pin)
         for stamp in config["dashcam"]["stamps"]["relay"]["triggers"]: # Iterate over reach configured relay trigger.
             if (config["dashcam"]["stamps"]["relay"]["triggers"][stamp]["enabled"] == True): # Check to see if this relay stamp is enabled.
                 pins_to_monitor.append(config["dashcam"]["stamps"]["relay"]["triggers"][stamp]["pin"])
+
         for pin in pins_to_monitor:
             buttons[pin] = Button(pin)
             buttons[pin].when_pressed = lambda pin=pin: update_gpio_state(pin, True)
             buttons[pin].when_released = lambda pin=pin: update_gpio_state(pin, False)
         while global_variables.predator_running: # Keep the thread open so the button actions persist (TODO: Check if this is necessary).
             pass
-    elif (config["dashcam"]["physical_controls"]["behavior"]["method"] == "gpio_remote"):
+
+
+    elif (config["dashcam"]["physical_controls"]["behavior"]["method"] == "gpio_module"): # External GPIO via `blinka` (USB FT232 module)
+        buttons = {}
+        pins_to_monitor = []
+        for pin in config["dashcam"]["physical_controls"]["actions"]["dashcam_saving"]: # Iterate through each dashcam save GPIO trigger.
+            pins_to_monitor.append(pin)
+        for pin in config["dashcam"]["physical_controls"]["actions"]["stop_predator"]: # Iterate through each dashcam save GPIO trigger.
+            pins_to_monitor.append(pin)
+        for stamp in config["dashcam"]["stamps"]["relay"]["triggers"]: # Iterate over reach configured relay trigger.
+            if (config["dashcam"]["stamps"]["relay"]["triggers"][stamp]["enabled"] == True): # Check to see if this relay stamp is enabled.
+                pins_to_monitor.append(config["dashcam"]["stamps"]["relay"]["triggers"][stamp]["pin"])
+
+        for pin in pins_to_monitor:
+            buttons[pin] = digitalio.DigitalInOut(getattr(board, "C" + str(pin)))
+            buttons[pin].direction = digitalio.Direction.INPUT
+        while global_variables.predator_running: # Run forever (until terminated).
+            for pin in buttons: # Iterate through each button.
+                update_gpio_state(pin, buttons[pin].value) # Update the state of this pin.
+
+
+    elif (config["dashcam"]["physical_controls"]["behavior"]["method"] == "gpio_remote"): # Remote GPIO from a network target running the `gpio_relay.py` tool.
         config["dashcam"]["physical_controls"]["behavior"]["gpio_remote"]["host"]["address"]
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         
@@ -226,7 +257,7 @@ gpio_monitor.start()
 
 
 
-# This function calls the function "event" when the button on "pin" is held for "hold_time" seconds.
+# This function calls the function `event` when the button on `pin` is held for `hold_time` seconds.
 def watch_button(pin, hold_time, event):
     global gpio_state
 
@@ -1325,15 +1356,15 @@ def dashcam():
     # Initialize the physical controls:
     button_watch_threads = {} # This will hold the processes watching each GPIO that will trigger a dashcam save.
 
-    for pin in config["dashcam"]["physical_controls"]["dashcam_saving"]: # Iterate through each dashcam save GPIO trigger.
-        hold_time = float(config["dashcam"]["physical_controls"]["dashcam_saving"][pin]["hold_time"])
+    for pin in config["dashcam"]["physical_controls"]["actions"]["dashcam_saving"]: # Iterate through each dashcam save GPIO trigger.
+        hold_time = float(config["dashcam"]["physical_controls"]["actions"]["dashcam_saving"][pin]["hold_time"])
         if (hold_time < 0):
             utils.display_message("The 'hold time' for pin '" + str(pin) + "' is negative. This will likely cause unexpected behavior.", 2)
         button_watch_threads[int(pin)] = threading.Thread(target=watch_button, args=[int(pin), hold_time, create_trigger_file], name="ButtonWatch" + str(pin)) # Create a thread to monitor this pin.
         button_watch_threads[int(pin)].start() # Start the thread to monitor the pin.
 
-    for pin in config["dashcam"]["physical_controls"]["stop_predator"]: # Iterate through each Predator termination GPIO trigger.
-        hold_time = float(config["dashcam"]["physical_controls"]["stop_predator"][pin]["hold_time"])
+    for pin in config["dashcam"]["physical_controls"]["actions"]["stop_predator"]: # Iterate through each Predator termination GPIO trigger.
+        hold_time = float(config["dashcam"]["physical_controls"]["actions"]["stop_predator"][pin]["hold_time"])
         if (hold_time < 0):
             utils.display_message("The 'hold time' for pin '" + str(pin) + "' is negative. This will likely cause unexpected behavior.", 2)
         button_watch_threads[int(pin)] = threading.Thread(target=watch_button, args=[int(pin), hold_time, utils.stop_predator], name="ButtonWatch" + str(pin)) # Create a thread to monitor this pin.
