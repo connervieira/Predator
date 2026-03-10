@@ -1,6 +1,6 @@
 # Predator
 
-# Copyright (C) 2024 V0LT - Conner Vieira 
+# Copyright (C) 2026 V0LT - Conner Vieira 
 
 # This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
@@ -72,29 +72,36 @@ if (config["dashcam"]["alpr"]["enabled"] == True): # Check to see if background 
 import lighting # Import the lighting.py script.
 update_status_lighting = lighting.update_status_lighting # Load the status lighting update function from the lighting script.
 
+
 must_import_gpio = False
 if ("physical_controls" in config["dashcam"]):
-    if ("behavior" in config["dashcam"]["physical_controls"]): # Check to see if the `behavior` field is present (this will not be the case for versions before V12).
-        if (config["dashcam"]["physical_controls"]["behavior"]["method"] in ["gpio_local", "gpio_module"]): # First, see if we need local GPIO monitoring.
-            if (len(config["dashcam"]["physical_controls"]["actions"]["dashcam_saving"]) > 0):
-                must_import_gpio = True
-            for stamp in config["dashcam"]["stamps"]["relay"]["triggers"]: # Check to see if there are any GPIO relay stamps active.
-                if (must_import_gpio == True):
-                    break # Exit the loop, since GPIOZero has already been imported.
-                if (config["dashcam"]["stamps"]["relay"]["triggers"][stamp]["enabled"] == True): # Check to see if at least one relay stamp is enabled.
-                    must_import_gpio = True
+    if ("behavior" in config["dashcam"]["physical_controls"]): # Check to see if the `behavior` field is present (this will not be the case for versions before v12 until the configuration is updated).
+        if (len(config["dashcam"]["physical_controls"]["actions"]["dashcam_saving"]) > 0 or len(config["dashcam"]["physical_controls"]["actions"]["stop_predator"]) > 0):
+            must_import_gpio = True
+        for stamp in config["dashcam"]["stamps"]["relay"]["triggers"]: # Check to see if there are any GPIO relay stamps active.
             if (must_import_gpio == True):
-                if (config["dashcam"]["physical_controls"]["behavior"]["method"] == "gpio_local"):
-                    from gpiozero import Button # Import GPIOZero
-                elif (config["dashcam"]["physical_controls"]["behavior"]["method"] == "gpio_module"):
-                    # Import adafruit-blinka:
+                break # Exit the loop, since GPIOZero has already been imported.
+            if (config["dashcam"]["stamps"]["relay"]["triggers"][stamp]["enabled"] == True): # Check to see if at least one relay stamp is enabled.
+                must_import_gpio = True
+
+        if (must_import_gpio == True): # We have established that we need to import GPIO libraries.
+            if (config["dashcam"]["physical_controls"]["behavior"]["method"] == "gpio_local"):
+                from gpiozero import Button # Import GPIOZero
+            elif (config["dashcam"]["physical_controls"]["behavior"]["method"] == "gpio_module"):
+                # Import adafruit-blinka:
+                try:
                     os.environ.setdefault('BLINKA_FT232H', '1')
                     import board
                     import digitalio
-        elif (config["dashcam"]["physical_controls"]["behavior"]["method"] == "gpio_remote"): # Alternatively, see if we need `socket` to monitor GPIO from a remote source.
-            import socket
-    else: # If the relevant configuration section is not yet initialized, then only import socket (the default).
-        import socket
+                except: # The required libraries could not be imported, so disable all of the GPIO features.
+                    for action in config["dashcam"]["physical_controls"]["actions"]:
+                        config["dashcam"]["physical_controls"]["actions"][action] = {}
+                    config["dashcam"]["stamps"]["relay"]["enabled"] = False
+                    utils.display_message("adafruit-blinka libraries could not be imported. GPIO functionality has been disabled.", 3)
+            elif (config["dashcam"]["physical_controls"]["behavior"]["method"] == "gpio_remote"): # Alternatively, see if we need `socket` to monitor GPIO from a remote source.
+                import socket
+    else: # If the relevant configuration section is not yet initialized, then import nothing.
+        pass
 
 
 
@@ -206,36 +213,29 @@ def get_gpio_state(pin):
 def monitor_gpio():
     global gpio_state
 
-    if (config["dashcam"]["physical_controls"]["behavior"]["method"] == "gpio_local"): # Local GPIO via `gpiozero` (Raspberry Pi).
+    if (config["dashcam"]["physical_controls"]["behavior"]["method"] in ["gpio_local", "gpio_module"]): # Check to see if we're using a GPIO monitoring method that checks pin states locally.
         buttons = {}
         pins_to_monitor = []
         for pin in config["dashcam"]["physical_controls"]["actions"]["dashcam_saving"]: # Iterate through each dashcam save GPIO trigger.
             pins_to_monitor.append(pin)
         for pin in config["dashcam"]["physical_controls"]["actions"]["stop_predator"]: # Iterate through each dashcam save GPIO trigger.
             pins_to_monitor.append(pin)
-        for stamp in config["dashcam"]["stamps"]["relay"]["triggers"]: # Iterate over reach configured relay trigger.
-            if (config["dashcam"]["stamps"]["relay"]["triggers"][stamp]["enabled"] == True): # Check to see if this relay stamp is enabled.
-                pins_to_monitor.append(config["dashcam"]["stamps"]["relay"]["triggers"][stamp]["pin"])
+        if (config["dashcam"]["stamps"]["relay"]["enabled"] == True): # Check to see if relay stamps are enabled globally.
+            for stamp in config["dashcam"]["stamps"]["relay"]["triggers"]: # Iterate over reach configured relay trigger.
+                if (config["dashcam"]["stamps"]["relay"]["triggers"][stamp]["enabled"] == True): # Check to see if this relay stamp is enabled.
+                    pins_to_monitor.append(config["dashcam"]["stamps"]["relay"]["triggers"][stamp]["pin"])
 
+
+
+    if (config["dashcam"]["physical_controls"]["behavior"]["method"] == "gpio_local"): # Local GPIO via `gpiozero` (Raspberry Pi).
         for pin in pins_to_monitor:
             buttons[pin] = Button(pin)
             buttons[pin].when_pressed = lambda pin=pin: update_gpio_state(pin, True)
             buttons[pin].when_released = lambda pin=pin: update_gpio_state(pin, False)
-        while global_variables.predator_running: # Keep the thread open so the button actions persist (TODO: Check if this is necessary).
-            pass
+        global_variables.shutdown_event.wait() # Keep the thread open so the button actions persist (until shutdown).
 
 
     elif (config["dashcam"]["physical_controls"]["behavior"]["method"] == "gpio_module"): # External GPIO via `blinka` (USB FT232 module)
-        buttons = {}
-        pins_to_monitor = []
-        for pin in config["dashcam"]["physical_controls"]["actions"]["dashcam_saving"]: # Iterate through each dashcam save GPIO trigger.
-            pins_to_monitor.append(pin)
-        for pin in config["dashcam"]["physical_controls"]["actions"]["stop_predator"]: # Iterate through each dashcam save GPIO trigger.
-            pins_to_monitor.append(pin)
-        for stamp in config["dashcam"]["stamps"]["relay"]["triggers"]: # Iterate over reach configured relay trigger.
-            if (config["dashcam"]["stamps"]["relay"]["triggers"][stamp]["enabled"] == True): # Check to see if this relay stamp is enabled.
-                pins_to_monitor.append(config["dashcam"]["stamps"]["relay"]["triggers"][stamp]["pin"])
-
         for pin in pins_to_monitor:
             buttons[pin] = digitalio.DigitalInOut(getattr(board, config["dashcam"]["physical_controls"]["behavior"]["gpio_module"]["pin_prefix"] + str(pin)))
             buttons[pin].direction = digitalio.Direction.INPUT
@@ -260,7 +260,6 @@ def monitor_gpio():
 
 
     elif (config["dashcam"]["physical_controls"]["behavior"]["method"] == "gpio_remote"): # Remote GPIO from a network target running the `gpio_relay.py` tool.
-        config["dashcam"]["physical_controls"]["behavior"]["gpio_remote"]["host"]["address"]
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         
         try:
@@ -288,8 +287,8 @@ def watch_button(pin, hold_time, event):
             debug_message("Pressed" + str(pin))
             time_pressed = time.time()
         elif (get_gpio_state(pin) == True and time.time() - time_pressed >= 10): # Check to see if the button has been held for an excessively long time (it may be stuck).
-            if (time.time() - last_stuck_warning > 10): # Check to see if it has been at least 30 seconds since the last time a stuck warning was displayed.
-                display_message("The button on pin " + str(pin) + " appears to be stuck.", 3)
+            if (time.time() - last_stuck_warning > 10): # Check to see if it has been at least N seconds since the last time a stuck warning was displayed.
+                display_message("The button on pin " + str(pin) + " appears to be stuck.", 2)
             last_stuck_warning = time.time()
         elif (get_gpio_state(pin) == True and time.time() - time_pressed >= hold_time): # Check to see if the button is being held, and the time threshold has been reached.
             debug_message("Triggered " + str(pin))

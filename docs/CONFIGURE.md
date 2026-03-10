@@ -394,7 +394,7 @@ This document describes the configuration values found `config.json`.
             - `actions`
                 - `dashcam_saving` contains settings to trigger dash-cam saving using a GPIO button.
                     - Each entry in this configuration section uses the GPIO pin number as a key, and contains the following values:
-                        - `name` is a human friendly name for the pin, and can be set to any plain text string.
+                        - `name` is a human friendly name for the pin, and can be set to any plain text string (Ex: "Left Dashboard Button").
                         - `hold_time` is a floating point number that determines the number of seconds the button needs to be held to trigger the event.
                 - `stop_predator` contains settings to terminate Predator via GPIO pins.
                     - Each entry in this configuration section uses the GPIO pin number as a key, and contains the following values:
