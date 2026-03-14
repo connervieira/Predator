@@ -12,7 +12,9 @@ If you're already familiar with Predator, and you just want a quick set-up guide
 3. If you intended to use Predator's ALPR features, install an ALPR engine, like [Phantom](https://v0lttech.com/phantom.php).
 4. If you intended to use GPIO-based features using an external FT232H module, (not `gpiozero`), create corresponding udev rules:
     - `sudo cp ./assets/support/11-ftdi.rules /etc/udev/rules.d/11-ftdi.rules`
+    - Reload udev rules: `sudo udevadm control --reload-rules; sudo udevadm trigger`
     - You may need to unplug and re-connect your FT232H GPIO module after creating the udev rule file.
+    - If you enounter permissions errors from the GPIO module libraries, you may need to add yourself to the `plugdev` group: `sudo usermod -aG plugdev "$(whoami)"`
 5. Download and uncompress Predator.
     - Download stable version from V0LT (recommended): https://v0lttech.com/predator.php
     - Download the latest (potentially unstable) development version: `git clone https://github.com/connervieira/Predator`
@@ -89,5 +91,7 @@ SUBSYSTEM=="usb", ATTR{idVendor}=="0403", ATTR{idProduct}=="6014", GROUP="plugde
 SUBSYSTEM=="usb", ATTR{idVendor}=="0403", ATTR{idProduct}=="6015", GROUP="plugdev", MODE="0666"
 
 ```
+After creating the udev rules file, reload with: `sudo udevadm control --reload-rules; sudo udevadm trigger`
+You may need to unplug and re-connect your FT232H GPIO module for the changes to take affect.
 
-After creating the preceding file, unplug and reconnect your FT232H module.
+If you enounter permissions errors from the GPIO module libraries, you may need to add yourself to the `plugdev` group: `sudo usermod -aG plugdev "$(whoami)"`

@@ -1,6 +1,8 @@
 # Configuration
 
-This document describes the configuration values found `config.json`.
+This document describes the configuration values found `config.json`. The Predator configuration system makes use of minimal validation, and generally assumes that changes made directly to the `config.json` file are valid.
+
+Features that aren't thoroughly tested are described as "experimental" below. These features are not recommended if reliability is a concern.
 
 
 - `general` contains configuration values will effect Predator's general operation.
@@ -248,7 +250,7 @@ This document describes the configuration values found `config.json`.
                 - `resolution` sets the resolution of the video captured by this device.
                     - `width` sets the width of the video, measured in pixels.
                     - `height` sets the height of the video, measured in pixels.
-        - `audio` contains settings for configuring Predator's audio recording behavior.
+        - `audio` contains settings for configuring Predator's audio recording behavior (experimental).
             - `enabled` is a boolean that determines whether or not audio will be recorded during dash-cam operation.
             - `extension` sets the file extension that audio will be saved with.
             - `device` determines the name of the device that Predator will use to record audio.
@@ -265,7 +267,7 @@ This document describes the configuration values found `config.json`.
                 - This value should be as short as possible to reduce the period of silence at the start of each video, but not so short that the audio capture device fails to open due to being already claimed by the previous segment.
             - `display_output` is a boolean that determines whether Predator will display the console output of the audio recording command for sake of debugging.
                 - Under normal circumstances, this should be set to `false` to avoid unexpected behavior.
-    - `parked` contains settings to configure the dashcam's parking behavior. Parking mode is experimental, and not recommended for daily use.
+    - `parked` contains settings to configure the dashcam's parking behavior (experimental).
         - `enabled` is a boolean that determines whether Predator will ever go into a parked state.
             - When this value is set to `false` Predator will never enable parked mode, even if the conditions defined in this configuration section are met.
             - For parking mode to be enabled, GPS must also be enabled in the "general" section.
@@ -400,7 +402,7 @@ This document describes the configuration values found `config.json`.
                     - Each entry in this configuration section uses the GPIO pin number as a key, and contains the following values:
                         - `name` is a human friendly name for the pin, and can be set to any plain text string.
                         - `hold_time` is a positive floating point number that determines the number of seconds the button needs to be held to trigger the event.
-        - `telemetry` contains settings for configuring Predator to send telemetry data like dash-cam images and GPS data to an external service (see [docs/INTEGRATION.md](docs/INTEGRATION.md) for more information).
+        - `telemetry` contains settings for configuring Predator to send telemetry data like dash-cam images and GPS data to an external service (experimental) (see [docs/INTEGRATION.md](docs/INTEGRATION.md) for more information).
             - `enabled` is a boolean that determined whether telemetry sending is enabled.
             - `target` is the network target that telemetry data will be submitted to.
             - `vehicle_identifier` is the identifier used to authenticate with the external service.
