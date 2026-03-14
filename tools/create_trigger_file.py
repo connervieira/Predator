@@ -1,4 +1,6 @@
-# This is a simple testing script that manually creates the dashcam video saving trigger file when executed.
+# This is a simple testing script that manually creates the dashcam video saving trigger file using shell commands.
+# If this script is run while Predator is NOT running, then Predator will detect the trigger file the next time it runs, immediately triggering a save on the first segment.
+# This script could also theoretically be used by custom external programs to trigger a Predator dashcam save event. However, it's probably easier to just create the trigger file yourself in whatever program you're writing. Consider this an example.
 
 import os
 import json
