@@ -200,6 +200,7 @@ def create_trigger_file():
 gpio_state = {}
 def update_gpio_state(pin, state):
     global gpio_state
+    pin = int(pin)
     if (config["dashcam"]["physical_controls"]["behavior"]["invert"] == True):
         state = not state
     gpio_state[pin] = state
