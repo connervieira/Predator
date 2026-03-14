@@ -1,9 +1,18 @@
+# This script loads the current license plate history file (according to the Predator configuration file), and prints the contents to the console as CSV with the following headers:
+# Date,Plate,Alert,Latitude,Longitude
+# 2024-09-05 12:29:44,ATY4912,false,41.251224,-86.125122
+
+# Example use: `python3 convert_plate_history_csv.py > new_file.csv`
+
+INCLUDE_HEADER = True # Determines whether or not the header line is printed at the top.
+
+
 import os # Required to interact with certain operating system functions.
 import json # Required to process JSON data.
 import datetime # Required to handle timestamps.
 
 
-predator_root_directory = str(os.path.dirname(os.path.realpath(__file__ + "/.."))) # This variable determines the folder path of the root Predator directory. This should usually automatically recognize itself, but it if it doesn't, you can change it manually.
+predator_root_directory = str(os.path.dirname(os.path.realpath(__file__ + "/.."))) # This identifies the root of the Predator project (the directory containing `main.py`, `config.json`, and the other scripts/support files.
 
 
 try:
@@ -50,4 +59,7 @@ for time in plate_log.keys():
         csv_line = csv_line + "," + str(plate_log[time]["location"]["lat"]) + "," + str(plate_log[time]["location"]["lon"])
         csv_contents += csv_line + "\n"
 
+
+if (INCLUDE_HEADER == True):
+    print("Date,Plate,Alert,Latitude,Longitude")
 print(csv_contents)
