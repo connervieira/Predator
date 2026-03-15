@@ -1,6 +1,8 @@
 # Predator
+# object_recognition.py
+# This script is used to detect objects in images using a custom object recognition model. This feature is separate from license plate recognition, and is used to detect objects like vehicles, pedestrians, and deer.
 
-# Copyright (C) 2024 V0LT - Conner Vieira 
+# Copyright (C) 2026 V0LT - Conner Vieira 
 
 # This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by# the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 

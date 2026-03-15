@@ -1,4 +1,6 @@
 # Predator
+# utils.py
+# This script contains helper functions used in various locations across Predator.
 
 # Copyright (C) 2026 V0LT - Conner Vieira 
 

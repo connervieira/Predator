@@ -1,6 +1,8 @@
 # Predator
+# lighting.py
+# This script is used to control RGB status lights using WLED. Learn more about WLED (a third party, open source project) at: https://kno.wled.ge/
 
-# Copyright (C) 2024 V0LT - Conner Vieira 
+# Copyright (C) 2026 V0LT - Conner Vieira 
 
 # This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 

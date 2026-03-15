@@ -1,4 +1,6 @@
 # Predator
+# alpr.py
+# This script handles Predator's ALPR functionality in all modes (pre-recorded, real-time, and dash-cam).
 
 # Copyright (C) 2026 V0LT - Conner Vieira 
 

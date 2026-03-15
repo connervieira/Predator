@@ -1,4 +1,6 @@
 # Predator
+# dashcam.py
+# This script contains Predator's dash-cam functionality, including both normal recording and parked recording.
 
 # Copyright (C) 2026 V0LT - Conner Vieira 
 

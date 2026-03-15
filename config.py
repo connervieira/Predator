@@ -1,4 +1,6 @@
 # Copyright (C) 2026 V0LT - Conner Vieira 
+# config.py
+# This script handles the Predator configuration, including loading, validation, and automatic updating. It depends on a configuration outline for validation, and default configuration file for updating.
 
 # This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 

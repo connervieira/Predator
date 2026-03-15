@@ -1,4 +1,6 @@
 # Predator
+# main.py
+# This is the main driver script for Predator, and is the starting point for all other functionality. Run Predator with `python3 main.py --help`.
 
 # Copyright (C) 2026 V0LT - Conner Vieira 
 
