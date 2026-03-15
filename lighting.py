@@ -13,6 +13,8 @@
 
 
 
+import global_variables # `global_variables.py`
+
 import validators # Required to validating URLs.
 import requests # Required to send network requests.
 import json # Required to process JSON data.
@@ -26,16 +28,9 @@ debug_message = utils.debug_message # Load the debug message display function fr
 display_message = utils.display_message # Load the error message display function from the utils script.
 
 
-predator_root_directory = str(os.path.dirname(os.path.realpath(__file__))) # This variable determines the folder path of the root Predator directory. This should usually automatically recognize itself, but it if it doesn't, you can change it manually.
-try:
-    if (os.path.exists(predator_root_directory + "/config.json")):
-        config = json.load(open(predator_root_directory + "/config.json")) # Load the configuration database from config.json
-    else:
-        print("The configuration file doesn't appear to exist at " + predator_root_directory + "/config.json.")
-        exit()
-except:
-    print("The configuration database couldn't be loaded. It may be corrupted.")
-    exit()
+import config # `config.py`
+load_config = config.load_config
+config = load_config()
 
 
 current_status_light_id = ""

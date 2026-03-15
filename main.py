@@ -4,31 +4,24 @@
 
 # Copyright (C) 2026 V0LT - Conner Vieira 
 
-# This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by# the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-
+# This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 # This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
-
-# You should have received a copy of the GNU Affero General Public License along with this program (LICENSE)
-# If not, see https://www.gnu.org/licenses/ to read the license agreement.
+# You should have received a copy of the GNU Affero General Public License along with this program (LICENSE). If not, see https://www.gnu.org/licenses/ to read the license agreement.
 
 
 
 print("Loading Predator...")
-import global_variables
+import global_variables # `global_variables.py`
 global_variables.init()
 
 import os # Required to interact with certain operating system functions
 import json # Required to process JSON data
 
 
-
-import config
+import config # `config.py`
 load_config = config.load_config
 validate_config = config.validate_config
-
 config = load_config()
-
-predator_root_directory = str(os.path.dirname(os.path.realpath(__file__))) # This variable determines the folder path of the root Predator directory. This should usually automatically recognize itself, but it if it doesn't, you can change it manually.
 
 import time # Required to add delays and handle dates/times.
 import sys # Required to read command line arguments.
@@ -45,7 +38,7 @@ if ("--help" in sys.argv):
     print("        --headless\tenables headless mode, where all user prompts are skipped")
     print("        --help\t\tdisplays this help message, then exits")
 
-    global_variables.predator_running = False
+    global_variables.PREDATOR_RUNNING = False
     global_variables.shutdown_event.set()
     exit()
 
@@ -94,7 +87,7 @@ if (config["management"]["disk_statistics"] == True): # Only import the disk sta
 
 
 
-if (os.path.exists(predator_root_directory + "/install.json") == False): # Check to see if the install information file hasn't yet been created. This will be the case on the first start-up.
+if (os.path.exists(os.path.join(global_variables.PREDATOR_ROOT_DIRECTORY, "install.json")) == False): # Check to see if the install information file hasn't yet been created. This will be the case on the first start-up.
     import uuid
     install_data = {"first_start_time": int(time.time()), "id": str(uuid.uuid4())}
     clear()
@@ -137,7 +130,7 @@ if (os.path.exists(predator_root_directory + "/install.json") == False): # Check
     input(style.faint + "Press enter to continue..." + style.end)
 
 
-    with open(predator_root_directory + "/install.json", 'w') as file:
+    with open(os.path.join(global_variables.PREDATOR_ROOT_DIRECTORY, "/install.json"), 'w') as file:
         json.dump(install_data, file)
 
 
@@ -325,7 +318,7 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
 
 
 
-        while global_variables.predator_running:
+        while global_variables.PREDATOR_RUNNING:
             clear()
             print("Please select an option")
             print("0. Quit")
@@ -437,7 +430,7 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                     # Copy the files as per the user's inputs.
                     print("Copying files...")
                     if (copy_management_configuration):
-                        os.system("cp \"" + predator_root_directory + "/config.json\" \"" + copy_destination + "\"")
+                        os.system("cp \"" + global_variables.CONFIG_PATH + "\" \"" + copy_destination + "\"")
                     if (copy_prerecorded_processed_frames):
                         os.system("cp -r \"" + config["general"]["working_directory"] + "/frames\" \"" + copy_destination + "\"")
                     if (copy_prerecorded_gpx_files):
@@ -583,7 +576,7 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                 elif (selection == "2"): # The user has selected the "neofetch" option.
                     os.system("neofetch") # Execute neofetch to display information about the system.
                 elif (selection == "3"): # The user has selected the "print configuration" option.
-                    os.system("cat " + predator_root_directory + "/config.json") # Print out the raw contents of the configuration database.
+                    os.system("cat \"" + global_variables.CONFIG_PATH + "\"") # Print out the raw contents of the configuration database.
                 elif (selection == "4"): # The user has selected the "disk usage" option.
                     if (config["management"]["disk_statistics"] == True): # Check to make sure disk statistics are enabled before displaying disk statistics.
                         print("Free space: " + str(round(((psutil.disk_usage(path=config["general"]["working_directory"]).free)/1000000000)*100)/100) + "GB") # Display the free space on the storage device containing the current working directory.
@@ -701,10 +694,10 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                     display_message("Unknown configuration entry selected.", 3)
 
 
-                config_file = open(predator_root_directory + "/config.json", "w") # Open the configuration file.
+                config_file = open(global_variables.CONFIG_PATH, "w") # Open the configuration file.
                 json.dump(config, config_file, indent=4) # Dump the JSON data into the configuration file on the disk.
                 config_file.close() # Close the configuration file.
-                config = json.load(open(predator_root_directory + "/config.json")) # Re-load the configuration database from disk.
+                config = json.load(open(global_variables.CONFIG_PATH)) # Re-load the configuration database from disk.
 
 
             else: # The user has selected an invalid option in the main management menu.
@@ -841,9 +834,9 @@ elif (mode_selection == "1" and config["general"]["modes"]["enabled"]["prerecord
             if (config["prerecorded"]["image"]["processing"]["cropping"]["enabled"] == True): # Check to see if cropping is enabled in pre-recorded mode.
                 debug_message("Cropping discrete frames")
                 print("Cropping individual frames...")
-                crop_script_path = predator_root_directory + "/crop_image" # Path to the cropping script in the Predator directory.
+                crop_script_path = os.path.join(global_variables.PREDATOR_ROOT_DIRECTORY, "crop_image") # Path to the cropping script in the Predator directory.
                 for frame in frames:
-                    os.system(crop_script_path + " " + config["general"]["working_directory"] + "/frames/" + frame + " " + str(config["prerecorded"]["image"]["processing"]["cropping"]["left_margin"]) + " " + str(config["prerecorded"]["image"]["processing"]["cropping"]["right_margin"]) + " " + str(config["prerecorded"]["image"]["processing"]["cropping"]["top_margin"]) + " " + str(config["prerecorded"]["image"]["processing"]["cropping"]["bottom_margin"]))
+                    os.system("\"" + crop_script_path + "\" \"" + os.path.join(config["general"]["working_directory"], "/frames/", frame) + "\" " + str(config["prerecorded"]["image"]["processing"]["cropping"]["left_margin"]) + " " + str(config["prerecorded"]["image"]["processing"]["cropping"]["right_margin"]) + " " + str(config["prerecorded"]["image"]["processing"]["cropping"]["top_margin"]) + " " + str(config["prerecorded"]["image"]["processing"]["cropping"]["bottom_margin"]))
                 print("Done.\n")
 
 
@@ -996,7 +989,7 @@ elif (mode_selection == "1" and config["general"]["modes"]["enabled"]["prerecord
             utils.wait_for_input()
 
             debug_message("Starting menu loop")
-            while global_variables.predator_running: # Run the pre-recorded mode menu in a loop forever until the user exits.
+            while global_variables.PREDATOR_RUNNING: # Run the pre-recorded mode menu in a loop forever until the user exits.
                 clear()
 
                 # Show the main menu for handling data collected in pre-recorded mode.
@@ -1219,7 +1212,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
     frames_captured = 0 # Set the number of frames captured to 0 so we can increment it by one each time Predator analyzes a frame.
     debug_message("Starting main processing loop")
     try:
-        while global_variables.predator_running: # Run in a loop forever, (until Predator is terminated).
+        while global_variables.PREDATOR_RUNNING: # Run in a loop forever, (until Predator is terminated).
             if (config["realtime"]["interface"]["behavior"]["clearing"] == True): # Clear the output screen at the beginning of each round if the configuration indicates to.
                 clear()
 

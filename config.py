@@ -11,27 +11,19 @@
 
 
 
+import global_variables
 import os # Required to interact with certain operating system functions
 import json # Required to process JSON data
 import time
 
-predator_root_directory = str(os.path.dirname(os.path.realpath(__file__))) # This variable determines the folder path of the root Predator directory. This should usually automatically recognize itself, but it if it doesn't, you can change it manually.
+config_default_filepath = os.path.join(global_variables.PREDATOR_ROOT_DIRECTORY, "assets/support/configdefault.json")
+config_outline_filepath = os.path.join(global_variables.PREDATOR_ROOT_DIRECTORY, "assets/support/configoutline.json")
 
-config_default_filepath = predator_root_directory + "/./assets/support/configdefault.json"
-config_outline_filepath = predator_root_directory + "/./assets/support/configoutline.json"
-config_active_filepath = predator_root_directory + "/./config.json"
-
-if (os.path.exists(config_active_filepath) == False):
-    if (os.path.exists(predator_root_directory + "/../config.json") == True):
-        config_active_filepath = predator_root_directory + "/../config.json"
-        config_default_filepath = predator_root_directory + "/../assets/support/configdefault.json"
-        config_outline_filepath = predator_root_directory + "/../assets/support/configoutline.json"
-
-if (os.path.exists(config_active_filepath) == False): # Check to see if the active config file doesn't exit.
+if (os.path.exists(global_variables.CONFIG_PATH) == False): # Check to see if the active config file doesn't exit.
     # Copy the default config file as the active config file.
     with open(config_default_filepath) as configuration_file: config_default= configuration_file.read()
 
-    fh = open(config_active_filepath, 'w')
+    fh = open(global_variables.CONFIG_PATH, 'w')
     fh.write(config_default)
     fh.close()
 
@@ -47,9 +39,9 @@ def load_config(file_override=""):
     if (file_override != ""):
         configuration_file_path = file_override
     else:
-        if (os.path.exists(config_active_filepath) == True): # Check to see if the configuration file exists in the default location.
-            configuration_file_path = config_active_filepath
-        else: # The configuration file couldn't be located. Assassin can't continue to load.
+        if (os.path.exists(global_variables.CONFIG_PATH) == True): # Check to see if the configuration file exists in the default location.
+            configuration_file_path = global_variables.CONFIG_PATH
+        else: # The configuration file couldn't be located. Predator can't continue to load.
             config = {} # Set the configuration to a blank placeholder dictionary.
             print("The configuration file could not be located from " + str(os.path.realpath(__file__)))
             exit()
@@ -359,7 +351,7 @@ def check_defaults_extra(config_defaults, config_active, index=[], extra_values=
 # This function checks the active config file against the default config file, and attempts to reconcile any differences. Irreconcileable differences will cause Predator to exit, and a notice will be displayed.
 def update_config():
     config_default = load_config(config_default_filepath)
-    config_active = load_config(config_active_filepath)
+    config_active = load_config(global_variables.CONFIG_PATH)
 
     config_active, missing_values = check_defaults_missing(config_default, config_active)
     extra_values = check_defaults_extra(config_default, config_active)
@@ -380,8 +372,8 @@ def update_config():
                 config_active = del_nested_value(index, config_active)
         print(style.faint + "Continuing in 5 seconds" + style.end)
         time.sleep(5)
-    if (config_active != load_config(config_active_filepath)): # Check to see if the configuration has been modified.
-        save_to_file(config_active_filepath, json.dumps(config_active, indent=4)) # Save the updated configuration.
+    if (config_active != load_config(global_variables.CONFIG_PATH)): # Check to see if the configuration has been modified.
+        save_to_file(global_variables.CONFIG_PATH, json.dumps(config_active, indent=4)) # Save the updated configuration.
 
 
 update_config()

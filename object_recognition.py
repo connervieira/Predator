@@ -16,8 +16,10 @@ import os
 from ultralytics import YOLO
 import numpy
 import utils
-import config
-config = config.load_config()
+
+import config # `config.py`
+load_config = config.load_config
+config = load_config()
 
 dashcam_model = YOLO(config["dashcam"]["parked"]["event"]["trigger_object_recognition"]["model_weights"])
 

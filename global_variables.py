@@ -1,6 +1,13 @@
+import os
+
 def init():
-    global predator_running
-    predator_running = True
+    global PREDATOR_RUNNING
+    global PREDATOR_ROOT_DIRECTORY
+    global CONFIG_PATH
+
+    PREDATOR_RUNNING = True
+    PREDATOR_ROOT_DIRECTORY = str(os.path.dirname(os.path.realpath(__file__)))
+    CONFIG_PATH = os.path.join(PREDATOR_ROOT_DIRECTORY, "config.json")
 
 import threading
-shutdown_event = threading.Event() # This event is called when Predator exits (in sync with global_vars.predator_running)
+shutdown_event = threading.Event() # This event is called when Predator exits (in sync with global_vars.PREDATOR_RUNNING)

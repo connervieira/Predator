@@ -19,22 +19,21 @@
 
 
 
-import global_variables
+import global_variables # `global_variables.py`
 
 import os # Required to interact with certain operating system functions
 import json # Required to process JSON data
 
-predator_root_directory = str(os.path.dirname(os.path.realpath(__file__))) # This variable determines the folder path of the root Predator directory. This should usually automatically recognize itself, but it if it doesn't, you can change it manually.
-
 try:
-    if (os.path.exists(predator_root_directory + "/config.json")):
-        config = json.load(open(predator_root_directory + "/config.json")) # Load the configuration database from config.json
+    if (os.path.exists(global_variables.CONFIG_PATH)):
+        config = json.load(open(global_variables.CONFIG_PATH)) # Load the configuration database from config.json
     else:
-        print("The configuration file doesn't appear to exist at " + predator_root_directory + "/config.json.")
+        print("The configuration file doesn't appear to exist at `" + global_variables.CONFIG_PATH + "`")
         exit()
 except:
     print("The configuration database couldn't be loaded. It may be corrupted.")
     exit()
+
 
 
 
@@ -111,7 +110,7 @@ import threading
 def manage_time_offset(): # This function watches the system time, and reset the time offset if the system time changes.
     global global_time_offset
     debug_message("Starting time offset management.")
-    while global_variables.predator_running: # Run forever.
+    while global_variables.PREDATOR_RUNNING: # Run forever.
         start_time = time.time()
         time.sleep(1) # Wait for 1 second before checking the time again.
         end_time = time.time()
@@ -423,7 +422,7 @@ def display_message(message, level=1, suppress_sound=False):
         if (suppress_sound == False):
             play_sound("message_error")
         if (config["developer"]["hard_crash_on_error"] == True):
-            global_variables.predator_running = False
+            global_variables.PREDATOR_RUNNING = False
             os._exit(1)
         prompt(style.faint + "Press enter to continue..." + style.end)
 
@@ -773,7 +772,7 @@ most_recent_gps_location = [0.0, 0.0, 0.0, 0.0, 0.0, 0, 0]
 def gps_daemon():
     debug_message("Starting lazy GPS daemon")
     global most_recent_gps_location
-    while global_variables.predator_running:
+    while global_variables.PREDATOR_RUNNING:
         debug_message("Fetching lazy GPS location")
         most_recent_gps_location = get_gps_location()
         time.sleep(float(config["general"]["gps"]["lazy_polling_interval"])) # Wait before polling the GPS again.
@@ -1018,7 +1017,7 @@ def send_telemetry(data):
 # Calling this function will gracefully stop Predator.
 def stop_predator():
     display_message("Predator is exiting.", 1)
-    global_variables.predator_running = False
+    global_variables.PREDATOR_RUNNING = False
     global_variables.shutdown_event.set()
 
     # Wait briefly to see if all of the threads terminate:

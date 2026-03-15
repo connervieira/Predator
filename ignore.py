@@ -22,6 +22,7 @@
 # Custom ignore lists can be enabled and disabled in the configuration.
 
 
+import global_variables # `global_variables.py`
 import os # Required to interact with certain operating system functions.
 import json # Required to process JSON data.
 import time # Required to manage delays.
@@ -31,18 +32,9 @@ import utils
 style = utils.style
 display_message = utils.display_message
 
-predator_root_directory = str(os.path.dirname(os.path.realpath(__file__))) # This variable determines the folder path of the root Predator directory. This should usually automatically recognize itself, but it if it doesn't, you can change it manually.
-
-try:
-    if (os.path.exists(predator_root_directory + "/config.json")):
-        config = json.load(open(predator_root_directory + "/config.json")) # Load the configuration database from config.json
-    else:
-        print("The configuration file doesn't appear to exist at " + predator_root_directory + "/config.json.")
-        exit()
-except:
-    print("The configuration database couldn't be loaded. It may be corrupted.")
-    exit()
-
+import config # `config.py`
+load_config = config.load_config
+config = load_config()
 
 
 if (config["developer"]["offline"] == False): # Only import networking libraries if offline mode is turned off.
@@ -50,10 +42,7 @@ if (config["developer"]["offline"] == False): # Only import networking libraries
 
 
 def fetch_ignore_list():
-    predator_root_directory = str(os.path.dirname(os.path.realpath(__file__))) # This variable determines the folder path of the root Predator directory. This should usually automatically recognize itself, but it if it doesn't, you can change it manually.
-
-    config = json.load(open(predator_root_directory + "/config.json")) # Load the configuration database from config.json
-
+    global config
 
 
     complete_ignore_list = [] # This will hold the complete list of plates to ignore, after all ignore list sources have been loaded.

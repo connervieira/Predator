@@ -13,7 +13,7 @@
 
 
 
-import global_variables
+import global_variables # `global_variables.py`
 import csv
 import os
 import time
@@ -21,24 +21,14 @@ import json # Required to process JSON data
 import cv2
 
 
-
-predator_root_directory = str(os.path.dirname(os.path.realpath(__file__))) # This variable determines the folder path of the root Predator directory. This should usually automatically recognize itself, but if it doesn't, you can change it manually.
-
-
-try:
-    if (os.path.exists(predator_root_directory + "/config.json")):
-        config = json.load(open(predator_root_directory + "/config.json")) # Load the configuration database from config.json
-    else:
-        print("The configuration file doesn't appear to exist at " + predator_root_directory + "/config.json.")
-        exit()
-except:
-    print("The configuration database couldn't be loaded. It may be corrupted.")
-    exit()
+import config # `config.py`
+load_config = config.load_config
+config = load_config()
 
 
 try:
     if (config["developer"]["offline"] == False): # Only import networking libraries if offline mode is turned off.
-        if (config["general"]["status_lighting"]["enabled"] == True or config["realtime"]["push_notifications"]["enabled"] == True or len(config["general"]["alerts"]["databases"]) > 0):
+        if (config["general"]["status_lighting"]["enabled"] == True or config["realtime"]["push_notifications"]["enabled"] == True or len(config["general"]["alerts"]["databases"]) > 0): # Only import networking libraries if at least one feature is enable that needs it.
             import requests # Required to make network requests
             import validators # Required to validate URLs
 except:
@@ -78,7 +68,7 @@ def alpr_stream(device):
 def alpr_stream_maintainer(): # This function runs an endless loop that maintains
     global queued_plate_reads
     last_message_received = utils.get_time() + 5 # This variable holds the time that the last ALPR message was received. Initialize it to a time a few seconds into the future to allow the ALPR process extra time to start before a warning is displayed.
-    while global_variables.predator_running:
+    while global_variables.PREDATOR_RUNNING:
         debug_message("Starting ALPR stream maintainance cycle")
         time.sleep(0.3) # Delay for a short period of time before each loop so that the ALPR stream has time to output some results.
         stream_file = open(alpr_stream_file_location) # Open the ALPR stream file.
@@ -219,7 +209,7 @@ def display_alerts(active_alerts):
 def load_alert_database_remote(source, cache_directory):
     debug_message("Loading remote database source.")
     if (config["developer"]["identify_to_remote_sources"] == True):
-        with open(predator_root_directory + "/install.json", 'r') as file:
+        with open(os.path.join(global_variables.PREDATOR_ROOT_DIRECTORY, "install.json"), 'r') as file:
             install_data = json.load(file)
             client_id = install_data["id"]
         if ("?" in source): # Check to see if this source already has associated parameters.

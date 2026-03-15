@@ -18,16 +18,15 @@ import os # Required to interact with certain operating system functions
 import json # Required to process JSON data
 import fnmatch # Required to use wildcards to check strings.
 
-predator_root_directory = str(os.path.dirname(os.path.realpath(__file__))) # This variable determines the folder path of the root Predator directory. This should usually automatically recognize itself, but it if it doesn't, you can change it manually.
-
 try:
-    if (os.path.exists(predator_root_directory + "/config.json")):
-        config = json.load(open(predator_root_directory + "/config.json")) # Load the configuration database from config.json
+    if (os.path.exists(global_variables.CONFIG_PATH)):
+        config = json.load(open(global_variables.CONFIG_PATH)) # Load the configuration database from config.json
     else:
-        print("The configuration file doesn't appear to exist at " + predator_root_directory + "/config.json.")
+        print("The configuration file doesn't appear to exist at `" + global_variables.CONFIG_PATH + "`")
         exit()
-except:
+except Exception as e:
     print("The configuration database couldn't be loaded. It may be corrupted.")
+    print(e)
     exit()
 
 import utils
@@ -243,7 +242,7 @@ def monitor_gpio():
             buttons[pin] = digitalio.DigitalInOut(getattr(board, config["dashcam"]["physical_controls"]["behavior"]["gpio_module"]["pin_prefix"] + str(pin)))
             buttons[pin].direction = digitalio.Direction.INPUT
         consecutive_gpio_errors = 0 # This is a placeholder that will count up each time the GPIO monitoring process encounters an error, and reset each time a pin is successfully checked.
-        while global_variables.predator_running: # Run forever (until terminated).
+        while global_variables.PREDATOR_RUNNING: # Run forever (until terminated).
             for pin in buttons: # Iterate through each button.
                 try:
                     update_gpio_state(pin, buttons[pin].value) # Update the state of this pin.
@@ -268,7 +267,7 @@ def monitor_gpio():
         try:
             client_socket.connect((config["dashcam"]["physical_controls"]["behavior"]["gpio_remote"]["host"]["address"], config["dashcam"]["physical_controls"]["behavior"]["gpio_remote"]["host"]["port"]))
 
-            while global_variables.predator_running:
+            while global_variables.PREDATOR_RUNNING:
                 data = client_socket.recv(1024).decode() # Receive data from server
                 gpio_state = json.loads(data)  # Update global gpio_state
         except Exception as e:
@@ -285,7 +284,7 @@ gpio_monitor.start()
 def watch_button(pin, hold_time, event):
     time_pressed = 0
     last_stuck_warning = 0
-    while global_variables.predator_running:
+    while global_variables.PREDATOR_RUNNING:
         if (get_gpio_state(pin) == True and time_pressed == 0): # Check to see if the button was just pressed.
             debug_message("Pressed" + str(pin))
             time_pressed = time.time()
@@ -339,7 +338,7 @@ def background_alpr(device):
     if (config["realtime"]["saving"]["license_plates"]["enabled"] == True): # Check to see if the license plate logging file name is not empty. If the file name is empty, then license plate logging will be disabled.
         global plate_log
 
-    while global_variables.predator_running: # Run until dashcam capture finishes.
+    while global_variables.PREDATOR_RUNNING: # Run until dashcam capture finishes.
         if (device in current_frame_data):
             debug_message("Running ALPR")
             process_timing("start", "Dashcam/ALPR Processing")
@@ -505,7 +504,7 @@ def background_object_recognition(device):
         time.sleep(1)
 
     last_object_alert = 0 # This is a placeholder that will hold the timestamp of the last object alert.
-    while global_variables.predator_running:
+    while global_variables.PREDATOR_RUNNING:
         # Detect objects:
         detected_objects = object_recognition.predict(current_frame_data[device], "dashcam")
         considered_objects = []
@@ -774,7 +773,7 @@ def dashcam_parked_dormant(device):
         exit()
 
     frame_buffer = [] # This is a buffer that will hold the last N frames.
-    while global_variables.predator_running and parked == True:
+    while global_variables.PREDATOR_RUNNING and parked == True:
         ret, frame = capture.read() # Capture a frame.
 
         if (config["dashcam"]["capture"]["video"]["devices"][device]["flip"]): # Check to see if Predator is configured to flip this capture device's output.
@@ -887,7 +886,7 @@ def dashcam_parked_event(capture, device, frame_buffer):
     process_timing("end", "Dashcam/Calculations")
 
 
-    while global_variables.predator_running and parked == True and utils.get_time() - last_event_detected < config["dashcam"]["parked"]["event"]["timeout"]: # Run until the criteria for event recording are no longer met.
+    while global_variables.PREDATOR_RUNNING and parked == True and utils.get_time() - last_event_detected < config["dashcam"]["parked"]["event"]["timeout"]: # Run until the criteria for event recording are no longer met.
         heartbeat() # Issue a status heartbeat.
         update_state("dashcam/parked_active", instant_framerate)
 
@@ -1118,7 +1117,7 @@ def dashcam_normal(device):
 
 
 
-    while global_variables.predator_running and parked == False: # Only run while the dashcam recording flag is set to 'True' and Predator is not parked. While this flag changes to 'False' this recording process should exit.
+    while global_variables.PREDATOR_RUNNING and parked == False: # Only run while the dashcam recording flag is set to 'True' and Predator is not parked. While this flag changes to 'False' this recording process should exit.
         heartbeat() # Issue a status heartbeat.
 
         # =======================================
@@ -1244,7 +1243,7 @@ def dashcam_normal(device):
         if not ret: # Check to see if the frame failed to be read.
             display_message("Failed to receive video frame from the '" + device  + "' device. It is possible this device has been disconnected.", 2)
             for i in range(1, 12): # Attempt to re-open the capture device several times.
-                if (global_variables.predator_running == False):
+                if (global_variables.PREDATOR_RUNNING == False):
                     break
                 time.sleep(5*i) # Wait before re-attempting to open the capture device. The length of time between attempts increases with each attempt.
                 display_message("Attempting to re-open capture on '" + device  + "' device.", 1)
@@ -1427,7 +1426,7 @@ def dashcam():
 
 
     last_moved_time = utils.get_time() # This value holds the Unix timestamp of the last time the vehicle exceeded the parking speed threshold. Here it is initialized to the current time.
-    while global_variables.predator_running: # Run until Predator is terminated.
+    while global_variables.PREDATOR_RUNNING: # Run until Predator is terminated.
         if (config["dashcam"]["parked"]["enabled"] == True): # Check to see if parking mode is enabled before checking for movement.
             if (config["general"]["gps"]["enabled"] == True): # Check to see if GPS is enabled.
                 current_location = get_gps_location() # Get the current GPS location.
