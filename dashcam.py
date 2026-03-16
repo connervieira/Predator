@@ -185,13 +185,17 @@ if (str(config["dashcam"]["capture"]["audio"]["rate"]) != ""): # Check to see if
 
 last_trigger_file_created = 0
 def create_trigger_file():
-    update_status_lighting("dashcam_save") # Since the current dashcam segment is being saved, return to the corresponding status lighting value.
-
     global last_trigger_file_created
+    global last_played_dashcam_saved_sound
+
+    update_status_lighting("dashcam_save") # Since the current dashcam segment is being saved, return to the corresponding status lighting value.
+    if (time.time()-last_played_dashcam_saved_sound > 5):
+        utils.play_sound("dashcam_saved")
+
     if (time.time() - last_trigger_file_created > 1): # Check to see if the time that has passed since the last trigger file is more than 1 second.
         if (os.path.isdir(config["general"]["interface_directory"]) == False): # Check to see if the interface directory has not yet been created.
-            os.system("mkdir -p '" + str(config["general"]["interface_directory"]) + "'")
-            os.system("chmod -R 777 '" + str(config["general"]["interface_directory"]) + "'")
+            os.system("mkdir -p \"" + str(config["general"]["interface_directory"]) + "\"")
+            os.system("chmod -R 777 \"" + str(config["general"]["interface_directory"]) + "\"")
         if (os.path.exists(os.path.join(config["general"]["interface_directory"], config["dashcam"]["saving"]["trigger"])) == False): # Check to see if the trigger file hasn't already been created.
             os.system("echo " + str(time.time()) + " > \"" + os.path.join(config["general"]["interface_directory"], config["dashcam"]["saving"]["trigger"]) + "\"") # Save the trigger file with the current time as the timestamp.
     last_trigger_file_created = time.time()
@@ -532,7 +536,7 @@ def background_object_recognition(device):
             if (time.time() - last_object_alert > 3):
                 print(utils.style.red + "Detected alert object" + utils.style.end)
                 utils.play_sound("dashcam_object_alert")
-                update_status_lighting("dashcam_object") # Return the status lighting to normal.
+                update_status_lighting("dashcam_object")
             last_object_alert = time.time()
 
 
@@ -588,18 +592,12 @@ def benchmark_camera_framerate(device, frames=5): # This function benchmarks a g
 
 
 
-# This function is called when the lock trigger file is created, usually to save the current and last segments.
+# This function is called (in a separate thread) at the end of a segment when the lock trigger file is created.
 last_played_dashcam_saved_sound = 0 # This holds the timestamp of the last time the dashcam video was saved so we don't play the saved sound repeatedly in short succession.
 def lock_dashcam_segment(file):
     global config
-    global last_played_dashcam_saved_sound
 
     process_timing("start", "Dashcam/File Maintenance")
-
-    if (time.time()-last_played_dashcam_saved_sound > 5):
-        utils.play_sound("dashcam_saved")
-    last_played_dashcam_saved_sound = time.time()
-    utils.display_message("Locked dash-cam segment file")
 
     if (os.path.isdir(os.path.join(config["general"]["working_directory"], config["dashcam"]["saving"]["directory"])) == False): # Check to see if the saved dashcam video folder needs to be created.
         os.system("mkdir -p \"" + os.path.join(config["general"]["working_directory"], config["dashcam"]["saving"]["directory"] + "\"")) # Create the saved dashcam video directory.
@@ -608,6 +606,8 @@ def lock_dashcam_segment(file):
         os.system("cp \"" + file + "\" \"" + os.path.join(config["general"]["working_directory"], config["dashcam"]["saving"]["directory"]) + "\"") # Copy the current dashcam video segment to the saved folder.
     else:
         display_message("The dashcam saving directory does not exist, and could not be created. The dashcam video could not be locked.", 3)
+
+    utils.display_message("Locked dash-cam segment file")
 
     time.sleep(0.5) # Wait for a short period of time so that other dashcam recording threads have time to detect the trigger file.
     os.system("rm -f \"" + os.path.join(config["general"]["interface_directory"], config["dashcam"]["saving"]["trigger"]) + "\"") # Remove the dashcam lock trigger file.
@@ -969,6 +969,7 @@ def dashcam_parked_event(capture, device, frame_buffer):
         time.sleep(config["dashcam"]["capture"]["audio"]["start_delay"]) # Wait briefly for the audio recorder to terminate.
         subprocess.Popen(("sudo -u " + str(config["dashcam"]["capture"]["audio"]["record_as_user"]) + " killall arecord").split(" "), stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Force kill all audio recording processes.
         process_timing("end", "Dashcam/Audio Processing")
+    output.release()
     output = None # Release the output.
 
     process_timing("start", "Dashcam/Calculations")
@@ -1117,7 +1118,7 @@ def dashcam_normal(device):
 
 
 
-    while global_variables.PREDATOR_RUNNING and parked == False: # Only run while the dashcam recording flag is set to 'True' and Predator is not parked. While this flag changes to 'False' this recording process should exit.
+    while global_variables.PREDATOR_RUNNING and parked == False: # Only run while the dashcam recording flag is set to 'True' and Predator is not parked. When this flag changes to 'False' this recording process should exit.
         heartbeat() # Issue a status heartbeat.
 
         # =======================================
@@ -1125,6 +1126,7 @@ def dashcam_normal(device):
         # =======================================
         if (utils.get_time() > first_segment_start_time + (segment_number+1)*config["dashcam"]["saving"]["segment_length"]): # Check to see if a new segment needs to be created.
             # End the current segment:
+            output.release()
             output = None # Release the output writer.
             if (config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if audio recording is enabled in the configuration.
                 process_timing("start", "Dashcam/Audio Processing")
@@ -1265,6 +1267,8 @@ def dashcam_normal(device):
                     break # Exit the loop, now that the capture device has been re-established.
             if not ret: # Check to see if the frame failed to be read.
                 display_message("Video recording on the '" + device  + "' device could not be restarted.", 3)
+                capture.release()
+                capture = None
                 break # If the capture device can't be re-opened, then stop recording on this device.
 
 
@@ -1308,8 +1312,10 @@ def dashcam_normal(device):
         time.sleep(config["dashcam"]["capture"]["audio"]["start_delay"]) # Wait briefly for the audio recorder to terminate.
         subprocess.Popen(("sudo -u " + str(config["dashcam"]["capture"]["audio"]["record_as_user"]) + " killall arecord").split(" "), stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Force kill all audio recording processes.
         process_timing("end", "Dashcam/Audio Processing")
+    output.release()
     output = None # Release the output file.
     capture.release() # Release the capture device.
+    capture = None
     first_segment_start_time = 0 # Reset the segment start time.
 
     process_timing("start", "Dashcam/File Merging")

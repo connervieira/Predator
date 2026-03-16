@@ -610,6 +610,7 @@ November 20th, 2024
             - Added support for external GPIO modules (FT232H)
             - Added the experimental ability to relay GPIO pins from an external device over the network (not recommended)
         - Added the ability to globally invert GPIO inputs.
+    - The "dashcam saved" audio sample is now played when creating the dashcam trigger file (`create_trigger_file()`) immediately, rather than waiting until the segment is actually locked (`lock_dashcam_segment()`).
 - Updated real-time mode.
     - Improved license plate logging in real-time mode.
 - Added `--help` commmand line option.
@@ -620,6 +621,6 @@ November 20th, 2024
     - Previously, this functionality might have behaved unexpectedly when the file path involved spaces.
 - Improved the reliablity of graceful exits when pressing `Ctrl+C`.
     - Predator will detect when a thread is holding the process alive, and will display its name.
-    - Predator will now abandon trying to re-open a dropped capture device when gracefully exiting.
+    - Predator will now abandon trying to re-open a dropped capture device when gracefully exiting dash-cam mode.
 - The plates file in the interface directory now contains the image identifiers introduced in Phantom V1.4.0.
 - Added support for custom telemetry to remotely view vehicle location and preview the camera stream.
