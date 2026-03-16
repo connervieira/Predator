@@ -31,8 +31,8 @@ try:
         if (config["general"]["status_lighting"]["enabled"] == True or config["realtime"]["push_notifications"]["enabled"] == True or len(config["general"]["alerts"]["databases"]) > 0): # Only import networking libraries if at least one feature is enable that needs it.
             import requests # Required to make network requests
             import validators # Required to validate URLs
-except:
-    print("Failed to determine if network features are enabled in the configuration.")
+except Exception as e:
+    print("Failed to determine if network features are enabled in the configuration: " + str(e))
 if (len(config["general"]["alerts"]["databases"]) > 0):
     import hashlib
 

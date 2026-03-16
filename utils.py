@@ -159,8 +159,8 @@ try:
         if (config["general"]["status_lighting"]["enabled"] == True or config["realtime"]["push_notifications"]["enabled"] == True or len(config["general"]["alerts"]["databases"]) > 0):
             import requests # Required to make network requests
             import validators # Required to validate URLs
-except:
-    print("Failed to determine if network features are enabled in the configuration.")
+except Exception as e:
+    print("Failed to determine if network features are enabled in the configuration: " + str(e))
 if (len(config["general"]["alerts"]["databases"]) > 0):
     import hashlib
 import re # Required to use Regex
@@ -690,7 +690,9 @@ def closest_key(array, search_key):
 # Define the function that will be used to get the current GPS coordinates.
 if (len(config["general"]["gps"]["demo_file"]) > 0): # Check to see if there is a demo file set.
     display_message("The GPS is in demo mode. A pre-recorded file is being played back in place of live GPS data.", 1)
-    demo_file_path = config["general"]["working_directory"] + "/" + config["general"]["gps"]["demo_file"]
+    if (config["general"]["gps"]["enabled"] == False):
+        utils.display_message("A GPS demo file is set, but the GPS is disabled. To use GPS functionality (even if no physical gps is connected) make sure the GPS is enabled in the configuration.", 2)
+    demo_file_path = os.path.join(config["general"]["working_directory"], config["general"]["gps"]["demo_file"])
     if (os.path.exists(demo_file_path)):
         gps_demo_gpx_data = process_gpx(demo_file_path, modernize=True)
     else:
@@ -918,99 +920,92 @@ if ("telemetry" in config["dashcam"] and "save_failed_updates" in config["dashca
         telemetry_backlog = json.loads("{}") # Load a blank placeholder dictionary.
 else:
     telemetry_backlog = {}
-# This function is called for every frame, and uploads dash-cam telemetry information at regular intervals.
-last_telemetry_sent = 0 # This holds the timestamp of the last time telemetry was sent.
 
-sending_telemetry = False # This is used to indicate whether or not telemetry is being actively sent on a certain thread.
+
+# `send_telemetry` is called once every 10 seconds by the background telemetry thread, and uploads telemetry to a compatible service.
 def send_telemetry(data):
     global last_telemetry_sent
     global telemetry_backlog
-    global sending_telemetry
     if (config["dashcam"]["telemetry"]["enabled"] == True):
         data["system"] = {}
         data["system"]["timezone"] = timezone_offset_stamp # Add the system timezone to the data.
 
+        sending_telemetry = True # This will be reset to 'False' when this thread is no longer sending telemetry.
+        if ("send_images" in config["dashcam"]["telemetry"] and config["dashcam"]["telemetry"]["send_images"] == True): # Check to see if image sending is enabled.
+            for device in list(data["image"]):
+                try:
+                    # Rescale the image to 720p:
+                    original_height, original_width = data["image"][device].shape[:2]
+                    target_height = 720
+                    scale_factor = target_height / original_height
+                    if (scale_factor < 1): # Check to make sure we're shrinking the image, not upscaling it.
+                        new_width = int(original_width * scale_factor)
+                        data["image"][device] = cv2.resize(data["image"][device], (new_width, target_height)) # Resize the frame to the target size.
 
-        if (time.time() - last_telemetry_sent >= 10 and sending_telemetry == False): # Check to see if it has been at least 10 seconds since the last telemetry update. Note: most external receivers (such as V0LT Portal) will reject any data within 10 seconds of a previous datapoint.
-            sending_telemetry = True # This will be reset to 'False' when this thread is no longer sending telemetry.
-            if ("send_images" in config["dashcam"]["telemetry"] and config["dashcam"]["telemetry"]["send_images"] == True): # Check to see if image sending is enabled.
-                for device in list(data["image"]):
-                    try:
-                        # Rescale the image to 720p:
-                        original_height, original_width = data["image"][device].shape[:2]
-                        target_height = 720
-                        scale_factor = target_height / original_height
-                        if (scale_factor < 1): # Check to make sure we're shrinking the image, not upscaling it.
-                            new_width = int(original_width * scale_factor)
-                            data["image"][device] = cv2.resize(data["image"][device], (new_width, target_height)) # Resize the frame to the target size.
+                    # Encode the image to base64 for transmission:
+                    retval, buffer = cv2.imencode('.jpg', data["image"][device])
+                    data["image"][device] = base64.b64encode(buffer).decode("utf-8")
+                except Exception as e:
+                    del data["image"][device]
+                    utils.display_message("The '" + str(device) + "' image could not be processed for remote telemetry (" + str(e) + ")", 2)
+        else:
+            del data["image"]
 
-                        # Encode the image to base64 for transmission:
-                        retval, buffer = cv2.imencode('.jpg', data["image"][device])
-                        data["image"][device] = base64.b64encode(buffer).decode("utf-8")
-                    except Exception as e:
-                        del data["image"][device]
-                        utils.display_message("The '" + str(device) + "' image could not be processed for remote telemetry (" + str(e) + ")", 2)
-            else:
-                del data["image"]
-
-            last_telemetry_sent = time.time()
-
-            submission = json.dumps(data) # Convert the image information into a string.
-            try:
-                request = requests.post(config["dashcam"]["telemetry"]["target"], data={"identifier": config["dashcam"]["telemetry"]["vehicle_identifier"], "data": submission}, timeout=8) # Submit the data.
-                response = request.content
-                if (is_json(response)):
-                    response = json.loads(response)
-                    if ("success" in response and response["success"] == True):
-                        success = True
-                    else:
-                        success = False
-                        if ("reason" in response):
-                            display_message("The remote telemetry provider responded with an error: " + str(response["reason"]), 2)
-                        else:
-                            display_message("The remote telemetry provider responded with an unknown error.", 2)
+        submission = json.dumps(data) # Convert the telemtry information into a string.
+        try:
+            request = requests.post(config["dashcam"]["telemetry"]["target"], data={"identifier": config["dashcam"]["telemetry"]["vehicle_identifier"], "data": submission}, timeout=8) # Submit the data.
+            response = request.content
+            if (is_json(response)):
+                response = json.loads(response)
+                if ("success" in response and response["success"] == True):
+                    success = True
                 else:
-                    display_message("The response from the remote telemetry provider was not valid JSON, which may indicate a server-side error. (" + str(response) + ")", 2)
                     success = False
-            except Exception as exception:
-                display_message("The telemetry upload process failed with the following exception:", 2)
-                print(exception)
+                    if ("reason" in response):
+                        display_message("The remote telemetry provider responded with an error: " + str(response["reason"]), 2)
+                    else:
+                        display_message("The remote telemetry provider responded with an unknown error.", 2)
+            else:
+                display_message("The response from the remote telemetry provider was not valid JSON, which may indicate a server-side error. (" + str(response) + ")", 2)
                 success = False
+        except Exception as exception:
+            display_message("The telemetry upload process failed with the following exception:", 2)
+            print(exception)
+            success = False
 
-            if (success == True): # Check to see if the current submission was successful.
-                if (len(telemetry_backlog) > 0): # Check to see if there is at least one request in the back-log.
-                    consecutive_failures = 0 # This will count consecutive failures to we can tell if we should abort.
-                    for timestamp in list(telemetry_backlog.keys()): # Iterate over each entry in the telemetry back-log.
-                        try:
-                            request = requests.post(config["dashcam"]["telemetry"]["target"], data={"identifier": config["dashcam"]["telemetry"]["vehicle_identifier"], "data": json.dumps(telemetry_backlog[timestamp])}, timeout=8) # Submit the data.
-                            response = json.loads(request.content)
-                            if ("success" in response and response["success"] == True):
-                                success = True
-                            else:
-                                if ("code" in response): # Check to see if an error code was returned.
-                                    if (response["code"] in ["timezone_offset_invalid"]): # Check to see if the error code matches a type that would cause all of the other points to fail as well.
-                                        break
-                                    elif (response["code"] in ["timestamp_invalid", "premature_submission", "duplicate_submission"]): # Check to see if the error code matches a type that would cause this entry to fail forever.
-                                        del telemetry_backlog[timestamp] # Delete this point from the back-log.
-                                success = False
-                        except Exception as e:
-                            success = False
-                        if (success == True): # Check to see if the data submission was successful.
-                            consecutive_failures = 0 # Reset the consecutive failure counter.
-                            if (timestamp in telemetry_backlog): # Check to see if this timestamp is still present in the backlog (it may have been removed by another thread).
-                                del telemetry_backlog[timestamp] # Delete this point from the back-log.
+        if (success == True): # Check to see if the current submission was successful.
+            if (len(telemetry_backlog) > 0): # Check to see if there is at least one request in the back-log.
+                consecutive_failures = 0 # This will count consecutive failures to we can tell if we should abort.
+                for timestamp in list(telemetry_backlog.keys()): # Iterate over each entry in the telemetry back-log.
+                    try:
+                        request = requests.post(config["dashcam"]["telemetry"]["target"], data={"identifier": config["dashcam"]["telemetry"]["vehicle_identifier"], "data": json.dumps(telemetry_backlog[timestamp])}, timeout=8) # Submit the data.
+                        response = json.loads(request.content)
+                        if ("success" in response and response["success"] == True):
+                            success = True
                         else:
-                            consecutive_failures += 1
-                        if (consecutive_failures >= 10): # Check to see if we have had several consecutive failures.
-                            break # Exit the loop (give up on the remaining points)
-                    save_to_file(telemetry_backlog_file_location, json.dumps(telemetry_backlog)) # Save the updated back-log file.
-            else: # Otherwise, the current submission failed.
-                if (config["dashcam"]["telemetry"]["save_failed_updates"] == True):
-                    if ("image" in data): # Check to see if there is an image associated with this submission.
-                        del data["image"] # Delete the image data before adding it to the backlog.
-                    telemetry_backlog[data["location"]["time"]] = data # Add this datapoint to the back-log.
-                    save_to_file(telemetry_backlog_file_location, json.dumps(telemetry_backlog)) # Save the updated back-log file.
-            sending_telemetry = False
+                            if ("code" in response): # Check to see if an error code was returned.
+                                if (response["code"] in ["timezone_offset_invalid"]): # Check to see if the error code matches a type that would cause all of the other points to fail as well.
+                                    break
+                                elif (response["code"] in ["timestamp_invalid", "premature_submission", "duplicate_submission"]): # Check to see if the error code matches a type that would cause this entry to fail forever.
+                                    del telemetry_backlog[timestamp] # Delete this point from the back-log.
+                            success = False
+                    except Exception as e:
+                        success = False
+                    if (success == True): # Check to see if the data submission was successful.
+                        consecutive_failures = 0 # Reset the consecutive failure counter.
+                        if (timestamp in telemetry_backlog): # Check to see if this timestamp is still present in the backlog (it may have been removed by another thread).
+                            del telemetry_backlog[timestamp] # Delete this point from the back-log.
+                    else:
+                        consecutive_failures += 1
+                    if (consecutive_failures >= 10): # Check to see if we have had several consecutive failures.
+                        break # Exit the loop (give up on the remaining points)
+                save_to_file(telemetry_backlog_file_location, json.dumps(telemetry_backlog)) # Save the updated back-log file.
+        else: # Otherwise, the current submission failed.
+            if (config["dashcam"]["telemetry"]["save_failed_updates"] == True):
+                if ("image" in data): # Check to see if there is an image associated with this submission.
+                    del data["image"] # Delete the image data before adding it to the backlog.
+                telemetry_backlog[data["location"]["time"]] = data # Add this datapoint to the back-log.
+                save_to_file(telemetry_backlog_file_location, json.dumps(telemetry_backlog)) # Save the updated back-log file.
 
 
 

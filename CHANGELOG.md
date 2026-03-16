@@ -622,3 +622,4 @@ November 20th, 2024
     - Predator will detect when a thread is holding the process alive, and will display its name.
     - Predator will now abandon trying to re-open a dropped capture device when gracefully exiting.
 - The plates file in the interface directory now contains the image identifiers introduced in Phantom V1.4.0.
+- Added support for custom telemetry to remotely view vehicle location and preview the camera stream.

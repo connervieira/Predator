@@ -1290,23 +1290,6 @@ def dashcam_normal(device):
         output.write(frame)
 
 
-        # ===============
-        # Send telemetry:
-        telemetry_data = {}
-        telemetry_data["image"] = dict(current_frame_data)
-        current_location = utils.get_gps_location_lazy() # Get the most recent location.
-        telemetry_data["location"] = {
-            "time": utils.get_time(),
-            "lat": current_location[0],
-            "lon": current_location[1],
-            "alt": current_location[3],
-            "spd": current_location[2],
-            "head": current_location[4]
-        }
-        telemetry_thread = threading.Thread(target=utils.send_telemetry, args=[dict(telemetry_data)]) # Create a separate thread to process and upload telemetry.
-        telemetry_thread.start()
-
-
         # ===================
         # Handle diagnostics:
         update_state("dashcam/normal", instant_framerate)
@@ -1343,6 +1326,26 @@ def dashcam_normal(device):
     process_timing("end", "Dashcam/File Merging")
     # ===============================================
 
+
+
+
+def background_telemetry():
+    global current_frame_data
+    while global_variables.PREDATOR_RUNNING: # Run until Predator is terminated.
+        telemetry_data = {}
+        telemetry_data["image"] = dict(current_frame_data)
+        current_location = utils.get_gps_location_lazy() # Get the most recent location.
+        telemetry_data["location"] = {
+            "time": utils.get_time(),
+            "lat": current_location[0],
+            "lon": current_location[1],
+            "alt": current_location[3],
+            "spd": current_location[2],
+            "head": current_location[4]
+        }
+        utils.send_telemetry(telemetry_data)
+
+        global_variables.shutdown_event.wait(timeout=10) # Sleep for 10 seconds, or skip (the exit the loop) if Predator shuts down.
 
 
 
@@ -1423,6 +1426,11 @@ def dashcam():
             dashcam_objectrecognition_process[iteration_counter].start()
             iteration_counter += 1 # Iterate the counter. This value will be used to create unique file names for each recorded video.
 
+
+    # Start the dash-cam telemetry thread.
+    if (config["dashcam"]["telemetry"]["enabled"] == True):
+        background_telemetry_thread = threading.Thread(target=background_telemetry, name="BackgroundTelemetry")
+        background_telemetry_thread.start()
 
 
     last_moved_time = utils.get_time() # This value holds the Unix timestamp of the last time the vehicle exceeded the parking speed threshold. Here it is initialized to the current time.
