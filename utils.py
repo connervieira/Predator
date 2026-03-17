@@ -854,7 +854,7 @@ def sizeof_fmt(num, suffix='B'):
     return "%.1f %s%s" % (num, 'Yi', suffix)
 
 def wait_for_input():
-    prompt("Press enter to continue")
+    prompt(style.faint + style.italic + "Press enter to continue" + style.end + style.end)
 
 
 # This function takes the corners of a plate identified by the ALPR engine (

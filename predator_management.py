@@ -3,6 +3,7 @@ import subprocess
 import sys
 import json
 import utils
+import glob
 
 import global_variables # `global_variables.py`
 import utils # `utils.py`
@@ -160,17 +161,17 @@ def management_mode():
                             utils.display_message("Failed to copy pre-recorded processed frames: " + str(e), 2)
                     if (copy_prerecorded_gpx_files):
                         try:
-                            subprocess.run(["cp", os.path.join(config["general"]["working_directory"], "*.gpx"), copy_destination], check=True)
+                            subprocess.run(["cp"] + glob.glob(os.path.join(config["general"]["working_directory"], "*.gpx")) + [copy_destination], check=True)
                         except Exception as e:
                             utils.display_message("Failed to copy GPX files: " + str(e), 2)
                     if (copy_prerecorded_license_plate_analysis_data):
                         try:
-                            subprocess.run(["cp", os.path.join(config["general"]["working_directory"], "pre_recorded_license_plate_export.*"), copy_destination], check=True)
+                            subprocess.run(["cp"] + glob.glob(os.path.join(config["general"]["working_directory"], "pre_recorded_license_plate_export.*")) + [copy_destination], check=True)
                         except Exception as e:
                             utils.display_message("Failed to copy pre-recorded license plate analysis export files: " + str(e), 2)
                     if (copy_prerecorded_license_plate_location_data):
                         try:
-                            subprocess.run(["cp", os.path.join(config["general"]["working_directory"], "/pre_recorded_location_data_export.*"), copy_destination], check=True)
+                            subprocess.run(["cp"] + glob.glob(os.path.join(config["general"]["working_directory"], "pre_recorded_location_data_export.*")) + [copy_destination], check=True)
                         except Exception as e:
                             utils.display_message("Failed to copy pre-recorded license plate location export files: " + str(e), 2)
 
@@ -186,17 +187,17 @@ def management_mode():
                         extension = config["dashcam"]["saving"]["file"]["extension"]
                     if (copy_dashcam_video):
                         try:
-                            subprocess.run(["cp", os.path.join(config["general"]["working_directory"], "* Predator *." + extension), copy_destination], check=True)
+                            subprocess.run(["cp"] + glob.glob(os.path.join(config["general"]["working_directory"], "* Predator *." + extension)) + [copy_destination], check=True)
                         except Exception as e:
                             utils.display_message("Failed to copy dash-cam video: " + str(e), 2)
                     if (copy_dashcam_video_saved):
                         try:
                             subprocess.run(["cp", "-r", os.path.join(config["general"]["working_directory"], config["dashcam"]["saving"]["directory"]), copy_destination], check=True)
                         except Exception as e:
-                            utils.display_message("Failed to copy dash-cam video: " + str(e), 2)
+                            utils.display_message("Failed to copy saved dash-cam video: " + str(e), 2)
 
-                    utils.clear()
                     utils.display_message("Files have finished copying.", 1)
+                    utils.wait_for_input()
 
 
                 elif (selection == "3"): # The user has selected the "delete files" option.
@@ -287,28 +288,28 @@ def management_mode():
                         print("Deleting files...")
                         if (delete_management_custom):
                             try:
-                                subprocess.run(["rm", "-r", os.path.join(config["general"]["working_directory"], delete_custom_file_name)], check=True)
+                                subprocess.run(["rm", "-r"] + glob.glob(os.path.join(config["general"]["working_directory"], delete_custom_file_name)), check=True)
                             except Exception as e:
                                 utils.display_message("Failed to delete custom file-path: " + str(e), 2)
 
                         if (delete_prerecorded_processed_frames):
                             try:
-                                subprocess.run(["rm", "-r", os.path.join(config["general"]["working_directory"], "/frames")], check=True)
+                                subprocess.run(["rm", "-r", os.path.join(config["general"]["working_directory"], "frames")], check=True)
                             except Exception as e:
                                 utils.display_message("Failed to delete copy pre-recorded processed frames: " + str(e), 2)
                         if (delete_prerecorded_gpx_files):
                             try:
-                                subprocess.run(["rm", os.path.join(config["general"]["working_directory"], "/*.gpx")], check=True)
+                                subprocess.run(["rm"] + glob.glob(os.path.join(config["general"]["working_directory"], "*.gpx")), check=True)
                             except Exception as e:
                                 utils.display_message("Failed to delete GPX files: " + str(e), 2)
                         if (delete_prerecorded_license_plate_analysis_data):
                             try:
-                                subprocess.run(["rm", os.path.join(config["general"]["working_directory"], "/pre_recorded_license_plate_export.*")], check=True)
+                                subprocess.run(["rm"] + glob.glob(os.path.join(config["general"]["working_directory"], "pre_recorded_license_plate_export.*")), check=True)
                             except Exception as e:
                                 utils.display_message("Failed to delete pre-recorded license plate analysis export files: " + str(e), 2)
                         if (delete_prerecorded_license_plate_location_data):
                             try:
-                                subprocess.run(["rm", os.path.join(config["general"]["working_directory"], "/pre_recorded_location_data_export.*")], check=True)
+                                subprocess.run(["rm"] + glob.glob(os.path.join(config["general"]["working_directory"], "pre_recorded_location_data_export.*")), check=True)
                             except Exception as e:
                                 utils.display_message("Failed to delete pre-recorded license plate location export files: " + str(e), 2)
 
@@ -320,7 +321,7 @@ def management_mode():
 
                         if (delete_dashcam_video):
                             try:
-                                subprocess.run(["rm", os.path.join(config["general"]["working_directory"], "* Predator *." + extension)], check=True)
+                                subprocess.run(["rm"] + glob.glob(os.path.join(config["general"]["working_directory"], "* Predator *." + extension)), check=True)
                             except Exception as e:
                                 utils.display_message("Failed to delete unsaved dash-cam video: " + str(e), 2)
                         if (delete_dashcam_video_saved):
@@ -329,10 +330,11 @@ def management_mode():
                             except Exception as e:
                                 utils.display_message("Failed to delete saved dash-cam video: " + str(e), 2)
 
-                        utils.clear()
                         utils.display_message("Files have finished deleting.", 1)
+                        utils.wait_for_input()
                     else:
                         utils.display_message("No files have been deleted.", 1)
+                        utils.wait_for_input()
 
 
                 else: # The user has selected an invalid option in the file management menu.
