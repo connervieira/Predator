@@ -624,3 +624,5 @@ November 20th, 2024
     - Predator will now abandon trying to re-open a dropped capture device when gracefully exiting dash-cam mode.
 - The plates file in the interface directory now contains the image identifiers introduced in Phantom V1.4.0.
 - Added support for custom telemetry to remotely view vehicle location and preview the camera stream.
+- Restructured the project.
+    - Each mode now has it's own script (`predator_MODE.py`), which is called from `main.py`.
