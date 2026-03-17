@@ -156,7 +156,7 @@ import subprocess # Required for starting some shell commands
 import sys
 try:
     if (config["developer"]["offline"] == False): # Only import networking libraries if offline mode is turned off.
-        if (config["general"]["status_lighting"]["enabled"] == True or config["realtime"]["push_notifications"]["enabled"] == True or len(config["general"]["alerts"]["databases"]) > 0):
+        if (config["general"]["status_lighting"]["enabled"] == True or config["realtime"]["push_notifications"]["enabled"] == True or len(config["general"]["alerts"]["databases"]) > 0 or config["dashcam"]["telemetry"]["enabled"] == True):
             import requests # Required to make network requests
             import validators # Required to validate URLs
 except Exception as e:
@@ -796,7 +796,7 @@ def convert_speed(speed, unit="mph"):
     unit = unit.lower() # Convert the unit to all lowercase in order to make it easier to work with and remove inconsistencies in configuration setups.
 
     if (unit == "kph"): # Convert the speed to kilometers per hour.
-        speed = speed * 3.6 # The speed is already measured in kilometers per hour, so there is no reason to convert it.
+        speed = speed * 3.6 # Convert the speed to kilometers per hour.
     elif (unit == "mph"): # Convert the speed to miles per hour.
         speed = speed * 2.236936
     elif (unit == "mps"): # Convert the speed to meters per second.
