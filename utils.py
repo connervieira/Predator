@@ -166,7 +166,7 @@ if (len(config["general"]["alerts"]["databases"]) > 0):
 import re # Required to use Regex
 import datetime # Required for converting between timestamps and human readable date/time information
 from xml.dom import minidom # Required for processing GPX data
-if (config["general"]["gps"]["enabled"] == True): # Only import the GPS libraries if GPS settings are enabled.
+if (config["general"]["gps"]["enabled"] == True and len(config["general"]["gps"]["demo_file"]) == 0): # Only import the GPS libraries if GPS settings are enabled.
     from gps import * # Required to access GPS information.
     import gpsd
 import signal # Required to time out functions.
@@ -525,19 +525,19 @@ def play_sound(sound_id, override_cooldown=False):
                     if (audio_playing == False): # Check to make sure no other audio is playing. We waited for this to be the case, but a timeout will result in this still being true.
                         audio_playing = True
                         for i in range(0, int(config["general"]["audio"]["sounds"][sound_id]["repeat"])): # Repeat the sound several times, if the configuration says to.
-                            if (config["general"]["audio"]["player"]["backend"] == "mpg321"):
-                                command = "mpg321 \"" + config["general"]["audio"]["sounds"][sound_id]["path"] + "\" > /dev/null 2>&1 &"
-                                os.system(command) # Play the sound specified for this alert type in the configuration.
-                            elif (config["general"]["audio"]["player"]["backend"] == "mplayer"):
-                                if (len(config["general"]["audio"]["player"]["mplayer"]["device"]) == 0):
-                                    command = "mplayer \"" + config["general"]["audio"]["sounds"][sound_id]["path"] + "\" -noconsolecontrols 2>&- 1>/dev/null &"
-                                    os.system(command)
+                            try:
+                                if (config["general"]["audio"]["player"]["backend"] == "mpg321"):
+                                    subprocess.Popen(["mpg321", config["general"]["audio"]["sounds"][sound_id]["path"]], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                                elif (config["general"]["audio"]["player"]["backend"] == "mplayer"):
+                                    if (len(config["general"]["audio"]["player"]["mplayer"]["device"]) == 0):
+                                        subprocess.Popen(["mplayer", config["general"]["audio"]["sounds"][sound_id]["path"], "-noconsolecontrols"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                                    else:
+                                        subprocess.Popen(["mplayer", "-ao", config["general"]["audio"]["player"]["mplayer"]["device"], config["general"]["audio"]["sounds"][sound_id]["path"], "-noconsolecontrols"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                                 else:
-                                    command = "mplayer -ao " + config["general"]["audio"]["player"]["mplayer"]["device"] + " \"" + config["general"]["audio"]["sounds"][sound_id]["path"] + "\" -noconsolecontrols 2>&- 1>/dev/null &"
-                                    os.system(command)
-                            else:
-                                display_message("The configured audio player back-end is invalid.", 3)
-                            time.sleep(float(config["general"]["audio"]["sounds"][sound_id]["delay"])) # Wait before playing the sound again.
+                                    display_message("The configured audio player back-end is invalid.", 3)
+                                time.sleep(float(config["general"]["audio"]["sounds"][sound_id]["delay"])) # Wait before playing the sound again.
+                            except Exception as e:
+                                display_message("Failed to play sound `" + sound_id + "`: " + str(e), 3)
                         audio_playing = False
     else: # No sound with this ID exists in the configuration database, and therefore the sound can't be played.
         display_message("No sound with the ID (" + str(sound_id) + ") exists in the configuration.", 3)

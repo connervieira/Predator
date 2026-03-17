@@ -58,9 +58,6 @@ import cv2
 import subprocess # Required for starting some shell commands
 import sys
 import datetime # Required for converting between timestamps and human readable date/time information
-if (config["general"]["gps"]["enabled"] == True): # Only import the GPS libraries if GPS settings are enabled.
-    from gps import * # Required to access GPS information.
-    import gpsd
 if (config["dashcam"]["saving"]["looped_recording"]["mode"] == "automatic"): # Only import the disk usage library if it is enabled in the configuration.
     import psutil # Required to get disk usage information
 
@@ -94,11 +91,11 @@ if ("physical_controls" in config["dashcam"]):
                     os.environ.setdefault('BLINKA_FT232H', '1')
                     import board
                     import digitalio
-                except: # The required libraries could not be imported, so disable all of the GPIO features.
+                except Exception as e: # The required libraries could not be imported, so disable all of the GPIO features.
                     for action in config["dashcam"]["physical_controls"]["actions"]:
                         config["dashcam"]["physical_controls"]["actions"][action] = {}
                     config["dashcam"]["stamps"]["relay"]["enabled"] = False
-                    utils.display_message("adafruit-blinka libraries could not be imported. GPIO functionality has been disabled.", 3)
+                    utils.display_message("adafruit-blinka libraries could not be imported. GPIO functionality has been disabled. (" + str(e) + ")", 3)
             elif (config["dashcam"]["physical_controls"]["behavior"]["method"] == "gpio_remote"): # Alternatively, see if we need `socket` to monitor GPIO from a remote source.
                 import socket
     else: # If the relevant configuration section is not yet initialized, then import nothing.
@@ -600,17 +597,17 @@ def lock_dashcam_segment(file):
     process_timing("start", "Dashcam/File Maintenance")
 
     if (os.path.isdir(os.path.join(config["general"]["working_directory"], config["dashcam"]["saving"]["directory"])) == False): # Check to see if the saved dashcam video folder needs to be created.
-        os.system("mkdir -p \"" + os.path.join(config["general"]["working_directory"], config["dashcam"]["saving"]["directory"] + "\"")) # Create the saved dashcam video directory.
+        subprocess.run(["mkdir", "-p", os.path.join(config["general"]["working_directory"], config["dashcam"]["saving"]["directory"] + "\"")], check=True)
 
     if (os.path.isdir(os.path.join(config["general"]["working_directory"], config["dashcam"]["saving"]["directory"]))): # Check to see if the dashcam saving directory exists.
-        os.system("cp \"" + file + "\" \"" + os.path.join(config["general"]["working_directory"], config["dashcam"]["saving"]["directory"]) + "\"") # Copy the current dashcam video segment to the saved folder.
+        subprocess.run(["cp", file, os.path.join(config["general"]["working_directory"], config["dashcam"]["saving"]["directory"])], check=True)
     else:
         display_message("The dashcam saving directory does not exist, and could not be created. The dashcam video could not be locked.", 3)
 
     utils.display_message("Locked dash-cam segment file")
 
     time.sleep(0.5) # Wait for a short period of time so that other dashcam recording threads have time to detect the trigger file.
-    os.system("rm -f \"" + os.path.join(config["general"]["interface_directory"], config["dashcam"]["saving"]["trigger"]) + "\"") # Remove the dashcam lock trigger file.
+    subprocess.run(["rm", "-f", os.path.join(config["general"]["interface_directory"], config["dashcam"]["saving"]["trigger"])], check=True)
     if (os.path.exists(os.path.join(config["general"]["interface_directory"], config["dashcam"]["saving"]["trigger"]))): # Check to see if the trigger file exists even after it should have been removed.
         display_message("Unable to remove dashcam lock trigger file.", 3)
 
@@ -825,7 +822,6 @@ def dashcam_parked_event(capture, device, frame_buffer):
     global audio_record_command
 
 
-
     directory = config["general"]["working_directory"]
 
     last_event_detected = utils.get_time() # Initialize the last time that an event was detected to now. We can assume an event was just detected because this function is only called after an event is triggered.
@@ -964,8 +960,8 @@ def dashcam_parked_event(capture, device, frame_buffer):
     # Stop audio/video recording:
     if (config["dashcam"]["capture"]["audio"]["enabled"] == True): # Check to see if audio recording is enabled in the configuration.
         process_timing("start", "Dashcam/Audio Processing")
-        if (segment_base_names[-1] in audio_recorders and audio_recorders[segment_base_names[-1]].poll() is None): # Check to see if there is an active audio recorder.
-            audio_recorders[segment_base_names[-1]].terminate() # Kill the previous segment's audio recorder.
+        if (segment_base_name in audio_recorders and audio_recorders[segment_base_name].poll() is None): # Check to see if there is an active audio recorder.
+            audio_recorders[segment_base_name].terminate() # Kill the previous segment's audio recorder.
         time.sleep(config["dashcam"]["capture"]["audio"]["start_delay"]) # Wait briefly for the audio recorder to terminate.
         subprocess.Popen(("sudo -u " + str(config["dashcam"]["capture"]["audio"]["record_as_user"]) + " killall arecord").split(" "), stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # Force kill all audio recording processes.
         process_timing("end", "Dashcam/Audio Processing")
@@ -997,11 +993,11 @@ def delete_old_segments():
                 sidecar_file = os.path.splitext(video_file)[0] + ".json" # This file will only exists if it has been generated by the user with pre-recorded mode.
                 audio_file = os.path.splitext(video_file)[0] + "." + config["dashcam"]["capture"]["audio"]["extension"]
                 if (os.path.exists(video_file)): # Check to see if this video file still exists (it hasn't been deleted by another thread).
-                    os.system("timeout 5 rm \"" + video_file + "\"") # Delete the dashcam segment.
+                    subprocess.run(["rm", video_file], timeout=5, check=True)
                 if (os.path.exists(sidecar_file)): # Check to see if there is a side-car file associated with this video.
-                    os.system("timeout 5 rm \"" + sidecar_file + "\"") # Delete the dashcam segment side-car file.
+                    subprocess.run(["rm", sidecar_file], timeout=5, check=True)
                 if (os.path.exists(audio_file)): # Check to see if there is an audio file associated with this video. This is generally unnecessary, since audio files should be included in the query to get all dashcam files.
-                    os.system("timeout 5 rm \"" + audio_file + "\"") # Delete the dashcam segment audio file.
+                    subprocess.run(["rm", audio_file], timeout=5, check=True)
     elif (config["dashcam"]["saving"]["looped_recording"]["mode"] == "automatic"): # Check to see if looped recording is in automatic mode.
         free_disk_percentage = psutil.disk_usage(path=config["general"]["working_directory"]).free / psutil.disk_usage(path=config["general"]["working_directory"]).total # Calculate the initial free disk percentage.
         videos_deleted_this_round = 0 # This is a placeholder that will be incremented for each video deleted in the following step.
@@ -1015,9 +1011,9 @@ def delete_old_segments():
             video_file = dashcam_files[videos_deleted_this_round]
             sidecar_file = os.path.splitext(video_file)[0] + ".json" # This file will only exists if it has been generated by the user with pre-recorded mode.
             if (os.path.exists(video_file)): # Check to see if this video file still exists (it hasn't been deleted by another thread).
-                os.system("timeout 5 rm \"" + config["general"]["working_directory"] + "/" + video_file + "\"") # Delete the oldest remaining segment.
-            if (os.path.exists(sidecar_file)): # Check to see if this video file still exists (it hasn't been deleted by another thread).
-                os.system("timeout 5 rm \"" + config["general"]["working_directory"] + "/" + sidecar_file + "\"") # Delete the side-car file associated with this segment.
+                subprocess.run(["rm", os.path.join(config["general"]["working_directory"], video_file)], timeout=5, check=True) # Delete the oldest remaining segment.
+            if (os.path.exists(sidecar_file)): # Check to see if this sidecar file still exists (it hasn't been deleted by another thread).
+                subprocess.run(["rm", os.path.join(config["general"]["working_directory"], sidecar_file)], timeout=5, check=True) # Delete the side-car file associated with this segment.
             free_disk_percentage = psutil.disk_usage(path=config["general"]["working_directory"]).free / psutil.disk_usage(path=config["general"]["working_directory"]).total # Recalculate the free disk percentage.
             videos_deleted_this_round += 1 # Increment the number of videos deleted this round.
     elif (config["dashcam"]["saving"]["looped_recording"]["mode"] == "disabled"): # Check to see if looped recording is disabled.
@@ -1361,7 +1357,9 @@ def background_telemetry():
 def dashcam():
     global parked
 
-    # =================================================================================
+    # ==========================================
+    # Dash-cam specific configuration validation
+
     # Check to see if there is at least one capture device enabled (as a sanity check):
     at_least_one_enabled_device = False
     for device in config["dashcam"]["capture"]["video"]["devices"]: # Iterate through each device in the configuration.
@@ -1379,7 +1377,7 @@ def dashcam():
 
 
     update_status_lighting("normal") # Initialize the status lighting to normal.
-    os.system("rm -f \"" + os.path.join(config["general"]["interface_directory"], config["dashcam"]["saving"]["trigger"]) + "\"") # Remove the dashcam lock trigger file, in case it exists at start-up.
+    subprocess.run(["rm", "-f", os.path.join(config["general"]["interface_directory"], config["dashcam"]["saving"]["trigger"])], timeout=5, check=True) # Delete the side-car file associated with this segment.
 
     # =================================
     # Initialize the physical controls:

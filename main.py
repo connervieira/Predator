@@ -287,6 +287,7 @@ elif (config["general"]["modes"]["auto_start"] == "3" and config["general"]["mod
     mode_selection = "3"
 else: # No 'auto start mode' has been configured, so ask the user to select manually.
     mode_selection = prompt("Selection: ")
+print("")
 
 
 
@@ -1485,7 +1486,7 @@ elif (mode_selection == "2" and config["general"]["modes"]["enabled"]["realtime"
 
 # Dash-cam mode
 elif (mode_selection == "3" and config["general"]["modes"]["enabled"]["dashcam"] == True): # The user has set Predator to boot into dash-cam mode.
-    print("\nStarting dashcam recording")
+    utils.display_message("Starting dashcam recording", 1)
     debug_message("Started dash-cam mode")
     try:
         print("Press Ctrl+C to exit")
