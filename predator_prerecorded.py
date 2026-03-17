@@ -4,20 +4,24 @@ import sys
 import json
 import utils
 import fnmatch # Required to use wildcards to check strings.
+import datetime # Required for converting between timestamps and human readable date/time information.
 
 import global_variables # `global_variables.py`
 import utils # `utils.py`
 import alpr # `alpr.py`
+import ignore # `ignore.py`
 import config # `config.py`
 load_config = config.load_config
 validate_config = config.validate_config
 config = load_config()
 
-import ignore # `ignore.py`
-ignore_list = ignore.fetch_ignore_list() # Fetch the ignore lists.
 
 def prerecorded_mode():
     global config
+    utils.debug_message("Started pre-recorded mode")
+
+    ignore_list = ignore.fetch_ignore_list() # Fetch the ignore lists.
+
     try:
         utils.debug_message("Started pre-recorded mode")
         utils.debug_message("Taking user preferences")
@@ -262,7 +266,7 @@ def prerecorded_mode():
             if (gpx_file != ""): # Check to make sure the user actually supplied a GPX file.
                 utils.debug_message("Correlated location data")
                 print("Processing location data...")
-                decoded_gpx_data = process_gpx(config["general"]["working_directory"] + "/" + gpx_file) # Decode the data from the GPX file.
+                decoded_gpx_data = utils.process_gpx(config["general"]["working_directory"] + "/" + gpx_file) # Decode the data from the GPX file.
                 iteration = 0 # Set the iteration counter to 0 so we can add one to it each frame we iterate through.
                 for element in alpr_frames: # Iterate through each frame.
                     iteration+=1 # Add one to the iteration counter.
@@ -271,7 +275,7 @@ def prerecorded_mode():
                     if (frame_timestamp in decoded_gpx_data): # Check to see if the exact timestamp for this frame exists in the GPX data.
                         frame_locations[frame_timestamp] = [decoded_gpx_data[frame_timestamp], alpr_frames[element]]
                     else: # If the exact timestamp doesn't exist, try to find a nearby timestamp.
-                        closest_gpx_entry = closest_key(decoded_gpx_data, frame_timestamp)
+                        closest_gpx_entry = utils.closest_key(decoded_gpx_data, frame_timestamp)
 
                         if (closest_gpx_entry[1] < config["prerecorded"]["max_gpx_time_difference"]): # Check to see if the closest GPX entry is inside the maximum configured range.
                             frame_locations[frame_timestamp] = [decoded_gpx_data[closest_gpx_entry[0]], alpr_frames[element]]

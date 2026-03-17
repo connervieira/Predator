@@ -19,7 +19,7 @@
 
 
 
-import global_variables # `global_variables.py`
+emport global_variables # `global_variables.py`
 
 import os # Required to interact with certain operating system functions
 import json # Required to process JSON data
@@ -163,13 +163,11 @@ except Exception as e:
     print("Failed to determine if network features are enabled in the configuration: " + str(e))
 if (len(config["general"]["alerts"]["databases"]) > 0):
     import hashlib
-import re # Required to use Regex
 import datetime # Required for converting between timestamps and human readable date/time information
 from xml.dom import minidom # Required for processing GPX data
 if (config["general"]["gps"]["enabled"] == True and len(config["general"]["gps"]["demo_file"]) == 0): # Only import the GPS libraries if GPS settings are enabled.
     from gps import * # Required to access GPS information.
     import gpsd
-import signal # Required to time out functions.
 if ("developer" not in config or "frame_count_method" not in config["developer"]):
     config["developer"]["frame_count_method"] = "manual"
 if (config["developer"]["frame_count_method"] in ["manual" or "opencv"]):
@@ -213,13 +211,6 @@ def is_json(string):
 
 
 
-# Define a function for running a countdown timer.
-def countdown(timer):
-    for iteration in range(1, timer + 1): # Loop however many times specified by the `timer` variable.
-        print(str(timer - iteration + 1)) # Display the current countdown number for this iteration, but subtracting the current iteration count from the total timer length.
-        time.sleep(1) # Wait for 1 second.
-
-
 
 # Define the function that will be used to save files for exported data.
 def save_to_file(file_name, contents):
@@ -238,28 +229,6 @@ def save_to_file(file_name, contents):
         except:
             success = False
     return success
-
-
-
-# Define the function that will be used to add to the end of a file.
-def add_to_file(file_name, contents):
-    fh = None
-    success = False
-    try:
-        fh = open(file_name, 'a')
-        fh.write(contents)
-        success = True
-    except IOError as e:
-        success = False
-    finally:
-        try:
-            if fh:
-                fh.close()
-        except:
-            success = False
-    return success
-
-
 
 
 

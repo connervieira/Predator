@@ -33,11 +33,6 @@ import utils
 display_message = utils.display_message
 debug_message = utils.debug_message
 process_timing = utils.process_timing
-get_gps_location = utils.get_gps_location
-heartbeat = utils.heartbeat
-update_state = utils.update_state
-convert_speed = utils.convert_speed
-save_to_file = utils.save_to_file
 
 # Determine if the object recognition library needs to be imported.
 if ("object_recognition" not in config["dashcam"]): # Check to see if the object recognition field is missing. This will be the case if this instance of Predator has been updated from a version that previously didn't support this feature.
@@ -412,7 +407,7 @@ def background_alpr(device):
 
                     if (config["realtime"]["gps"]["alpr_location_tagging"] == True): # Check to see if the configuration value for geotagging license plate detections has been enabled.
                         if (config["general"]["gps"]["enabled"] == True): # Check to see if GPS functionality is enabled.
-                            current_location = get_gps_location() # Get the current location.
+                            current_location = utils.get_gps_location() # Get the current location.
                         else:
                             current_location = [0.0, 0.0] # Grab a placeholder for the current location, since GPS functionality is disabled.
 
@@ -432,7 +427,7 @@ def background_alpr(device):
                             if (config["realtime"]["saving"]["license_plates"]["save_guesses"] == True): # Only add this guess to the log if Predator is configured to do so.
                                 plate_log[current_time]["plates"][top_plate]["guesses"][guess] = plate[guess] # Add this guess to the log, with its confidence level.
 
-                    save_to_file(config["general"]["working_directory"] + "/" + config["realtime"]["saving"]["license_plates"]["file"], json.dumps(plate_log)) # Save the modified plate log to the disk as JSON data.
+                    utils.save_to_file(config["general"]["working_directory"] + "/" + config["realtime"]["saving"]["license_plates"]["file"], json.dumps(plate_log)) # Save the modified plate log to the disk as JSON data.
             process_timing("end", "Dashcam/ALPR Logging")
 
 
@@ -440,7 +435,7 @@ def background_alpr(device):
             if (config["general"]["interface_directory"] != ""): # Check to see if the interface directory is enabled.
                 process_timing("start", "Dashcam/ALPR Interface")
                 debug_message("Issuing interface updates")
-                heartbeat() # Issue a status heartbeat.
+                utils.heartbeat() # Issue a status heartbeat.
 
                 # Reformat the plates to the format expected by the interface directory.
                 plates_to_save_to_interface = {}
@@ -486,7 +481,7 @@ if (config["realtime"]["saving"]["object_recognition"]["enabled"] == True):
     debug_message("Loading object_recognition history")
     object_recognition_file_location = config["general"]["working_directory"] + "/" + config["realtime"]["saving"]["object_recognition"]["file"]
     if (os.path.exists(object_recognition_file_location) == False): # If the log file doesn't exist, create it.
-        save_to_file(object_recognition_file_location, "{}") # Save a blank placeholder dictionary to the log file.
+        utils.save_to_file(object_recognition_file_location, "{}") # Save a blank placeholder dictionary to the log file.
     object_recognition_file = open(object_recognition_file_location, "r") # Open the log file for reading.
     object_recognition_file_contents = object_recognition_file.read() # Read the raw contents of the file as a string.
     object_recognition_file.close() # Close the log file.
@@ -687,7 +682,7 @@ def apply_dashcam_stamps(frame, device=""):
             if (config["dashcam"]["stamps"]["gps"]["altitude"]["enabled"] == True): # Check to see if the GPS altitude stamp is enabled.
                 gps_stamp = gps_stamp + str(round(current_location[3])) + "m  " # Add the current altitude to the GPS stamp.
             if (config["dashcam"]["stamps"]["gps"]["speed"]["enabled"] == True): # Check to see if the GPS speed stamp is enabled.
-                gps_stamp = gps_stamp + str(round(convert_speed(current_location[2],config["dashcam"]["stamps"]["gps"]["speed"]["unit"])*10)/10) + config["dashcam"]["stamps"]["gps"]["speed"]["unit"] + "  " # Add the current speed to the GPS stamp.
+                gps_stamp = gps_stamp + str(round(utils.convert_speed(current_location[2],config["dashcam"]["stamps"]["gps"]["speed"]["unit"])*10)/10) + config["dashcam"]["stamps"]["gps"]["speed"]["unit"] + "  " # Add the current speed to the GPS stamp.
 
     # Determine the font color of the stamps from the configuration.
     main_stamp_color = config["dashcam"]["stamps"]["main"]["color"]
@@ -743,7 +738,7 @@ def detect_motion(frame, background_subtractor):
 
 def dashcam_parked_dormant(device):
     global parked
-    update_state("dashcam/parked_dormant", instant_framerate)
+    utils.update_state("dashcam/parked_dormant", instant_framerate)
 
     device_index = config["dashcam"]["capture"]["video"]["devices"][device]["index"]
 
@@ -883,8 +878,8 @@ def dashcam_parked_event(capture, device, frame_buffer):
 
 
     while global_variables.PREDATOR_RUNNING and parked == True and utils.get_time() - last_event_detected < config["dashcam"]["parked"]["event"]["timeout"]: # Run until the criteria for event recording are no longer met.
-        heartbeat() # Issue a status heartbeat.
-        update_state("dashcam/parked_active", instant_framerate)
+        utils.heartbeat() # Issue a status heartbeat.
+        utils.update_state("dashcam/parked_active", instant_framerate)
 
         if (capture is None or capture.isOpened() == False): # Check to see if the capture failed to open.
             display_message("The video capture on device '" + str(device) + "' was dropped during parked recording", 3)
@@ -1115,7 +1110,7 @@ def dashcam_normal(device):
 
 
     while global_variables.PREDATOR_RUNNING and parked == False: # Only run while the dashcam recording flag is set to 'True' and Predator is not parked. When this flag changes to 'False' this recording process should exit.
-        heartbeat() # Issue a status heartbeat.
+        utils.heartbeat() # Issue a status heartbeat.
 
         # =======================================
         # ===== Start of segment management =====
@@ -1292,7 +1287,7 @@ def dashcam_normal(device):
 
         # ===================
         # Handle diagnostics:
-        update_state("dashcam/normal", instant_framerate)
+        utils.update_state("dashcam/normal", instant_framerate)
         if (config["developer"]["print_timings"] == True):
             utils.clear(True)
             print(json.dumps(process_timing("dump", ""), indent=4))
@@ -1354,129 +1349,148 @@ def background_telemetry():
 
 
 # This function is responsible for starting the dashcam recording process. It calls the relevant recording functions as subprocesses.
-def dashcam():
+def dashcam_mode():
     global parked
+    utils.debug_message("Started dash-cam mode")
 
-    # ==========================================
-    # Dash-cam specific configuration validation
+    try:
+        print("Press Ctrl+C to exit")
+        # ==========================================
+        # Dash-cam specific configuration validation
 
-    # Check to see if there is at least one capture device enabled (as a sanity check):
-    at_least_one_enabled_device = False
-    for device in config["dashcam"]["capture"]["video"]["devices"]: # Iterate through each device in the configuration.
-        if (config["dashcam"]["capture"]["video"]["devices"][device]["enabled"] == True): # Check to see if this device is enabled.
-            at_least_one_enabled_device = True
-    if (at_least_one_enabled_device == False):
-        display_message("There are no dashcam capture devices enabled. Dashcam recording will not start.", 3)
-    del at_least_one_enabled_device
+        # Check to see if there is at least one capture device enabled (as a sanity check):
+        at_least_one_enabled_device = False
+        for device in config["dashcam"]["capture"]["video"]["devices"]: # Iterate through each device in the configuration.
+            if (config["dashcam"]["capture"]["video"]["devices"][device]["enabled"] == True): # Check to see if this device is enabled.
+                at_least_one_enabled_device = True
+        if (at_least_one_enabled_device == False):
+            display_message("There are no dashcam capture devices enabled. Dashcam recording will not start.", 3)
+        del at_least_one_enabled_device
 
-    # Ensure the segment length is a positive number to prevent an endless loop of empty segments:
-    if (config["dashcam"]["saving"]["segment_length"] <= 0):
-        display_message("Invalid dashcam segment length '" + str(config["dashcam"]["saving"]["segment_length"]) + "'. Defaulting to 60 seconds.", 2)
-        config["dashcam"]["saving"]["segment_length"] = 60
-
-
-
-    update_status_lighting("normal") # Initialize the status lighting to normal.
-    subprocess.run(["rm", "-f", os.path.join(config["general"]["interface_directory"], config["dashcam"]["saving"]["trigger"])], timeout=5, check=True) # Delete the side-car file associated with this segment.
-
-    # =================================
-    # Initialize the physical controls:
-    button_watch_threads = {} # This will hold the processes watching each GPIO that will trigger a dashcam save.
-
-    for pin in config["dashcam"]["physical_controls"]["actions"]["dashcam_saving"]: # Iterate through each dashcam save GPIO trigger.
-        hold_time = float(config["dashcam"]["physical_controls"]["actions"]["dashcam_saving"][pin]["hold_time"])
-        if (hold_time < 0):
-            utils.display_message("The 'hold time' for pin '" + str(pin) + "' is negative. This will likely cause unexpected behavior.", 2)
-        button_watch_threads[int(pin)] = threading.Thread(target=watch_button, args=[int(pin), hold_time, create_trigger_file], name="ButtonWatch" + str(pin)) # Create a thread to monitor this pin.
-        button_watch_threads[int(pin)].start() # Start the thread to monitor the pin.
-
-    for pin in config["dashcam"]["physical_controls"]["actions"]["stop_predator"]: # Iterate through each Predator termination GPIO trigger.
-        hold_time = float(config["dashcam"]["physical_controls"]["actions"]["stop_predator"][pin]["hold_time"])
-        if (hold_time < 0):
-            utils.display_message("The 'hold time' for pin '" + str(pin) + "' is negative. This will likely cause unexpected behavior.", 2)
-        button_watch_threads[int(pin)] = threading.Thread(target=watch_button, args=[int(pin), hold_time, utils.stop_predator], name="ButtonWatch" + str(pin)) # Create a thread to monitor this pin.
-        button_watch_threads[int(pin)].start() # Start the thread to monitor the pin.
-    # =================================
+        # Ensure the segment length is a positive number to prevent an endless loop of empty segments:
+        if (config["dashcam"]["saving"]["segment_length"] <= 0):
+            display_message("Invalid dashcam segment length '" + str(config["dashcam"]["saving"]["segment_length"]) + "'. Defaulting to 60 seconds.", 2)
+            config["dashcam"]["saving"]["segment_length"] = 60
 
 
 
-    dashcam_normal_processes = [] # Create a placeholder to store the normal dashcam recording processes.
-    dashcam_parked_processes = [] # Create a placeholder to store the parked dashcam recording processes.
-    dashcam_alpr_process = {} # Create a placeholder to store the dashcam ALPR processes.
-    dashcam_objectrecognition_process = {} # Create a placeholder to store the dashcam object recognition processes for standard recording.
+        update_status_lighting("normal") # Initialize the status lighting to normal.
+        subprocess.run(["rm", "-f", os.path.join(config["general"]["interface_directory"], config["dashcam"]["saving"]["trigger"])], timeout=5, check=True) # Delete the side-car file associated with this segment.
 
-    utils.play_sound("recording_started")
-    if (config["dashcam"]["notifications"]["reticulum"]["enabled"] == True and config["dashcam"]["notifications"]["reticulum"]["events"]["start_up"]["enabled"] == True): # Check to see if Predator is configured to send start-up notifications over Reticulum.
-        for destination in config["dashcam"]["notifications"]["reticulum"]["destinations"]: # Iterate over each configured destination.
-            reticulum.lxmf_send_message(str(config["dashcam"]["notifications"]["reticulum"]["instance_name"]) + " has been started", destination) # Send a Reticulum LXMF message to this destination.
-    
-    iteration_counter = 0 # Set the iteration counter to 0 so that we can increment it for each recording device specified.
-    for device in config["dashcam"]["capture"]["video"]["devices"]: # Iterate through each device in the configuration.
-        if (config["dashcam"]["capture"]["video"]["devices"][device]["enabled"] == True):
-            dashcam_normal_processes.append(threading.Thread(target=dashcam_normal, args=[device], name="DashcamCapture" + str(config["dashcam"]["capture"]["video"]["devices"][device]["index"])))
-            dashcam_normal_processes[iteration_counter].start()
-            if (config["dashcam"]["alpr"]["enabled"] == True): # Check to see if background ALPR processing is enabled.
-                if (device in config["dashcam"]["alpr"]["devices"]): # Check to see if this device is in the list of devices to run ALPR on.
-                    dashcam_alpr_process[iteration_counter] = threading.Thread(target=background_alpr, args=[device], name="DashcamALPR" + str(config["dashcam"]["capture"]["video"]["devices"][device]["index"]))
-                    dashcam_alpr_process[iteration_counter].start()
+        # =================================
+        # Initialize the physical controls:
+        button_watch_threads = {} # This will hold the processes watching each GPIO that will trigger a dashcam save.
 
-            iteration_counter += 1 # Iterate the counter. This value will be used to create unique file names for each recorded video.
-            print("Started dashcam recording on " + str(config["dashcam"]["capture"]["video"]["devices"][device]["index"])) # Inform the user that recording was initiation for this camera device.
+        for pin in config["dashcam"]["physical_controls"]["actions"]["dashcam_saving"]: # Iterate through each dashcam save GPIO trigger.
+            hold_time = float(config["dashcam"]["physical_controls"]["actions"]["dashcam_saving"][pin]["hold_time"])
+            if (hold_time < 0):
+                utils.display_message("The 'hold time' for pin '" + str(pin) + "' is negative. This will likely cause unexpected behavior.", 2)
+            button_watch_threads[int(pin)] = threading.Thread(target=watch_button, args=[int(pin), hold_time, create_trigger_file], name="ButtonWatch" + str(pin)) # Create a thread to monitor this pin.
+            button_watch_threads[int(pin)].start() # Start the thread to monitor the pin.
 
-    iteration_counter = 0 # Set the iteration counter to 0 so that we can increment it for each recording device specified.
-    for device in config["dashcam"]["object_recognition"]: # Iterate over each device configured to run object recognition during recording.
-        if (config["dashcam"]["object_recognition"][device]["enabled"] == True): # Check to make sure object recognition is enabled for this device.
-            dashcam_objectrecognition_process[iteration_counter] = threading.Thread(target=background_object_recognition, args=[device], name="DashcamObjectRecognition" + str(config["dashcam"]["capture"]["video"]["devices"][device]["index"]))
-            dashcam_objectrecognition_process[iteration_counter].start()
-            iteration_counter += 1 # Iterate the counter. This value will be used to create unique file names for each recorded video.
+        for pin in config["dashcam"]["physical_controls"]["actions"]["stop_predator"]: # Iterate through each Predator termination GPIO trigger.
+            hold_time = float(config["dashcam"]["physical_controls"]["actions"]["stop_predator"][pin]["hold_time"])
+            if (hold_time < 0):
+                utils.display_message("The 'hold time' for pin '" + str(pin) + "' is negative. This will likely cause unexpected behavior.", 2)
+            button_watch_threads[int(pin)] = threading.Thread(target=watch_button, args=[int(pin), hold_time, utils.stop_predator], name="ButtonWatch" + str(pin)) # Create a thread to monitor this pin.
+            button_watch_threads[int(pin)].start() # Start the thread to monitor the pin.
+        # =================================
 
 
-    # Start the dash-cam telemetry thread.
-    if (config["dashcam"]["telemetry"]["enabled"] == True):
-        background_telemetry_thread = threading.Thread(target=background_telemetry, name="BackgroundTelemetry")
-        background_telemetry_thread.start()
+
+        dashcam_normal_processes = [] # Create a placeholder to store the normal dashcam recording processes.
+        dashcam_parked_processes = [] # Create a placeholder to store the parked dashcam recording processes.
+        dashcam_alpr_process = {} # Create a placeholder to store the dashcam ALPR processes.
+        dashcam_objectrecognition_process = {} # Create a placeholder to store the dashcam object recognition processes for standard recording.
+
+        utils.play_sound("recording_started")
+        if (config["dashcam"]["notifications"]["reticulum"]["enabled"] == True and config["dashcam"]["notifications"]["reticulum"]["events"]["start_up"]["enabled"] == True): # Check to see if Predator is configured to send start-up notifications over Reticulum.
+            for destination in config["dashcam"]["notifications"]["reticulum"]["destinations"]: # Iterate over each configured destination.
+                reticulum.lxmf_send_message(str(config["dashcam"]["notifications"]["reticulum"]["instance_name"]) + " has been started", destination) # Send a Reticulum LXMF message to this destination.
+        
+        iteration_counter = 0 # Set the iteration counter to 0 so that we can increment it for each recording device specified.
+        for device in config["dashcam"]["capture"]["video"]["devices"]: # Iterate through each device in the configuration.
+            if (config["dashcam"]["capture"]["video"]["devices"][device]["enabled"] == True):
+                dashcam_normal_processes.append(threading.Thread(target=dashcam_normal, args=[device], name="DashcamCapture" + str(config["dashcam"]["capture"]["video"]["devices"][device]["index"])))
+                dashcam_normal_processes[iteration_counter].start()
+                if (config["dashcam"]["alpr"]["enabled"] == True): # Check to see if background ALPR processing is enabled.
+                    if (device in config["dashcam"]["alpr"]["devices"]): # Check to see if this device is in the list of devices to run ALPR on.
+                        dashcam_alpr_process[iteration_counter] = threading.Thread(target=background_alpr, args=[device], name="DashcamALPR" + str(config["dashcam"]["capture"]["video"]["devices"][device]["index"]))
+                        dashcam_alpr_process[iteration_counter].start()
+
+                iteration_counter += 1 # Iterate the counter. This value will be used to create unique file names for each recorded video.
+                print("Started dashcam recording on " + str(config["dashcam"]["capture"]["video"]["devices"][device]["index"])) # Inform the user that recording was initiation for this camera device.
+
+        iteration_counter = 0 # Set the iteration counter to 0 so that we can increment it for each recording device specified.
+        for device in config["dashcam"]["object_recognition"]: # Iterate over each device configured to run object recognition during recording.
+            if (config["dashcam"]["object_recognition"][device]["enabled"] == True): # Check to make sure object recognition is enabled for this device.
+                dashcam_objectrecognition_process[iteration_counter] = threading.Thread(target=background_object_recognition, args=[device], name="DashcamObjectRecognition" + str(config["dashcam"]["capture"]["video"]["devices"][device]["index"]))
+                dashcam_objectrecognition_process[iteration_counter].start()
+                iteration_counter += 1 # Iterate the counter. This value will be used to create unique file names for each recorded video.
 
 
-    last_moved_time = utils.get_time() # This value holds the Unix timestamp of the last time the vehicle exceeded the parking speed threshold. Here it is initialized to the current time.
-    while global_variables.PREDATOR_RUNNING: # Run until Predator is terminated.
-        if (config["dashcam"]["parked"]["enabled"] == True): # Check to see if parking mode is enabled before checking for movement.
-            if (config["general"]["gps"]["enabled"] == True): # Check to see if GPS is enabled.
-                current_location = get_gps_location() # Get the current GPS location.
-            else:
-                current_location = [0, 0, 0, 0, 0, 0]
-            if (current_location[2] > config["dashcam"]["parked"]["conditions"]["speed"]): # Check to see if the current speed exceeds the parked speed threshold.
-                last_moved_time = utils.get_time()
+        # Start the dash-cam telemetry thread.
+        if (config["dashcam"]["telemetry"]["enabled"] == True):
+            background_telemetry_thread = threading.Thread(target=background_telemetry, name="BackgroundTelemetry")
+            background_telemetry_thread.start()
 
-            if (utils.get_time() - last_moved_time > config["dashcam"]["parked"]["conditions"]["time"]): # Check to see if the amount of time the vehicle has been stopped exceeds the time threshold to enable parked mode.
-                if (parked == False): # Check to see if Predator wasn't already in parked mode.
-                    parked = True # Enter parked mode.
-                    display_message("Entered parked mode.", 1)
-                    if (config["dashcam"]["notifications"]["reticulum"]["enabled"] == True and config["dashcam"]["notifications"]["reticulum"]["events"]["parking_mode_enabled"]["enabled"] == True): # Check to see if Predator is configured to parking mode activation notifications over Reticulum.
-                        for destination in config["dashcam"]["notifications"]["reticulum"]["destinations"]: # Iterate over each configured destination.
-                            reticulum.lxmf_send_message(str(config["dashcam"]["notifications"]["reticulum"]["instance_name"]) + " has entered parked mode.", destination) # Send a Reticulum LXMF message to this destination.
-                    time.sleep(2) # Wait briefly to allow the other threads to finish.
-                    # Start parked dormant dash-cam monitoring:
-                    iteration_counter = 0 # Set the iteration counter to 0 so that we can increment it for each recording device specified.
-                    for device in config["dashcam"]["capture"]["video"]["devices"]: # Run through each camera device specified in the configuration, and launch an OpenCV recording instance for it.
-                        if (config["dashcam"]["capture"]["video"]["devices"][device]["enabled"] == True):
-                            dashcam_parked_processes.append(threading.Thread(target=dashcam_parked_dormant, args=[device], name="ParkedDormant" + str(config["dashcam"]["capture"]["video"]["devices"][device]["index"])))
-                            dashcam_parked_processes[iteration_counter].start()
-                            iteration_counter += 1 # Iterate the counter. This value will be used to create unique file names for each recorded video.
 
-            else: # The vehicle has not been stopped for the minimum time to activate parking mode.
-                if (parked == True): # Check to see if Predator wasn't already out of parked mode.
-                    parked = False # Exit parked mode.
-                    display_message("Exited parked mode.", 1)
-                    if (config["dashcam"]["notifications"]["reticulum"]["enabled"] == True and config["dashcam"]["notifications"]["reticulum"]["events"]["parking_mode_disabled"]["enabled"] == True): # Check to see if Predator is configured to parking mode deactivation notifications over Reticulum.
-                        for destination in config["dashcam"]["notifications"]["reticulum"]["destinations"]: # Iterate over each configured destination.
-                            reticulum.lxmf_send_message(str(config["dashcam"]["notifications"]["reticulum"]["instance_name"]) + " has exited parked mode.", destination) # Send a Reticulum LXMF message to this destination.
-                    time.sleep(2) # Wait briefly to allow the other threads to finish.
-                    # Restart normal dash-cam recording:
-                    iteration_counter = 0 # Set the iteration counter to 0 so that we can increment it for each recording device specified.
-                    for device in config["dashcam"]["capture"]["video"]["devices"]: # Run through each camera device specified in the configuration, and launch an OpenCV recording instance for it.
-                        if (config["dashcam"]["capture"]["video"]["devices"][device]["enabled"] == True):
-                            dashcam_normal_processes.append(threading.Thread(target=dashcam_normal, args=[device], name="DashcamCapture" + str(config["dashcam"]["capture"]["video"]["devices"][device]["index"])))
-                            dashcam_normal_processes[iteration_counter].start()
-                            iteration_counter += 1 # Iterate the counter. This value will be used to create unique file names for each recorded video.
-        time.sleep(1)
-    display_message("Dashcam recording exited.", 1)
+        last_moved_time = utils.get_time() # This value holds the Unix timestamp of the last time the vehicle exceeded the parking speed threshold. Here it is initialized to the current time.
+        while global_variables.PREDATOR_RUNNING: # Run until Predator is terminated.
+            if (config["dashcam"]["parked"]["enabled"] == True): # Check to see if parking mode is enabled before checking for movement.
+                if (config["general"]["gps"]["enabled"] == True): # Check to see if GPS is enabled.
+                    current_location = utils.get_gps_location() # Get the current GPS location.
+                else:
+                    current_location = [0, 0, 0, 0, 0, 0]
+                if (current_location[2] > config["dashcam"]["parked"]["conditions"]["speed"]): # Check to see if the current speed exceeds the parked speed threshold.
+                    last_moved_time = utils.get_time()
+
+                if (utils.get_time() - last_moved_time > config["dashcam"]["parked"]["conditions"]["time"]): # Check to see if the amount of time the vehicle has been stopped exceeds the time threshold to enable parked mode.
+                    if (parked == False): # Check to see if Predator wasn't already in parked mode.
+                        parked = True # Enter parked mode.
+                        display_message("Entered parked mode.", 1)
+                        if (config["dashcam"]["notifications"]["reticulum"]["enabled"] == True and config["dashcam"]["notifications"]["reticulum"]["events"]["parking_mode_enabled"]["enabled"] == True): # Check to see if Predator is configured to parking mode activation notifications over Reticulum.
+                            for destination in config["dashcam"]["notifications"]["reticulum"]["destinations"]: # Iterate over each configured destination.
+                                reticulum.lxmf_send_message(str(config["dashcam"]["notifications"]["reticulum"]["instance_name"]) + " has entered parked mode.", destination) # Send a Reticulum LXMF message to this destination.
+                        time.sleep(2) # Wait briefly to allow the other threads to finish.
+                        # Start parked dormant dash-cam monitoring:
+                        iteration_counter = 0 # Set the iteration counter to 0 so that we can increment it for each recording device specified.
+                        for device in config["dashcam"]["capture"]["video"]["devices"]: # Run through each camera device specified in the configuration, and launch an OpenCV recording instance for it.
+                            if (config["dashcam"]["capture"]["video"]["devices"][device]["enabled"] == True):
+                                dashcam_parked_processes.append(threading.Thread(target=dashcam_parked_dormant, args=[device], name="ParkedDormant" + str(config["dashcam"]["capture"]["video"]["devices"][device]["index"])))
+                                dashcam_parked_processes[iteration_counter].start()
+                                iteration_counter += 1 # Iterate the counter. This value will be used to create unique file names for each recorded video.
+
+                else: # The vehicle has not been stopped for the minimum time to activate parking mode.
+                    if (parked == True): # Check to see if Predator wasn't already out of parked mode.
+                        parked = False # Exit parked mode.
+                        display_message("Exited parked mode.", 1)
+                        if (config["dashcam"]["notifications"]["reticulum"]["enabled"] == True and config["dashcam"]["notifications"]["reticulum"]["events"]["parking_mode_disabled"]["enabled"] == True): # Check to see if Predator is configured to parking mode deactivation notifications over Reticulum.
+                            for destination in config["dashcam"]["notifications"]["reticulum"]["destinations"]: # Iterate over each configured destination.
+                                reticulum.lxmf_send_message(str(config["dashcam"]["notifications"]["reticulum"]["instance_name"]) + " has exited parked mode.", destination) # Send a Reticulum LXMF message to this destination.
+                        time.sleep(2) # Wait briefly to allow the other threads to finish.
+                        # Restart normal dash-cam recording:
+                        iteration_counter = 0 # Set the iteration counter to 0 so that we can increment it for each recording device specified.
+                        for device in config["dashcam"]["capture"]["video"]["devices"]: # Run through each camera device specified in the configuration, and launch an OpenCV recording instance for it.
+                            if (config["dashcam"]["capture"]["video"]["devices"][device]["enabled"] == True):
+                                dashcam_normal_processes.append(threading.Thread(target=dashcam_normal, args=[device], name="DashcamCapture" + str(config["dashcam"]["capture"]["video"]["devices"][device]["index"])))
+                                dashcam_normal_processes[iteration_counter].start()
+                                iteration_counter += 1 # Iterate the counter. This value will be used to create unique file names for each recorded video.
+            time.sleep(1)
+        display_message("Dashcam recording exited.", 1)
+    except KeyboardInterrupt:
+        pass
+    except Exception as e:
+        e_type, e_object, e_traceback = sys.exc_info()
+        e_filename = os.path.split(e_traceback.tb_frame.f_code.co_filename)[1]
+        e_message = str(e)
+        e_line_number = e_traceback.tb_lineno
+        print(f'Exception type: {e_type}')
+        print(f'Exception filename: {e_filename}')
+        print(f'Exception line number: {e_line_number}')
+        print(f'Exception message: {e_message}')
+        utils.display_message("A fatal exception occurred", 3)
+    finally:
+        utils.display_message("Dashcam recording halted.", 1)
+        utils.play_sound("recording_stopped")
+

@@ -20,9 +20,9 @@ if (config["management"]["disk_statistics"] == True): # Only import the disk sta
 # This function is the entry point for management mode, and is called directly when management mode starts.
 def management_mode():
     global config
-    try:
-        utils.debug_message("Started management mode")
+    utils.debug_message("Started management mode")
 
+    try:
         working_directory_input = utils.prompt("Working directory (Default " + config["general"]["working_directory"] + "): ", optional=True, input_type=str, default=config["general"]["working_directory"])
         while (os.path.exists(working_directory_input) == False): # Run forever until the user enters a working directory that exists.
             utils.display_message("The specified working directory doesn't seem to exist.", 2)
