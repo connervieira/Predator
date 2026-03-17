@@ -93,7 +93,7 @@ def get_time():
 
 # Define the function to print debugging information when the configuration specifies to do so.
 debugging_time_record = {}
-def debug_message(message, thread="MainThread"):
+def debug_message(message):
     if (config["general"]["display"]["debugging_output"] == True): # Only print the message if the debugging output configuration value is set to true.
         global debugging_time_record
         thread = threading.current_thread().name
