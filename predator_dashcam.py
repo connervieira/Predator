@@ -71,35 +71,34 @@ import lighting # Import the lighting.py script.
 update_status_lighting = lighting.update_status_lighting # Load the status lighting update function from the lighting script.
 
 
-must_import_gpio = False
+GPIO_FEATURES_USED = False # This will be switched to `True` if the GPIO libraries are used (and therefore needed).
 if ("physical_controls" in config["dashcam"]):
     if ("behavior" in config["dashcam"]["physical_controls"]): # Check to see if the `behavior` field is present (this will not be the case for versions before v12 until the configuration is updated).
         if (len(config["dashcam"]["physical_controls"]["actions"]["dashcam_saving"]) > 0 or len(config["dashcam"]["physical_controls"]["actions"]["stop_predator"]) > 0):
-            must_import_gpio = True
+            GPIO_FEATURES_USED = True
         for stamp in config["dashcam"]["stamps"]["relay"]["triggers"]: # Check to see if there are any GPIO relay stamps active.
-            if (must_import_gpio == True):
+            if (GPIO_FEATURES_USED == True):
                 break # Exit the loop, since GPIOZero has already been imported.
             if (config["dashcam"]["stamps"]["relay"]["triggers"][stamp]["enabled"] == True): # Check to see if at least one relay stamp is enabled.
-                must_import_gpio = True
-
-        if (must_import_gpio == True): # We have established that we need to import GPIO libraries.
-            if (config["dashcam"]["physical_controls"]["behavior"]["method"] == "gpio_local"):
-                from gpiozero import Button # Import GPIOZero
-            elif (config["dashcam"]["physical_controls"]["behavior"]["method"] == "gpio_module"):
-                # Import adafruit-blinka:
-                try:
-                    os.environ.setdefault('BLINKA_FT232H', '1')
-                    import board
-                    import digitalio
-                except Exception as e: # The required libraries could not be imported, so disable all of the GPIO features.
-                    for action in config["dashcam"]["physical_controls"]["actions"]:
-                        config["dashcam"]["physical_controls"]["actions"][action] = {}
-                    config["dashcam"]["stamps"]["relay"]["enabled"] = False
-                    utils.display_message("adafruit-blinka libraries could not be imported. GPIO functionality has been disabled. (" + str(e) + ")", 3)
-            elif (config["dashcam"]["physical_controls"]["behavior"]["method"] == "gpio_remote"): # Alternatively, see if we need `socket` to monitor GPIO from a remote source.
-                import socket
+                GPIO_FEATURES_USED = True
     else: # If the relevant configuration section is not yet initialized, then import nothing.
         pass
+if (GPIO_FEATURES_USED == True):
+    if (config["dashcam"]["physical_controls"]["behavior"]["method"] == "gpio_local"):
+        from gpiozero import Button # Import gpiozero (only inputs are needed)
+    elif (config["dashcam"]["physical_controls"]["behavior"]["method"] == "gpio_module"):
+        # Import adafruit-blinka:
+        try:
+            os.environ.setdefault('BLINKA_FT232H', '1')
+            import board
+            import digitalio
+        except Exception as e: # The required libraries could not be imported, so disable all of the GPIO features.
+            for action in config["dashcam"]["physical_controls"]["actions"]:
+                config["dashcam"]["physical_controls"]["actions"][action] = {}
+            config["dashcam"]["stamps"]["relay"]["enabled"] = False
+            utils.display_message("adafruit-blinka libraries could not be imported. GPIO functionality has been disabled. (" + str(e) + ")", 3)
+    elif (config["dashcam"]["physical_controls"]["behavior"]["method"] == "gpio_remote"):
+        import socket
 
 
 
@@ -275,9 +274,10 @@ def monitor_gpio():
             print(f"An error occurred: {e}")
         finally:
             client_socket.close()
-gpio_monitor = threading.Thread(target=monitor_gpio)
-gpio_monitor.daemon = True
-gpio_monitor.start()
+if (GPIO_FEATURES_USED == True):
+    gpio_monitor = threading.Thread(target=monitor_gpio)
+    gpio_monitor.daemon = True
+    gpio_monitor.start()
 
 
 
