@@ -37,7 +37,6 @@ except:
 
 
 
-
 # Define some styling information
 class style:
     # Define colors
@@ -59,8 +58,7 @@ class style:
     end = '\033[0m'
 
 
-import sys # Required to process command line arguments.
-import pytz # Required to handle timezones.
+import sys
 import time # Required to add delays and handle dates/times
 
 if (time.daylight and time.localtime().tm_isdst >= 1):

@@ -8,7 +8,7 @@ This document contains detailed instructions on how to install Predator.
 If you're already familiar with Predator, and you just want a quick set-up guide, you can use the following steps to set everything up. For more detailed instructions, skip to the 'Full Install Guide' later in the document.
 
 1. Install Linux packages: `sudo apt-get install ffmpeg mpg321 gpsd gpsd-clients imagemagick fswebcam libhdf5-dev build-essential libusb-1.0`
-2. Install Python packages: `pip3 install pytz validators requests gps gpsd-py3 opencv-python psutil rns lxmf gpiozero ultralytics pyftdi adafruit-blinka`
+2. Install Python packages: `pip3 install validators requests gps gpsd-py3 opencv-python psutil rns lxmf gpiozero ultralytics pyftdi adafruit-blinka`
 3. If you intended to use Predator's ALPR features, install an ALPR engine, like [Phantom](https://v0lttech.com/phantom.php).
 4. If you intended to use GPIO-based features using an external FT232H module, (not `gpiozero`), create corresponding udev rules:
     - `sudo cp ./assets/support/11-ftdi.rules /etc/udev/rules.d/11-ftdi.rules`
@@ -27,13 +27,10 @@ This is the installation process for Predator and all of its dependencies. This 
 
 ### Dependencies
 
-- Python packages: `pip3 install pytz validators requests gps gpsd-py3 opencv-python psutil lxmf rns gpiozero pyftdi ultralytics`
-    - Required:
-        - `pytz`: Required to manage timezones.
+- Python packages: `pip3 install validators requests gps gpsd-py3 opencv-python psutil lxmf rns gpiozero pyftdi ultralytics`
     - Highly recommended:
         - `validators` and `requests`: Required for network functionality, like push notifications, status light interfacing, remote alert lists, and more.
         - `opencv-python`: Required for dash-cam recording.
-            - Unless you have a good reason not to (and you know exactly what you're doing) you should install these packages.
     - Recommended:
         - `gps` and `gpsd-py3`: Required to enable GPS features.
             - These packages are not required for reading GPX files, and are only necessary for interacting with live GPS devices.
