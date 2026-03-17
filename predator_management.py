@@ -2,7 +2,6 @@ import os
 import subprocess
 import sys
 import json
-import utils
 import glob
 
 import global_variables # `global_variables.py`
@@ -13,7 +12,6 @@ validate_config = config.validate_config
 config = load_config()
 
 if (config["management"]["disk_statistics"] == True): # Only import the disk statistic library if it is enabled in the configuration.
-    utils.debug_message("Loading system utility library")
     import psutil # Required to get disk usage information
 
 

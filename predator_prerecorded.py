@@ -2,7 +2,7 @@ import os
 import subprocess
 import sys
 import json
-import utils
+import time
 import fnmatch # Required to use wildcards to check strings.
 import datetime # Required for converting between timestamps and human readable date/time information.
 
@@ -23,7 +23,6 @@ def prerecorded_mode():
     ignore_list = ignore.fetch_ignore_list() # Fetch the ignore lists.
 
     try:
-        utils.debug_message("Started pre-recorded mode")
         utils.debug_message("Taking user preferences")
 
         working_directory_input = utils.prompt("Working directory (Default " + config["general"]["working_directory"] + "): ", optional=True, input_type=str, default=config["general"]["working_directory"])

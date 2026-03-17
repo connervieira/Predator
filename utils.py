@@ -19,7 +19,7 @@
 
 
 
-emport global_variables # `global_variables.py`
+import global_variables # `global_variables.py`
 
 import os # Required to interact with certain operating system functions
 import json # Required to process JSON data
@@ -156,7 +156,6 @@ try:
     if (config["developer"]["offline"] == False): # Only import networking libraries if offline mode is turned off.
         if (config["general"]["status_lighting"]["enabled"] == True or config["realtime"]["push_notifications"]["enabled"] == True or len(config["general"]["alerts"]["databases"]) > 0 or config["dashcam"]["telemetry"]["enabled"] == True):
             import requests # Required to make network requests
-            import validators # Required to validate URLs
 except Exception as e:
     print("Failed to determine if network features are enabled in the configuration: " + str(e))
 if (len(config["general"]["alerts"]["databases"]) > 0):

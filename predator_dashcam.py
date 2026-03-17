@@ -63,7 +63,6 @@ if (config["dashcam"]["alpr"]["enabled"] == True): # Check to see if background 
     import alpr
 
 import lighting # Import the lighting.py script.
-update_status_lighting = lighting.update_status_lighting # Load the status lighting update function from the lighting script.
 
 
 GPIO_FEATURES_USED = False # This will be switched to `True` if the GPIO libraries are used (and therefore needed).
@@ -179,7 +178,7 @@ def create_trigger_file():
     global last_trigger_file_created
     global last_played_dashcam_saved_sound
 
-    update_status_lighting("dashcam_save") # Since the current dashcam segment is being saved, return to the corresponding status lighting value.
+    lighting.update_status_lighting("dashcam_save") # Since the current dashcam segment is being saved, return to the corresponding status lighting value.
     if (time.time()-last_played_dashcam_saved_sound > 5):
         utils.play_sound("dashcam_saved")
 
@@ -455,11 +454,11 @@ def background_alpr(device):
             alpr.display_alerts(active_alerts) # Display active alerts.
             if (config["general"]["status_lighting"]["enabled"] == True): # Check to see if status lighting alerts are enabled in the Predator configuration.
                 if (len(active_alerts) > 0): # Check to see if there are active alerts.
-                    update_status_lighting("alpr_alert") # Run the function to update the status lighting.
+                    lighting.update_status_lighting("alpr_alert") # Run the function to update the status lighting.
                 elif (len(detected_plates_valid) > 0):
-                    update_status_lighting("alpr_detection") # Run the function to update the status lighting.
+                    lighting.update_status_lighting("alpr_detection") # Run the function to update the status lighting.
                 else:
-                    update_status_lighting("dashcam_save") # Since the current dashcam segment is being saved, return to the corresponding status lighting value.
+                    lighting.update_status_lighting("dashcam_save") # Since the current dashcam segment is being saved, return to the corresponding status lighting value.
             for plate in detected_plates_valid: # Run once for each detected plate.
                 utils.play_sound("alpr_notification") # Play the "new plate detected" sound.
             for alert in active_alerts: # Run once for each active alert.
@@ -528,7 +527,7 @@ def background_object_recognition(device):
             if (time.time() - last_object_alert > 3):
                 print(utils.style.red + "Detected alert object" + utils.style.end)
                 utils.play_sound("dashcam_object_alert")
-                update_status_lighting("dashcam_object")
+                lighting.update_status_lighting("dashcam_object")
             last_object_alert = time.time()
 
 
@@ -1168,7 +1167,7 @@ def dashcam_normal(device):
 
 
             delete_old_segments() # Handle the erasing of any old dash-cam segments that need to be deleted.
-            update_status_lighting("normal") # Return the status lighting to normal.
+            lighting.update_status_lighting("normal") # Return the status lighting to normal.
 
 
             # Initialize the next segment name:
@@ -1374,7 +1373,7 @@ def dashcam_mode():
 
 
 
-        update_status_lighting("normal") # Initialize the status lighting to normal.
+        lighting.update_status_lighting("normal") # Initialize the status lighting to normal.
         subprocess.run(["rm", "-f", os.path.join(config["general"]["interface_directory"], config["dashcam"]["saving"]["trigger"])], timeout=5, check=True) # Delete the side-car file associated with this segment.
 
         # =================================

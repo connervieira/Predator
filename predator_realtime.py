@@ -2,13 +2,14 @@ import os
 import subprocess
 import sys
 import json
-import utils
+import time
 import fnmatch # Required to use wildcards to check strings.
 
 import global_variables # `global_variables.py`
 import utils # `utils.py`
 import alpr # `alpr.py`
 import ignore # `ignore.py`
+import lighting # `lighting.py`
 import config # `config.py`
 load_config = config.load_config
 validate_config = config.validate_config
@@ -36,8 +37,6 @@ def realtime_mode():
 
     alpr.start_alpr_stream() # Start the ALPR stream.
 
-    detected_license_plates = [] # Create an empty list that will hold each license plate detected by Predator during this session.
-
     frames_captured = 0 # Set the number of frames captured to 0 so we can increment it by one each time Predator analyzes a frame.
     utils.debug_message("Starting main processing loop")
     try:
@@ -58,7 +57,7 @@ def realtime_mode():
 
             # Reset the status lighting to normal before processing the license plate data from ALPR.
             if (config["general"]["status_lighting"]["enabled"] == True): # Check to see if status lighting alerts are enabled in the Predator configuration.
-                update_status_lighting("normal") # Run the function to update the status lighting.
+                lighting.update_status_lighting("normal") # Run the function to update the status lighting.
 
 
 
@@ -128,7 +127,6 @@ def realtime_mode():
 
                     # Run the appropriate tasks, based on whether or not a valid license plate was detected.
                     if (successfully_found_plate == True): # Check to see if a valid plate was detected this round after the validation process ran.
-                        detected_license_plates.append(detected_plate) # Save the most likely license plate ID to the detected_license_plates complete list.
                         new_plates_detected.append([detected_plate, individual_detected_plate]) # Save the most likely license plate to this round's new_plates_detected list, as well as the plate from "all_current_plate_guesses" that it comes from.
 
 
@@ -140,7 +138,7 @@ def realtime_mode():
                             utils.display_shape("square") # Display an ASCII square in the output.
 
                         if (config["general"]["status_lighting"]["enabled"] == True): # Check to see if status lighting alerts are enabled in the Predator configuration.
-                            update_status_lighting("alpr_detection") # Run the function to update the status lighting.
+                            lighting.update_status_lighting("alpr_detection") # Run the function to update the status lighting.
 
 
 
@@ -268,7 +266,7 @@ def realtime_mode():
 
             if (len(active_alerts) > 0): # Check to see if there are any active alerts to see if an alert state should be triggered.
                 if (config["general"]["status_lighting"]["enabled"] == True): # Check to see if status lighting alerts are enabled in the Predator configuration.
-                    update_status_lighting("alpr_alert") # Run the function to update the status lighting.
+                    lighting.update_status_lighting("alpr_alert") # Run the function to update the status lighting.
 
                 if (config["realtime"]["interface"]["display"]["output_level"] >= 1): # Only display alerts if the configuration specifies to do so.
                     alpr.display_alerts(active_alerts) # Display all active alerts.

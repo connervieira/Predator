@@ -15,19 +15,14 @@
 
 import global_variables # `global_variables.py`
 
-import validators # Required to validating URLs.
-import requests # Required to send network requests.
+if (config["general"]["status_lighting"]["enabled"] == True and config["developer"]["offline"] == False): # Only update the status lighting if it is enabled in the configuration.
+    import validators # Required to validating URLs.
+    import requests # Required to send network requests.
 import json # Required to process JSON data.
 import os # Required to interact with certain operating system functions.
 import time
 
 import utils # Import the utils.py script.
-style = utils.style # Load the style from the utils script.
-clear = utils.clear # Load the screen clearing function from the utils script.
-debug_message = utils.debug_message # Load the debug message display function from the utils script.
-display_message = utils.display_message # Load the error message display function from the utils script.
-
-
 import config # `config.py`
 load_config = config.load_config
 config = load_config()
@@ -38,7 +33,7 @@ start_time = time.time() # This stores the time that the status lighting engine 
 def update_status_lighting(url_id):
     global current_status_light_id
     global start_time
-    debug_message("Updating status lighting")
+    utils.debug_message("Updating status lighting")
     if (time.time() - start_time >= config["general"]["status_lighting"]["delay_after_boot"]):
         if (url_id != current_status_light_id): # Check to see if the status light URL ID is different from the current state of the lights.
             current_status_light_id = url_id
@@ -49,7 +44,7 @@ def update_status_lighting(url_id):
                         try:
                             response = requests.get(status_lighting_update_url, timeout=0.5)
                         except:
-                            display_message("Failed to update status lighting. The request timed out.", 3) # Display a warning indicating that the status lighting request timed out.
+                            utils.display_message("Failed to update status lighting. The request timed out.", 3) # Display a warning indicating that the status lighting request timed out.
                     else:
-                        display_message("Unable to update status lighting. Invalid URL configured for " + url_id, 3) # Display a warning indicating that the URL was invalid, and no network request was sent.
-    debug_message("Status light update complete")
+                        utils.display_message("Unable to update status lighting. Invalid URL configured for " + url_id, 3) # Display a warning indicating that the URL was invalid, and no network request was sent.
+    utils.debug_message("Status light update complete")
