@@ -15,7 +15,7 @@ This section describes the initial start-up process of Predator.
         - Example: `python3 main.py 3`
             - This command will force Predator to start into mode 3, which is dash-cam mode.
         - To learn more about each mode, see the mode descriptions below.
-        - If no mode number is supplied, Predator will respect the `auto_start_mode` configuration value instead. If the `auto_start_mode` configuration value is not set, then Predator will prompt the user to select an operating mode after start-up.
+        - If no mode number is supplied, Predator will respect the `auto_start` configuration value instead. If the `auto_start` configuration value is not set, then Predator will prompt the user to select an operating mode after start-up.
     - To force Predator to use a particular working directory, instead of the one specified in the configuration, add the directory path as the second command line argument.
         - A mode number must be entered as the first command line argument to specify a working directory.
         - Example: `python3 main.py 2 /home/pi/PredatorData/`
@@ -55,7 +55,7 @@ This section describes the initial start-up process of Predator.
             - If you select "Y" to enable side-car mode, Predator will immediately begin analyzing all dash-cam videos that don't already have side-car files.
                 - This process may take a very long time, since every frame of every video is analyzed.
             - If you select "N" to skip side-car mode, then set-up process will continue with the next dialog.
-        - Provided you haven't selected side-car mode, you'll next be asked to enter the file name(s) of the video(s) you want to analyze. Videos should be placed in the working directory you just specified. If you have multiple video files, you can enter them as a comma-separated list. If you want to scan an entire directory, Use a `*` wildcard as the first character.
+        - Provided you haven't selected side-car mode, you'll next be asked to enter the file name(s) of the video(s) you want to analyze. Videos should be placed in the working directory you just specified. If you have multiple video files, you can enter them as a comma-separated list. If you want to scan an entire directory, use a `*` wildcard as the first character.
             - Example 1: `MyVideo.mp4`
             - Example 2: `MyFirstVideo.mp4, MySecondVideo.mp4`
             - Example 3: `*.mp4`
@@ -67,7 +67,6 @@ This section describes the initial start-up process of Predator.
         - Next, you'll be asked for a license plate format example. Filling out this value is highly recommended, since it will greatly reduce the number of incorrectly read plates. If this is left blank, no formatting validation will be used.
             - This value can be set to any alphanumeric string. For example, if all the plates in your state have 3 letters followed by 4 numbers, you could set this value to "AAA0000" or "ABC1234". Both values will work the exact same way. Predator only looks at the type of each character, not the character itself.
                 - For sake of simplicity, you can often just enter the license plate of another car in your state or region. Since Predator only looks to see whether a character is a number or letter, not the character itself, "EGY4011" will act identically to "AAA0000".
-            - Leave this option blank to use the default value.
             - Example: `AAA0000`
         - Next, you'll be asked for the time and date that the specified video recording started.
             - This preference takes the following format: YYYY-mm-dd HH:MM:SS

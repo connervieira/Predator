@@ -11,10 +11,11 @@ This section contains recommendations for those looking to build a hardware devi
 
 - The processing device should be fully capable of running Linux.
     - Having a device that can easily run Linux will make installing and setting up Predator drastically easier, as you'll spend less time troubleshooting compatibility issues, and more time actually assembling and configuring your device.
-        - More specifically, something running a Debian-based distribution will work best. This includes operating systems like Ubuntu, Raspberry Pi OS, Pop!_OS, and several others.
+        - More specifically, something running a Debian-based distribution will work best. This includes operating systems like Ubuntu, Raspberry Pi OS, Pop!\_OS, and several others.
 - Camera color accuracy is practically irrelevant when it comes to Predator's ability to recognize license plates.
     - Even gray-scale cameras should have no problems recognizing license plates.
 - Consider the context of the situation you want to use Predator in, and consider how to align your camera and it's lens.
+    - The camera lens (FOV) is more important than camera resolution.
 - Consider motion blur when setting up your camera.
     - Ensure your camera is mounted somewhere stable enough that it can take clear images of the vehicles you're scanning, even while they are in motion.
 
@@ -27,7 +28,7 @@ As a general rule, these are the parts you'll need in a Predator device:
     - Required (for real-time and dash-cam mode)
         - Without a camera, Predator will have no way of using real-time mode or dash-cam mode, and only pre-recorded mode will be usable.
 - Processing
-    - Required
+    - Required:
         - Needless to say, Predator can't be run without a processing device.
     - This device could be anything from a high end workstation to a single-board-computer, like a Raspberry Pi.
 - Networking

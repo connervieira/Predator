@@ -18,6 +18,11 @@ For installation and setup instructions, check the [DOCUMENTATION.md](DOCUMENTAT
 Predator is designed for hobbyists and tech enthusiasts who want to experiment with ALPR without the need for expensive software and specialized equipment. It's for people who want to tinker and experiment with computer vision technology in a powerful and easy way.
 
 
+**Who is Predator not designed for?**
+
+Predator is not designed for those who want to conduct mass-surveillance. It's not for governments and law enforcement agencies looking to log the movements of civilians for criminal investigations. It's not for companies who want to track how often certain people visit their business. For sake of privacy, Predator actively avoids features designed for mass-surveillance, and focuses on targeted, private alerts for individual use.
+
+
 **Can Predator be used as a plain dashcam, without ALPR?**
 
 Absolutely. Predator's dashcam mode allows it to operate like a fully featured traditional dashcam, without any ALPR functionality. If you want to retroactively run ALPR on recorded dashcam video, you can do so using pre-recorded mode at a later time.
@@ -43,11 +48,6 @@ Predator's intended ALPR engine, Phantom, is heavily based on OpenALPR. Predator
 Using Phantom as the ALPR back-end over OpenALPR is recommended for a few reasons. Phantom returns much more computer-friendly errors, meaning Predator can more reliably detect when the ALPR engine encounters problems, and can provide more actionable solutions. Additionally, Phantom's "video transparency" allows other processes to access images captured by the ALPR process. This allows Predator to run object recognition using the same camera used by the ALPR process.
 
 
-**Who is Predator not designed for?**
-
-Predator is not designed for those who want to conduct mass-surveillance. Its not for governments and law enforcement agencies looking to log the movements of civilians for criminal investigations. Its not for companies who want to track how often certain people visit their business. For sake of privacy, Predator actively avoids features designed for mass-surveillance, and focuses on targeted, private alerts for individual use.
-
-
 **How much does Predator cost?**
 
 The Predator software itself is completely free, and has absolutely no subscriptions. However, you may still need to purchase hardware for Predator to run on. You can either assemble hardware yourself, or purchase pre-made models through Predator Apex (see [APEX.md](APEX.md))
@@ -55,7 +55,7 @@ The Predator software itself is completely free, and has absolutely no subscript
 
 **What operating systems is Predator compatible with?**
 
-Officially, Predator is only compatible with Linux based operating systems, and is primarily designed for Debian-based distributions (though other distributions should work smoothly as well). However, if you're OK with a few hiccups, its also reasonably possible to install Predator on MacOS. Since Predator and all of its dependencies are all open source, it's technically possible to get it to work on Windows as well, but but you'll have to re-write a significant portion of it to get everything working as intended. In short, Predator on Linux works great, Predator on MacOS will probably work, and Predator in Windows would take extensive effort and modifications.
+Officially, Predator is only compatible with Linux based operating systems, and is primarily designed for Debian-based distributions (though other distributions should work smoothly as well). However, if you're OK with a few hiccups, it's also reasonably possible to install Predator on MacOS. Since Predator and all of its dependencies are all open source, it's technically possible to get it to work on Windows as well, but you'll have to re-write a significant portion of it to get everything working as intended. In short, Predator on Linux works great, Predator on MacOS will probably work, and Predator in Windows would take extensive effort and modifications.
 
 
 **Why is Predator written in Python, and not something more efficient, like C++?**
@@ -76,7 +76,7 @@ Predator is a fairly complex program, but below is a list of the general steps P
 7. Predator then uses various methods of validation to filter out plate guesses that are unlikely to be correct.
 8. Next, Predator removes plates it believes to be invalid, and creates a list of (ideally) correctly recognized plates.
 9. Finally, Predator checks the list of license plates against any alert lists that may be loaded to check for hot-list hits.
-9. After this, Predator might save the plates to a local log file, send a push notification to a Gotify server, play an audio alert, or any number of other customizable actions.
+10. After this, Predator might save the plates to a local log file, send a push notification to a Gotify server, play an audio alert, or any number of other customizable actions.
 
 
 **How many cameras can Predator use at one time?**

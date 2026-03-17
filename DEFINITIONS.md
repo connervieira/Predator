@@ -11,7 +11,7 @@ ALPR stands for 'automated license plate reading', and is the practice of automa
 
 ### ALPR Provider/Back-end
 
-The ALPR provider or back-end is the program that Predator uses to process images and receive ALPR results. Predator is designed to primarily to use Phantom as an ALPR back-end, but it is also compatible with OpenALPR.
+The ALPR provider or back-end is the program that Predator uses to process images and receive ALPR results. Predator is designed primarily to use Phantom as an ALPR back-end, but it is also compatible with OpenALPR.
 
 
 ## Predator
@@ -31,7 +31,7 @@ The terms 'file path', 'directory path', or simply 'path' are used to refer to a
         - `/home/pi/Downloads/file.txt`
 - Working Directory Relative
     - This type of path is defined relative to the current working (project) directory.
-    - This kind of file path is typically used to define files that will change each time Predator runs, including analysis videos and a export information.
+    - This kind of file path is typically used to define files that will change each time Predator runs, including analysis videos and export information.
     - For example, a file path defined relative to the root project directory as `data/file.txt`, when the current root project directory is `/home/pi/Downloads/`, will translate to a complete file path of `/home/pi/Downloads/data/file.txt`
 - Instance Directory Relative/Predator Directory Relative
     - This type of path is defined relative to the directory of Predator itself.

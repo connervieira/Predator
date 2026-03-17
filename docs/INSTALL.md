@@ -14,7 +14,7 @@ If you're already familiar with Predator, and you just want a quick set-up guide
     - `sudo cp ./assets/support/11-ftdi.rules /etc/udev/rules.d/11-ftdi.rules`
     - Reload udev rules: `sudo udevadm control --reload-rules; sudo udevadm trigger`
     - You may need to unplug and re-connect your FT232H GPIO module after creating the udev rule file.
-    - If you enounter permissions errors from the GPIO module libraries, you may need to add yourself to the `plugdev` group: `sudo usermod -aG plugdev "$(whoami)"`
+    - If you encounter permissions errors from the GPIO module libraries, you may need to add yourself to the `plugdev` group: `sudo usermod -aG plugdev "$(whoami)"`
 5. Download and uncompress Predator.
     - Download stable version from V0LT (recommended): https://v0lttech.com/predator.php
     - Download the latest (potentially unstable) development version: `git clone https://github.com/connervieira/Predator`
@@ -45,8 +45,8 @@ This is the installation process for Predator and all of its dependencies. This 
         - `ultralytics`: Required for object recognition (but not license plate recognition).
     - Notes:
         - If you see an "externally managed environment" error while installing Python packages, consider one of the following solutions:
-            - If you're installing Predator on a system dedicated to its use (such as a computer installed in a vehicle), you can override this warning and force install the packages (at the risk of breaking your install) using by adding the `--break-system-packages` flag to the installation command.
-                - It's worth mentioning that during testing, using the `--break-system-packages` flag while installing Predator has never caused any noticable system issues on any common Debian-based Linux distribution (Ubuntu, Mint, Raspberry Pi OS, etc.). However, you should still exercise caution when using it, especially if you aren't using a fresh Python installation.
+            - If you're installing Predator on a system dedicated to its use (such as a computer installed in a vehicle), you can override this warning and force install the packages (at the risk of breaking your install) by adding the `--break-system-packages` flag to the installation command.
+                - It's worth mentioning that during testing, using the `--break-system-packages` flag while installing Predator has never caused any noticeable system issues on any common Debian-based Linux distribution (Ubuntu, Mint, Raspberry Pi OS, etc.). However, you should still exercise caution when using it, especially if you aren't using a fresh Python installation.
             - If you're focused on developing or modifying Predator, try creating a virtual environment for sake of consistency. This method is very reliable, but will often cause issues if you intend to integrate Predator with external interfaces in production (like V0LT Optic or V0LT Cortex), since these interfaces are unable to run Predator as part of a virtual environment.
                 - You can create a virtual environment by navigating to the Predator directory, and running the following command: `python3 -m venv .venv`
                 - After creating the virtual environment, activate it by running the `source .venv/bin/activate` command.
@@ -92,6 +92,6 @@ SUBSYSTEM=="usb", ATTR{idVendor}=="0403", ATTR{idProduct}=="6015", GROUP="plugde
 
 ```
 After creating the udev rules file, reload with: `sudo udevadm control --reload-rules; sudo udevadm trigger`
-You may need to unplug and re-connect your FT232H GPIO module for the changes to take affect.
+You may need to unplug and re-connect your FT232H GPIO module for the changes to take effect.
 
-If you enounter permissions errors from the GPIO module libraries, you may need to add yourself to the `plugdev` group: `sudo usermod -aG plugdev "$(whoami)"`
+If you encounter permissions errors from the GPIO module libraries, you may need to add yourself to the `plugdev` group: `sudo usermod -aG plugdev "$(whoami)"`

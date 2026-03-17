@@ -1,14 +1,14 @@
 # Configuration
 
-This document describes the configuration values found `config.json`. The Predator configuration system makes use of minimal validation, and generally assumes that changes made directly to the `config.json` file are valid.
+This document describes the configuration values found in `config.json`. The Predator configuration system makes use of minimal validation, and generally assumes that changes made directly to the `config.json` file are valid.
 
 Features that aren't thoroughly tested are described as "experimental" below. These features are not recommended if reliability is a concern.
 
 
-- `general` contains configuration values will effect Predator's general operation.
+- `general` contains configuration values that affect Predator's general operation.
     - `working_directory` specifies the default directory that Predator will use to persistently store files.
-        - This value can be over-ridden using command line arguments.
-        - In management mode and pre-recorded mode, this value serves as a default, but can be over-ridden by user input.
+        - This value can be overridden using command line arguments.
+        - In management mode and pre-recorded mode, this value serves as a default, but can be overridden by user input.
         - In real-time mode and dash-cam mode, this value will be automatically used without user input.
     - `interface_directory` specifies the directory that predator will store files used to share real-time information with external programs.
         - This value is only used in real-time and dashcam mode.
@@ -26,7 +26,7 @@ Features that aren't thoroughly tested are described as "experimental" below. Th
                 - This setting can override both the license plate validation format, as well as the minimum confidence threshold.
                 - When set to `false`, Predator will discard plates that don't have any valid guesses.
                 - This setting does not override `general>alerts>alerts_ignore_validation`, and can be set to `false` without interfering with license plate hot-list alerts.
-                - This value does not effect which license plates are logged to disk as configured in the `realtime>saving` configuration section.
+                - This value does not affect which license plates are logged to disk as configured in the `realtime>saving` configuration section.
             - `license_plate_format` is a list of strings that provide Predator with examples of how license plates in your region should be formatted.
                 - For example, license plates in the state of Ohio generally follow the pattern of 3 letters followed by 4 numbers. In Ohio, this preference might contain `"AAA0000"` to filter out plate guesses that don't match the most common formatting pattern.
                 - This preference only considers the type of each character, not the character itself.
@@ -41,7 +41,7 @@ Features that aren't thoroughly tested are described as "experimental" below. Th
             - Setting this to `true` will cause Predator to check all guesses against all alert rules. This can lead to situations where alert rules with wildcards cause a single license plate to alert repeatedly, for each of its guesses.
         - `databases` is a list that contains strings, with each string pointing to either a local or remote license plate hot-list.
             - If a particular entry in this list is a file, the file path should be relative to the working directory.
-                - For example, if your alert database is in `/home/pi/Data/alerts.json`, and your working directory is `/home/pi/Data/`, then then the alert database value should simply be set to `"alerts.json"`, not the the full file path.
+                - For example, if your alert database is in `/home/pi/Data/alerts.json`, and your working directory is `/home/pi/Data/`, then the alert database value should simply be set to `"alerts.json"`, not the full file path.
             - If a particular entry in this list is a remote source, the remote source should be a complete URL.
                 - For example, an entry might be set to `"https://example.com/alerts.json"`.
             - To learn more about the alert database format, see the [docs/ALERTS.md](docs/ALERTS.md) document.
@@ -79,14 +79,14 @@ Features that aren't thoroughly tested are described as "experimental" below. Th
         - `enabled` contains controls to enable and disable each operation mode of Predator.
             - When the value for a particular mode is set to `false`, that mode's option will be hidden from the mode selection menu shown to the user when Predator starts, and the auto-start-mode command line arguments won't allow the user to boot Predator directly to that mode.
             - Under normal circumstances, all of these settings should be left as 'true', in order to enable full functionality of Predator, but there may be certain situations in which is useful to block certain modes from starting.
-                - This setting is not intended to a be a security feature. It's completely trivial to bypass this setting by simply modifying the configuration file directly.
+                - This setting is not intended to be a security feature. It's completely trivial to bypass this setting by simply modifying the configuration file directly.
                 - If you never plan to use a particular operating mode, disabling it might decrease Predator's loading time by preventing unnecessary libraries from being loaded.
     - `status_lighting` contains settings for configuring Predator's status light interfacing capabilities.
         - `status_lighting_enabled` is a boolean value that determines whether or not Predator will attempt to make use of LED status lights
         - `status_lighting_base_url`
             - This is the base part of the URL that Predator will send requests to in order to update the status lighting.
             - By default, this setting is set to the default router IP address of the "WLED" lighting controller software. However, you should be able to modify it to fit any lighting controller software that supports GET network requests.
-            - This is that value that precedes the `status_lighting_values` entries explained below.
+            - This is that value the precedes the `status_lighting_values` entries explained below.
         - `delay_after_boot` specifies a number of seconds to ignore all status lighting requests after boot.
             - If your lighting system starts up along-side Predator, you may need to wait for the controller to connect to the network before status light requests can be made. Otherwise, the first few requests will time-out.
             - Any status lighting request made within the delay will be ignored.
@@ -97,7 +97,7 @@ Features that aren't thoroughly tested are described as "experimental" below. Th
                 - The `alpr_alert` status is relevant in real-time mode, and is used when Predator detects a license plate in an alert database.
                 - The `alpr_detection` status is relevant in real-time mode, and used when Predator detects any valid license plate.
                 - The `dashcam_save` status is relevant to dash-cam mode, and is triggered when a dashcam video file is saved using the dashcam lock trigger file.
-                    - The lighting will remain in the "dashcam_save" status until the segment has ended, and Predator returns to normal, unlocked recording.
+                    - The lighting will remain in the "dashcam\_save" status until the segment has ended, and Predator returns to normal, unlocked recording.
                 - The `dashcam_object` status is triggered when Predator detects an object as defined under `dashcam>object_recognition>DEVICE>objects_alert`.
     - `audio` contains settings that control audio play-back.
         - `enabled` is a boolean value that determines whether audio playback is enabled.
@@ -114,7 +114,7 @@ Features that aren't thoroughly tested are described as "experimental" below. Th
                 - The `repeat` value should be set to how many times you want the sound effect to be repeated.
                     - To disable a sound from playing, set this to 0.
                     - Under normal circumstances, this value should just be "1", but there might be some cases in which you want to play a particular sound repeatedly.
-                - The `delay` value determines how long Predator will wait, in seconds, between repetitions, if `reptition` is set to more than 1.
+                - The `delay` value determines how long Predator will wait, in seconds, between repetitions, if `repeat` is set to more than 1.
                     - Note that this delay includes the time it takes for the previous instances of the sound effect to play.
                     - For example, if the audio clip you're repeating takes 2 seconds to play, and you want a 1 second delay between audio clips, this setting should be 3 seconds.
                     - If the delay is set to zero, then all of the repetitions will play over top of each-other.
@@ -445,7 +445,7 @@ Features that aren't thoroughly tested are described as "experimental" below. Th
         - Ideally, the queue size will never exceed 1 frame during normal recording, but it may occasionally reach higher values in between segments. However, if buffered parked recording is enabled, then the size of the frame queue will briefly match the size of the frame buffer. As such, you should make sure this value is set higher than the parked recording frame buffer configuration value.
     - `dashcam_shortterm_framerate_interval` is a positive decimal number that determines the interval (in seconds) over which Predator will calculate the short-term frame-rate.
         - Higher (longer) values will cause the short-term frame-rate to be more accurate, while lower (shorter) values will cause the short-term frame-rate to update more frequently.
-        - This short-term frame-rate is currently only used for visual purposes, and does not effect output files.
+        - This short-term frame-rate is currently only used for visual purposes, and does not affect output files.
     - `hard_crash_on_error` is a boolean that determines whether Predator will globally exit if an error is encountered. This is useful if you run Predator as an unmonitored headless service, and you want to force it to restart when an error is encountered.
         - Keep in mind that enabling this configuration option will cause Predator to boot-loop if the problem that caused the error isn't resolved between start-ups.
     - `identify_to_remote_sources` determines whether Predator will attach its randomly generated identifier when fetching hot-lists from remote sources. This is helpful to allow administrators of remote hot-list sources to see how many clients are using their server.
