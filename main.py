@@ -342,7 +342,7 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                 if (selection == "0"): # The user has selected to return back to the previous menu.
                     continue # Do nothing, and just finish this loop.
                 elif (selection == "1"): # The user has selected the "view files" option.
-                    os.system("find " + config["general"]["working_directory"]) # Run the 'find' command in the working directory.
+                    subprocess.run(["find", config["general"]["working_directory"]], check=True) # Run the 'find' command in the working directory to recursively list all files/directories.
                     utils.wait_for_input()
                 elif (selection == "2"): # The user has selected the "copy files" option.
 
@@ -354,6 +354,7 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                     copy_prerecorded_license_plate_location_data = False
                     copy_realtime_license_plate_recognition_data = False
                     copy_dashcam_video = False
+                    copy_dashcam_video_saved = False
 
                     while True: # Run the "copy files" selection menu on a loop forever until the user is finished selecting files.
                         clear() # Clear the console output before each loop.
@@ -392,9 +393,13 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                         print("")
                         print("===== Dash-cam Mode =====")
                         if (copy_dashcam_video == True):
-                            print("D1. [X] Dash-cam videos")
+                            print("D1. [X] Dash-cam videos (unsaved)")
                         else:
-                            print("D1. [ ] Dash-cam videos")
+                            print("D1. [ ] Dash-cam videos (unsaved)")
+                        if (copy_dashcam_video_saved == True):
+                            print("D2. [X] Dash-cam videos (saved)")
+                        else:
+                            print("D2. [ ] Dash-cam videos (saved)")
                         print("")
 
                         selection = prompt("Selection: ", optional=False, input_type=str) # Prompt the user for a selection.
@@ -418,6 +423,8 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                             copy_realtime_license_plate_recognition_data = not copy_realtime_license_plate_recognition_data
                         elif (selection.lower() == "d1"):
                             copy_dashcam_video = not copy_dashcam_video
+                        elif (selection.lower() == "d2"):
+                            copy_dashcam_video_saved = not copy_dashcam_video_saved
                     
 
                     # Prompt the user for the copying destination.
@@ -431,22 +438,55 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                     # Copy the files as per the user's inputs.
                     print("Copying files...")
                     if (copy_management_configuration):
-                        os.system("cp \"" + global_variables.CONFIG_PATH + "\" \"" + copy_destination + "\"")
+                        try:
+                            subprocess.run(["cp", global_variables.CONFIG_PATH, copy_destination], check=True)
+                        except Exception as e:
+                            utils.display_message("Failed to copy configuration file: " + str(e), 2)
+
                     if (copy_prerecorded_processed_frames):
-                        os.system("cp -r \"" + config["general"]["working_directory"] + "/frames\" \"" + copy_destination + "\"")
+                        try:
+                            subprocess.run(["cp", "-r", os.path.join(config["general"]["working_directory"], "frames"), copy_destination], check=True)
+                        except Exception as e:
+                            utils.display_message("Failed to copy pre-recorded processed frames: " + str(e), 2)
                     if (copy_prerecorded_gpx_files):
-                        os.system("cp \"" + config["general"]["working_directory"] + "/*.gpx\" \"" + copy_destination + "\"")
+                        try:
+                            subprocess.run(["cp", os.path.join(config["general"]["working_directory"], "*.gpx"), copy_destination], check=True)
+                        except Exception as e:
+                            utils.display_message("Failed to copy GPX files: " + str(e), 2)
                     if (copy_prerecorded_license_plate_analysis_data):
-                        os.system("cp \"" + config["general"]["working_directory"] + "/pre_recorded_license_plate_export.*\" \"" + copy_destination + "\"")
+                        try:
+                            subprocess.run(["cp", os.path.join(config["general"]["working_directory"], "pre_recorded_license_plate_export.*"), copy_destination], check=True)
+                        except Exception as e:
+                            utils.display_message("Failed to copy pre-recorded license plate analysis export files: " + str(e), 2)
                     if (copy_prerecorded_license_plate_location_data):
-                        os.system("cp \"" + config["general"]["working_directory"] + "/pre_recorded_location_data_export.*\" \"" + copy_destination + "\"")
+                        try:
+                            subprocess.run(["cp", os.path.join(config["general"]["working_directory"], "/pre_recorded_location_data_export.*"), copy_destination], check=True)
+                        except Exception as e:
+                            utils.display_message("Failed to copy pre-recorded license plate location export files: " + str(e), 2)
+
                     if (copy_realtime_license_plate_recognition_data):
-                        os.system("cp \"" + os.path.join(config["general"]["working_directory"], config["realtime"]["saving"]["license_plates"]["file"]) + "/\" \"" + copy_destination + "\"")
+                        try:
+                            subprocess.run(["cp", os.path.join(config["general"]["working_directory"], config["realtime"]["saving"]["license_plates"]["file"]), copy_destination], check=True)
+                        except Exception as e:
+                            utils.display_message("Failed to copy real-time license plate log files: " + str(e), 2)
+
+                    if (config["dashcam"]["capture"]["audio"]["merge"] == True):
+                        extension = "mkv"
+                    else:
+                        extension = config["dashcam"]["saving"]["file"]["extension"]
                     if (copy_dashcam_video):
-                        os.system("cp \"" + os.path.join(config["general"]["working_directory"], "* Predator *." + config["dashcam"]["saving"]["file"]["extension"]) + "\" \"" + copy_destination + "\"")
+                        try:
+                            subprocess.run(["cp", os.path.join(config["general"]["working_directory"], "* Predator *." + extension), copy_destination], check=True)
+                        except Exception as e:
+                            utils.display_message("Failed to copy dash-cam video: " + str(e), 2)
+                    if (copy_dashcam_video_saved):
+                        try:
+                            subprocess.run(["cp", "-r", os.path.join(config["general"]["working_directory"], config["dashcam"]["saving"]["directory"]), copy_destination], check=True)
+                        except Exception as e:
+                            utils.display_message("Failed to copy dash-cam video: " + str(e), 2)
 
                     clear()
-                    print("Files have finished copying.")
+                    utils.display_message("Files have finished copying.", 1)
 
 
                 elif (selection == "3"): # The user has selected the "delete files" option.
@@ -458,6 +498,7 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                     delete_prerecorded_license_plate_location_data = False
                     delete_realtime_license_plate_recognition_data = False
                     delete_dashcam_video = False
+                    delete_dashcam_video_saved = False
 
                     while True: # Run the "delete files" selection menu on a loop forever until the user is finished selecting files.
                         clear() # Clear the console output before each loop.
@@ -496,9 +537,13 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                         print("")
                         print("===== Dash-cam Mode =====")
                         if (delete_dashcam_video == True):
-                            print("D1. [X] Dash-cam videos")
+                            print("D1. [X] Dash-cam videos (unsaved)")
                         else:
-                            print("D1. [ ] Dash-cam videos")
+                            print("D1. [ ] Dash-cam videos (unsaved)")
+                        if (delete_dashcam_video == True):
+                            print("D2. [X] Dash-cam videos (saved)")
+                        else:
+                            print("D2. [ ] Dash-cam videos (saved)")
                         print("")
 
                         selection = prompt("Selection: ", optional=False, input_type=str) # Prompt the user for a selection.
@@ -521,6 +566,8 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                             delete_realtime_license_plate_recognition_data = not delete_realtime_license_plate_recognition_data
                         elif (selection.lower() == "d1"):
                             delete_dashcam_video = not delete_dashcam_video
+                        elif (selection.lower() == "d2"):
+                            delete_dashcam_video_saved = not delete_dashcam_video_saved
 
                     if (delete_management_custom):
                         delete_custom_file_name = prompt("Please specify the name of the additional file you'd like to delete from the current working directory: ")
@@ -529,23 +576,53 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                     if (prompt("Are you sure you want to delete the selected files permanently? (y/n): ").lower() == "y"):
                         print("Deleting files...")
                         if (delete_management_custom):
-                            os.system("rm -r \"" + config["general"]["working_directory"] + "/" + delete_custom_file_name + "\"")
+                            try:
+                                subprocess.run(["rm", "-r", os.path.join(config["general"]["working_directory"], delete_custom_file_name)], check=True)
+                            except Exception as e:
+                                utils.display_message("Failed to delete custom file-path: " + str(e), 2)
+
                         if (delete_prerecorded_processed_frames):
-                            os.system("rm -r \"" + config["general"]["working_directory"] + "/frames\"")
+                            try:
+                                subprocess.run(["rm", "-r", os.path.join(config["general"]["working_directory"], "/frames")], check=True)
+                            except Exception as e:
+                                utils.display_message("Failed to delete copy pre-recorded processed frames: " + str(e), 2)
                         if (delete_prerecorded_gpx_files):
-                            os.system("rm \"" + config["general"]["working_directory"] + "/*.gpx\"")
+                            try:
+                                subprocess.run(["rm", os.path.join(config["general"]["working_directory"], "/*.gpx")], check=True)
+                            except Exception as e:
+                                utils.display_message("Failed to delete GPX files: " + str(e), 2)
                         if (delete_prerecorded_license_plate_analysis_data):
-                            os.system("rm \"" + config["general"]["working_directory"] + "/pre_recorded_license_plate_export.*\"")
+                            try:
+                                subprocess.run(["rm", os.path.join(config["general"]["working_directory"], "/pre_recorded_license_plate_export.*")], check=True)
+                            except Exception as e:
+                                utils.display_message("Failed to delete pre-recorded license plate analysis export files: " + str(e), 2)
                         if (delete_prerecorded_license_plate_location_data):
-                            os.system("rm \"" + config["general"]["working_directory"] + "/pre_recorded_location_data_export.*\"")
+                            try:
+                                subprocess.run(["rm", os.path.join(config["general"]["working_directory"], "/pre_recorded_location_data_export.*")], check=True)
+                            except Exception as e:
+                                utils.display_message("Failed to delete pre-recorded license plate location export files: " + str(e), 2)
+
                         if (delete_realtime_license_plate_recognition_data):
-                            os.system("rm \"" + os.path.join(config["general"]["working_directory"], config["realtime"]["saving"]["license_plates"]["file"]) + "/\"")
+                            try:
+                                subprocess.run(["rm", os.path.join(config["general"]["working_directory"], config["realtime"]["saving"]["license_plates"]["file"])], check=True)
+                            except Exception as e:
+                                utils.display_message("Failed to delete real-time license plate log files: " + str(e), 2)
+
                         if (delete_dashcam_video):
-                            os.system("rm \"" + os.path.join(config["general"]["working_directory"], "* Predator *." + config["dashcam"]["saving"]["file"]["extension"]) + "\"")
+                            try:
+                                subprocess.run(["rm", os.path.join(config["general"]["working_directory"], "* Predator *." + extension)], check=True)
+                            except Exception as e:
+                                utils.display_message("Failed to delete unsaved dash-cam video: " + str(e), 2)
+                        if (delete_dashcam_video_saved):
+                            try:
+                                subprocess.run(["rm", "-r", os.path.join(config["general"]["working_directory"], config["dashcam"]["saving"]["directory"])], check=True)
+                            except Exception as e:
+                                utils.display_message("Failed to delete saved dash-cam video: " + str(e), 2)
+
                         clear()
-                        print("Files have finished deleting.")
+                        utils.display_message("Files have finished deleting.", 1)
                     else:
-                        print("No files have been deleted.")
+                        utils.display_message("No files have been deleted.", 1)
 
 
                 else: # The user has selected an invalid option in the file management menu.
@@ -568,12 +645,11 @@ if (mode_selection == "0" and config["general"]["modes"]["enabled"]["management"
                     continue # Do nothing, and just finish this loop.
                 elif (selection == "1"): # The user has selected the "about" option.
                     clear()
-                    print(style.bold + "============" + style.end)
-                    print(style.bold + "  Predator" + style.end)
-                    print(style.bold + "    V0LT" + style.end)
-                    print(style.bold + "    V9.0" + style.end)
-                    print(style.bold + "   AGPLv3" + style.end)
-                    print(style.bold + "============" + style.end)
+                    lines = ["Predator", "V0LT", str(global_variables.PREDATOR_VERSION), "AGPLv3"]
+                    print(style.bold + "="*max(map(len, lines)) + style.end) # Print N number of equal signs, where N is the length of the longest line.
+                    for line in lines:
+                        print(style.bold + line + style.end)
+                    print(style.bold + "="*max(map(len, lines)) + style.end) # Print N number of equal signs, where N is the length of the longest line.
                 elif (selection == "2"): # The user has selected the "neofetch" option.
                     os.system("neofetch") # Execute neofetch to display information about the system.
                 elif (selection == "3"): # The user has selected the "print configuration" option.

@@ -202,7 +202,7 @@ Features that aren't thoroughly tested are described as "experimental" below. Th
             - `codec` is the codec used to encode video. Below are common video codecs:
                 - "XVID" is used for'.avi' files, and is the default option.
                 - "MP4V" is used for '.mp4' files, and is great for video player compatability.
-                    - Note that this codec will often result in the current vidoe segment being lost in the event of a sudden power loss.
+                    - Note that this codec will often result in the current video segment being lost in the event of a sudden power loss.
             - `extension` is the video file extension (not including the dot).
                 - When audio/video merging is enabled, the resulting file will always have the "mkv" extension, irrespective of this setting.
         - `trigger` is the name of a file inside the interface directory that will trigger Predator to save the current and previous dashcam segments.
