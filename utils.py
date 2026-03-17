@@ -747,7 +747,8 @@ def get_gps_location():
                         else:
                             global_time_offset = gps_time - time.time()
                             display_message("The local system time differs significantly from the GPS time. Applied time offset of " + str(round(global_time_offset*10**3)/10**3) + " seconds.", 2)
-
+                if (isinstance(position, (list, tuple)) == False or len(position) < 2): # Check if the position is not valid.
+                    position = [0, 0] # Default to 0, 0.
                 if (position == [0,0]):
                     if (last_gps_status != False):
                         play_sound("gps_disconnected")
