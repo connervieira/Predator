@@ -14,10 +14,8 @@
 
 import global_variables # `global_variables.py`
 import os
-import csv
 import time
 import json
-import cv2
 import subprocess
 import threading
 

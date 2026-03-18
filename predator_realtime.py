@@ -1,5 +1,4 @@
 import os
-import subprocess
 import sys
 import json
 import time
@@ -131,8 +130,7 @@ def realtime_mode():
 
 
                         if (config["realtime"]["push_notifications"]["enabled"] == True): # Check to see if the user has Gotify notifications enabled.
-                            utils.debug_message("Issuing detection push notification")
-                            os.system("curl -X POST '" + config["realtime"]["push_notifications"]["server"] + "/message?token=" + config["realtime"]["push_notifications"]["token"] + "' -F 'title=Predator' -F 'message=A license plate has been detected: " + detected_plate + "' > /dev/null 2>&1 &") # Send a push notification via Gotify.
+                            utils.send_notification("Predator", "A license plate has been detected: " + detected_plate)
 
                         if (config["realtime"]["interface"]["display"]["shape_alerts"] == True): # Check to see if the user has enabled shape notifications.
                             utils.display_shape("square") # Display an ASCII square in the output.
@@ -273,8 +271,7 @@ def realtime_mode():
 
                 for alert in active_alerts: # Run once for each active alert.
                     if (config["realtime"]["push_notifications"]["enabled"] == True): # Check to see if the user has Gotify notifications enabled.
-                        utils.debug_message("Issuing alert push notification")
-                        os.system("curl -X POST '" + config["realtime"]["push_notifications"]["server"] + "/message?token=" + config["realtime"]["push_notifications"]["token"] + "' -F 'title=Predator' -F 'message=A license plate in an alert database has been detected: " + detected_plate + "' > /dev/null 2>&1 &") # Send a push notification using Gotify.
+                        utils.send_notification("Predator", "A license plate in an alert database has been detected: " + detected_plate)
 
                     if (config["realtime"]["interface"]["display"]["shape_alerts"] == True): # Check to see if the user has enabled shape notifications.
                         utils.display_shape("triangle") # Display an ASCII triangle in the output.

@@ -25,7 +25,6 @@ config = load_config()
 
 import time # Required to add delays and handle dates/times.
 import sys # Required to read command line arguments.
-import threading # Required to check which threads are alive when Predator fails to exit in a timely manner.
 
 if ("--help" in sys.argv):
     print("\npython3 main.py [MODE] [DIRECTORY] [OPTIONS]")

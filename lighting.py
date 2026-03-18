@@ -13,13 +13,9 @@
 
 
 
-import global_variables # `global_variables.py`
-
-import json # Required to process JSON data.
-import os # Required to interact with certain operating system functions.
 import time
 
-import utils # Import the utils.py script.
+import utils # `utils.py`
 import config # `config.py`
 load_config = config.load_config
 config = load_config()

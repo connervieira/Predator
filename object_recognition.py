@@ -12,7 +12,6 @@
 # If not, see https://www.gnu.org/licenses/ to read the license agreement.
 
 
-import os
 from ultralytics import YOLO
 import numpy
 import utils

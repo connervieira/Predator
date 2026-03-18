@@ -158,12 +158,9 @@ try:
             import requests # Required to make network requests
 except Exception as e:
     print("Failed to determine if network features are enabled in the configuration: " + str(e))
-if (len(config["general"]["alerts"]["databases"]) > 0):
-    import hashlib
 import datetime # Required for converting between timestamps and human readable date/time information
 from xml.dom import minidom # Required for processing GPX data
 if (config["general"]["gps"]["enabled"] == True and len(config["general"]["gps"]["demo_file"]) == 0): # Only import the GPS libraries if GPS settings are enabled.
-    from gps import * # Required to access GPS information.
     import gpsd
 if ("developer" not in config or "frame_count_method" not in config["developer"]):
     config["developer"]["frame_count_method"] = "manual"
@@ -1004,3 +1001,18 @@ def to_int(value):
     return value
 
 
+
+def send_notification(title, body):
+    if (config["developer"]["offline"] == False): # Only import networking libraries if offline mode is turned off.
+        debug_message("Issuing push notification")
+
+        url = config["realtime"]["push_notifications"]["server"] + "/message?token=" + config["realtime"]["push_notifications"]["token"]
+        payload = {"title": title, "message": body}
+
+        try:
+            resp = requests.post(url, data=payload, timeout=5)
+            resp.raise_for_status()
+        except Exception as e:
+            display_message("Failed to send Gotify notification: " + str(e), 2)
+    else:
+        display_message("Predator tried to send a push notification, but offline mode is enabled.", 2)

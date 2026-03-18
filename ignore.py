@@ -22,10 +22,8 @@
 # Custom ignore lists can be enabled and disabled in the configuration.
 
 
-import global_variables # `global_variables.py`
 import os # Required to interact with certain operating system functions.
 import json # Required to process JSON data.
-import time # Required to manage delays.
 import validators # Required to validate URLs.
 
 import utils
