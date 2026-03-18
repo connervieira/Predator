@@ -28,7 +28,7 @@ def prerecorded_mode():
         working_directory_input = utils.prompt("Working directory (Default " + config["general"]["working_directory"] + "): ", optional=True, input_type=str, default=config["general"]["working_directory"])
         while (os.path.exists(working_directory_input) == False): # Run forever until the user enters a working directory that exists.
             utils.display_message("The specified working directory doesn't seem to exist.", 2)
-            working_directory_input = prompt("Working directory (Default " + config["general"]["working_directory"] + "): ", optional=True, input_type=str)
+            working_directory_input = utils.prompt("Working directory (Default " + config["general"]["working_directory"] + "): ", optional=True, input_type=str)
         config["general"]["working_directory"] = working_directory_input # Apply an override to the configured working directory.
 
         del working_directory_input # Remove the working directory input now that it is no longer needed.
@@ -106,12 +106,12 @@ def prerecorded_mode():
             utils.debug_message("Splitting video into discrete frames")
             video_counter = 0 # Create a placeholder counter that will be incremented by 1 for each video. This will be appended to the file names of the video frames to keep frames from different videos separate.
             print("Splitting video into discrete images...")
-            if (os.path.exists(os.path.join(config["general"]["working_directory"], "frames/"))): # Check to see the frames directory already exists.
+            if (os.path.exists(os.path.join(config["general"]["working_directory"], "frames"))): # Check to see the frames directory already exists.
                 subprocess.run(["rm", "-r", os.path.join(config["general"]["working_directory"], "frames")], check=True)
 
+            subprocess.run(["mkdir", os.path.join(config["general"]["working_directory"], "frames")], check=True)
             for video in videos: # Iterate through each video specified by the user.
                 video_counter+=1 # Increment the video counter by 1.
-                subprocess.run(["mkdir", os.path.join(config["general"]["working_directory"], "frames")], check=True)
                 subprocess.run(["ffmpeg", "-i",  os.path.join(config["general"]["working_directory"], video), "-r", str(1/frame_interval), os.path.join(config["general"]["working_directory"], "frames/video" + str(video_counter) + "_output%04d.png"), "-loglevel", "quiet"], check=True)
              
             print("Done.\n")
@@ -188,7 +188,7 @@ def prerecorded_mode():
                                 alpr_frames[frame][plate] = [] # Remove this plate from the ALPR dictionary.
                                 break # Break the loop, since this entire plate, including all of its guesses, has just been removed.
                             if (fnmatch.fnmatch(guess, config["developer"]["kill_plate"]) and config["developer"]["kill_plate"] != ""): # Check to see if this plate matches the kill plate, and if a kill plate is set.
-                                exit() # Terminate the program.
+                                utils.stop_predator()
 
             # Remove any empty plates.
             for frame in alpr_frames: # Iterate through each frame of video in the database of scanned plates.
@@ -427,7 +427,7 @@ def prerecorded_mode():
                             print("        2. View as JSON data")
                             selection = utils.prompt("        Selection: ", optional=False, input_type=str)
 
-                            if (selection == 0):
+                            if (selection == "0"):
                                 print("Returning to main menu.")
                             elif (selection == "1"):
                                 print(frame_locations)
@@ -443,10 +443,10 @@ def prerecorded_mode():
                             print("        2. Export as JSON data")
                             selection = utils.prompt("        Selection: ", optional=False, input_type=str)
 
-                            if (selection == 0):
+                            if (selection == "0"):
                                 print("Returning to main menu.")
                             elif (selection == "1"):
-                                utils.save_to_file(config["general"]["working_directory"] + "/pre_recorded_location_data_export.txt", frame_locations) # Save to disk.
+                                utils.save_to_file(config["general"]["working_directory"] + "/pre_recorded_location_data_export.txt", str(frame_locations)) # Save to disk.
                             elif (selection == "2"):
                                 utils.save_to_file(config["general"]["working_directory"] + "/pre_recorded_location_data_export.json", json.dumps(frame_locations, indent=4)) # Save to disk.
                             else:

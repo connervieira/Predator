@@ -90,9 +90,9 @@ def management_mode():
                         else:
                             print("P3. [ ] License plate analysis data files")
                         if (copy_prerecorded_license_plate_location_data == True):
-                            print("P5. [X] License plate location data files")
+                            print("P4. [X] License plate location data files")
                         else:
-                            print("P5. [ ] License plate location data files")
+                            print("P4. [ ] License plate location data files")
                         print("")
                         print("===== Real-time Mode =====")
                         if (copy_realtime_license_plate_recognition_data == True):
@@ -249,7 +249,7 @@ def management_mode():
                             print("D1. [X] Dash-cam videos (unsaved)")
                         else:
                             print("D1. [ ] Dash-cam videos (unsaved)")
-                        if (delete_dashcam_video == True):
+                        if (delete_dashcam_video_saved == True):
                             print("D2. [X] Dash-cam videos (saved)")
                         else:
                             print("D2. [ ] Dash-cam videos (saved)")
@@ -319,9 +319,11 @@ def management_mode():
 
                         if (delete_dashcam_video):
                             try:
-                                subprocess.run(["rm"] + glob.glob(os.path.join(config["general"]["working_directory"], "* Predator *." + extension)), check=True)
+                                subprocess.run(["rm"] + glob.glob(os.path.join(config["general"]["working_directory"], "* Predator *." + config["dashcam"]["saving"]["file"]["extension"])), check=True) # Delete video files.
+                                subprocess.run(["rm"] + glob.glob(os.path.join(config["general"]["working_directory"], "* Predator *." + config["dashcam"]["capture"]["audio"]["extension"])), check=True) # Delete audio files.
+                                subprocess.run(["rm"] + glob.glob(os.path.join(config["general"]["working_directory"], "* Predator *.mkv")), check=True) # Delete merged files.
                             except Exception as e:
-                                utils.display_message("Failed to delete unsaved dash-cam video: " + str(e), 2)
+                                pass # Ignore the exception, since it's highly likely one of the 3 file types didn't exist (for example, when 'merging' is enabled, there will likely not be stand-alone video/audio files, which results in the `rm` command failing).
                         if (delete_dashcam_video_saved):
                             try:
                                 subprocess.run(["rm", "-r", os.path.join(config["general"]["working_directory"], config["dashcam"]["saving"]["directory"])], check=True)
@@ -366,9 +368,10 @@ def management_mode():
                     os.system("cat \"" + global_variables.CONFIG_PATH + "\"") # Print out the raw contents of the configuration database.
                 elif (selection == "4"): # The user has selected the "disk usage" option.
                     if (config["management"]["disk_statistics"] == True): # Check to make sure disk statistics are enabled before displaying disk statistics.
-                        print("Free space: " + str(round(((psutil.disk_usage(path=config["general"]["working_directory"]).free)/1000000000)*100)/100) + "GB") # Display the free space on the storage device containing the current working directory.
-                        print("Used space: " + str(round(((psutil.disk_usage(path=config["general"]["working_directory"]).used)/1000000000)*100)/100) + "GB") # Display the used space on the storage device containing the current working directory.
-                        print("Total space: " + str(round(((psutil.disk_usage(path=config["general"]["working_directory"]).total)/1000000000)*100)/100) + "GB") # Display the total space on the storage device containing the current working directory.
+                        disk_usage = psutil.disk_usage(path=config["general"]["working_directory"])
+                        print("Free space: " + str(round(((disk_usage.free)/1000000000)*100)/100) + " GB") # Display the free space on the storage device containing the current working directory.
+                        print("Used space: " + str(round(((disk_usage.used)/1000000000)*100)/100) + " GB") # Display the used space on the storage device containing the current working directory.
+                        print("Total space: " + str(round(((disk_usage.total)/1000000000)*100)/100) + " GB") # Display the total space on the storage device containing the current working directory.
                     else: # Disk statistics are disabled, but the user has selected the disk usage option.
                         utils.display_message("The disk usage could not be displayed because the 'disk_statistics' configuration option is disabled.", 2)
                 else: # The user has selected an invalid option in the information menu.

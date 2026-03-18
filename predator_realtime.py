@@ -77,7 +77,7 @@ def realtime_mode():
                         ignore_plate = True # Indicate that this plate should be ignored.
 
                     if (fnmatch.fnmatch(plate_guess["plate"], config["developer"]["kill_plate"]) and config["developer"]["kill_plate"] != ""): # Check to see if this plate matches the kill plate, and if a kill plate is set.
-                        exit() # Terminate the program.
+                        utils.stop_predator()
 
                 if (ignore_plate == False): # Only process this plate if it isn't set to be ignored.
                     all_current_plate_guesses[detected_plate["candidates"][0]["plate"]] = {"guesses": {}, "identifier": detected_plate["identifier"]} # Create an empty dictionary for this plate so we can add all the potential plate guesses to it in the next step.
@@ -271,7 +271,7 @@ def realtime_mode():
 
                 for alert in active_alerts: # Run once for each active alert.
                     if (config["realtime"]["push_notifications"]["enabled"] == True): # Check to see if the user has Gotify notifications enabled.
-                        utils.send_notification("Predator", "A license plate in an alert database has been detected: " + detected_plate)
+                        utils.send_notification("Predator", "A license plate in an alert database has been detected: " + alert)
 
                     if (config["realtime"]["interface"]["display"]["shape_alerts"] == True): # Check to see if the user has enabled shape notifications.
                         utils.display_shape("triangle") # Display an ASCII triangle in the output.

@@ -91,7 +91,7 @@ if (os.path.exists(os.path.join(global_variables.PREDATOR_ROOT_DIRECTORY, "insta
     input(utils.style.faint + "Press enter to continue..." + utils.style.end)
 
 
-    with open(os.path.join(global_variables.PREDATOR_ROOT_DIRECTORY, "/install.json"), 'w') as file:
+    with open(os.path.join(global_variables.PREDATOR_ROOT_DIRECTORY, "install.json"), 'w') as file:
         json.dump(install_data, file)
 
 
@@ -149,48 +149,7 @@ else: # If the user his disabled the large ASCII art header, then show a simple 
 utils.play_sound("startup")
 
 if (config["realtime"]["push_notifications"]["enabled"] == True): # Check to see if the user has push notifications enabled.
-    utils.debug_message("Issuing start-up push notification")
-    os.system("curl -X POST '" + config["realtime"]["push_notifications"]["server"] + "/message?token=" + config["realtime"]["push_notifications"]["token"] + "' -F 'title=Predator' -F 'message=Predator has been started.' > /dev/null 2>&1 &") # Send a push notification via Gotify indicating that Predator has started.
-
-
-
-# Run some basic error checks to see if any of the data supplied in the configuration seems wrong.
-utils.debug_message("Validating configuration")
-config["general"]["alpr"]["engine"] = config["general"]["alpr"]["engine"].lower().strip() # Convert the ALPR engine configuration value to all lowercase, and trim leading and trailing white-spaces.
-if (config["general"]["alpr"]["engine"] != "phantom" and config["general"]["alpr"]["engine"] != "openalpr"): # Check to see if the configured ALPR engine is invalid.
-    utils.display_message("The configured ALPR engine is invalid. Please select either 'phantom' or 'openalpr' in the configuration.", 3)
-
-if (os.path.isdir(config["general"]["working_directory"]) == False): # Check to see if the configured working directory is missing.
-    utils.display_message("The 'general>working_directory' configuration value does not point to an existing directory.", 3)
-elif ("'" in config["general"]["working_directory"]):
-    utils.display_message("The 'general>working_directory' configuration value contains an apostrophe. This will likely cause unexpected behavior.", 3)
-elif ("\"" in config["general"]["working_directory"]):
-    utils.display_message("The 'general>working_directory' configuration value contains a quotation mark. This will likely cause unexpected behavior.", 3)
-
-if (os.path.isdir(config["general"]["interface_directory"]) == False and config["general"]["interface_directory"] != ""): # Check to see if the configured interface directory is missing.
-    utils.display_message("The 'general>interface_directory' configuration value does not point to an existing directory.", 3)
-elif ("'" in config["general"]["interface_directory"]):
-    utils.display_message("The 'general>interface_directory' configuration value contains an apostrophe. This will likely cause unexpected behavior.", 3)
-elif ("\"" in config["general"]["interface_directory"]):
-    utils.display_message("The 'general>interface_directory' configuration value contains a quotation mark. This will likely cause unexpected behavior.", 3)
-
-if (config["prerecorded"]["image"]["processing"]["cropping"]["left_margin"] < 0 or config["prerecorded"]["image"]["processing"]["cropping"]["right_margin"] < 0 or config["prerecorded"]["image"]["processing"]["cropping"]["bottom_margin"] < 0 or config["prerecorded"]["image"]["processing"]["cropping"]["top_margin"] < 0): # Check to make sure that all of the pre-recorded mode cropping margins are positive numbers.
-    utils.display_message("One or more of the cropping margins for pre-recorded mode are below 0. This should never happen, and it's likely there's a configuration issue somewhere. Cropping margins have all been set to 0.", 3)
-    config["prerecorded"]["image"]["processing"]["cropping"]["left_margin"] = 0
-    config["prerecorded"]["image"]["processing"]["cropping"]["right_margin"] = 0
-    config["prerecorded"]["image"]["processing"]["cropping"]["bottom_margin"] = 0
-    config["prerecorded"]["image"]["processing"]["cropping"]["top_margin"] = 0
-
-
-
-
-if (config["realtime"]["push_notifications"]["enabled"] == True): # Check to see if the user has Gotify notifications turned on in the configuration.
-    if (config["realtime"]["push_notifications"]["server"] == "" or config["realtime"]["push_notifications"]["server"] == None): # Check to see if the gotify server configuration value has been left blank
-        utils.display_message("The 'realtime>push_notifications>enabled' setting is turned on, but the 'realtime>push_notifications>server' hasn't been set. Push notifications have been disabled.", 3)
-        config["realtime"]["push_notifications"]["enabled"] = False
-    if (config["realtime"]["push_notifications"]["token"] == "" or config["realtime"]["push_notifications"]["token"] == None): # Check to see if the Gotify application token has been left blank.
-        utils.display_message("The 'realtime>push_notifications>token' setting is turned on, but the 'realtime>push_notifications>token' hasn't been set. Push notifications have been disabled.", 3)
-        config["realtime"]["push_notifications"]["enabled"] = False
+    utils.send_notification("Predator", "Predator has been started")
 
 
 
@@ -205,10 +164,6 @@ if (config["general"]["modes"]["enabled"]["realtime"] == True): # Only show the 
 if (config["general"]["modes"]["enabled"]["dashcam"] == True): # Only show the dash-cam mode option if it's enabled in the configuration.
     print("3. Dash-cam")
 
-# Check to see if the auto_start_mode configuration value is an expected value. If it isn't execution can continue, but the user will need to manually select what mode Predator should start in.
-config["general"]["modes"]["auto_start"] = str(config["general"]["modes"]["auto_start"]) # Make sure the "general>modes>auto_start" configuration value is a string.
-if (config["general"]["modes"]["auto_start"] != "" and config["general"]["modes"]["auto_start"] != "0" and config["general"]["modes"]["auto_start"] != "1" and config["general"]["modes"]["auto_start"] != "2" and config["general"]["modes"]["auto_start"]!= "3"):
-    utils.display_message("The 'auto_start_mode' configuration value isn't properly set. This value should be blank, '0', '1', '2', or '3'. It's possible there's been a typo.", 3)
 
 if (len(sys.argv) > 1): # Check to see if there is at least 1 command line argument.
     if (sys.argv[1] == "0" or sys.argv[1] == "1" or sys.argv[1] == "2" or sys.argv[1] == "3"): # Check to see if a mode override was specified in the Predator command arguments.

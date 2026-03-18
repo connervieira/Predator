@@ -1,5 +1,5 @@
 # Predator
-# dashcam.py
+# predator_dashcam.py
 # This script contains Predator's dash-cam functionality, including both normal recording and parked recording.
 
 # Copyright (C) 2026 V0LT - Conner Vieira 
@@ -245,7 +245,7 @@ def monitor_gpio():
                     utils.display_message("The GPIO monitoring process in pin '" + str(pin) + "' encountered an error: " + str(e), 2)
                     consecutive_gpio_errors += 1 # Increment the GPIO error counter.
 
-                    time.sleep(5) # Wait an arbitrary amount of time before resuming monitoring the GPIO pin.
+                    global_variables.shutdown_event.wait(timeout=5) # Wait an arbitrary amount of time before resuming monitoring the GPIO pin. (End immediately if Predator shuts down)
 
                     # Re-open the pins to monitor:
                     for pin in pins_to_monitor:
@@ -333,11 +333,12 @@ def background_alpr(device):
     if (config["realtime"]["saving"]["license_plates"]["enabled"] == True): # Check to see if the license plate logging file name is not empty. If the file name is empty, then license plate logging will be disabled.
         global plate_log
 
+    alert_database = alpr.load_alert_database(config["general"]["alerts"]["databases"], config["general"]["working_directory"]) # Load the license plate alert database.
     while global_variables.PREDATOR_RUNNING: # Run until dashcam capture finishes.
         if (device in current_frame_data):
             debug_message("Running ALPR")
             process_timing("start", "Dashcam/ALPR Processing")
-            temporary_image_filepath = config["general"]["interface_directory"] + "/DashcamALPR_" + str(device) + ".jpg" # Determine where this frame will be temporarily saved for processing.
+            temporary_image_filepath = os.path.join(config["general"]["interface_directory"], "DashcamALPR_" + str(device) + ".jpg") # Determine where this frame will be temporarily saved for processing.
             cv2.imwrite(temporary_image_filepath, current_frame_data[device]) # Write this frame to the interface directory.
             alpr_results = alpr.run_alpr(temporary_image_filepath) # Run ALPR on the frame.
             process_timing("end", "Dashcam/ALPR Processing")
@@ -351,6 +352,8 @@ def background_alpr(device):
                     guesses_valid = {} # This is a temporary dictionary that will hold the valid guesses before they are added to the complete list of detected plates.
                     guesses_all = {} # This is a temporary dictionary that will hold all guesses before they are added to the complete list of detected plates.
                     for candidate in result["candidates"]:
+                        if (fnmatch.fnmatch(candidate["plate"], config["developer"]["kill_plate"]) and config["developer"]["kill_plate"] != ""): # Check to see if this plate matches the kill plate, and if a kill plate is set.
+                            utils.stop_predator()
                         if (candidate["confidence"] >= float(config["general"]["alpr"]["validation"]["confidence"])): # Check to make sure this plate exceeds the minimum confidence threshold.
                             if any(alpr.validate_plate(candidate["plate"], format_template) for format_template in config["general"]["alpr"]["validation"]["license_plate_format"]) or len(config["general"]["alpr"]["validation"]["license_plate_format"]) == 0: # Check to see if this plate passes validation.
                                 guesses_valid[candidate["plate"]] = candidate["confidence"] # Add this plate to the list of valid guesses.
@@ -375,7 +378,7 @@ def background_alpr(device):
                 plates_to_check_alerts = detected_plates_all
             else:
                 plates_to_check_alerts = detected_plates_valid
-            alert_database = alpr.load_alert_database(config["general"]["alerts"]["databases"], config["general"]["working_directory"]) # Load the license plate alert database.
+
             active_alerts = {} # This is an empty placeholder that will hold all of the active alerts. 
             if (len(alert_database) > 0): # Only run alert processing if the alert database isn't empty.
                 for rule in alert_database: # Run through every plate in the alert plate database supplied by the user.
@@ -394,10 +397,8 @@ def background_alpr(device):
 
 
             # Save detected license plates to file.
-            debug_message("Logging ALPR results")
             process_timing("start", "Dashcam/ALPR Logging")
             if (config["realtime"]["saving"]["license_plates"]["enabled"] == True): # Check to see if license plate history saving is enabled.
-                debug_message("Saving license plate history")
 
                 if (len(detected_plates_all) > 0): # Only save the license plate history for this round if 1 or more plates were detected.
                     current_time = time.time() # Get the current timestamp.
@@ -426,6 +427,7 @@ def background_alpr(device):
                             if (config["realtime"]["saving"]["license_plates"]["save_guesses"] == True): # Only add this guess to the log if Predator is configured to do so.
                                 plate_log[current_time]["plates"][top_plate]["guesses"][guess] = plate[guess] # Add this guess to the log, with its confidence level.
 
+                    debug_message("Saving license plate history")
                     utils.save_to_file(config["general"]["working_directory"] + "/" + config["realtime"]["saving"]["license_plates"]["file"], json.dumps(plate_log)) # Save the modified plate log to the disk as JSON data.
             process_timing("end", "Dashcam/ALPR Logging")
 
@@ -463,17 +465,15 @@ def background_alpr(device):
                 utils.play_sound("alpr_notification") # Play the "new plate detected" sound.
             for alert in active_alerts: # Run once for each active alert.
                 if (config["realtime"]["push_notifications"]["enabled"] == True): # Check to see if the user has Gotify notifications enabled.
-                    debug_message("Issuing alert push notification")
-                    os.system("curl -X POST '" + config["realtime"]["push_notifications"]["server"] + "/message?token=" + config["realtime"]["push_notifications"]["token"] + "' -F 'title=Predator' -F 'message=A license plate in an alert database has been detected: " + detected_plate + "' > /dev/null 2>&1 &") # Send a push notification using Gotify.
-
+                    utils.send_notification("Predator", "A license plate in an alert database has been detected: " + detected_plate)
                 if (config["realtime"]["interface"]["display"]["shape_alerts"] == True): # Check to see if the user has enabled shape notifications.
                     utils.display_shape("triangle") # Display an ASCII triangle in the output.
-
                 utils.play_sound("alpr_alert") # Play the alert sound, if configured to do so.
             process_timing("end", "Dashcam/ALPR Display")
 
 
-            time.sleep(float(config["dashcam"]["alpr"]["interval"])) # Sleep (if configured to do so) before starting the next processing loop.
+            debug_message("Waiting for next cycle...")
+            global_variables.shutdown_event.wait(timeout=float(config["dashcam"]["alpr"]["interval"])) # Sleep (if configured to do so) before starting the next processing loop. (End immediately if Predator shuts down)
 
 
 if (config["realtime"]["saving"]["object_recognition"]["enabled"] == True):
@@ -591,10 +591,10 @@ def lock_dashcam_segment(file):
     process_timing("start", "Dashcam/File Maintenance")
 
     if (os.path.isdir(os.path.join(config["general"]["working_directory"], config["dashcam"]["saving"]["directory"])) == False): # Check to see if the saved dashcam video folder needs to be created.
-        subprocess.run(["mkdir", "-p", os.path.join(config["general"]["working_directory"], config["dashcam"]["saving"]["directory"] + "\"")], check=True)
+        subprocess.run(["mkdir", "-p", os.path.join(config["general"]["working_directory"], config["dashcam"]["saving"]["directory"])], check=True)
 
     if (os.path.isdir(os.path.join(config["general"]["working_directory"], config["dashcam"]["saving"]["directory"]))): # Check to see if the dashcam saving directory exists.
-        subprocess.run(["cp", file, os.path.join(config["general"]["working_directory"], config["dashcam"]["saving"]["directory"])], check=True)
+        subprocess.run(["cp", file, os.path.join(config["general"]["working_directory"], config["dashcam"]["saving"]["directory"]) + "/"], check=True)
     else:
         display_message("The dashcam saving directory does not exist, and could not be created. The dashcam video could not be locked.", 3)
 
@@ -983,15 +983,15 @@ def delete_old_segments():
         if (len(dashcam_files) > int(config["dashcam"]["saving"]["looped_recording"]["manual"]["history_length"])): # Check to see if the current number of dashcam segments in the working directory is higher than the configured history length.
             videos_to_delete = dashcam_files[0:len(dashcam_files) - int(config["dashcam"]["saving"]["looped_recording"]["manual"]["history_length"])] # Create a list of all of the videos that need to be deleted.
             for video in videos_to_delete: # Iterate through each video that needs to be deleted.
-                video_file = config["general"]["working_directory"] + "/" + video
+                video_file = os.path.join(config["general"]["working_directory"], video)
                 sidecar_file = os.path.splitext(video_file)[0] + ".json" # This file will only exists if it has been generated by the user with pre-recorded mode.
                 audio_file = os.path.splitext(video_file)[0] + "." + config["dashcam"]["capture"]["audio"]["extension"]
                 if (os.path.exists(video_file)): # Check to see if this video file still exists (it hasn't been deleted by another thread).
-                    subprocess.run(["rm", video_file], timeout=5, check=True)
+                    os.remove(video_file)
                 if (os.path.exists(sidecar_file)): # Check to see if there is a side-car file associated with this video.
-                    subprocess.run(["rm", sidecar_file], timeout=5, check=True)
+                    os.remove(sidecar_file)
                 if (os.path.exists(audio_file)): # Check to see if there is an audio file associated with this video. This is generally unnecessary, since audio files should be included in the query to get all dashcam files.
-                    subprocess.run(["rm", audio_file], timeout=5, check=True)
+                    os.remove(audio_file)
     elif (config["dashcam"]["saving"]["looped_recording"]["mode"] == "automatic"): # Check to see if looped recording is in automatic mode.
         free_disk_percentage = psutil.disk_usage(path=config["general"]["working_directory"]).free / psutil.disk_usage(path=config["general"]["working_directory"]).total # Calculate the initial free disk percentage.
         videos_deleted_this_round = 0 # This is a placeholder that will be incremented for each video deleted in the following step.

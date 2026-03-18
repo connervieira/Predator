@@ -31,7 +31,7 @@
             "lazy_polling_interval": "+float"
         },
         "modes": {
-            "auto_start": "str",
+            "auto_start": ["", "0", "1", "2", "3"],
             "enabled": {
                 "management": "bool",
                 "prerecorded": "bool",

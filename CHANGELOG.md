@@ -611,6 +611,9 @@ November 20th, 2024
             - Added the experimental ability to relay GPIO pins from an external device over the network (not recommended)
         - Added the ability to globally invert GPIO inputs.
     - The "dashcam saved" audio sample is now played when creating the dashcam trigger file (`create_trigger_file()`) immediately, rather than waiting until the segment is actually locked (`lock_dashcam_segment()`).
+    - Updated background ALPR functionality.
+        - Background ALPR in dash-cam mode now loads the alert databases once at start up, rather than every time analysis is run.
+        - Added "kill plate" support to dash-cam background ALPR.
 - Updated real-time mode.
     - Improved license plate logging in real-time mode.
 - Added `--help` commmand line option.
@@ -626,3 +629,5 @@ November 20th, 2024
 - Added support for custom telemetry to remotely view vehicle location and preview the camera stream.
 - Restructured the project.
     - Each mode now has it's own script (`predator_MODE.py`), which is called from `main.py`.
+- Removed redundant configuration validation
+- Added a push notification when Predator is stopped.

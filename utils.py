@@ -870,17 +870,22 @@ def count_frames(video):
 
 
 if ("telemetry" in config["dashcam"] and "save_failed_updates" in config["dashcam"]["telemetry"] and config["dashcam"]["telemetry"]["enabled"] == True and config["dashcam"]["telemetry"]["save_failed_updates"] == True):
-    telemetry_backlog_file_location = config["general"]["working_directory"] + "/telemetry_backlog.json"
+    telemetry_backlog_file_location = os.path.join(config["general"]["working_directory"], "telemetry_backlog.json")
     if (os.path.exists(telemetry_backlog_file_location) == False): # If the backlog file doesn't exist, create it.
         save_to_file(telemetry_backlog_file_location, "{}") # Save a blank placeholder dictionary to the backlog file.
 
-    telemetry_backlog_file = open(telemetry_backlog_file_location, "r") # Open the backlog log file for reading.
-    telemetry_backlog_contents = telemetry_backlog_file.read() # Read the raw contents of the backlog file as a string.
-    telemetry_backlog_file.close() # Close the backlog log file.
+    print(telemetry_backlog_file_location)
+    if (os.path.exists(telemetry_backlog_file_location) == True): # Check if the telemetry back-log exists again (we just created it, but it's possible the creation failed).
+        telemetry_backlog_file = open(telemetry_backlog_file_location, "r") # Open the backlog log file for reading.
+        telemetry_backlog_contents = telemetry_backlog_file.read() # Read the raw contents of the backlog file as a string.
+        telemetry_backlog_file.close() # Close the backlog log file.
 
-    if (is_json(telemetry_backlog_contents) == True): # If the backlog file contains valid JSON data, then load it.
-        telemetry_backlog = json.loads(telemetry_backlog_contents) # Read and load the backlog log from the file.
-    else: # If the backlog file doesn't contain valid JSON data, then load a blank placeholder in it's place.
+        if (is_json(telemetry_backlog_contents) == True): # If the backlog file contains valid JSON data, then load it.
+            telemetry_backlog = json.loads(telemetry_backlog_contents) # Read and load the backlog log from the file.
+        else: # If the backlog file doesn't contain valid JSON data, then load a blank placeholder in it's place.
+            telemetry_backlog = json.loads("{}") # Load a blank placeholder dictionary.
+    else: # The telemetry back-log could not be created.
+        display_message("The telemetry backlog file could not be initialized.", 3)
         telemetry_backlog = json.loads("{}") # Load a blank placeholder dictionary.
 else:
     telemetry_backlog = {}
@@ -989,7 +994,8 @@ def stop_predator():
         for thread in threading.enumerate():
             print("    " + thread.name)
 
-    os._exit(1)
+    if (config["realtime"]["push_notifications"]["enabled"] == True): # Check to see if the user has push notifications enabled.
+        utils.send_notification("Predator", "Predator has been stopped")
 
 
 # This function converts a value to an integer, and returns 0 if the provided value is not a number.
